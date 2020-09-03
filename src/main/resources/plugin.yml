@@ -1,0 +1,8 @@
+name: AussieBedwars
+version: ${project.version}
+main: me.thevipershow.aussiebedwars.AussieBedwars
+prefix: Aussie-Bedwars
+load: STARTUP
+authors: [ TheViperShow ]
+description: Bedwars plugin for AussieBedwars server.
+website: ${project.url}
