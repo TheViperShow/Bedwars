@@ -83,7 +83,9 @@ solo:
       title: "{TEAM} Shop"
       slots: 54
       items:
-        - material: "{TEAM}_WOOL"
+        - material: "WOOL"
+          slot: 12
           amount: 16
           buy-with: "IRON"
           price: 12
+          # others items below...

@@ -50,6 +50,6 @@ public class SoloBedwars implements ConfigurationSerializable {
     }
 
     public static SoloBedwars deserialize(Map<String, Object> objectMap) {
-        return null;
+        return null; //TODO: implement
     }
 }
