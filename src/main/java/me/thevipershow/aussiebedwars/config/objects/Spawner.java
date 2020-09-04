@@ -1,10 +1,9 @@
-package me.thevipershow.aussiebedwars.bedwars.spawner;
+package me.thevipershow.aussiebedwars.config.objects;
 
-import com.sun.org.apache.xerces.internal.xs.datatypes.ObjectList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import me.thevipershow.aussiebedwars.bedwars.objects.SpawnPosition;
+import me.thevipershow.aussiebedwars.bedwars.spawner.SpawnerLevel;
 import me.thevipershow.aussiebedwars.bedwars.objects.spawners.SpawnerType;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
@@ -30,9 +29,7 @@ public class Spawner implements ConfigurationSerializable {
 
     public static Spawner deserialize(Map<String, Object> map) {
         SpawnerType spawnerType = SpawnerType.valueOf((String) map.get("type"));
-        SpawnPosition sp = new SpawnPosition((double) map.get("location.x"),
-                (double) map.get("location.y"),
-                (double) map.get("location.z"));
+        SpawnPosition sp = SpawnPosition.deserialize((Map<String, Object>) map.get("location"));
         int drop = (int) map.get("drop-amount");
         List<SpawnerLevel> levels = new ArrayList<>();
         final List<Map<String, Object>> objects = (List<Map<String, Object>>) map.get("levels");

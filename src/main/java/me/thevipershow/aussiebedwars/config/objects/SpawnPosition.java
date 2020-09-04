@@ -1,4 +1,4 @@
-package me.thevipershow.aussiebedwars.bedwars.objects;
+package me.thevipershow.aussiebedwars.config.objects;
 
 import java.util.HashMap;
 import java.util.Map;

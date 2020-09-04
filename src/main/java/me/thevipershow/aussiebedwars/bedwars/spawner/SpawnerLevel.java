@@ -9,9 +9,9 @@ import org.bukkit.configuration.serialization.SerializableAs;
 public class SpawnerLevel implements ConfigurationSerializable {
     private final int level;
     private final int dropIncrease;
-    private final long afterSeconds;
+    private final int afterSeconds;
 
-    public SpawnerLevel(int level, int dropIncrease, long afterSeconds) {
+    public SpawnerLevel(int level, int dropIncrease, int afterSeconds) {
         this.level = level;
         this.dropIncrease = dropIncrease;
         this.afterSeconds = afterSeconds;
@@ -29,7 +29,7 @@ public class SpawnerLevel implements ConfigurationSerializable {
     public static SpawnerLevel deserialize(Map<String, Object> objectMap) {
         int level = (int) objectMap.get("number");
         int increase = (int) objectMap.get("increase-drop");
-        long seconds = (long) objectMap.get("after-seconds");
+        int seconds = (int) objectMap.get("after-seconds");
         return new SpawnerLevel(level, increase, seconds);
     }
 }

@@ -1,6 +1,6 @@
 solo:
-  - map-filename: "bedwars1"
-    minimum-games: 1
+  - map-filename: "bedwars-solo"
+    minimum-games: 2
     maximum-games: 4
     players: 8
     teams:
@@ -86,6 +86,6 @@ solo:
         - material: "WOOL"
           slot: 12
           amount: 16
-          buy-with: "IRON"
+          buy-with: "IRON_INGOT"
           price: 12
           # others items below...

@@ -1,4 +1,4 @@
-package me.thevipershow.aussiebedwars.bedwars.objects.shops;
+package me.thevipershow.aussiebedwars.config.objects;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +30,7 @@ public class ShopItem implements ConfigurationSerializable {
         map.put("amount", amount);
         map.put("buy-with", buyWith.name());
         map.put("price", buyCost);
+        map.put("slot", slot);
         return map;
     }
 
@@ -40,5 +41,25 @@ public class ShopItem implements ConfigurationSerializable {
         int c = (int) objectMap.get("price");
         int s = (int) objectMap.get("slot");
         return new ShopItem(m, a, b, c, s);
+    }
+
+    public Material getMaterial() {
+        return material;
+    }
+
+    public int getAmount() {
+        return amount;
+    }
+
+    public Material getBuyWith() {
+        return buyWith;
+    }
+
+    public int getBuyCost() {
+        return buyCost;
+    }
+
+    public int getSlot() {
+        return slot;
     }
 }

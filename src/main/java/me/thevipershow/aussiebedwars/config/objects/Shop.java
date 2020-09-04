@@ -1,4 +1,4 @@
-package me.thevipershow.aussiebedwars.bedwars.objects.shops;
+package me.thevipershow.aussiebedwars.config.objects;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +31,6 @@ public class Shop implements ConfigurationSerializable {
         List<Map<String, Object>> objectMap1 = (List<Map<String, Object>>) objectMap.get("items");
         final List<ShopItem> itemsShop = new ArrayList<>();
         objectMap1.forEach(o -> itemsShop.add(ShopItem.deserialize(o)));
-        return null; // TODO: Finish.
+        return new Shop(title, slots, itemsShop);
     }
 }
