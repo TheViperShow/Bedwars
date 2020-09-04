@@ -30,7 +30,7 @@ public class WorldsManager {
         return instance;
     }
 
-    private final HashMap<String, World> worldHashMap = new HashMap<>();
+    private final HashMap<SoloBedwars, World> worldHashMap = new HashMap<>();
 
     public final void loadBaseAmount() {
         final List<SoloBedwars> games = soloConfig.getSoloBedwarsConfigurations();
@@ -56,7 +56,7 @@ public class WorldsManager {
                             .environment(World.Environment.NORMAL)
                             .createWorld();
                     if (w != null) {
-                        worldHashMap.put(tempName, w);
+                        worldHashMap.put(game, w);
                         plugin.getLogger().info(String.format("Successfully created a world name [%s].", tempName));
                     } else {
                         plugin.getLogger().warning(String.format("Something went wrong when creating world [%s].", tempName));
@@ -66,4 +66,7 @@ public class WorldsManager {
         }
     }
 
+    public HashMap<SoloBedwars, World> getWorldHashMap() {
+        return worldHashMap;
+    }
 }
