@@ -2,8 +2,8 @@ package me.thevipershow.aussiebedwars.bedwars;
 
 public enum Gamemode {
     SOLO(1),
-    TEAM_2(2),
-    TEAM_4(4);
+    DUO(2),
+    QUAD(4);
 
     private final int teamPlayers;
 

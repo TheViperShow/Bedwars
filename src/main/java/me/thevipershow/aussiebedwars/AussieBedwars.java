@@ -2,6 +2,7 @@ package me.thevipershow.aussiebedwars;
 
 import java.util.Objects;
 import me.thevipershow.aussiebedwars.bedwars.spawner.SpawnerLevel;
+import me.thevipershow.aussiebedwars.commands.CommandsManager;
 import me.thevipershow.aussiebedwars.config.SoloConfig;
 import me.thevipershow.aussiebedwars.config.objects.Merchant;
 import me.thevipershow.aussiebedwars.config.objects.Shop;
@@ -14,8 +15,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public final class AussieBedwars extends JavaPlugin {
 
+    public static String PREFIX = "§7[§eAussieBedwars§7]: ";
+
     private SoloConfig soloConfig;
     private WorldsManager worldsManager;
+    private CommandsManager commandsManager;
 
     private static void registerSerializers() {
         ConfigurationSerialization.registerClass(SpawnerLevel.class);
@@ -35,6 +39,9 @@ public final class AussieBedwars extends JavaPlugin {
 
         worldsManager = WorldsManager.getInstance(this, Objects.requireNonNull(soloConfig, "Config didn't load correctly!"));
         worldsManager.loadBaseAmount();
+
+        commandsManager = CommandsManager.getInstance(this);
+        commandsManager.registerAll();
     }
 
     @Override
