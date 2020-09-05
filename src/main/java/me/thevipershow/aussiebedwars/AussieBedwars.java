@@ -9,6 +9,8 @@ import me.thevipershow.aussiebedwars.config.objects.Shop;
 import me.thevipershow.aussiebedwars.config.objects.ShopItem;
 import me.thevipershow.aussiebedwars.config.objects.SoloBedwars;
 import me.thevipershow.aussiebedwars.config.objects.Spawner;
+import me.thevipershow.aussiebedwars.storage.sql.Database;
+import me.thevipershow.aussiebedwars.storage.sql.SQLiteDatabase;
 import me.thevipershow.aussiebedwars.worlds.WorldsManager;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -20,6 +22,7 @@ public final class AussieBedwars extends JavaPlugin {
     private SoloConfig soloConfig;
     private WorldsManager worldsManager;
     private CommandsManager commandsManager;
+    private Database database;
 
     private static void registerSerializers() {
         ConfigurationSerialization.registerClass(SpawnerLevel.class);
@@ -42,6 +45,8 @@ public final class AussieBedwars extends JavaPlugin {
 
         commandsManager = CommandsManager.getInstance(this);
         commandsManager.registerAll();
+
+        database = new SQLiteDatabase(this);
     }
 
     @Override

@@ -23,7 +23,7 @@ public final class SQLiteDatabase extends Database {
         createTables();
     }
 
-    public Optional<Connection> getConnection() {
+    public static Optional<Connection> getConnection() {
         try {
             return Optional.of(DriverManager.getConnection(getConnectionUrl()));
         } catch (final SQLException e) {
