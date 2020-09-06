@@ -2,6 +2,8 @@ package me.thevipershow.aussiebedwars.config.objects;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
 
@@ -45,5 +47,9 @@ public class SpawnPosition implements ConfigurationSerializable {
 
     public double getZ() {
         return z;
+    }
+
+    public Location toLocation(final World world) {
+        return new Location(world, x, y, z);
     }
 }

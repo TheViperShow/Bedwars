@@ -9,9 +9,9 @@
 # Plugin made by TheViperShow - Commissioned for SQCE
 settings:
   database:
-    username: "root"
+    username: "thevipershow"
     password: "password"
-    address: "127.0.0.1"
+    address: "192.168.1.124"
     port: 3306
     db-name: "aussie_bedwars_data"
   lobby:

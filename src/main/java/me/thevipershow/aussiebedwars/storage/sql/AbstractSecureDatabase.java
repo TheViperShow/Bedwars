@@ -9,13 +9,14 @@ public abstract  class AbstractSecureDatabase extends Database {
     private final String databaseName;
     private final int port;
 
+    @SafeVarargs
     private AbstractSecureDatabase(JavaPlugin plugin,
-                                  String username,
-                                  String password,
-                                  String address,
-                                  String databaseName,
-                                  int port,
-                                  Class<? extends TableCreator>... tableCreators) {
+                                   String username,
+                                   String password,
+                                   String address,
+                                   String databaseName,
+                                   int port,
+                                   Class<? extends TableCreator>... tableCreators) {
         super(plugin, tableCreators);
         this.username = username;
         this.password = password;

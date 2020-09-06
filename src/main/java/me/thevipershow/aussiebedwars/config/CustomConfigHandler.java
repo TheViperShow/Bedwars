@@ -31,7 +31,7 @@ public abstract class CustomConfigHandler {
 
     public abstract void reload();
 
-    public boolean reloadConfig() {
+    public void reloadConfig() {
         if (customConfigFile == null) {
             customConfigFile = new File(plugin.getDataFolder(), fileName);
         }
@@ -47,7 +47,6 @@ public abstract class CustomConfigHandler {
             YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(defConfigStream);
             customConfig.setDefaults(defConfig);
         }
-        return true;
     }
 
     public File getFile() {
@@ -87,9 +86,7 @@ public abstract class CustomConfigHandler {
             config.load(file);
         } catch (FileNotFoundException e) {
             // empty
-        } catch (IOException e) {
-            plugin.getLogger().log(Level.SEVERE, "Cannot load " + file, e);
-        } catch (InvalidConfigurationException e) {
+        } catch (IOException | InvalidConfigurationException e) {
             plugin.getLogger().log(Level.SEVERE, "Cannot load " + file, e);
         }
         return config;

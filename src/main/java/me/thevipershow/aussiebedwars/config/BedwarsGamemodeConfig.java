@@ -6,6 +6,7 @@ import me.thevipershow.aussiebedwars.config.objects.BedwarsGame;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public abstract class BedwarsGamemodeConfig<T extends BedwarsGame> extends CustomConfigHandler {
+
     public BedwarsGamemodeConfig(JavaPlugin plugin, String name) {
         super(plugin, name);
     }

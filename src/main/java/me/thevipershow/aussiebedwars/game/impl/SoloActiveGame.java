@@ -1,22 +1,16 @@
 package me.thevipershow.aussiebedwars.game.impl;
 
-import me.thevipershow.aussiebedwars.bedwars.Gamemode;
 import me.thevipershow.aussiebedwars.config.objects.BedwarsGame;
 import me.thevipershow.aussiebedwars.game.ActiveGame;
-import me.thevipershow.aussiebedwars.listeners.AbstractQueue;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 public class SoloActiveGame extends ActiveGame {
 
-    public SoloActiveGame(
-            BedwarsGame bedwarsGame,
-            AbstractQueue<? extends Player> associatedQueue,
-            String lobbyWorldName,
-            World associatedWorld,
-            Plugin plugin) {
-        super(bedwarsGame, associatedQueue, Gamemode.SOLO, lobbyWorldName, associatedWorld, plugin);
+    public SoloActiveGame(String associatedWorldFilename,
+                          BedwarsGame bedwarsGame,
+                          String lobbyWorldName,
+                          Plugin plugin) {
+        super(associatedWorldFilename, bedwarsGame, lobbyWorldName, plugin);
     }
 
     @Override
@@ -26,22 +20,16 @@ public class SoloActiveGame extends ActiveGame {
                 handleError("Something went wrong while you were being sent into the game.");
                 return;
             }
-
-            this.assignTeams();
-            this.assignScoreboards();
-            this.createSpawners();
-            this.createMerchants();
+            assignTeams();
+            assignScoreboards();
+            createSpawners();
+            createMerchants();
         }
     }
 
     @Override
     public void stop() {
 
-    }
-
-    @Override
-    public void moveToWaitingRoom() {
-        // associatedQueue.perform(player -> player.teleport());
     }
 
     @Override

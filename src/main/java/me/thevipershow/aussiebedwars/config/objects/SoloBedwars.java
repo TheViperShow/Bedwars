@@ -16,6 +16,7 @@ public class SoloBedwars extends BedwarsGame implements ConfigurationSerializabl
             Gamemode gamemode,
             int minGames,
             int maxGames,
+            int minPlayers,
             int players,
             Set<BedwarsTeam> teams,
             SpawnPosition lobbySpawn,
@@ -23,7 +24,7 @@ public class SoloBedwars extends BedwarsGame implements ConfigurationSerializabl
             List<SpawnPosition> mapSpawns,
             List<Spawner> spawners,
             List<Merchant> merchants, Shop shop) {
-        super(gamemode, minGames, maxGames, players, teams, lobbySpawn, mapFilename, mapSpawns, spawners, merchants, shop);
+        super(gamemode, minGames, maxGames, minPlayers, players, teams, lobbySpawn, mapFilename, mapSpawns, spawners, merchants, shop);
     }
 
     @Override
@@ -44,7 +45,7 @@ public class SoloBedwars extends BedwarsGame implements ConfigurationSerializabl
         SpawnPosition mapLobbySpawnPos = SpawnPosition.deserialize(mapLobbySpawn);
         List<Map<String, Object>> mapSpawns = (List<Map<String, Object>>) objectMap.get("map-spawns");
         List<SpawnPosition> mapSpawnPos = mapSpawns.stream()
-                .map(o -> SpawnPosition.deserialize(o))
+                .map(SpawnPosition::deserialize)
                 .collect(Collectors.toList());
 
         List<Map<String, Object>> spawners = (List<Map<String, Object>>) objectMap.get("spawners");
@@ -60,7 +61,7 @@ public class SoloBedwars extends BedwarsGame implements ConfigurationSerializabl
         Shop shop = Shop.deserialize(shopSection);
 
 
-        return new SoloBedwars(Gamemode.SOLO, minGames, maxGames, players, actualTeams, mapLobbySpawnPos, filename, mapSpawnPos, spawnerList, merchantsList, shop);
+        return new SoloBedwars(Gamemode.SOLO, minGames, maxGames, minGames, players, actualTeams, mapLobbySpawnPos, filename, mapSpawnPos, spawnerList, merchantsList, shop);
     }
 
 }

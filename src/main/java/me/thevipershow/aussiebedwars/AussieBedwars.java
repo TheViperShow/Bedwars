@@ -1,10 +1,10 @@
 package me.thevipershow.aussiebedwars;
 
 import java.sql.Driver;
-import java.util.Objects;
 import me.thevipershow.aussiebedwars.bedwars.spawner.SpawnerLevel;
 import me.thevipershow.aussiebedwars.commands.CommandsManager;
 import me.thevipershow.aussiebedwars.config.BedwarsGamemodeConfig;
+import me.thevipershow.aussiebedwars.config.ConfigManager;
 import me.thevipershow.aussiebedwars.config.DefaultConfiguration;
 import me.thevipershow.aussiebedwars.config.SoloConfig;
 import me.thevipershow.aussiebedwars.config.objects.Merchant;
@@ -30,12 +30,12 @@ public final class AussieBedwars extends JavaPlugin {
     private Database database;
     private DefaultConfiguration defaultConfiguration;
     // loading file configurations:
-    private BedwarsGamemodeConfig<? extends SoloBedwars> soloConfig;
+    private BedwarsGamemodeConfig<SoloBedwars> soloConfig;
+    private ConfigManager configManager;
 
     private static void registerDriver() {
         try {
-            final Class<? extends Driver> driverClass = (Class<? extends Driver>) Class.forName("com.mysql.jdbc.Driver");
-            MYSQL_DRIVER_CLASS = driverClass;
+            MYSQL_DRIVER_CLASS = (Class<? extends Driver>) Class.forName("com.mysql.jdbc.Driver");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -58,14 +58,16 @@ public final class AussieBedwars extends JavaPlugin {
         soloConfig = new SoloConfig(this);
         soloConfig.saveDefaultConfig();
 
-        worldsManager = WorldsManager.getInstance(this, soloConfig); //TODO: ADD OTHER GAMEMODES CONFIG:
-        worldsManager.loadBaseAmount();
+        configManager = new ConfigManager(defaultConfiguration, soloConfig);
+
+        worldsManager = new WorldsManager(configManager, this); //TODO: ADD OTHER GAMEMODES CONFIG:
 
         commandsManager = CommandsManager.getInstance(this);
         commandsManager.registerAll();
 
         database = new MySQLDatabase(this, defaultConfiguration);
-        gameManager = new GameManager(this, soloConfig);
+        gameManager = new GameManager(this, worldsManager, soloConfig);
+        gameManager.loadBaseAmount();
     }
 
 

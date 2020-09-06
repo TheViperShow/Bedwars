@@ -1,7 +1,5 @@
 package me.thevipershow.aussiebedwars.commands.tasks;
 
-import java.util.Optional;
-
 public abstract class AbstractTargetCreator<I, T, L extends AbstractLookupResult<I, T>> {
 
     protected final I interested;

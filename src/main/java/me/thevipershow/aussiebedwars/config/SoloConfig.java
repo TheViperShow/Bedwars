@@ -1,19 +1,16 @@
 package me.thevipershow.aussiebedwars.config;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import me.thevipershow.aussiebedwars.config.objects.SoloBedwars;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class SoloConfig extends BedwarsGamemodeConfig<SoloBedwars> {
+
     public SoloConfig(final JavaPlugin plugin) {
         super(plugin, "solo.yml");
         load();
     }
-
 
     @Override
     public void load() {
