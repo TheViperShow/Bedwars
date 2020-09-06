@@ -1,6 +1,5 @@
 package me.thevipershow.aussiebedwars.storage.sql;
 
-import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -13,24 +12,28 @@ import me.thevipershow.aussiebedwars.storage.sql.queue.QueueVillagerTableCreator
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class MySQLDatabase extends Database {
+
     private final DefaultConfiguration defaultConfiguration;
-    private final HikariConfig hikariConfig;
     private static HikariDataSource dataSource = null;
 
     public MySQLDatabase(JavaPlugin plugin,
                          DefaultConfiguration defaultConfiguration) {
         super(plugin, QueueVillagerTableCreator.class);
         this.defaultConfiguration = defaultConfiguration;
-        hikariConfig = new HikariConfig();
-        hikariConfig.setUsername(defaultConfiguration.getDatabaseUsername());
-        hikariConfig.setPassword(defaultConfiguration.getPassword());
-        hikariConfig.setDriverClassName(AussieBedwars.MYSQL_DRIVER_CLASS.getCanonicalName());
-        hikariConfig.setConnectionTimeout(3000);
-        hikariConfig.setJdbcUrl(String.format("jdbc:mysql://%s:%d/%s",
-                defaultConfiguration.getAddress(),
-                defaultConfiguration.getPort(),
-                defaultConfiguration.getDatabaseName()));
-        dataSource = new HikariDataSource(this.hikariConfig);
+        HikariDataSource dataSrc = new HikariDataSource();
+        final String address = defaultConfiguration.getAddress();
+        final int port = defaultConfiguration.getPort();
+        final String dbName = defaultConfiguration.getDatabaseName();
+
+        final String jdbcUrl = "jdbc:mysql://" + address + ":" + port + "/" + dbName;
+        dataSrc.setJdbcUrl(jdbcUrl);
+        dataSrc.setUsername(defaultConfiguration.getDatabaseUsername());
+        dataSrc.setPassword(defaultConfiguration.getPassword());
+        dataSrc.setDriverClassName(AussieBedwars.MYSQL_DRIVER_CLASS);
+        dataSrc.setConnectionTimeout(3500);
+        dataSource = dataSrc;
+        plugin.getLogger().info("Attempting MySQL Connection at " + jdbcUrl);
+        createTables();
     }
 
     public static Optional<Connection> getConnection() {

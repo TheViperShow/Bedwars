@@ -68,48 +68,6 @@ public class WorldsManager {
                 });
     }
 
-    // private final HashMap<BedwarsGame, World> worldHashMap = new HashMap<>();
-
-    /*
-    public final void loadBaseAmount() {
-        for (BedwarsGamemodeConfig<? extends BedwarsGame> c : configs) {
-            final Set<? extends BedwarsGame> games = c.getSoloBedwarsObjects();
-            for (final BedwarsGame game : games) {
-                final int minimumGames = game.getMinGames();
-                final String worldName = game.getMapFilename();
-                if (minimumGames < 1) continue;
-
-                File sourceFile = new File(pluginFolder.getAbsolutePath(), worldName);
-                if (!sourceFile.exists()) {
-                    plugin.getLogger().warning(String.format("Could not find a world folder named [%s].", sourceFile.getAbsolutePath()));
-                    return;
-                }
-
-                int created = 0;
-                while (created < minimumGames) {
-                    created++;
-
-                    final String tempName = worldName + "-" + created; // <- IMPORTANT
-
-                    final WorldLoader worldLoader = new WorldLoader(sourceFile, tempName);
-                    worldLoader.copyToDir().thenAccept(v -> {
-                        plugin.getLogger().info(String.format("Attempting to load bukkit World [%s].", tempName));
-                        final World w = WorldCreator.name(tempName)
-                                .environment(World.Environment.NORMAL)
-                                .createWorld();
-                        if (w != null) {
-                            worldHashMap.put(game, w);
-                            plugin.getLogger().info(String.format("Successfully created a world name [%s].", tempName));
-                        } else {
-                            plugin.getLogger().warning(String.format("Something went wrong when creating world [%s].", tempName));
-                        }
-                    });
-                }
-            }
-        }
-    }
-    */
-
     public Set<ActiveGame> getActiveGameSet() {
         return activeGameSet;
     }

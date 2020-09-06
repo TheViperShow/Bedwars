@@ -27,7 +27,7 @@ public class DefaultConfiguration {
         plugin.reloadConfig();
         this.databaseUsername = config.getString("settings.database.username");
         this.password = config.getString("settings.database.password");
-        this.address = config.getString("settings.database.password");
+        this.address = config.getString("settings.database.address");
         this.port = config.getInt("settings.database.port");
         this.databaseName = config.getString("settings.database.db-name");
         this.lobbyName = config.getString("settings.lobby.world-name");

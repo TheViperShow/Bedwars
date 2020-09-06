@@ -9,10 +9,11 @@
 # Plugin made by TheViperShow - Commissioned for SQCE
 settings:
   database:
-    username: "thevipershow"
-    password: "password"
+    username: "thevipershow" # set your username
+    password: "password" # set your password
     address: "192.168.1.124"
     port: 3306
-    db-name: "aussie_bedwars_data"
+    db-name: "aussie_bedwars_data" #set your DB name
   lobby:
     world-name: "world"
+

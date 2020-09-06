@@ -26,9 +26,8 @@ public class WorldLoader {
         final File newFile = new File(destinationPath);
         newFile.mkdirs();
         try {
-            //if (newFile.exists()) newFile.delete(); //TODO: Check if directory overrides.
             newFile.createNewFile();
-            return CompletableFuture.runAsync(()->{
+            return CompletableFuture.runAsync(() -> {
                 try {
                     FileUtils.copyDirectory(source, newFile);
                 } catch (IOException e) {
