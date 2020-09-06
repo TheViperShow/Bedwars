@@ -8,7 +8,7 @@ public abstract class Database {
     protected Class<? extends TableCreator>[] tableCreators;
 
     @SafeVarargs
-    public Database(JavaPlugin plugin, Class<? extends TableCreator>... tableCreators) {
+    public Database(final JavaPlugin plugin, final Class<? extends TableCreator>... tableCreators) {
         this.plugin = plugin;
         this.tableCreators = tableCreators;
     }

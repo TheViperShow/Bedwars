@@ -73,6 +73,7 @@ public abstract class SelfRegisteringCommand extends Command {
                     missingPermission = true;
                     continue;
                 }
+
             }
             if (clazz.isAnnotationPresent(REQUIRED_SENDER_CLASS)) {
                 RequiredSender requiredSender = clazz.getAnnotation(REQUIRED_SENDER_CLASS);

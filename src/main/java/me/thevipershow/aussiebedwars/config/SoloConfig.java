@@ -3,34 +3,30 @@ package me.thevipershow.aussiebedwars.config;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import me.thevipershow.aussiebedwars.config.objects.SoloBedwars;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class SoloConfig extends CustomConfigHandler {
+public class SoloConfig extends BedwarsGamemodeConfig<SoloBedwars> {
     public SoloConfig(final JavaPlugin plugin) {
         super(plugin, "solo.yml");
         load();
     }
 
-    private List<SoloBedwars> soloBedwarsConfigurations = Collections.emptyList();
 
     @Override
     public void load() {
-        soloBedwarsConfigurations =
+        soloBedwarsObjects =
                 getConfig().getMapList("solo")
                         .stream()
                         .map(map -> SoloBedwars.deserialize((Map<String, Object>) map))
-                        .collect(Collectors.toList());
+                        .collect(Collectors.toSet());
     }
 
     @Override
     public void reload() {
-        soloBedwarsConfigurations.clear();
+        soloBedwarsObjects.clear();
         load();
-    }
-
-    public List<SoloBedwars> getSoloBedwarsConfigurations() {
-        return soloBedwarsConfigurations;
     }
 }

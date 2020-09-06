@@ -8,3 +8,11 @@
 #
 # Plugin made by TheViperShow - Commissioned for SQCE
 settings:
+  database:
+    username: "root"
+    password: "password"
+    address: "127.0.0.1"
+    port: 3306
+    db-name: "aussie_bedwars_data"
+  lobby:
+    world-name: "world"

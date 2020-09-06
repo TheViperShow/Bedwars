@@ -10,40 +10,20 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
 
 @SerializableAs("Solo")
-public class SoloBedwars implements ConfigurationSerializable {
-    private static final Gamemode gamemode = Gamemode.SOLO;
+public class SoloBedwars extends BedwarsGame implements ConfigurationSerializable {
 
-    private final int minGames;
-    private final int maxGames;
-    private final int players;
-    private final Set<BedwarsTeam> teams;
-    private final SpawnPosition lobbySpawn;
-    private final String mapFilename;
-    private final List<SpawnPosition> mapSpawns;
-    private final List<Spawner> spawners;
-    private final List<Merchant> merchants;
-    private final Shop shop;
-
-    public SoloBedwars(int minGames,
-                       int maxGames,
-                       int players,
-                       Set<BedwarsTeam> teams,
-                       SpawnPosition lobbySpawn,
-                       String mapFilename,
-                       List<SpawnPosition> mapSpawns,
-                       List<Spawner> spawners,
-                       List<Merchant> merchants,
-                       Shop shop) {
-        this.minGames = minGames;
-        this.maxGames = maxGames;
-        this.players = players;
-        this.teams = teams;
-        this.lobbySpawn = lobbySpawn;
-        this.mapFilename = mapFilename;
-        this.mapSpawns = mapSpawns;
-        this.spawners = spawners;
-        this.merchants = merchants;
-        this.shop = shop;
+    protected SoloBedwars(
+            Gamemode gamemode,
+            int minGames,
+            int maxGames,
+            int players,
+            Set<BedwarsTeam> teams,
+            SpawnPosition lobbySpawn,
+            String mapFilename,
+            List<SpawnPosition> mapSpawns,
+            List<Spawner> spawners,
+            List<Merchant> merchants, Shop shop) {
+        super(gamemode, minGames, maxGames, players, teams, lobbySpawn, mapFilename, mapSpawns, spawners, merchants, shop);
     }
 
     @Override
@@ -80,50 +60,7 @@ public class SoloBedwars implements ConfigurationSerializable {
         Shop shop = Shop.deserialize(shopSection);
 
 
-        return new SoloBedwars(minGames, maxGames, players, actualTeams, mapLobbySpawnPos, filename, mapSpawnPos, spawnerList, merchantsList, shop);
+        return new SoloBedwars(Gamemode.SOLO, minGames, maxGames, players, actualTeams, mapLobbySpawnPos, filename, mapSpawnPos, spawnerList, merchantsList, shop);
     }
 
-    public static Gamemode getGamemode() {
-        return gamemode;
-    }
-
-    public int getMinGames() {
-        return minGames;
-    }
-
-    public int getMaxGames() {
-        return maxGames;
-    }
-
-    public int getPlayers() {
-        return players;
-    }
-
-    public Set<BedwarsTeam> getTeams() {
-        return teams;
-    }
-
-    public SpawnPosition getLobbySpawn() {
-        return lobbySpawn;
-    }
-
-    public String getMapFilename() {
-        return mapFilename;
-    }
-
-    public List<SpawnPosition> getMapSpawns() {
-        return mapSpawns;
-    }
-
-    public List<Spawner> getSpawners() {
-        return spawners;
-    }
-
-    public List<Merchant> getMerchants() {
-        return merchants;
-    }
-
-    public Shop getShop() {
-        return shop;
-    }
 }

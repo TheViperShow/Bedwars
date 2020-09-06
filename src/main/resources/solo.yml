@@ -2,6 +2,7 @@ solo:
   - map-filename: "bedwars-solo"
     minimum-games: 2
     maximum-games: 4
+    min-players: 2
     players: 8
     teams:
       - "CYAN"
