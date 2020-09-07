@@ -2,41 +2,32 @@ package me.thevipershow.aussiebedwars.worlds;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.CompletableFuture;
 import org.apache.commons.io.FileUtils;
 
 public class WorldLoader {
     private final File source;
-    private final String destinationPath;
+    private final File destination;
 
-    public WorldLoader(final File source, final String destinationPath) {
+    public WorldLoader(final File source, final File destination) {
         this.source = source;
-        this.destinationPath = destinationPath;
+        this.destination = destination;
     }
 
     public final File getSource() {
         return source;
     }
 
-    public final String getDestinationPath() {
-        return destinationPath;
+    public File getDestination() {
+        return destination;
     }
 
-    public CompletableFuture<Void> copyToDir() {
-        final File newFile = new File(destinationPath);
-        newFile.mkdirs();
+    public boolean copyToDir() {
         try {
-            newFile.createNewFile();
-            return CompletableFuture.runAsync(() -> {
-                try {
-                    FileUtils.copyDirectory(source, newFile);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
+            FileUtils.copyDirectory(source, destination);
+            return true;
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
+        return false;
     }
 }

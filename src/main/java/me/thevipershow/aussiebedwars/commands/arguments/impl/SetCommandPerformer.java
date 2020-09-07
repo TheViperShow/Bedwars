@@ -4,7 +4,7 @@ import me.thevipershow.aussiebedwars.bedwars.Gamemode;
 import me.thevipershow.aussiebedwars.commands.arguments.CommandPerformer;
 import me.thevipershow.aussiebedwars.commands.arguments.RequiredPermission;
 import me.thevipershow.aussiebedwars.commands.arguments.RequiredSender;
-import me.thevipershow.aussiebedwars.commands.tasks.VillagerQueueCreator;
+import me.thevipershow.aussiebedwars.commands.tasks.VillagerQueueInteractor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -25,7 +25,7 @@ public class SetCommandPerformer extends CommandPerformer {
             case "SOLO":
             case "DUO":
             case "QUAD":
-                executionLogic = (sender) -> new VillagerQueueCreator((Player) sender, Gamemode.valueOf(secondArg)).create();
+                executionLogic = (sender) -> new VillagerQueueInteractor((Player) sender, Gamemode.valueOf(secondArg)).perform();
                 break;
             default:
                 break;

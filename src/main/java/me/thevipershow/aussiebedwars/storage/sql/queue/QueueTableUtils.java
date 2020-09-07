@@ -16,13 +16,29 @@ public final class QueueTableUtils {
         try (Connection conn = connection;
              PreparedStatement preparedStatement = conn.prepareStatement(
                      "INSERT INTO " + QueueVillagerTableCreator.TABLE +
-                             " (uuid, gamemode) VALUES (?, ?);")) {
+                             " (uuid, gamemode) VALUES (?, ?) ON DUPLICATE KEY UPDATE gamemode = ?;")) {
             preparedStatement.setString(1, villager.getUniqueId().toString());
             preparedStatement.setString(2, gamemode.name());
+            preparedStatement.setString(3, gamemode.name());
             preparedStatement.executeUpdate();
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public static CompletableFuture<Boolean> removeVillager(final Connection connection, final Villager villager) {
+        return CompletableFuture.supplyAsync(() -> {
+            try (Connection conn = connection;
+                 PreparedStatement preparedStatement = conn.prepareStatement(
+                         "DELETE FROM " + QueueVillagerTableCreator.TABLE + " WHERE uuid=?;")
+            ) {
+                preparedStatement.setString(1, villager.getUniqueId().toString());
+                return preparedStatement.executeUpdate() > 0;
+            } catch (final SQLException e) {
+                e.printStackTrace();
+                return false;
+            }
+        });
     }
 
     public static CompletableFuture<Optional<Gamemode>> getVillagerGamemode(final UUID villagerUUID, final Connection connection) {
@@ -32,17 +48,18 @@ public final class QueueTableUtils {
                          "SELECT (gamemode) FROM " + QueueVillagerTableCreator.TABLE + " WHERE uuid = ?;")) {
                 preparedStatement.setString(1, villagerUUID.toString());
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                    String g = resultSet.getString("gamemode");
-                    if (g == null) return Optional.empty();
-                    return Optional.of(Gamemode.valueOf(g));
+                    if (resultSet.next()) {
+                        String g = resultSet.getString("gamemode");
+                        if (g == null) return Optional.empty();
+                        return Optional.of(Gamemode.valueOf(g));
+                    }
                 }
-            } catch (SQLException e) {
+            } catch (final SQLException e) {
                 e.printStackTrace();
             }
             return Optional.empty();
         });
     }
-
 
 
 }

@@ -18,7 +18,9 @@ public final class GameManager {
     private final Set<BedwarsGame> bedwarsGameSet = new HashSet<>();
 
     @SafeVarargs
-    public GameManager(JavaPlugin plugin, WorldsManager worldsManager, BedwarsGamemodeConfig<? extends BedwarsGame>... configs) {
+    public GameManager(JavaPlugin plugin,
+                       WorldsManager worldsManager,
+                       BedwarsGamemodeConfig<? extends BedwarsGame>... configs) {
         this.plugin = plugin;
         this.worldsManager = worldsManager;
         for (final BedwarsGamemodeConfig<? extends BedwarsGame> config : configs)
@@ -29,7 +31,7 @@ public final class GameManager {
         bedwarsGameSet.forEach(bedwarsGame -> {
             int count = 0;
             while (count < bedwarsGame.getMinGames()) {
-                worldsManager.load(bedwarsGame, true);
+                worldsManager.load(bedwarsGame);
                 count++;
             }
         });

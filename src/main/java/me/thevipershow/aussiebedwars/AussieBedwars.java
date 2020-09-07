@@ -53,15 +53,26 @@ public final class AussieBedwars extends JavaPlugin {
         ConfigurationSerialization.registerClass(ShopItem.class);
     }
 
+    //@Override
+    //public void onLoad() {
+    //    defaultConfiguration = new DefaultConfiguration(this);
+    //    soloConfig = new SoloConfig(this);
+    //    soloConfig.saveDefaultConfig();
+    //    configManager = new ConfigManager(defaultConfiguration, soloConfig);
+    //    worldsManager = new WorldsManager(configManager, this);
+    //    worldsManager.cleanPreviousDirs();
+    //}
+
     @Override
     public void onEnable() { // Plugin startup logic
         defaultConfiguration = new DefaultConfiguration(this);
         soloConfig = new SoloConfig(this);
         soloConfig.saveDefaultConfig();
 
-        configManager = new ConfigManager(defaultConfiguration, soloConfig);
+        configManager = new ConfigManager(defaultConfiguration, soloConfig); // TODO: add extras
 
-        worldsManager = new WorldsManager(configManager, this); //TODO: ADD OTHER GAMEMODES CONFIG:
+        worldsManager = new WorldsManager(configManager, this);
+        worldsManager.cleanPreviousDirs();
 
         commandsManager = CommandsManager.getInstance(this);
         commandsManager.registerAll();
@@ -74,9 +85,4 @@ public final class AussieBedwars extends JavaPlugin {
         getServer().getPluginManager().registerEvents(matchmakingVillagerListener, this);
     }
 
-
-    @Override
-    public void onDisable() {
-
-    }
 }

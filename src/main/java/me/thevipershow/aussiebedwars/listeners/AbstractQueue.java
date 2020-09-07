@@ -31,7 +31,8 @@ public abstract class AbstractQueue<T> {
 
     public boolean addToQueue(T t) {
         if (!isFull()) {
-            return inQueue.offerLast(t);
+            inQueue.offerLast(t);
+            return true;
         }
         return false;
     }

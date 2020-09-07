@@ -14,7 +14,6 @@ public abstract class ActiveGame {
 
     protected final String associatedWorldFilename;
     protected final BedwarsGame bedwarsGame;
-    protected final String lobbyWorldName;
     protected final World associatedWorld;
     protected final World lobbyWorld;
     protected final Location cachedSpawnLocation;
@@ -25,16 +24,15 @@ public abstract class ActiveGame {
     public ActiveGame(
             String associatedWorldFilename,
             BedwarsGame bedwarsGame,
-            String lobbyWorldName,
+            World lobbyWorld,
             Plugin plugin) {
         this.associatedWorldFilename = associatedWorldFilename;
         this.bedwarsGame = bedwarsGame;
-        this.lobbyWorldName = lobbyWorldName;
+        this.lobbyWorld = lobbyWorld;
         this.associatedWorld = Bukkit.getWorld(associatedWorldFilename);
         this.plugin = plugin;
-        this.lobbyWorld = Bukkit.getWorld(this.lobbyWorldName);
         if (lobbyWorld == null)
-            throw new UnsupportedOperationException("World " + lobbyWorldName + " does not exist. Please correct config.yml");
+            throw new UnsupportedOperationException("World " + lobbyWorld.getName() + " does not exist. Please correct config.yml");
         this.cachedSpawnLocation = this.lobbyWorld.getSpawnLocation();
         this.associatedQueue = new MatchmakingQueue(bedwarsGame.getPlayers());
         this.cachedWaitingLocation = bedwarsGame.getLobbySpawn().toLocation(associatedWorld);
@@ -78,8 +76,12 @@ public abstract class ActiveGame {
         return bedwarsGame;
     }
 
-    public String getLobbyWorldName() {
-        return lobbyWorldName;
+    public String getAssociatedWorldFilename() {
+        return associatedWorldFilename;
+    }
+
+    public Location getCachedWaitingLocation() {
+        return cachedWaitingLocation;
     }
 
     public World getAssociatedWorld() {
