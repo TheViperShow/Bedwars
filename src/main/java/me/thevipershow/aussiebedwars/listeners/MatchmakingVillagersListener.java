@@ -1,7 +1,11 @@
 package me.thevipershow.aussiebedwars.listeners;
 
+import java.sql.Connection;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import me.thevipershow.aussiebedwars.AussieBedwars;
+import me.thevipershow.aussiebedwars.bedwars.Gamemode;
 import me.thevipershow.aussiebedwars.game.ActiveGame;
 import me.thevipershow.aussiebedwars.game.GameManager;
 import me.thevipershow.aussiebedwars.storage.sql.MySQLDatabase;
@@ -26,34 +30,35 @@ public class MatchmakingVillagersListener implements Listener {
         this.gameManager = gameManager;
     }
 
-    private static void connectedToQueue(final Player player, final ActiveGame activeGame) {
-        player.sendMessage(AussieBedwars.PREFIX + "§eYou have joined §7" + activeGame.getLobbyWorld().getName() + " §equeue");
-        player.sendMessage(AussieBedwars.PREFIX + String.format("§eStatus §7[§a%d§8/§a%d§7]", activeGame.getAssociatedQueue().queueSize(), activeGame.getBedwarsGame().getPlayers()));
-    }
-
     @EventHandler(ignoreCancelled = true)
-    public void onPlayerInteractAtEntity(PlayerInteractEntityEvent event) {
+    public void onPlayerInteractAtEntity(final PlayerInteractEntityEvent event) {
         final Player player = event.getPlayer();
         final Entity entity = event.getRightClicked();
         if (!(entity instanceof Villager)) return;
+        final UUID uuid = entity.getUniqueId();
         if (!player.getWorld().equals(gameManager.getWorldsManager().getLobbyWorld())) return;
-
-        System.out.println("I got here my boi");
-
         event.setCancelled(true);
 
-        final UUID uuid = entity.getUniqueId();
+        final Optional<Connection> conn = MySQLDatabase.getConnection();
 
-        MySQLDatabase.getConnection()
-                .ifPresent(connection -> QueueTableUtils.getVillagerGamemode(uuid, connection)
-                        .thenAccept(gamemode -> gamemode.flatMap(gameManager::findOptimalGame)
-                                .ifPresent(activeGame -> {
-                                    gameManager.removeFromAllQueues(player);
-                                    if (activeGame.getAssociatedQueue().addToQueue(player)) {
-                                        plugin.getLogger().info(player.getName() + " moved to " + activeGame.getLobbyWorld().getName());
-                                        connectedToQueue(player, activeGame);
-                                        activeGame.moveToLobby(player);
-                                    }
-                                })));
+        if (!conn.isPresent()) return;
+
+        final CompletableFuture<Optional<Gamemode>> future = QueueTableUtils.getVillagerGamemode(uuid, conn.get());
+
+        future.thenAccept((g) -> {
+
+            if (!g.isPresent()) return;
+
+            final Optional<ActiveGame> opt = gameManager.findOptimalGame(g.get());
+
+            if (!opt.isPresent()) return;
+
+            final ActiveGame activeGame = opt.get();
+
+            gameManager.removeFromAllQueues(player);
+
+            plugin.getServer().getScheduler().runTaskLater(plugin, ()-> activeGame.moveToWaitingRoom(player), 1L);
+        });
+
     }
 }

@@ -81,10 +81,18 @@ public class WorldsManager {
                 .generateStructures(false)
                 .createWorld();
 
+        plugin.getLogger().info(String.format("Loading [%s] into active games.", tempName));
+
+        final ActiveGame activeGame = GameUtilities.fromGamemode(tempName, game, lobbyWorld, plugin);
+
         if (w != null && copyResult) {
-            activeGameSet.add(GameUtilities.fromGamemode(game, tempName, lobbyWorld, plugin));
-            createdAmountsMap.put(game, currentInt);
             plugin.getLogger().info(String.format("Successfully created a world name [%s].", tempName));
+            createdAmountsMap.put(game, currentInt);
+            if (activeGame == null) {
+                plugin.getLogger().severe(String.format("Could not create active game for [%s].", tempName));
+            } else {
+                this.activeGameSet.add(activeGame);
+            }
         } else {
             plugin.getLogger().warning(String.format("Something went wrong when creating world [%s].", tempName));
         }

@@ -46,7 +46,7 @@ public abstract class AbstractQueue<T> {
     }
 
     public boolean isFull() {
-        return maximumSize - inQueue.size() > 0;
+        return maximumSize - inQueue.size() < 1;
     }
 
     public int getMaximumSize() {

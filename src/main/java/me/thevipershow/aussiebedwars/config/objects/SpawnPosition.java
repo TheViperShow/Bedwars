@@ -49,7 +49,7 @@ public class SpawnPosition implements ConfigurationSerializable {
         return z;
     }
 
-    public Location toLocation(final World world) {
-        return new Location(world, x, y, z);
+    public final Location toLocation(final World world) {
+        return new Location(world, this.x, this.y, this.z);
     }
 }

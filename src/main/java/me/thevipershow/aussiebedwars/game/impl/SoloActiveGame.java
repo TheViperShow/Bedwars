@@ -5,12 +5,9 @@ import me.thevipershow.aussiebedwars.game.ActiveGame;
 import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
 
-public class SoloActiveGame extends ActiveGame {
+public final class SoloActiveGame extends ActiveGame {
 
-    public SoloActiveGame(String associatedWorldFilename,
-                          BedwarsGame bedwarsGame,
-                          World lobbyWorld,
-                          Plugin plugin) {
+    public SoloActiveGame(String associatedWorldFilename, BedwarsGame bedwarsGame, World lobbyWorld, Plugin plugin) {
         super(associatedWorldFilename, bedwarsGame, lobbyWorld, plugin);
     }
 

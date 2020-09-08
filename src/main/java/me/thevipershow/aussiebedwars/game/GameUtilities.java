@@ -7,15 +7,14 @@ import org.bukkit.plugin.Plugin;
 
 public final class GameUtilities {
 
-    public static ActiveGame fromGamemode(BedwarsGame game,
-                                   String associatedWorldFilename,
-                                   World lobbyWorld,
-                                   Plugin plugin) {
+    public static ActiveGame fromGamemode(String associatedWorldName ,BedwarsGame game, World lobbyWorld, Plugin plugin) {
+        ActiveGame gameToReturn = null;
         switch (game.getGamemode()) {
-            case DUO:
-                return new SoloActiveGame(associatedWorldFilename, game, lobbyWorld, plugin);
-            default:
-                return null;
+            case SOLO:
+                gameToReturn = new SoloActiveGame(associatedWorldName, game, lobbyWorld, plugin);
+                break;
         }
+        // System.out.println("Created a new ActiveGame: " + gameToReturn.toString());
+        return gameToReturn;
     }
 }

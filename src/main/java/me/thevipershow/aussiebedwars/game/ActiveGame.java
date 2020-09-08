@@ -21,18 +21,13 @@ public abstract class ActiveGame {
     protected final AbstractQueue<Player> associatedQueue;
     protected final Location cachedWaitingLocation;
 
-    public ActiveGame(
-            String associatedWorldFilename,
-            BedwarsGame bedwarsGame,
-            World lobbyWorld,
-            Plugin plugin) {
+    public ActiveGame(String associatedWorldFilename, BedwarsGame bedwarsGame, World lobbyWorld, Plugin plugin) {
         this.associatedWorldFilename = associatedWorldFilename;
         this.bedwarsGame = bedwarsGame;
         this.lobbyWorld = lobbyWorld;
+        // System.out.println("Sing us a song , you're the piano man -> " + associatedWorldFilename);
         this.associatedWorld = Bukkit.getWorld(associatedWorldFilename);
         this.plugin = plugin;
-        if (lobbyWorld == null)
-            throw new UnsupportedOperationException("World " + lobbyWorld.getName() + " does not exist. Please correct config.yml");
         this.cachedSpawnLocation = this.lobbyWorld.getSpawnLocation();
         this.associatedQueue = new MatchmakingQueue(bedwarsGame.getPlayers());
         this.cachedWaitingLocation = bedwarsGame.getLobbySpawn().toLocation(associatedWorld);
@@ -57,10 +52,17 @@ public abstract class ActiveGame {
         });
     }
 
+    public static void connectedToQueue(final Player player, final ActiveGame activeGame) {
+        player.sendMessage(AussieBedwars.PREFIX + "§eYou have joined §7" + activeGame.getAssociatedWorld().getName() + " §equeue");
+        player.sendMessage(AussieBedwars.PREFIX + String.format("§eStatus §7[§a%d§8/§a%d§7]", activeGame.getAssociatedQueue().queueSize(), activeGame.getBedwarsGame().getPlayers()));
+    }
+
     public void moveToWaitingRoom(final Player player) {
-        if (cachedWaitingLocation != null)
-            player.teleport(cachedWaitingLocation);
-        else
+        if (cachedWaitingLocation != null) {
+            if (player.teleport(cachedWaitingLocation)) {
+                connectedToQueue(player, this);
+            }
+        } else
             player.sendMessage(AussieBedwars.PREFIX + "Something went wrong when teleporting you to waiting room.");
     }
 
@@ -112,5 +114,20 @@ public abstract class ActiveGame {
 
     public void setRunning(boolean running) {
         isRunning = running;
+    }
+
+    @Override
+    public final String toString() {
+        return "ActiveGame{" +
+                "associatedWorldFilename='" + associatedWorldFilename + '\'' +
+                ", bedwarsGame=" + bedwarsGame +
+                ", associatedWorld=" + associatedWorld +
+                ", lobbyWorld=" + lobbyWorld +
+                ", cachedSpawnLocation=" + cachedSpawnLocation +
+                ", plugin=" + plugin +
+                ", associatedQueue=" + associatedQueue +
+                ", cachedWaitingLocation=" + cachedWaitingLocation +
+                ", isRunning=" + isRunning +
+                '}';
     }
 }
