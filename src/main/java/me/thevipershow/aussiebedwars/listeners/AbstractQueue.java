@@ -22,7 +22,7 @@ public abstract class AbstractQueue<T> {
     }
 
     public void perform(final Consumer<? super T> consumer) {
-        inQueue.iterator().forEachRemaining(consumer);
+        inQueue.forEach(consumer);
     }
 
     public boolean removeFromQueue(final T t) {
@@ -35,6 +35,10 @@ public abstract class AbstractQueue<T> {
             return true;
         }
         return false;
+    }
+
+    public boolean isEmpty() {
+        return this.inQueue.isEmpty();
     }
 
     public boolean contains(final T t) {

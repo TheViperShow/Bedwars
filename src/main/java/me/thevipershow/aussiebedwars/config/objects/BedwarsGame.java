@@ -16,10 +16,11 @@ public abstract class BedwarsGame {
     protected final Set<BedwarsTeam> teams;
     protected final SpawnPosition lobbySpawn;
     protected final String mapFilename;
-    protected final List<SpawnPosition> mapSpawns;
+    protected final Set<TeamSpawnPosition> mapSpawns;
     protected final List<Spawner> spawners;
     protected final List<Merchant> merchants;
     protected final Shop shop;
+    protected final int startTimer;
 
     protected BedwarsGame(
             Gamemode gamemode,
@@ -30,10 +31,11 @@ public abstract class BedwarsGame {
             Set<BedwarsTeam> teams,
             SpawnPosition lobbySpawn,
             String mapFilename,
-            List<SpawnPosition> mapSpawns,
+            Set<TeamSpawnPosition> mapSpawns,
             List<Spawner> spawners,
             List<Merchant> merchants,
-            Shop shop) {
+            Shop shop,
+            int startTimer) {
         this.gamemode = gamemode;
         this.minGames = minGames;
         this.maxGames = maxGames;
@@ -46,6 +48,7 @@ public abstract class BedwarsGame {
         this.spawners = spawners;
         this.merchants = merchants;
         this.shop = shop;
+        this.startTimer = startTimer;
     }
 
     public Gamemode getGamemode() {
@@ -76,7 +79,7 @@ public abstract class BedwarsGame {
         return mapFilename;
     }
 
-    public List<SpawnPosition> getMapSpawns() {
+    public Set<TeamSpawnPosition> getMapSpawns() {
         return mapSpawns;
     }
 
@@ -94,5 +97,9 @@ public abstract class BedwarsGame {
 
     public int getMinPlayers() {
         return minPlayers;
+    }
+
+    public int getStartTimer() {
+        return startTimer;
     }
 }

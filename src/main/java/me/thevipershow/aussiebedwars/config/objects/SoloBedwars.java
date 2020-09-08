@@ -12,24 +12,13 @@ import org.bukkit.configuration.serialization.SerializableAs;
 @SerializableAs("Solo")
 public class SoloBedwars extends BedwarsGame implements ConfigurationSerializable {
 
-    protected SoloBedwars(
-            Gamemode gamemode,
-            int minGames,
-            int maxGames,
-            int minPlayers,
-            int players,
-            Set<BedwarsTeam> teams,
-            SpawnPosition lobbySpawn,
-            String mapFilename,
-            List<SpawnPosition> mapSpawns,
-            List<Spawner> spawners,
-            List<Merchant> merchants, Shop shop) {
-        super(gamemode, minGames, maxGames, minPlayers, players, teams, lobbySpawn, mapFilename, mapSpawns, spawners, merchants, shop);
+    protected SoloBedwars(Gamemode gamemode, int minGames, int maxGames, int minPlayers, int players, Set<BedwarsTeam> teams, SpawnPosition lobbySpawn, String mapFilename, Set<TeamSpawnPosition> mapSpawns, List<Spawner> spawners, List<Merchant> merchants, Shop shop, int startTimer) {
+        super(gamemode, minGames, maxGames, minPlayers, players, teams, lobbySpawn, mapFilename, mapSpawns, spawners, merchants, shop, startTimer);
     }
 
     @Override
     public Map<String, Object> serialize() {
-        return null;
+        throw new UnsupportedOperationException("Cannot serialize SoloBedwars.");
     }
 
     public static SoloBedwars deserialize(Map<String, Object> objectMap) {
@@ -37,6 +26,7 @@ public class SoloBedwars extends BedwarsGame implements ConfigurationSerializabl
         int minGames = (int) objectMap.get("minimum-games");
         int maxGames = (int) objectMap.get("maximum-games");
         int players = (int) objectMap.get("players");
+        int startTimer = (int) objectMap.get("start-timer");
         List<String> teams = (List<String>) objectMap.get("teams");
         Set<BedwarsTeam> actualTeams = teams.stream().map(BedwarsTeam::valueOf).collect(Collectors.toSet());
         double spawnX, spawnY, spawnZ;
@@ -44,9 +34,9 @@ public class SoloBedwars extends BedwarsGame implements ConfigurationSerializabl
 
         SpawnPosition mapLobbySpawnPos = SpawnPosition.deserialize(mapLobbySpawn);
         List<Map<String, Object>> mapSpawns = (List<Map<String, Object>>) objectMap.get("map-spawns");
-        List<SpawnPosition> mapSpawnPos = mapSpawns.stream()
-                .map(SpawnPosition::deserialize)
-                .collect(Collectors.toList());
+        Set<TeamSpawnPosition> mapSpawnPos = mapSpawns.stream()
+                .map(TeamSpawnPosition::deserialize)
+                .collect(Collectors.toSet());
 
         List<Map<String, Object>> spawners = (List<Map<String, Object>>) objectMap.get("spawners");
         List<Spawner> spawnerList = spawners.stream()
@@ -60,8 +50,7 @@ public class SoloBedwars extends BedwarsGame implements ConfigurationSerializabl
         Map<String, Object> shopSection = (Map<String, Object>) objectMap.get("shop");
         Shop shop = Shop.deserialize(shopSection);
 
-
-        return new SoloBedwars(Gamemode.SOLO, minGames, maxGames, minGames, players, actualTeams, mapLobbySpawnPos, filename, mapSpawnPos, spawnerList, merchantsList, shop);
+        return new SoloBedwars(Gamemode.SOLO, minGames, maxGames, minGames, players, actualTeams, mapLobbySpawnPos, filename, mapSpawnPos, spawnerList, merchantsList, shop, startTimer);
     }
 
 }

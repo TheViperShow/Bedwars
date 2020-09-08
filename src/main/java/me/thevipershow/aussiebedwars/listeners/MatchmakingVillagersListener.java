@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import me.thevipershow.aussiebedwars.AussieBedwars;
 import me.thevipershow.aussiebedwars.bedwars.Gamemode;
 import me.thevipershow.aussiebedwars.game.ActiveGame;
 import me.thevipershow.aussiebedwars.game.GameManager;
@@ -15,7 +14,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.plugin.Plugin;
 
@@ -57,7 +55,7 @@ public class MatchmakingVillagersListener implements Listener {
 
             gameManager.removeFromAllQueues(player);
 
-            plugin.getServer().getScheduler().runTaskLater(plugin, ()-> activeGame.moveToWaitingRoom(player), 1L);
+            plugin.getServer().getScheduler().runTaskLater(plugin, () -> activeGame.moveToWaitingRoom(player), 1L);
         });
 
     }

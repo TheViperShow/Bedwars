@@ -1,5 +1,6 @@
 solo:
   - map-filename: "bedwars-solo"
+    start-timer: 30
     minimum-games: 2
     maximum-games: 4
     min-players: 2
@@ -21,34 +22,42 @@ solo:
       - x: 1.0 # Please set this <- SPAWN #1
         y: 2.0 # Please set this
         z: 3.0 # Please set this
+        team: "CYAN"
 
       - x: 1.0 # Please set this <- SPAWN #2
         y: 2.0 # Please set this
         z: 3.0 # Please set this
+        team: "PINK"
 
       - x: 1.0 # Please set this <- SPAWN #3
         y: 2.0 # Please set this
         z: 3.0 # Please set this
+        team: "YELLOW"
 
       - x: 1.0 # Please set this <- SPAWN #4
         y: 2.0 # Please set this
         z: 3.0 # Please set this
+        team: "GREEN"
 
       - x: 1.0 # Please set this <- SPAWN #5
         y: 2.0 # Please set this
         z: 3.0 # Please set this
+        team: "RED"
 
       - x: 1.0 # Please set this <- SPAWN #6
         y: 2.0 # Please set this
         z: 3.0 # Please set this
+        team: "BLUE"
 
       - x: 1.0 # Please set this <- SPAWN #7
         y: 2.0 # Please set this
         z: 3.0 # Please set this
+        team: "WHITE"
 
       - x: 1.0 # Please set this <- SPAWN #8
         y: 2.0 # Please set this
         z: 3.0 # Please set this
+        team: "GREY"
     spawners:
       - type: "GOLD"
         location:
@@ -66,6 +75,22 @@ solo:
           - number: 4
             increase-drop: 2
             after-seconds: 160
+      - type: "DIAMOND"
+          location:
+            x: 1.0
+            y: 1.0
+            z: 1.0
+          drop-amount: 1
+          levels:
+            - number: 2
+              increase-drop: 1
+              after-seconds: 60
+            - number: 3
+              increase-drop: 1
+              after-seconds: 120
+            - number: 4
+              increase-drop: 2
+              after-seconds: 160
 
     merchants:
       - name: "[AussieBedwars] Shop"
