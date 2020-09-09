@@ -1,14 +1,20 @@
 package me.thevipershow.aussiebedwars.game;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import me.thevipershow.aussiebedwars.AussieBedwars;
 import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.aussiebedwars.config.objects.BedwarsGame;
 import me.thevipershow.aussiebedwars.events.GameStartEvent;
 import me.thevipershow.aussiebedwars.listeners.AbstractQueue;
+import me.thevipershow.aussiebedwars.listeners.MapIllegalMovementsListener;
+import me.thevipershow.aussiebedwars.listeners.MapProtectionListener;
 import me.thevipershow.aussiebedwars.listeners.MatchmakingQueue;
+import me.thevipershow.aussiebedwars.listeners.UnregisterableListener;
+import me.tigerhix.lib.scoreboard.type.Scoreboard;
 import net.minecraft.server.v1_8_R3.ChatMessage;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
 import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
@@ -31,6 +37,10 @@ public abstract class ActiveGame {
     protected final AbstractQueue<Player> associatedQueue;
     protected final Location cachedWaitingLocation;
     protected final Map<BedwarsTeam, Set<Player>> assignedTeams;
+    protected final Set<ActiveSpawner> activeSpawners;
+
+    protected final Set<Scoreboard> activeScoreboards = new HashSet<>();
+    protected final Set<UnregisterableListener> unregisterableListeners = new HashSet<>();
 
     ///////////////////////////////////////////////////
     // Internal ActiveGame fields                    //
@@ -52,7 +62,14 @@ public abstract class ActiveGame {
         this.cachedWaitingLocation = bedwarsGame.getLobbySpawn().toLocation(associatedWorld);
         this.missingtime = bedwarsGame.getStartTimer();
         this.assignedTeams = new HashMap<>();
+
+        this.activeSpawners = bedwarsGame.getSpawners()
+                .stream()
+                .map(spawner -> new ActiveSpawner(spawner, this))
+                .collect(Collectors.toSet());
+
         tickTimer();
+        registerMapListeners();
     }
 
     public void handleError(String text) {
@@ -64,6 +81,7 @@ public abstract class ActiveGame {
 
         byte start = 0x00;
         final long toColor = 0x14 * (bedwarsGame.getStartTimer() - missingtime) / bedwarsGame.getStartTimer();
+
         while (start <= 0x14) {
             strB.append('§').append(start > toColor ? 'c' : 'a').append('|');
             start++;
@@ -73,6 +91,14 @@ public abstract class ActiveGame {
 
     private String generateMissingPlayerText() {
         return "§7[§eAussieBedwars§7]: Missing §e" + (bedwarsGame.getMinPlayers() - associatedQueue.queueSize()) + " §7more players to play";
+    }
+
+    protected String getTeamChar(final BedwarsTeam t) {
+        if (assignedTeams.get(t) == null || assignedTeams.get(t).isEmpty()) {
+            return " §c✘";
+        } else {
+            return " §a✓";
+        }
     }
 
     public void tickTimer() {
@@ -138,6 +164,27 @@ public abstract class ActiveGame {
         player.sendMessage(AussieBedwars.PREFIX + String.format("§eStatus §7[§a%d§8/§a%d§7]", activeGame.getAssociatedQueue().queueSize(), activeGame.getBedwarsGame().getPlayers()));
     }
 
+    public void registerMapListeners() {
+        final UnregisterableListener mapProtectionListener = new MapProtectionListener(this);
+        final UnregisterableListener mapIllegalMovementsListener = new MapIllegalMovementsListener(this);
+
+        plugin.getServer().getPluginManager().registerEvents(mapProtectionListener, plugin);
+        plugin.getServer().getPluginManager().registerEvents(mapIllegalMovementsListener, plugin);
+
+        unregisterableListeners.add(mapIllegalMovementsListener);
+        unregisterableListeners.add(mapProtectionListener);
+    }
+
+    public void unregisterAllListeners() {
+        for (final UnregisterableListener unregisterableListener : unregisterableListeners)
+            if (!unregisterableListener.isUnregistered())
+                unregisterableListener.unregister();
+    }
+
+    public Set<UnregisterableListener> getUnregisterableListeners() {
+        return unregisterableListeners;
+    }
+
     public void moveToWaitingRoom(final Player player) {
         if (cachedWaitingLocation != null) {
             if (player.teleport(cachedWaitingLocation)) {
@@ -148,6 +195,8 @@ public abstract class ActiveGame {
             player.sendMessage(AussieBedwars.PREFIX + "Something went wrong when teleporting you to waiting room.");
     }
 
+
+    public abstract void declareWinner();
 
     public abstract void assignTeams();
 
@@ -199,6 +248,10 @@ public abstract class ActiveGame {
         isRunning = running;
     }
 
+    public Set<ActiveSpawner> getActiveSpawners() {
+        return activeSpawners;
+    }
+
     @Override
     public final String toString() {
         return "ActiveGame{" +
@@ -216,6 +269,31 @@ public abstract class ActiveGame {
 
     public boolean isHasStarted() {
         return hasStarted;
+    }
+
+    public abstract void destroyTeamBed(final BedwarsTeam team);
+
+    public BedwarsTeam getPlayerTeam(final Player player) {
+        for (final Map.Entry<BedwarsTeam, Set<Player>> entry : assignedTeams.entrySet())
+            if (entry.getValue().contains(player))
+                return entry.getKey();
+        return null;
+    }
+
+    public Map<BedwarsTeam, Set<Player>> getAssignedTeams() {
+        return assignedTeams;
+    }
+
+    public Set<Scoreboard> getActiveScoreboards() {
+        return activeScoreboards;
+    }
+
+    public long getMissingtime() {
+        return missingtime;
+    }
+
+    public BukkitTask getTimerTask() {
+        return timerTask;
     }
 
     public void setHasStarted(boolean hasStarted) {

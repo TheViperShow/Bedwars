@@ -32,4 +32,16 @@ public class SpawnerLevel implements ConfigurationSerializable {
         int seconds = (int) objectMap.get("after-seconds");
         return new SpawnerLevel(level, increase, seconds);
     }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public int getDropIncrease() {
+        return dropIncrease;
+    }
+
+    public int getAfterSeconds() {
+        return afterSeconds;
+    }
 }

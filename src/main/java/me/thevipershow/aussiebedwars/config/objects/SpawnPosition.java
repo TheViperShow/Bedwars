@@ -8,7 +8,7 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
 
 @SerializableAs("SpawnPosition")
-public class SpawnPosition implements ConfigurationSerializable {
+public class SpawnPosition implements ConfigurationSerializable, Cloneable {
 
     private final double x;
     private final double y;
@@ -35,6 +35,43 @@ public class SpawnPosition implements ConfigurationSerializable {
         y = (double) objectMap.get("y");
         z = (double) objectMap.get("z");
         return new SpawnPosition(x, y, z);
+    }
+
+    @Override
+    protected SpawnPosition clone() throws CloneNotSupportedException {
+        return (SpawnPosition) super.clone();
+    }
+
+    public final double xDistance(final SpawnPosition spawnPosition) {
+        return Math.abs(x - spawnPosition.x);
+    }
+
+    public final double yDistance(final SpawnPosition spawnPosition) {
+        return Math.abs(y - spawnPosition.y);
+    }
+
+    public final double zDistance(final SpawnPosition spawnPosition) {
+        return Math.abs(z - spawnPosition.z);
+    }
+
+    public final double distance(final SpawnPosition spawnPosition) {
+        return Math.sqrt(squaredDistance(spawnPosition));
+    }
+
+    public final double distance(final Location location) {
+        return Math.sqrt(squaredDistance(location));
+    }
+
+    public final double squaredDistance(final SpawnPosition spawnPosition) {
+        return Math.pow((x - spawnPosition.x), 2.0)
+                + Math.pow((y - spawnPosition.y), 2.0)
+                + Math.pow((z - spawnPosition.z), 2.0);
+    }
+
+    public final double squaredDistance(final Location location) {
+        return Math.pow((x - location.getX()), 2.0)
+                + Math.pow((y - location.getY()), 2.0)
+                + Math.pow((z - location.getZ()), 2.0);
     }
 
     public double getX() {

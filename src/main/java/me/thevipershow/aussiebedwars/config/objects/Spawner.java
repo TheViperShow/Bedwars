@@ -24,7 +24,7 @@ public class Spawner implements ConfigurationSerializable {
 
     @Override
     public Map<String, Object> serialize() {
-        return null;
+        throw new UnsupportedOperationException("Cannot serialize spawner.");
     }
 
     public static Spawner deserialize(Map<String, Object> map) {
@@ -35,5 +35,21 @@ public class Spawner implements ConfigurationSerializable {
         final List<Map<String, Object>> objects = (List<Map<String, Object>>) map.get("levels");
         objects.forEach(o -> levels.add(SpawnerLevel.deserialize(o)));
         return new Spawner(sp, spawnerType, drop, levels);
+    }
+
+    public SpawnPosition getSpawnPosition() {
+        return spawnPosition;
+    }
+
+    public SpawnerType getSpawnerType() {
+        return spawnerType;
+    }
+
+    public int getDropAmount() {
+        return dropAmount;
+    }
+
+    public List<SpawnerLevel> getSpawnerLevels() {
+        return spawnerLevels;
     }
 }

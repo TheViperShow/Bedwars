@@ -20,6 +20,11 @@ public class TeamSpawnPosition extends SpawnPosition implements ConfigurationSer
     }
 
     @Override
+    protected TeamSpawnPosition clone() throws CloneNotSupportedException {
+        return (TeamSpawnPosition) super.clone();
+    }
+
+    @Override
     public Map<String, Object> serialize() {
         throw new UnsupportedOperationException("I don't want to write this.");
     }
