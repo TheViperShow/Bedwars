@@ -8,7 +8,6 @@ import me.thevipershow.aussiebedwars.config.BedwarsGamemodeConfig;
 import me.thevipershow.aussiebedwars.config.objects.BedwarsGame;
 import me.thevipershow.aussiebedwars.events.ConnectToQueueEvent;
 import me.thevipershow.aussiebedwars.events.LeaveQueueEvent;
-import me.thevipershow.aussiebedwars.listeners.AbstractQueue;
 import me.thevipershow.aussiebedwars.worlds.WorldsManager;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;

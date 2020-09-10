@@ -1,4 +1,4 @@
-package me.thevipershow.aussiebedwars.listeners;
+package me.thevipershow.aussiebedwars.listeners.queue;
 
 import me.thevipershow.aussiebedwars.game.GameManager;
 import org.bukkit.event.EventHandler;

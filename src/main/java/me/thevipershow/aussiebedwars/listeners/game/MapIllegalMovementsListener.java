@@ -1,4 +1,4 @@
-package me.thevipershow.aussiebedwars.listeners;
+package me.thevipershow.aussiebedwars.listeners.game;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,6 +6,7 @@ import me.thevipershow.aussiebedwars.AussieBedwars;
 import me.thevipershow.aussiebedwars.config.objects.SpawnPosition;
 import me.thevipershow.aussiebedwars.game.ActiveGame;
 import me.thevipershow.aussiebedwars.game.ActiveSpawner;
+import me.thevipershow.aussiebedwars.listeners.UnregisterableListener;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;

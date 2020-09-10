@@ -51,6 +51,13 @@ public abstract class BedwarsGame {
         this.startTimer = startTimer;
     }
 
+    public SpawnPosition spawnPosOfTeam(final BedwarsTeam team) {
+        for (TeamSpawnPosition mapSpawn : this.mapSpawns)
+            if (mapSpawn.getBedwarsTeam() == team)
+                return mapSpawn;
+        return null;
+    }
+
     public Gamemode getGamemode() {
         return gamemode;
     }

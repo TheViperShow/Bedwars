@@ -1,7 +1,7 @@
 package me.thevipershow.aussiebedwars.events;
 
 import me.thevipershow.aussiebedwars.game.ActiveGame;
-import me.thevipershow.aussiebedwars.listeners.AbstractQueue;
+import me.thevipershow.aussiebedwars.game.AbstractQueue;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;

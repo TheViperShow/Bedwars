@@ -14,13 +14,15 @@ public class ShopItem implements ConfigurationSerializable {
     private final Material buyWith;
     private final int buyCost;
     private final int slot;
+    private final String itemName;
 
-    public ShopItem(String material, int amount, String buyWith, int buyCost, int slot) {
+    public ShopItem(String material, int amount, String buyWith, int buyCost, int slot, String itemName) {
         this.material = Material.valueOf(material);
         this.amount = amount;
         this.buyWith = Material.valueOf(buyWith);
         this.buyCost = buyCost;
         this.slot = slot;
+        this.itemName = itemName;
     }
 
     @Override
@@ -31,6 +33,7 @@ public class ShopItem implements ConfigurationSerializable {
         map.put("buy-with", buyWith.name());
         map.put("price", buyCost);
         map.put("slot", slot);
+        map.put("item-name", itemName);
         return map;
     }
 
@@ -40,7 +43,8 @@ public class ShopItem implements ConfigurationSerializable {
         String b = (String) objectMap.get("buy-with");
         int c = (int) objectMap.get("price");
         int s = (int) objectMap.get("slot");
-        return new ShopItem(m, a, b, c, s);
+        String itemName = (String) objectMap.get("item-name");
+        return new ShopItem(m, a, b, c, s, itemName);
     }
 
     public Material getMaterial() {
@@ -61,5 +65,9 @@ public class ShopItem implements ConfigurationSerializable {
 
     public int getSlot() {
         return slot;
+    }
+
+    public String getItemName() {
+        return itemName;
     }
 }

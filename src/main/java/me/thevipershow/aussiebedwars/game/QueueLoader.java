@@ -6,8 +6,6 @@ import java.util.Optional;
 import java.util.Set;
 import me.thevipershow.aussiebedwars.bedwars.Gamemode;
 import me.thevipershow.aussiebedwars.config.objects.BedwarsGame;
-import me.thevipershow.aussiebedwars.listeners.AbstractQueue;
-import me.thevipershow.aussiebedwars.listeners.MatchmakingQueue;
 import org.bukkit.entity.Player;
 
 public class QueueLoader {

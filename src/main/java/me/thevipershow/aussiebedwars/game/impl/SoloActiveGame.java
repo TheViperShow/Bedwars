@@ -37,7 +37,6 @@ public final class SoloActiveGame extends ActiveGame {
             createSpawners(); // creating and spawning ore spawners for this map. //TODO: FINISH
             createMerchants(); // creating and spawning merchants for this map. //TODO: FINISH
             moveTeamsToSpawns(); // moving everyone to their team's spawn.
-
         }
     }
 
@@ -55,6 +54,11 @@ public final class SoloActiveGame extends ActiveGame {
 
     @Override
     public void stop() {
+
+    }
+
+    @Override
+    public void removePlayer(final Player p) {
 
     }
 

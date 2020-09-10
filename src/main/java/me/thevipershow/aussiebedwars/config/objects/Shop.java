@@ -24,7 +24,6 @@ public class Shop implements ConfigurationSerializable {
         return null; //TODO: im not going to write this.
     }
 
-
     public static Shop deserialize(Map<String, Object> objectMap) {
         String title = (String) objectMap.get("title");
         int slots = (int) objectMap.get("slots");
@@ -32,5 +31,17 @@ public class Shop implements ConfigurationSerializable {
         final List<ShopItem> itemsShop = new ArrayList<>();
         objectMap1.forEach(o -> itemsShop.add(ShopItem.deserialize(o)));
         return new Shop(title, slots, itemsShop);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getSlots() {
+        return slots;
+    }
+
+    public List<ShopItem> getItems() {
+        return items;
     }
 }

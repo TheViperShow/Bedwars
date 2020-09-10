@@ -1,4 +1,4 @@
-package me.thevipershow.aussiebedwars.listeners;
+package me.thevipershow.aussiebedwars.listeners.queue;
 
 import java.sql.Connection;
 import java.util.Optional;

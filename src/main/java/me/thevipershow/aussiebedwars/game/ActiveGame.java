@@ -9,11 +9,14 @@ import me.thevipershow.aussiebedwars.AussieBedwars;
 import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.aussiebedwars.config.objects.BedwarsGame;
 import me.thevipershow.aussiebedwars.events.GameStartEvent;
-import me.thevipershow.aussiebedwars.listeners.AbstractQueue;
-import me.thevipershow.aussiebedwars.listeners.MapIllegalMovementsListener;
-import me.thevipershow.aussiebedwars.listeners.MapProtectionListener;
-import me.thevipershow.aussiebedwars.listeners.MatchmakingQueue;
 import me.thevipershow.aussiebedwars.listeners.UnregisterableListener;
+import me.thevipershow.aussiebedwars.listeners.game.BedBreakListener;
+import me.thevipershow.aussiebedwars.listeners.game.DeathListener;
+import me.thevipershow.aussiebedwars.listeners.game.LobbyCompassListener;
+import me.thevipershow.aussiebedwars.listeners.game.MapIllegalMovementsListener;
+import me.thevipershow.aussiebedwars.listeners.game.MapProtectionListener;
+import me.thevipershow.aussiebedwars.listeners.game.MerchantInteractListener;
+import me.thevipershow.aussiebedwars.listeners.game.PlayerQuitDuringGameListener;
 import me.tigerhix.lib.scoreboard.type.Scoreboard;
 import net.minecraft.server.v1_8_R3.ChatMessage;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
@@ -32,7 +35,7 @@ public abstract class ActiveGame {
     protected final BedwarsGame bedwarsGame;
     protected final World associatedWorld;
     protected final World lobbyWorld;
-    protected final Location cachedSpawnLocation;
+    protected final Location cachedLobbySpawnLocation;
     protected final Plugin plugin;
     protected final AbstractQueue<Player> associatedQueue;
     protected final Location cachedWaitingLocation;
@@ -40,6 +43,8 @@ public abstract class ActiveGame {
     protected final Set<ActiveSpawner> activeSpawners;
 
     protected final Set<Scoreboard> activeScoreboards = new HashSet<>();
+    protected final Set<BedwarsTeam> destroyedTeams = new HashSet<>();
+    protected final Set<AbstractActiveMerchant> activeMerchants = new HashSet<>();
     protected final Set<UnregisterableListener> unregisterableListeners = new HashSet<>();
 
     ///////////////////////////////////////////////////
@@ -57,7 +62,7 @@ public abstract class ActiveGame {
         this.lobbyWorld = lobbyWorld;
         this.associatedWorld = Bukkit.getWorld(associatedWorldFilename);
         this.plugin = plugin;
-        this.cachedSpawnLocation = this.lobbyWorld.getSpawnLocation();
+        this.cachedLobbySpawnLocation = this.lobbyWorld.getSpawnLocation();
         this.associatedQueue = new MatchmakingQueue(bedwarsGame.getPlayers());
         this.cachedWaitingLocation = bedwarsGame.getLobbySpawn().toLocation(associatedWorld);
         this.missingtime = bedwarsGame.getStartTimer();
@@ -142,20 +147,14 @@ public abstract class ActiveGame {
                 }, 1L, 20L);
     }
 
-    public abstract void start();
-
-    public abstract void moveTeamsToSpawns();
-
-    public abstract void stop();
-
     public void moveToLobby(Player player) {
-        player.teleport(cachedSpawnLocation);
+        player.teleport(cachedLobbySpawnLocation);
     }
 
     public void moveAllToLobby() {
         associatedQueue.performAndClean(player -> {
             if (player.isOnline())
-                player.teleport(cachedSpawnLocation);
+                player.teleport(cachedLobbySpawnLocation);
         });
     }
 
@@ -167,22 +166,33 @@ public abstract class ActiveGame {
     public void registerMapListeners() {
         final UnregisterableListener mapProtectionListener = new MapProtectionListener(this);
         final UnregisterableListener mapIllegalMovementsListener = new MapIllegalMovementsListener(this);
+        final UnregisterableListener bedDestroyListener = new BedBreakListener(this);
+        final UnregisterableListener lobbyCompassListener = new LobbyCompassListener(this);
+        final UnregisterableListener deathListener = new DeathListener(this);
+        final UnregisterableListener quitListener = new PlayerQuitDuringGameListener(this);
+        final UnregisterableListener merchantListener = new MerchantInteractListener(this);
 
         plugin.getServer().getPluginManager().registerEvents(mapProtectionListener, plugin);
         plugin.getServer().getPluginManager().registerEvents(mapIllegalMovementsListener, plugin);
+        plugin.getServer().getPluginManager().registerEvents(bedDestroyListener, plugin);
+        plugin.getServer().getPluginManager().registerEvents(lobbyCompassListener, plugin);
+        plugin.getServer().getPluginManager().registerEvents(deathListener, plugin);
+        plugin.getServer().getPluginManager().registerEvents(quitListener, plugin);
+        plugin.getServer().getPluginManager().registerEvents(merchantListener, plugin);
 
         unregisterableListeners.add(mapIllegalMovementsListener);
         unregisterableListeners.add(mapProtectionListener);
+        unregisterableListeners.add(bedDestroyListener);
+        unregisterableListeners.add(lobbyCompassListener);
+        unregisterableListeners.add(deathListener);
+        unregisterableListeners.add(quitListener);
+        unregisterableListeners.add(merchantListener);
     }
 
     public void unregisterAllListeners() {
         for (final UnregisterableListener unregisterableListener : unregisterableListeners)
             if (!unregisterableListener.isUnregistered())
                 unregisterableListener.unregister();
-    }
-
-    public Set<UnregisterableListener> getUnregisterableListeners() {
-        return unregisterableListeners;
     }
 
     public void moveToWaitingRoom(final Player player) {
@@ -195,6 +205,20 @@ public abstract class ActiveGame {
             player.sendMessage(AussieBedwars.PREFIX + "Something went wrong when teleporting you to waiting room.");
     }
 
+    public BedwarsTeam getPlayerTeam(final Player player) {
+        for (final Map.Entry<BedwarsTeam, Set<Player>> entry : assignedTeams.entrySet())
+            if (entry.getValue().contains(player))
+                return entry.getKey();
+        return null;
+    }
+
+    public abstract void start();
+
+    public abstract void moveTeamsToSpawns();
+
+    public abstract void stop();
+
+    public abstract void removePlayer(final Player p);
 
     public abstract void declareWinner();
 
@@ -205,6 +229,10 @@ public abstract class ActiveGame {
     public abstract void createSpawners();
 
     public abstract void createMerchants();
+
+    public Set<UnregisterableListener> getUnregisterableListeners() {
+        return unregisterableListeners;
+    }
 
     public BedwarsGame getBedwarsGame() {
         return bedwarsGame;
@@ -226,8 +254,8 @@ public abstract class ActiveGame {
         return lobbyWorld;
     }
 
-    public Location getCachedSpawnLocation() {
-        return cachedSpawnLocation;
+    public Location getCachedLobbySpawnLocation() {
+        return cachedLobbySpawnLocation;
     }
 
     public Plugin getPlugin() {
@@ -252,6 +280,10 @@ public abstract class ActiveGame {
         return activeSpawners;
     }
 
+    public Set<AbstractActiveMerchant> getActiveMerchants() {
+        return activeMerchants;
+    }
+
     @Override
     public final String toString() {
         return "ActiveGame{" +
@@ -259,7 +291,7 @@ public abstract class ActiveGame {
                 ", bedwarsGame=" + bedwarsGame +
                 ", associatedWorld=" + associatedWorld +
                 ", lobbyWorld=" + lobbyWorld +
-                ", cachedSpawnLocation=" + cachedSpawnLocation +
+                ", cachedSpawnLocation=" + cachedLobbySpawnLocation +
                 ", plugin=" + plugin +
                 ", associatedQueue=" + associatedQueue +
                 ", cachedWaitingLocation=" + cachedWaitingLocation +
@@ -267,18 +299,15 @@ public abstract class ActiveGame {
                 '}';
     }
 
+    public Set<BedwarsTeam> getDestroyedTeams() {
+        return destroyedTeams;
+    }
+
     public boolean isHasStarted() {
         return hasStarted;
     }
 
     public abstract void destroyTeamBed(final BedwarsTeam team);
-
-    public BedwarsTeam getPlayerTeam(final Player player) {
-        for (final Map.Entry<BedwarsTeam, Set<Player>> entry : assignedTeams.entrySet())
-            if (entry.getValue().contains(player))
-                return entry.getKey();
-        return null;
-    }
 
     public Map<BedwarsTeam, Set<Player>> getAssignedTeams() {
         return assignedTeams;

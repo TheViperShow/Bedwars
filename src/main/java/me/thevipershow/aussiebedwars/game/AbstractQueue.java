@@ -1,4 +1,4 @@
-package me.thevipershow.aussiebedwars.listeners;
+package me.thevipershow.aussiebedwars.game;
 
 import java.util.LinkedList;
 import java.util.function.Consumer;

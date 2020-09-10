@@ -1,21 +1,25 @@
 package me.thevipershow.aussiebedwars.events;
 
+import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.aussiebedwars.game.ActiveGame;
-import me.thevipershow.aussiebedwars.game.AbstractQueue;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class GameStartEvent extends Event implements Cancellable {
+public final class TeamBedDestroyEvent extends Event implements Cancellable {
     private boolean isCancelled = false;
     public static final HandlerList handlerList = new HandlerList();
-    private final AbstractQueue<Player> matchmakingQueue;
-    private final ActiveGame activeGame;
 
-    public GameStartEvent(ActiveGame activeGame) {
-        this.matchmakingQueue = activeGame.getAssociatedQueue();
+    private final ActiveGame activeGame;
+    private final BedwarsTeam team;
+
+    /**
+     * The default constructor is defined for cleaner code. This constructor
+     * assumes the event is synchronous.
+     */
+    public TeamBedDestroyEvent(final ActiveGame activeGame, final BedwarsTeam team) {
         this.activeGame = activeGame;
+        this.team = team;
     }
 
     /**
@@ -49,11 +53,11 @@ public class GameStartEvent extends Event implements Cancellable {
         return handlerList;
     }
 
-    public AbstractQueue<Player> getMatchmakingQueue() {
-        return matchmakingQueue;
-    }
-
     public ActiveGame getActiveGame() {
         return activeGame;
+    }
+
+    public BedwarsTeam getTeam() {
+        return team;
     }
 }
