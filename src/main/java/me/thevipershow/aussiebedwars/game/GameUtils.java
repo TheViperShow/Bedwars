@@ -1,5 +1,6 @@
 package me.thevipershow.aussiebedwars.game;
 
+import me.thevipershow.aussiebedwars.config.objects.Merchant;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
 import net.minecraft.server.v1_8_R3.PlayerConnection;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
@@ -33,5 +34,15 @@ public final class GameUtils {
         e.c(eTag);
         eTag.setInt(NO_AI_TAG, status ? 0x00 : 0x01);
         e.f(eTag);
+    }
+
+    public static AbstractActiveMerchant fromMerchant(final Merchant merchant, final ActiveGame activeGame) {
+        switch (merchant.getMerchantType()) {
+            case SHOP:
+                return new ShopActiveMerchant(activeGame, merchant);
+            case UPGRADE:
+                return new UpgradeActiveMerchant(activeGame, merchant);
+        }
+        return null;
     }
 }

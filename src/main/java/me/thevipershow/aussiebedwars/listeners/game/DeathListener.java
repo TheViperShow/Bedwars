@@ -54,9 +54,8 @@ public final class DeathListener extends UnregisterableListener {
 
         @Override
         public final void run() {
-            if (!p.isOnline()) {
+            if (!p.isOnline() && p.getWorld().equals(activeGame.getAssociatedWorld())) {
                 cancel();
-                return;
             } else if (secondsLeft == 0) {
                 final SpawnPosition spawnPos = activeGame.getBedwarsGame().spawnPosOfTeam(activeGame.getPlayerTeam(p));
                 if (spawnPos != null)
@@ -92,6 +91,7 @@ public final class DeathListener extends UnregisterableListener {
             // here player has lost the game.
             p.setGameMode(GameMode.SPECTATOR);
             givePlayerLobbyCompass(p);
+            activeGame.removePlayer(p);
         } else { // player is still in game
             doDeathTimer(p);
         }

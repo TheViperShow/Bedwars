@@ -59,6 +59,7 @@ public final class MapProtectionListener extends UnregisterableListener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onBlockBreak(BlockBreakEvent event) {
         final Player p = event.getPlayer();
+        if (p.isOp()) return;
         final Block block = event.getBlock();
         if (!block.getWorld().equals(activeGame.getAssociatedWorld())) return;
 

@@ -9,7 +9,7 @@ import me.thevipershow.aussiebedwars.config.BedwarsGamemodeConfig;
 import me.thevipershow.aussiebedwars.config.ConfigManager;
 import me.thevipershow.aussiebedwars.config.objects.BedwarsGame;
 import me.thevipershow.aussiebedwars.game.ActiveGame;
-import me.thevipershow.aussiebedwars.game.GameUtilities;
+import me.thevipershow.aussiebedwars.game.GamemodeUtilities;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -24,6 +24,7 @@ public class WorldsManager {
     private final File pluginFolder;
     private final World lobbyWorld;
     private final HashMap<BedwarsGame, Integer> createdAmountsMap;
+    private final Set<ActiveGame> activeGameSet;
 
     public WorldsManager(ConfigManager configManager, final JavaPlugin plugin) {
         this.configManager = configManager;
@@ -53,8 +54,6 @@ public class WorldsManager {
         }
     }
 
-    private final Set<ActiveGame> activeGameSet;
-
     public final void load(final BedwarsGame game) {
         final String fileName = game.getMapFilename();
         final Integer i = createdAmountsMap.get(game);
@@ -83,7 +82,7 @@ public class WorldsManager {
 
         plugin.getLogger().info(String.format("Loading [%s] into active games.", tempName));
 
-        final ActiveGame activeGame = GameUtilities.fromGamemode(tempName, game, lobbyWorld, plugin);
+        final ActiveGame activeGame = GamemodeUtilities.fromGamemode(tempName, game, lobbyWorld, plugin);
 
         if (w != null && copyResult) {
             plugin.getLogger().info(String.format("Successfully created a world name [%s].", tempName));

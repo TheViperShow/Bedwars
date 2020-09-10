@@ -76,4 +76,20 @@ public abstract class AbstractActiveMerchant {
         if (isActive())
             this.villager.remove();
     }
+
+    public Merchant getMerchant() {
+        return merchant;
+    }
+
+    public Inventory getCachedInventory() {
+        return cachedInventory;
+    }
+
+    public HashMap<ItemStack, ShopItem> getCachedShopItems() {
+        return cachedShopItems;
+    }
+
+    public Villager getVillager() {
+        return villager;
+    }
 }

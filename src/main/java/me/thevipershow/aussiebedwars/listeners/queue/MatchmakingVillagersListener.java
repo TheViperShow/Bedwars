@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import me.thevipershow.aussiebedwars.AussieBedwars;
 import me.thevipershow.aussiebedwars.bedwars.Gamemode;
 import me.thevipershow.aussiebedwars.game.ActiveGame;
 import me.thevipershow.aussiebedwars.game.GameManager;
@@ -49,7 +50,10 @@ public class MatchmakingVillagersListener implements Listener {
 
             final Optional<ActiveGame> opt = gameManager.findOptimalGame(g.get());
 
-            if (!opt.isPresent()) return;
+            if (!opt.isPresent()) {
+                player.sendMessage(AussieBedwars.PREFIX + "§eWe could not find a game.");
+                return;
+            }
 
             final ActiveGame activeGame = opt.get();
 

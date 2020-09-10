@@ -1,5 +1,7 @@
 package me.thevipershow.aussiebedwars.game;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -8,10 +10,13 @@ import java.util.stream.Collectors;
 import me.thevipershow.aussiebedwars.AussieBedwars;
 import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.aussiebedwars.config.objects.BedwarsGame;
+import me.thevipershow.aussiebedwars.config.objects.Merchant;
 import me.thevipershow.aussiebedwars.events.GameStartEvent;
 import me.thevipershow.aussiebedwars.listeners.UnregisterableListener;
 import me.thevipershow.aussiebedwars.listeners.game.BedBreakListener;
 import me.thevipershow.aussiebedwars.listeners.game.DeathListener;
+import me.thevipershow.aussiebedwars.listeners.game.EntityDamageListener;
+import me.thevipershow.aussiebedwars.listeners.game.GUIInteractListener;
 import me.thevipershow.aussiebedwars.listeners.game.LobbyCompassListener;
 import me.thevipershow.aussiebedwars.listeners.game.MapIllegalMovementsListener;
 import me.thevipershow.aussiebedwars.listeners.game.MapProtectionListener;
@@ -22,10 +27,12 @@ import net.minecraft.server.v1_8_R3.ChatMessage;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
 import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
 import net.minecraft.server.v1_8_R3.PlayerConnection;
+import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Villager;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -153,7 +160,7 @@ public abstract class ActiveGame {
 
     public void moveAllToLobby() {
         associatedQueue.performAndClean(player -> {
-            if (player.isOnline())
+            if (player.isOnline() && player.getWorld().equals(associatedWorld))
                 player.teleport(cachedLobbySpawnLocation);
         });
     }
@@ -171,6 +178,8 @@ public abstract class ActiveGame {
         final UnregisterableListener deathListener = new DeathListener(this);
         final UnregisterableListener quitListener = new PlayerQuitDuringGameListener(this);
         final UnregisterableListener merchantListener = new MerchantInteractListener(this);
+        final UnregisterableListener entityDamageListener = new EntityDamageListener(this);
+        final UnregisterableListener guiInteractListener = new GUIInteractListener(this);
 
         plugin.getServer().getPluginManager().registerEvents(mapProtectionListener, plugin);
         plugin.getServer().getPluginManager().registerEvents(mapIllegalMovementsListener, plugin);
@@ -179,6 +188,8 @@ public abstract class ActiveGame {
         plugin.getServer().getPluginManager().registerEvents(deathListener, plugin);
         plugin.getServer().getPluginManager().registerEvents(quitListener, plugin);
         plugin.getServer().getPluginManager().registerEvents(merchantListener, plugin);
+        plugin.getServer().getPluginManager().registerEvents(entityDamageListener, plugin);
+        plugin.getServer().getPluginManager().registerEvents(guiInteractListener, plugin);
 
         unregisterableListeners.add(mapIllegalMovementsListener);
         unregisterableListeners.add(mapProtectionListener);
@@ -187,9 +198,11 @@ public abstract class ActiveGame {
         unregisterableListeners.add(deathListener);
         unregisterableListeners.add(quitListener);
         unregisterableListeners.add(merchantListener);
+        unregisterableListeners.add(entityDamageListener);
+        unregisterableListeners.add(guiInteractListener);
     }
 
-    public void unregisterAllListeners() {
+    public final void unregisterAllListeners() {
         for (final UnregisterableListener unregisterableListener : unregisterableListeners)
             if (!unregisterableListener.isUnregistered())
                 unregisterableListener.unregister();
@@ -212,23 +225,59 @@ public abstract class ActiveGame {
         return null;
     }
 
+    public boolean isMerchantVillager(final Villager villager) {
+        for (AbstractActiveMerchant activeMerchant : getActiveMerchants())
+            if (activeMerchant.getVillager() == villager)
+                return true;
+        return false;
+    }
+
     public abstract void start();
 
     public abstract void moveTeamsToSpawns();
 
     public abstract void stop();
 
-    public abstract void removePlayer(final Player p);
+    public void removePlayer(final Player p) {
+        associatedQueue.removeFromQueue(p);
+    }
 
-    public abstract void declareWinner();
+    public abstract void declareWinner(final Player player);
 
     public abstract void assignTeams();
 
     public abstract void assignScoreboards();
 
-    public abstract void createSpawners();
+    public abstract void destroyTeamBed(final BedwarsTeam team);
 
-    public abstract void createMerchants();
+    public void createSpawners() {
+        for (final ActiveSpawner activeSpawner : getActiveSpawners())
+            activeSpawner.spawn();
+    }
+
+    public void destroyMap() {
+        if (isRunning)
+            stop();
+        plugin.getServer().unloadWorld(associatedWorld, false);
+        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+            final File wDir = associatedWorld.getWorldFolder();
+            try {
+                FileUtils.deleteDirectory(wDir);
+            } catch (IOException e) {
+                plugin.getLogger().severe("Something went wrong while destroying map of " + associatedWorldFilename);
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public void createMerchants() {
+        for (final Merchant merchant : bedwarsGame.getMerchants()) {
+            final AbstractActiveMerchant aMerchant = GameUtils.fromMerchant(merchant, this);
+            if (aMerchant == null) continue;
+            aMerchant.spawn();
+            this.activeMerchants.add(aMerchant);
+        }
+    }
 
     public Set<UnregisterableListener> getUnregisterableListeners() {
         return unregisterableListeners;
@@ -306,8 +355,6 @@ public abstract class ActiveGame {
     public boolean isHasStarted() {
         return hasStarted;
     }
-
-    public abstract void destroyTeamBed(final BedwarsTeam team);
 
     public Map<BedwarsTeam, Set<Player>> getAssignedTeams() {
         return assignedTeams;

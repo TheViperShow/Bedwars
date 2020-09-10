@@ -24,6 +24,10 @@ public final class ImmutableTraversableList<T> {
         }
     }
 
+    public void clear() {
+        list.clear();
+    }
+
     public final T forward() {
         final int listSize = list.size();
         if (listSize == 0) {

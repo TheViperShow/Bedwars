@@ -1,8 +1,8 @@
 solo:
   - map-filename: "bedwars-solo"
     start-timer: 30
-    minimum-games: 2
-    maximum-games: 4
+    minimum-games: 4
+    maximum-games: 8
     min-players: 2
     players: 8
     teams:
@@ -15,96 +15,189 @@ solo:
       - "WHITE"
       - "GREY"
     map-lobby-spawn:
-      x: 1.0 #Please modify this
-      y: 1.0 #Please modify this
-      z: 1.0 #Please modify this
+      x: -290.0 #Please modify this
+      y: 111.0 #Please modify this
+      z: 0.0 #Please modify this
     map-spawns:
-      - x: 1.0 # Please set this <- SPAWN #1
-        y: 2.0 # Please set this
-        z: 3.0 # Please set this
-        team: "CYAN"
+      - x: -93.0 # Please set this <- SPAWN #1
+        y: 62.0 # Please set this
+        z: -37.0 # Please set this
+        team: "GREY"
 
-      - x: 1.0 # Please set this <- SPAWN #2
-        y: 2.0 # Please set this
-        z: 3.0 # Please set this
+      - x: -93.0 # Please set this <- SPAWN #2
+        y: 62.0 # Please set this
+        z: 38.0 # Please set this
         team: "PINK"
 
-      - x: 1.0 # Please set this <- SPAWN #3
-        y: 2.0 # Please set this
-        z: 3.0 # Please set this
+      - x: 94.0 # Please set this <- SPAWN #3
+        y: 62.0 # Please set this
+        z: 38.0 # Please set this
         team: "YELLOW"
 
-      - x: 1.0 # Please set this <- SPAWN #4
-        y: 2.0 # Please set this
-        z: 3.0 # Please set this
+      - x: 94.0 # Please set this <- SPAWN #4
+        y: 62.0 # Please set this
+        z: -37.0 # Please set this
         team: "GREEN"
 
-      - x: 1.0 # Please set this <- SPAWN #5
-        y: 2.0 # Please set this
-        z: 3.0 # Please set this
+      - x: -37.0 # Please set this <- SPAWN #5
+        y: 62.0 # Please set this
+        z: -93.0 # Please set this
         team: "RED"
 
-      - x: 1.0 # Please set this <- SPAWN #6
-        y: 2.0 # Please set this
-        z: 3.0 # Please set this
+      - x: 38.0 # Please set this <- SPAWN #6
+        y: 62.0 # Please set this
+        z: -93.0 # Please set this
         team: "BLUE"
 
-      - x: 1.0 # Please set this <- SPAWN #7
-        y: 2.0 # Please set this
-        z: 3.0 # Please set this
+      - x: -37.0 # Please set this <- SPAWN #7
+        y: 62.0 # Please set this
+        z: 94.0 # Please set this
         team: "WHITE"
 
-      - x: 1.0 # Please set this <- SPAWN #8
-        y: 2.0 # Please set this
-        z: 3.0 # Please set this
-        team: "GREY"
+      - x: 38.0 # Please set this <- SPAWN #8
+        y: 62.0 # Please set this
+        z: 94.0 # Please set this
+        team: "CYAN"
     spawners:
-      - type: "GOLD"
+# EMERALD SPAWNERS
+      - type: "EMERALD"
         location:
-          x: 1.0
-          y: 1.0
-          z: 1.0
+          x: 26.5
+          y: 72.0
+          z: -25.5
         drop-amount: 1
         levels:
           - number: 2
-            increase-drop: 0
+            increase-drop: 1
             after-seconds: 60
-          - number: 3
-            increase-drop: 2
-            after-seconds: 120
-          - number: 4
-            increase-drop: 3
-            after-seconds: 160
+      - type: "EMERALD"
+        location:
+          x: -25.5
+          y: 72.0
+          z: -25.5
+        drop-amount: 1
+        levels:
+          - number: 2
+            increase-drop: 1
+            after-seconds: 60
+      - type: "EMERALD"
+        location:
+          x: -25.5
+          y: 72.0
+          z: 26.5
+        drop-amount: 1
+        levels:
+          - number: 2
+            increase-drop: 1
+            after-seconds: 60
+      - type: "EMERALD"
+        location:
+          x: 26.5
+          y: 72.0
+          z: 26.5
+        drop-amount: 1
+        levels:
+          - number: 2
+            increase-drop: 1
+            after-seconds: 60
+# DIAMONDS SPAWNERS
       - type: "DIAMOND"
-          location:
-            x: 1.0
-            y: 1.0
-            z: 1.0
-          drop-amount: 1
-          levels:
-            - number: 2
-              increase-drop: 1
-              after-seconds: 60
-            - number: 3
-              increase-drop: 1
-              after-seconds: 120
-            - number: 4
-              increase-drop: 2
-              after-seconds: 160
-
+        location:
+          x: 62.5
+          y: 63.0
+          z: 0.5
+        drop-amount: 1
+        levels:
+          - number: 2
+            increase-drop: 1
+            after-seconds: 60
+      - type: "DIAMOND"
+        location:
+          x: 0.5
+          y: 63.0
+          z: 62.5
+        drop-amount: 1
+        levels:
+          - number: 2
+            increase-drop: 1
+            after-seconds: 60
+      - type: "DIAMOND"
+        location:
+          x: -61.5
+          y: 63.0
+          z: 0.5
+        drop-amount: 1
+        levels:
+          - number: 2
+            increase-drop: 1
+            after-seconds: 60
+      - type: "DIAMOND"
+        location:
+          x: 0.5
+          y: 63.0
+          z: -61.5
+        drop-amount: 1
+        levels:
+          - number: 2
+            increase-drop: 1
+            after-seconds: 60
     merchants:
+      # MERCHANTS SHOP SIGNS
       - name: "[AussieBedwars] Shop"
         type: "SHOP"
         location:
-          x: 1.0 # Please set this
-          y: 1.0 # Please set this
-          z: 1.0 # Plz set this
-      - name: "[AussieBedwars] Upgrades"
-        type: "UPGRADE"
+          x: 33.5 # Please set this
+          y: 62.0 # Please set this
+          z: -93.0 # Plz set this
+      - name: "[AussieBedwars] Shop"
+        type: "SHOP"
         location:
-          x: 1.0
-          y: 1.0
-          z: 1.0
+          x: 94.0 # Please set this
+          y: 62.0 # Please set this
+          z: -32.5 # Plz set this
+      - name: "[AussieBedwars] Shop"
+        type: "SHOP"
+        location:
+          x: 94.0 # Please set this
+          y: 62.0 # Please set this
+          z: 33.5 # Plz set this
+      - name: "[AussieBedwars] Shop"
+        type: "SHOP"
+        location:
+          x: 33.5 # Please set this
+          y: 62.0 # Please set this
+          z: 94.0 # Plz set this
+      - name: "[AussieBedwars] Shop"
+        type: "SHOP"
+        location:
+          x: -32.5 # Please set this
+          y: 62.0 # Please set this
+          z: 94.0 # Plz set this
+      - name: "[AussieBedwars] Shop"
+        type: "SHOP"
+        location:
+          x: -93.0 # Please set this
+          y: 62.0 # Please set this
+          z: 33.50 # Plz set this
+      - name: "[AussieBedwars] Shop"
+        type: "SHOP"
+        location:
+          x: -93.0 # Please set this
+          y: 62.0 # Please set this
+          z: -32.50 # Plz set this
+      - name: "[AussieBedwars] Shop"
+        type: "SHOP"
+        location:
+          x: -32.50 # Please set this
+          y: 52.0 # Please set this
+          z: -93.0 # Plz set this
+# UPGRADE SHOPS SECTION
+    #  - name: "[AussieBedwars] Upgrades"
+    #    type: "UPGRADE"
+    #    location:
+    #      x: 1.0
+    #      y: 1.0
+    #      z: 1.0
     shop:
       title: "{TEAM} Shop"
       slots: 54

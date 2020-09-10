@@ -5,7 +5,7 @@ import me.thevipershow.aussiebedwars.game.impl.SoloActiveGame;
 import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
 
-public final class GameUtilities {
+public final class GamemodeUtilities {
 
     public static ActiveGame fromGamemode(String associatedWorldName ,BedwarsGame game, World lobbyWorld, Plugin plugin) {
         ActiveGame gameToReturn = null;

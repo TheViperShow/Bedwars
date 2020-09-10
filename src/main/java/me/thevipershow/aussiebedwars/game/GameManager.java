@@ -28,7 +28,6 @@ public final class GameManager {
     private final WorldsManager worldsManager;
     private final Set<BedwarsGame> bedwarsGameSet = new HashSet<>();
 
-
     public void loadBaseAmount() {
         bedwarsGameSet.forEach(bedwarsGame -> {
             int count = 0;
@@ -44,7 +43,7 @@ public final class GameManager {
         ActiveGame bestGame = null;
 
         for (final ActiveGame game : worldsManager.getActiveGameSet()) {
-
+            if (game.isRunning()) continue;
             final AbstractQueue<Player> queue = game.getAssociatedQueue();
             final int newDiff = game.bedwarsGame.getPlayers() - queue.queueSize();
             if (diff == null) {

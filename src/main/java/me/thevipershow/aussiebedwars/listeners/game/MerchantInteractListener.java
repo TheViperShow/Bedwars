@@ -1,5 +1,7 @@
 package me.thevipershow.aussiebedwars.listeners.game;
 
+import me.thevipershow.aussiebedwars.bedwars.objects.shops.MerchantType;
+import me.thevipershow.aussiebedwars.game.AbstractActiveMerchant;
 import me.thevipershow.aussiebedwars.game.ActiveGame;
 import me.thevipershow.aussiebedwars.listeners.UnregisterableListener;
 import org.bukkit.World;
@@ -24,8 +26,22 @@ public final class MerchantInteractListener extends UnregisterableListener {
         if (!(entity instanceof Villager)) return;
         final World w = entity.getWorld();
         if (!w.equals(activeGame.getAssociatedWorld())) return;
-
         final Player p = event.getPlayer();
+        final Villager villager = (Villager) entity;
 
+        AbstractActiveMerchant aMerchant = null;
+
+        for (final AbstractActiveMerchant activeMerchant : activeGame.getActiveMerchants()) {
+            final Villager activeMerchantVillager = activeMerchant.getVillager();
+            if (activeMerchantVillager == villager) {
+                aMerchant = activeMerchant;
+                break;
+            }
+        }
+
+        if (aMerchant == null) return;
+
+        event.setCancelled(true);
+        aMerchant.openUI(p);
     }
 }

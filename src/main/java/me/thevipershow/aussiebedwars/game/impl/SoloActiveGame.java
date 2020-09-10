@@ -8,8 +8,10 @@ import java.util.Set;
 import me.thevipershow.aussiebedwars.AussieBedwars;
 import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.aussiebedwars.config.objects.BedwarsGame;
+import me.thevipershow.aussiebedwars.game.AbstractActiveMerchant;
 import me.thevipershow.aussiebedwars.game.ActiveGame;
 import me.thevipershow.aussiebedwars.game.ActiveSpawner;
+import me.thevipershow.aussiebedwars.listeners.UnregisterableListener;
 import me.tigerhix.lib.scoreboard.ScoreboardLib;
 import me.tigerhix.lib.scoreboard.common.EntryBuilder;
 import me.tigerhix.lib.scoreboard.type.Entry;
@@ -54,17 +56,32 @@ public final class SoloActiveGame extends ActiveGame {
 
     @Override
     public void stop() {
-
+        this.getActiveSpawners().forEach(ActiveSpawner::despawn);
+        this.getActiveSpawners().clear();
+        this.getActiveMerchants().forEach(AbstractActiveMerchant::delete);
+        this.getActiveMerchants().clear();
+        this.getAssignedTeams().clear();
+        this.getActiveScoreboards().forEach(Scoreboard::deactivate);
+        this.getActiveScoreboards().clear();
+        this.getDestroyedTeams().clear();
+        this.getUnregisterableListeners().forEach(UnregisterableListener::unregister);
+        this.getUnregisterableListeners().clear();
+        associatedQueue.perform(p -> {
+            if (p.isOnline() && p.getWorld().equals(associatedWorld))
+                p.teleport(cachedLobbySpawnLocation);
+        });
+        this.associatedQueue.cleanQueue();
+        setRunning(false);
+        destroyMap();
     }
 
     @Override
-    public void removePlayer(final Player p) {
-
-    }
-
-    @Override
-    public void declareWinner() {
-
+    public void declareWinner(final Player player) {
+        associatedQueue.perform(p -> {
+            if (p.isOnline() && p.getWorld().equals(associatedWorld)) {
+                p.sendTitle("§e" + player.getName() + " §7has won the game!", "");
+            }
+        });
     }
 
     @Override
@@ -108,17 +125,12 @@ public final class SoloActiveGame extends ActiveGame {
     }
 
     @Override
-    public void createSpawners() {
-        getActiveSpawners().forEach(ActiveSpawner::spawn);
-    }
-
-    @Override
-    public void createMerchants() {
-
-    }
-
-    @Override
-    public void destroyTeamBed(BedwarsTeam team) {
-
+    public void destroyTeamBed(final BedwarsTeam team) {
+        associatedQueue.perform(p -> {
+            if (p.isOnline() && p.getWorld().equals(associatedWorld)) {
+                p.sendTitle('§' + team.getColorCode() + team.name() + " §7team's bed has been broken!",
+                        "");
+            }
+        });
     }
 }

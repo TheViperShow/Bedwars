@@ -11,6 +11,7 @@ import me.thevipershow.aussiebedwars.config.objects.Shop;
 import me.thevipershow.aussiebedwars.config.objects.ShopItem;
 import me.thevipershow.aussiebedwars.config.objects.SoloBedwars;
 import me.thevipershow.aussiebedwars.config.objects.Spawner;
+import me.thevipershow.aussiebedwars.config.objects.TeamSpawnPosition;
 import me.thevipershow.aussiebedwars.game.GameManager;
 import me.thevipershow.aussiebedwars.listeners.queue.MatchmakingVillagersListener;
 import me.thevipershow.aussiebedwars.listeners.queue.QueueResizerListener;
@@ -56,7 +57,7 @@ public final class AussieBedwars extends JavaPlugin {
         ConfigurationSerialization.registerClass(Merchant.class);
         ConfigurationSerialization.registerClass(SoloBedwars.class);
         ConfigurationSerialization.registerClass(ShopItem.class);
-
+        ConfigurationSerialization.registerClass(TeamSpawnPosition.class);
     }
 //
 //         _nnnn_
@@ -100,6 +101,11 @@ public final class AussieBedwars extends JavaPlugin {
         getServer().getPluginManager().registerEvents(matchmakingVillagerListener, this);
         queueResizerListener = new QueueResizerListener(gameManager);
         getServer().getPluginManager().registerEvents(queueResizerListener, this);
+    }
+
+    @Override
+    public void onDisable() {
+        worldsManager.getActiveGameSet().forEach(game -> getServer().unloadWorld(game.getAssociatedWorld(), false));
     }
 
 }

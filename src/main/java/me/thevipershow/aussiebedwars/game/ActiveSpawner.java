@@ -108,6 +108,14 @@ public class ActiveSpawner {
                 && this.dropTask != null;
     }
 
+    public void despawn() {
+        if (active()) {
+            animationTask.cancel();
+            getCachedAnimation().clear();
+            stand.remove();
+        }
+    }
+
     /*--------------------------------------------------------------------------------------------------------------*/
 
     public SpawnerType getType() {

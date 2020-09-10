@@ -1,8 +1,5 @@
 package me.thevipershow.aussiebedwars.listeners.game;
 
-import java.util.HashMap;
-import java.util.Map;
-import me.thevipershow.aussiebedwars.AussieBedwars;
 import me.thevipershow.aussiebedwars.config.objects.SpawnPosition;
 import me.thevipershow.aussiebedwars.game.ActiveGame;
 import me.thevipershow.aussiebedwars.game.ActiveSpawner;
@@ -73,8 +70,9 @@ public final class MapIllegalMovementsListener extends UnregisterableListener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onBlockPlace(final BlockPlaceEvent event) {
         final Block block = event.getBlock();
-
-        if (isOutOfBounds(block))
+        final Player player = event.getPlayer();
+        if (player.isOp()) return;
+        if (isOutOfBounds(block) && player.getWorld().equals(activeGame.getAssociatedWorld()))
             event.setCancelled(true);
     }
 }
