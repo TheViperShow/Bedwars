@@ -89,4 +89,13 @@ public class SpawnPosition implements ConfigurationSerializable, Cloneable {
     public final Location toLocation(final World world) {
         return new Location(world, this.x, this.y, this.z);
     }
+
+    @Override
+    public String toString() {
+        return "SpawnPosition{" +
+                "x=" + x +
+                ", y=" + y +
+                ", z=" + z +
+                '}';
+    }
 }

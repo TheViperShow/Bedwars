@@ -1,5 +1,6 @@
 package me.thevipershow.aussiebedwars.listeners.game;
 
+import java.util.Set;
 import me.thevipershow.aussiebedwars.AussieBedwars;
 import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.aussiebedwars.config.objects.TeamSpawnPosition;
@@ -13,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.ItemSpawnEvent;
 
 public final class BedBreakListener extends UnregisterableListener {
 
@@ -48,22 +50,39 @@ public final class BedBreakListener extends UnregisterableListener {
         final Block b = event.getBlock();
         if (!b.getWorld().equals(activeGame.getAssociatedWorld())) return;
 
-        if (b.getType() == Material.BED_BLOCK) {
-            final BedwarsTeam playerTeam = activeGame.getPlayerTeam(p);
-            final BedwarsTeam destroyedBedTeam = teamOfBed(b);
-            if (playerTeam == destroyedBedTeam) {
-                p.sendMessage(AussieBedwars.PREFIX + "§eYou cannot destroy your own bed.");
-                event.setCancelled(true);
+
+        if (activeGame.getPlayerPlacedBlocks().contains(b)) {
+            activeGame.getPlayerPlacedBlocks().remove(b);
+        } else {
+            if (b.getType() == Material.BED_BLOCK) {
+                System.out.println("1");
+                final BedwarsTeam playerTeam = activeGame.getPlayerTeam(p);
+                final BedwarsTeam destroyedBedTeam = teamOfBed(b);
+                if (playerTeam == destroyedBedTeam) {
+                    p.sendMessage(AussieBedwars.PREFIX + "§eYou cannot destroy your own bed.");
+                    event.setCancelled(true);
+                } else {
+                    final TeamBedDestroyEvent e = new TeamBedDestroyEvent(activeGame, destroyedBedTeam);
+                    activeGame.getPlugin().getServer().getPluginManager().callEvent(e);
+
+                    if (e.isCancelled()) return;
+
+                    activeGame.getDestroyedTeams().add(destroyedBedTeam);
+                    activeGame.destroyTeamBed(destroyedBedTeam);
+                }
             } else {
-                final TeamBedDestroyEvent e = new TeamBedDestroyEvent(activeGame, destroyedBedTeam);
-                activeGame.getPlugin().getServer().getPluginManager().callEvent(e);
-
-                if (e.isCancelled()) return;
-
-                activeGame.getDestroyedTeams().add(destroyedBedTeam);
-                activeGame.destroyTeamBed(destroyedBedTeam);
+                event.setCancelled(true);
             }
         }
+
+        System.out.println("2");
     }
 
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    public void onItemSpawn(final ItemSpawnEvent event) {
+        if (!event.getEntity().getWorld().equals(activeGame.getAssociatedWorld())) return;
+        if (event.getEntity().getItemStack().getType() == Material.BED) {
+            event.setCancelled(true);
+        }
+    }
 }

@@ -105,6 +105,7 @@ public final class AussieBedwars extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        
         worldsManager.getActiveGameSet().forEach(game -> getServer().unloadWorld(game.getAssociatedWorld(), false));
     }
 

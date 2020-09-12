@@ -12,13 +12,17 @@ import org.bukkit.configuration.serialization.SerializableAs;
 public class Spawner implements ConfigurationSerializable {
     private final SpawnPosition spawnPosition;
     private final SpawnerType spawnerType;
-    private int dropAmount;
-    private List<SpawnerLevel> spawnerLevels;
+    private final int dropDelay;
+    private final int dropAmount;
+    private final boolean invisible;
+    private final List<SpawnerLevel> spawnerLevels;
 
-    public Spawner(SpawnPosition spawnPosition, SpawnerType spawnerType, int dropAmount, List<SpawnerLevel> spawnerLevels) {
+    public Spawner(SpawnPosition spawnPosition, SpawnerType spawnerType, int dropDelay, int dropAmount, boolean invisible, List<SpawnerLevel> spawnerLevels) {
         this.spawnPosition = spawnPosition;
         this.spawnerType = spawnerType;
+        this.dropDelay = dropDelay;
         this.dropAmount = dropAmount;
+        this.invisible = invisible;
         this.spawnerLevels = spawnerLevels;
     }
 
@@ -34,7 +38,9 @@ public class Spawner implements ConfigurationSerializable {
         List<SpawnerLevel> levels = new ArrayList<>();
         final List<Map<String, Object>> objects = (List<Map<String, Object>>) map.get("levels");
         objects.forEach(o -> levels.add(SpawnerLevel.deserialize(o)));
-        return new Spawner(sp, spawnerType, drop, levels);
+        final int dropDelay = (int) map.get("drop-delay");
+        final boolean inv = (boolean) map.get("invisible");
+        return new Spawner(sp, spawnerType, dropDelay, drop, inv, levels);
     }
 
     public SpawnPosition getSpawnPosition() {
@@ -51,5 +57,24 @@ public class Spawner implements ConfigurationSerializable {
 
     public List<SpawnerLevel> getSpawnerLevels() {
         return spawnerLevels;
+    }
+
+    public int getDropDelay() {
+        return dropDelay;
+    }
+
+    public boolean isInvisible() {
+        return invisible;
+    }
+
+    @Override
+    public String toString() {
+        return "Spawner{" +
+                "spawnPosition=" + spawnPosition +
+                ", spawnerType=" + spawnerType +
+                ", dropDelay=" + dropDelay +
+                ", dropAmount=" + dropAmount +
+                ", spawnerLevels=" + spawnerLevels +
+                '}';
     }
 }

@@ -43,7 +43,9 @@ public final class GameManager {
         ActiveGame bestGame = null;
 
         for (final ActiveGame game : worldsManager.getActiveGameSet()) {
-            if (game.isRunning()) continue;
+            //plugin.getLogger().info(game.toString());
+            if (game.bedwarsGame.getGamemode() != gamemode) continue;
+            if (game.isHasStarted()) continue;
             final AbstractQueue<Player> queue = game.getAssociatedQueue();
             final int newDiff = game.bedwarsGame.getPlayers() - queue.queueSize();
             if (diff == null) {

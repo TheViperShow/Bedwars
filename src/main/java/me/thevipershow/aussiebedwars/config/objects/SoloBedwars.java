@@ -26,10 +26,10 @@ public class SoloBedwars extends BedwarsGame implements ConfigurationSerializabl
         int minGames = (int) objectMap.get("minimum-games");
         int maxGames = (int) objectMap.get("maximum-games");
         int players = (int) objectMap.get("players");
+        int minPlayers = (int) objectMap.get("min-players");
         int startTimer = (int) objectMap.get("start-timer");
         List<String> teams = (List<String>) objectMap.get("teams");
         Set<BedwarsTeam> actualTeams = teams.stream().map(BedwarsTeam::valueOf).collect(Collectors.toSet());
-        double spawnX, spawnY, spawnZ;
         Map<String, Object> mapLobbySpawn = (Map<String, Object>) objectMap.get("map-lobby-spawn");
 
         SpawnPosition mapLobbySpawnPos = SpawnPosition.deserialize(mapLobbySpawn);
@@ -50,7 +50,7 @@ public class SoloBedwars extends BedwarsGame implements ConfigurationSerializabl
         Map<String, Object> shopSection = (Map<String, Object>) objectMap.get("shop");
         Shop shop = Shop.deserialize(shopSection);
 
-        return new SoloBedwars(Gamemode.SOLO, minGames, maxGames, minGames, players, actualTeams, mapLobbySpawnPos, filename, mapSpawnPos, spawnerList, merchantsList, shop, startTimer);
+        return new SoloBedwars(Gamemode.SOLO, minGames, maxGames, minPlayers, players, actualTeams, mapLobbySpawnPos, filename, mapSpawnPos, spawnerList, merchantsList, shop, startTimer);
     }
 
 }

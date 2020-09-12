@@ -1,6 +1,7 @@
 package me.thevipershow.aussiebedwars.listeners.queue;
 
 import me.thevipershow.aussiebedwars.game.GameManager;
+import org.bukkit.GameMode;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -16,5 +17,7 @@ public class QueueResizerListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onPlayerQuit(PlayerQuitEvent event) {
         gameManager.removeFromAllQueues(event.getPlayer());
+        event.getPlayer().setGameMode(GameMode.SURVIVAL);
+
     }
 }

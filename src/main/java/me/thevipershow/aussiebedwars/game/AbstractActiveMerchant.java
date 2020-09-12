@@ -8,6 +8,7 @@ import me.thevipershow.aussiebedwars.config.objects.BedwarsGame;
 import me.thevipershow.aussiebedwars.config.objects.Merchant;
 import me.thevipershow.aussiebedwars.config.objects.ShopItem;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
@@ -56,7 +57,12 @@ public abstract class AbstractActiveMerchant {
 
     public void setupVillager() {
         if (isActive()) return;
-        this.villager = (Villager) activeGame.associatedWorld.spawnEntity(merchant.getMerchantPosition().toLocation(activeGame.associatedWorld), EntityType.VILLAGER);
+
+        final Location spawnAt = merchant.getMerchantPosition().toLocation(activeGame.associatedWorld);
+        if (!spawnAt.getWorld().isChunkLoaded(spawnAt.getChunk()))
+            spawnAt.getWorld().loadChunk(spawnAt.getChunk());
+
+        this.villager = (Villager) activeGame.associatedWorld.spawnEntity(spawnAt, EntityType.VILLAGER);
         villager.setCustomNameVisible(true);
         villager.setCustomName(this.merchant.getMerchantName());
         villager.setCanPickupItems(false);

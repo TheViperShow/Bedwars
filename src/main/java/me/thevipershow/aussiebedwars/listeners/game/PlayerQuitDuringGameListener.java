@@ -1,5 +1,6 @@
 package me.thevipershow.aussiebedwars.listeners.game;
 
+import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.aussiebedwars.game.ActiveGame;
 import me.thevipershow.aussiebedwars.listeners.UnregisterableListener;
 import org.bukkit.World;
@@ -22,5 +23,12 @@ public final class PlayerQuitDuringGameListener extends UnregisterableListener {
         if (!w.equals(activeGame.getAssociatedWorld())) return;
 
         activeGame.removePlayer(p);
+        if (!activeGame.isWinnerDeclared()) {
+            final BedwarsTeam bedwarsTeam = activeGame.findWinningTeam();
+            if (bedwarsTeam != null) {
+                activeGame.declareWinner(bedwarsTeam);
+                activeGame.getPlugin().getServer().getScheduler().runTaskLater(activeGame.getPlugin(), activeGame::stop, 20*15L);
+            }
+        }
     }
 }

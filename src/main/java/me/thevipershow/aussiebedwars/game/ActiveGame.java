@@ -2,6 +2,7 @@ package me.thevipershow.aussiebedwars.game;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -11,7 +12,6 @@ import me.thevipershow.aussiebedwars.AussieBedwars;
 import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.aussiebedwars.config.objects.BedwarsGame;
 import me.thevipershow.aussiebedwars.config.objects.Merchant;
-import me.thevipershow.aussiebedwars.events.GameStartEvent;
 import me.thevipershow.aussiebedwars.listeners.UnregisterableListener;
 import me.thevipershow.aussiebedwars.listeners.game.BedBreakListener;
 import me.thevipershow.aussiebedwars.listeners.game.DeathListener;
@@ -23,14 +23,12 @@ import me.thevipershow.aussiebedwars.listeners.game.MapProtectionListener;
 import me.thevipershow.aussiebedwars.listeners.game.MerchantInteractListener;
 import me.thevipershow.aussiebedwars.listeners.game.PlayerQuitDuringGameListener;
 import me.tigerhix.lib.scoreboard.type.Scoreboard;
-import net.minecraft.server.v1_8_R3.ChatMessage;
-import net.minecraft.server.v1_8_R3.IChatBaseComponent;
-import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
-import net.minecraft.server.v1_8_R3.PlayerConnection;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.plugin.Plugin;
@@ -51,7 +49,9 @@ public abstract class ActiveGame {
 
     protected final Set<Scoreboard> activeScoreboards = new HashSet<>();
     protected final Set<BedwarsTeam> destroyedTeams = new HashSet<>();
+    protected final Set<Player> playersOutOfGame = new HashSet<>();
     protected final Set<AbstractActiveMerchant> activeMerchants = new HashSet<>();
+    protected final Set<Block> playerPlacedBlocks = new HashSet<>();
     protected final Set<UnregisterableListener> unregisterableListeners = new HashSet<>();
 
     ///////////////////////////////////////////////////
@@ -59,8 +59,9 @@ public abstract class ActiveGame {
     //-----------------------------------------------//
     //                                               //
     protected boolean hasStarted = false;            //
-    protected long missingtime;                      //
+    protected boolean winnerDeclared = false;
     protected BukkitTask timerTask = null;           //
+    protected final GameLobbyTicker gameLobbyTicker;
     //-----------------------------------------------//
 
     public ActiveGame(String associatedWorldFilename, BedwarsGame bedwarsGame, World lobbyWorld, Plugin plugin) {
@@ -72,86 +73,20 @@ public abstract class ActiveGame {
         this.cachedLobbySpawnLocation = this.lobbyWorld.getSpawnLocation();
         this.associatedQueue = new MatchmakingQueue(bedwarsGame.getPlayers());
         this.cachedWaitingLocation = bedwarsGame.getLobbySpawn().toLocation(associatedWorld);
-        this.missingtime = bedwarsGame.getStartTimer();
         this.assignedTeams = new HashMap<>();
-
+        this.gameLobbyTicker = new GameLobbyTicker(this);
         this.activeSpawners = bedwarsGame.getSpawners()
                 .stream()
                 .map(spawner -> new ActiveSpawner(spawner, this))
                 .collect(Collectors.toSet());
 
-        tickTimer();
+
         registerMapListeners();
+        gameLobbyTicker.startTicking();
     }
 
     public void handleError(String text) {
         associatedQueue.perform(p -> p.sendMessage(AussieBedwars.PREFIX + "§c" + text));
-    }
-
-    private String generateTimeText() {
-        final StringBuilder strB = new StringBuilder("§eStarting in §7§l[§r");
-
-        byte start = 0x00;
-        final long toColor = 0x14 * (bedwarsGame.getStartTimer() - missingtime) / bedwarsGame.getStartTimer();
-
-        while (start <= 0x14) {
-            strB.append('§').append(start > toColor ? 'c' : 'a').append('|');
-            start++;
-        }
-        return strB.append("§7§l] §6" + missingtime + " §eseconds").toString();
-    }
-
-    private String generateMissingPlayerText() {
-        return "§7[§eAussieBedwars§7]: Missing §e" + (bedwarsGame.getMinPlayers() - associatedQueue.queueSize()) + " §7more players to play";
-    }
-
-    protected String getTeamChar(final BedwarsTeam t) {
-        if (assignedTeams.get(t) == null || assignedTeams.get(t).isEmpty()) {
-            return " §c✘";
-        } else {
-            return " §a✓";
-        }
-    }
-
-    public void tickTimer() {
-        timerTask = plugin.getServer()
-                .getScheduler()
-                .runTaskTimer(plugin, () -> {
-                    if (hasStarted) {
-                        timerTask.cancel();
-                        return;
-                    }
-                    if (associatedQueue.isEmpty()) {
-                        missingtime = bedwarsGame.getStartTimer();
-                        return;
-                    }
-
-                    if (associatedQueue.queueSize() >= bedwarsGame.getMinGames()) {
-                        final GameStartEvent event = new GameStartEvent(this);
-                        plugin.getServer().getPluginManager().callEvent(event);
-
-                        if (!event.isCancelled()) {
-                            hasStarted = true;
-                            start();
-                        }
-                        return;
-                    }
-
-                    associatedQueue.perform(p -> {
-                        final PlayerConnection conn = GameUtils.getPlayerConnection(p);
-                        final IChatBaseComponent iChat;
-                        final boolean tickTime = associatedQueue.queueSize() >= bedwarsGame.getMinPlayers();
-                        if (tickTime) {
-                            iChat = new ChatMessage(generateTimeText());
-                            missingtime--;
-                        } else {
-                            iChat = new ChatMessage(generateMissingPlayerText());
-                        }
-                        final PacketPlayOutChat chatPacket = new PacketPlayOutChat(iChat, (byte) 0x2);
-                        conn.sendPacket(chatPacket);
-                    });
-
-                }, 1L, 20L);
     }
 
     public void moveToLobby(Player player) {
@@ -159,15 +94,14 @@ public abstract class ActiveGame {
     }
 
     public void moveAllToLobby() {
-        associatedQueue.performAndClean(player -> {
-            if (player.isOnline() && player.getWorld().equals(associatedWorld))
-                player.teleport(cachedLobbySpawnLocation);
+        associatedWorld.getPlayers().forEach(p -> {
+            p.teleport(getCachedLobbySpawnLocation());
         });
     }
 
     public static void connectedToQueue(final Player player, final ActiveGame activeGame) {
         player.sendMessage(AussieBedwars.PREFIX + "§eYou have joined §7" + activeGame.getAssociatedWorld().getName() + " §equeue");
-        player.sendMessage(AussieBedwars.PREFIX + String.format("§eStatus §7[§a%d§8/§a%d§7]", activeGame.getAssociatedQueue().queueSize(), activeGame.getBedwarsGame().getPlayers()));
+        player.sendMessage(AussieBedwars.PREFIX + String.format("§eStatus §7[§a%d§8/§a%d§7]", activeGame.getAssociatedQueue().queueSize() + 1, activeGame.getBedwarsGame().getPlayers()));
     }
 
     public void registerMapListeners() {
@@ -213,6 +147,7 @@ public abstract class ActiveGame {
             if (player.teleport(cachedWaitingLocation)) {
                 connectedToQueue(player, this);
                 associatedQueue.addToQueue(player);
+                player.setGameMode(GameMode.ADVENTURE);
             }
         } else
             player.sendMessage(AussieBedwars.PREFIX + "Something went wrong when teleporting you to waiting room.");
@@ -242,7 +177,37 @@ public abstract class ActiveGame {
         associatedQueue.removeFromQueue(p);
     }
 
-    public abstract void declareWinner(final Player player);
+    public BedwarsTeam findWinningTeam() {
+        if (teamsLeft().size() == 1) {
+            return teamsLeft().stream().findAny().get();
+        } else {
+            return null;
+        }
+    }
+
+    public Set<Player> getTeamPlayers(final BedwarsTeam bedwarsTeam) {
+        for (final Map.Entry<BedwarsTeam, Set<Player>> entry : assignedTeams.entrySet()) {
+            if (entry.getKey() == bedwarsTeam)
+                return entry.getValue();
+        }
+        return null;
+    }
+
+    public Set<BedwarsTeam> teamsLeft() {
+        if (playersOutOfGame.isEmpty()) return Collections.emptySet();
+        final Set<BedwarsTeam> bedwarsTeams = new HashSet<>();
+        for (final Map.Entry<BedwarsTeam, Set<Player>> entry : assignedTeams.entrySet()) {
+            final BedwarsTeam team = entry.getKey();
+            final Set<Player> playerSet = entry.getValue();
+            final boolean isTeamOutOfGame = playersOutOfGame.containsAll(playerSet);
+            if (!isTeamOutOfGame) {
+                bedwarsTeams.add(team);
+            }
+        }
+        return bedwarsTeams;
+    }
+
+    public abstract void declareWinner(final BedwarsTeam player);
 
     public abstract void assignTeams();
 
@@ -256,26 +221,33 @@ public abstract class ActiveGame {
     }
 
     public void destroyMap() {
-        if (isRunning)
-            stop();
-        plugin.getServer().unloadWorld(associatedWorld, false);
-        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
-            final File wDir = associatedWorld.getWorldFolder();
-            try {
-                FileUtils.deleteDirectory(wDir);
-            } catch (IOException e) {
-                plugin.getLogger().severe("Something went wrong while destroying map of " + associatedWorldFilename);
-                e.printStackTrace();
-            }
-        });
+        final boolean unloaded = plugin.getServer().unloadWorld(associatedWorld, false);
+        plugin.getLogger().info((unloaded ? "Successfully" : "Failed") + " Unloaded game " + associatedWorldFilename);
+        final File wDir = associatedWorld.getWorldFolder();
+        try {
+            FileUtils.deleteDirectory(wDir);
+        } catch (IOException e) {
+            plugin.getLogger().severe("Something went wrong while destroying map of " + associatedWorldFilename);
+            e.printStackTrace();
+        }
     }
 
     public void createMerchants() {
         for (final Merchant merchant : bedwarsGame.getMerchants()) {
             final AbstractActiveMerchant aMerchant = GameUtils.fromMerchant(merchant, this);
-            if (aMerchant == null) continue;
+            if (aMerchant == null) {
+                continue;
+            }
             aMerchant.spawn();
             this.activeMerchants.add(aMerchant);
+        }
+    }
+
+    protected String getTeamChar(final BedwarsTeam t) {
+        if (assignedTeams.get(t) == null || assignedTeams.get(t).isEmpty()) {
+            return " §c§l✘";
+        } else {
+            return " §a§l✓";
         }
     }
 
@@ -299,8 +271,16 @@ public abstract class ActiveGame {
         return associatedWorld;
     }
 
+    public Set<Block> getPlayerPlacedBlocks() {
+        return playerPlacedBlocks;
+    }
+
     public World getLobbyWorld() {
         return lobbyWorld;
+    }
+
+    public Set<Player> getPlayersOutOfGame() {
+        return playersOutOfGame;
     }
 
     public Location getCachedLobbySpawnLocation() {
@@ -315,16 +295,6 @@ public abstract class ActiveGame {
         return associatedQueue;
     }
 
-    private boolean isRunning = true;
-
-    public boolean isRunning() {
-        return isRunning;
-    }
-
-    public void setRunning(boolean running) {
-        isRunning = running;
-    }
-
     public Set<ActiveSpawner> getActiveSpawners() {
         return activeSpawners;
     }
@@ -334,22 +304,33 @@ public abstract class ActiveGame {
     }
 
     @Override
-    public final String toString() {
+    public String toString() {
         return "ActiveGame{" +
                 "associatedWorldFilename='" + associatedWorldFilename + '\'' +
                 ", bedwarsGame=" + bedwarsGame +
                 ", associatedWorld=" + associatedWorld +
                 ", lobbyWorld=" + lobbyWorld +
-                ", cachedSpawnLocation=" + cachedLobbySpawnLocation +
+                ", cachedLobbySpawnLocation=" + cachedLobbySpawnLocation +
                 ", plugin=" + plugin +
                 ", associatedQueue=" + associatedQueue +
                 ", cachedWaitingLocation=" + cachedWaitingLocation +
-                ", isRunning=" + isRunning +
+                ", assignedTeams=" + assignedTeams +
+                ", activeSpawners=" + activeSpawners +
+                ", activeScoreboards=" + activeScoreboards +
+                ", destroyedTeams=" + destroyedTeams +
+                ", activeMerchants=" + activeMerchants +
+                ", unregisterableListeners=" + unregisterableListeners +
+                ", hasStarted=" + hasStarted +
+                ", timerTask=" + timerTask +
                 '}';
     }
 
     public Set<BedwarsTeam> getDestroyedTeams() {
         return destroyedTeams;
+    }
+
+    public boolean isWinnerDeclared() {
+        return winnerDeclared;
     }
 
     public boolean isHasStarted() {
@@ -362,10 +343,6 @@ public abstract class ActiveGame {
 
     public Set<Scoreboard> getActiveScoreboards() {
         return activeScoreboards;
-    }
-
-    public long getMissingtime() {
-        return missingtime;
     }
 
     public BukkitTask getTimerTask() {

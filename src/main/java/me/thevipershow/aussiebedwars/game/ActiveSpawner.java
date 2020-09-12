@@ -33,9 +33,8 @@ public class ActiveSpawner {
     private final static double START = -4.000;
     private final static double END = +4.000;
     private final static double LOOP_INCREASE = 0.100;
-    private final static double ROUND = 360.000;
-    private final static double YAW_INCREASE = ROUND / LOOP_INCREASE * Math.abs(START - END);
-    private final static double MAX_HEIGHT_MOV = 1.250;
+    private final static double YAW_INCREASE = 4.5;
+    private final static double MAX_HEIGHT_MOV = 0.850;
 
     private static ImmutableTraversableList<Location> generateAnimation(final Location absolutePos) {
         double start = START;
@@ -64,42 +63,53 @@ public class ActiveSpawner {
     }
 
     private String generateStandName() {
-        return String.format("§7Level: §7[§e%s§7] Next in: (§e%d§7)s", currentLevel.getLevel(), 2);
+        return String.format("§7Level: §7[§e%s§7] Next in: (§e%d§7)s",
+                currentLevel.getLevel(),
+                spawner.getDropDelay() - ((now() - lastDrop) / 1000));
     }
 
     private void drop() {
-        game.associatedWorld.dropItem(spawner.getSpawnPosition().toLocation(game.associatedWorld), new ItemStack(type.getDropItem(), spawner.getDropAmount() + currentLevel.getDropIncrease()));
+        game.associatedWorld.dropItem(spawner.getSpawnPosition().toLocation(game.associatedWorld).add(0, 1, 0),
+                new ItemStack(type.getDropItem(), spawner.getDropAmount() + currentLevel.getDropIncrease()));
     }
 
     public void spawn() {
-        if (active()) return;
+        if (active()) {
+            return;
+        }
 
-        this.stand = (ArmorStand) game.associatedWorld.spawnEntity(spawner.getSpawnPosition().toLocation(game.associatedWorld), EntityType.ARMOR_STAND);
-        this.stand.setGravity(false);
-        this.stand.setVisible(false);
-        this.stand.setCanPickupItems(false);
-        this.stand.setCustomNameVisible(true);
-        this.stand.setHelmet(type.getHeadItem().clone());
+        final Location spawnStandAt = spawner.getSpawnPosition().toLocation(game.associatedWorld);
+        if (!spawnStandAt.getWorld().isChunkLoaded(spawnStandAt.getChunk()))
+            spawnStandAt.getWorld().loadChunk(spawnStandAt.getChunk());
 
-        this.animationTask = game.plugin.getServer()
-                .getScheduler()
-                .runTaskTimer(game.plugin, () -> stand.teleport(cachedAnimation.move()), 1L, 1L);
+        if (!spawner.isInvisible()) {
+            this.stand = (ArmorStand) game.associatedWorld.spawnEntity(spawnStandAt, EntityType.ARMOR_STAND);
+            this.stand.setGravity(false);
+            this.stand.setVisible(false);
+            this.stand.setCanPickupItems(false);
+            this.stand.setCustomNameVisible(true);
+            this.stand.setHelmet(type.getHeadItem().clone());
+
+            this.updateNameTask = game.plugin.getServer()
+                    .getScheduler()
+                    .runTaskTimer(game.plugin, () -> this.stand.setCustomName(generateStandName()), 1L, 20L);
+
+            this.animationTask = game.plugin.getServer()
+                    .getScheduler()
+                    .runTaskTimer(game.plugin, () -> stand.teleport(cachedAnimation.move()), 1L, 1L);
+        }
+
+        // game.plugin.getLogger().info("Created spawner " + spawner.toString() + '\n');
 
         this.dropTask = game.plugin.getServer()
                 .getScheduler()
                 .runTaskTimer(game.plugin, () -> {
-                    if (this.lastDrop == -1L) {
-                        this.lastDrop = now();
+                    final long currentTime = now();
+                    if (lastDrop == -1L || ((currentTime - lastDrop) / 1000 >= spawner.getDropDelay())) {
+                        lastDrop = currentTime;
                         drop();
-                    } else if ((now() - lastDrop) / 1000 >= currentLevel.getAfterSeconds()) {
-                        drop();
-                        lastDrop = now();
                     }
-                }, 1L, 20L);
-
-        this.updateNameTask = game.plugin.getServer()
-                .getScheduler()
-                .runTaskTimer(game.plugin, () -> this.stand.setCustomName(generateStandName()), 1L, 20L);
+                }, 1, 20L);
     }
 
     public boolean active() {
@@ -111,6 +121,8 @@ public class ActiveSpawner {
     public void despawn() {
         if (active()) {
             animationTask.cancel();
+            updateNameTask.cancel();
+            dropTask.cancel();
             getCachedAnimation().clear();
             stand.remove();
         }

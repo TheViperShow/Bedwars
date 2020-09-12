@@ -15,6 +15,24 @@ public final class GameUtils {
         throw new UnsupportedOperationException("Instantiation of Utility class " + getClass().getName());
     }
 
+    public static String capitalize(String str) {
+        if(str == null || str.isEmpty()) {
+            return str;
+        }
+
+        return str.substring(0, 1).toUpperCase() + str.substring(1);
+    }
+
+    public static String beautifyCaps(final String s) {
+        final String[] split = s.split("_");
+        final StringBuilder stringBuilder = new StringBuilder();
+        for (String s1 : split) {
+            stringBuilder.append(capitalize(s1.toLowerCase())).append(' ');
+        }
+        stringBuilder.setLength(stringBuilder.length() - 1);
+        return stringBuilder.toString();
+    }
+
     /**
      * Unsafe check
      *

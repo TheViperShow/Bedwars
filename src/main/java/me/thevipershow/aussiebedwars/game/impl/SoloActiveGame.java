@@ -17,6 +17,8 @@ import me.tigerhix.lib.scoreboard.common.EntryBuilder;
 import me.tigerhix.lib.scoreboard.type.Entry;
 import me.tigerhix.lib.scoreboard.type.Scoreboard;
 import me.tigerhix.lib.scoreboard.type.ScoreboardHandler;
+import org.bukkit.GameMode;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -29,6 +31,7 @@ public final class SoloActiveGame extends ActiveGame {
 
     @Override
     public void start() {
+        setHasStarted(true);
         if (associatedQueue.queueSize() >= bedwarsGame.getMinGames()) {
             if (associatedWorld == null) {
                 handleError("Something went wrong while you were being sent into the game.");
@@ -50,12 +53,16 @@ public final class SoloActiveGame extends ActiveGame {
                     .stream()
                     .filter(pos -> pos.getBedwarsTeam() == k)
                     .findAny()
-                    .ifPresent(spawnPos -> p.teleport(spawnPos.toLocation(associatedWorld)));
+                    .ifPresent(spawnPos -> {
+                        p.teleport(spawnPos.toLocation(associatedWorld));
+                        p.setGameMode(GameMode.SURVIVAL);
+                    });
         });
     }
 
     @Override
     public void stop() {
+        moveAllToLobby();
         this.getActiveSpawners().forEach(ActiveSpawner::despawn);
         this.getActiveSpawners().clear();
         this.getActiveMerchants().forEach(AbstractActiveMerchant::delete);
@@ -66,22 +73,20 @@ public final class SoloActiveGame extends ActiveGame {
         this.getDestroyedTeams().clear();
         this.getUnregisterableListeners().forEach(UnregisterableListener::unregister);
         this.getUnregisterableListeners().clear();
-        associatedQueue.perform(p -> {
-            if (p.isOnline() && p.getWorld().equals(associatedWorld))
-                p.teleport(cachedLobbySpawnLocation);
-        });
         this.associatedQueue.cleanQueue();
-        setRunning(false);
+        setHasStarted(false);
         destroyMap();
     }
 
     @Override
-    public void declareWinner(final Player player) {
+    public void declareWinner(final BedwarsTeam team) {
+        if (winnerDeclared) return;
         associatedQueue.perform(p -> {
             if (p.isOnline() && p.getWorld().equals(associatedWorld)) {
-                p.sendTitle("§e" + player.getName() + " §7has won the game!", "");
+                p.sendTitle("§7Team " + '§' + team.getColorCode() + team.name() + " §7has won the game!", "§7Returning to lobby in 15s");
             }
         });
+        this.winnerDeclared = true;
     }
 
     @Override
@@ -97,7 +102,6 @@ public final class SoloActiveGame extends ActiveGame {
     @Override
     public void assignScoreboards() {
         for (Map.Entry<BedwarsTeam, Set<Player>> entry : assignedTeams.entrySet()) {
-            final BedwarsTeam team = entry.getKey();
             final Player p = entry.getValue().stream().findAny().get();
             final Scoreboard scoreboard = ScoreboardLib.createScoreboard(p);
 
@@ -110,17 +114,17 @@ public final class SoloActiveGame extends ActiveGame {
 
                 @Override
                 public List<Entry> getEntries(final Player player) {
-                    EntryBuilder builder = new EntryBuilder();
+                    final EntryBuilder builder = new EntryBuilder();
                     for (BedwarsTeam t : assignedTeams.keySet()) {
-                        builder.next(" §7Team " + t.getColorCode() + t.name() + getTeamChar(t));
+                        builder.next(" §7Team " + "§" + t.getColorCode() + t.name() + getTeamChar(t));
                     }
                     return builder.build();
-
                 }
+
             }).setUpdateInterval(20L);
 
-            scoreboard.activate();
             super.activeScoreboards.add(scoreboard);
+            scoreboard.activate();
         }
     }
 
@@ -128,8 +132,12 @@ public final class SoloActiveGame extends ActiveGame {
     public void destroyTeamBed(final BedwarsTeam team) {
         associatedQueue.perform(p -> {
             if (p.isOnline() && p.getWorld().equals(associatedWorld)) {
-                p.sendTitle('§' + team.getColorCode() + team.name() + " §7team's bed has been broken!",
-                        "");
+                if (getPlayerTeam(p) == team) {
+                    p.sendTitle("§e§lYour bed has been broken!", "");
+                    p.playSound(p.getLocation(), Sound.ENDERDRAGON_GROWL, 10.0f, 1.0f);
+                } else {
+                    p.sendMessage("§" + team.getColorCode() + team.name() + " §7team's bed has been broken!");
+                }
             }
         });
     }
