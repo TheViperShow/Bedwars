@@ -1,6 +1,5 @@
 package me.thevipershow.aussiebedwars.listeners.game;
 
-import java.util.Set;
 import me.thevipershow.aussiebedwars.AussieBedwars;
 import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.aussiebedwars.config.objects.TeamSpawnPosition;
@@ -55,7 +54,6 @@ public final class BedBreakListener extends UnregisterableListener {
             activeGame.getPlayerPlacedBlocks().remove(b);
         } else {
             if (b.getType() == Material.BED_BLOCK) {
-                System.out.println("1");
                 final BedwarsTeam playerTeam = activeGame.getPlayerTeam(p);
                 final BedwarsTeam destroyedBedTeam = teamOfBed(b);
                 if (playerTeam == destroyedBedTeam) {
@@ -74,8 +72,6 @@ public final class BedBreakListener extends UnregisterableListener {
                 event.setCancelled(true);
             }
         }
-
-        System.out.println("2");
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)

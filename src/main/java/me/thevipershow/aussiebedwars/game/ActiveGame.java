@@ -13,15 +13,18 @@ import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.aussiebedwars.config.objects.BedwarsGame;
 import me.thevipershow.aussiebedwars.config.objects.Merchant;
 import me.thevipershow.aussiebedwars.listeners.UnregisterableListener;
+import me.thevipershow.aussiebedwars.listeners.game.ArmorSet;
 import me.thevipershow.aussiebedwars.listeners.game.BedBreakListener;
 import me.thevipershow.aussiebedwars.listeners.game.DeathListener;
 import me.thevipershow.aussiebedwars.listeners.game.EntityDamageListener;
 import me.thevipershow.aussiebedwars.listeners.game.GUIInteractListener;
+import me.thevipershow.aussiebedwars.listeners.game.HungerLossListener;
 import me.thevipershow.aussiebedwars.listeners.game.LobbyCompassListener;
 import me.thevipershow.aussiebedwars.listeners.game.MapIllegalMovementsListener;
 import me.thevipershow.aussiebedwars.listeners.game.MapProtectionListener;
 import me.thevipershow.aussiebedwars.listeners.game.MerchantInteractListener;
 import me.thevipershow.aussiebedwars.listeners.game.PlayerQuitDuringGameListener;
+import me.thevipershow.aussiebedwars.listeners.game.Tools;
 import me.tigerhix.lib.scoreboard.type.Scoreboard;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
@@ -53,6 +56,8 @@ public abstract class ActiveGame {
     protected final Set<AbstractActiveMerchant> activeMerchants = new HashSet<>();
     protected final Set<Block> playerPlacedBlocks = new HashSet<>();
     protected final Set<UnregisterableListener> unregisterableListeners = new HashSet<>();
+    protected final Map<Player, ArmorSet> playerSetMap = new HashMap<>();
+    protected final Map<Player, Tools> toolsMap = new HashMap<>();
 
     ///////////////////////////////////////////////////
     // Internal ActiveGame fields                    //
@@ -100,8 +105,10 @@ public abstract class ActiveGame {
     }
 
     public static void connectedToQueue(final Player player, final ActiveGame activeGame) {
-        player.sendMessage(AussieBedwars.PREFIX + "§eYou have joined §7" + activeGame.getAssociatedWorld().getName() + " §equeue");
-        player.sendMessage(AussieBedwars.PREFIX + String.format("§eStatus §7[§a%d§8/§a%d§7]", activeGame.getAssociatedQueue().queueSize() + 1, activeGame.getBedwarsGame().getPlayers()));
+        activeGame.getAssociatedWorld().getPlayers().forEach(p -> {
+            player.sendMessage(AussieBedwars.PREFIX + p.getName() + " §ehas joined §7" + activeGame.getAssociatedWorld().getName() + " §equeue");
+            player.sendMessage(AussieBedwars.PREFIX + String.format("§eStatus §7[§a%d§8/§a%d§7]", activeGame.getAssociatedQueue().queueSize() + 1, activeGame.getBedwarsGame().getPlayers()));
+        });
     }
 
     public void registerMapListeners() {
@@ -114,6 +121,7 @@ public abstract class ActiveGame {
         final UnregisterableListener merchantListener = new MerchantInteractListener(this);
         final UnregisterableListener entityDamageListener = new EntityDamageListener(this);
         final UnregisterableListener guiInteractListener = new GUIInteractListener(this);
+        final UnregisterableListener hungerLossListener = new HungerLossListener(this);
 
         plugin.getServer().getPluginManager().registerEvents(mapProtectionListener, plugin);
         plugin.getServer().getPluginManager().registerEvents(mapIllegalMovementsListener, plugin);
@@ -124,6 +132,7 @@ public abstract class ActiveGame {
         plugin.getServer().getPluginManager().registerEvents(merchantListener, plugin);
         plugin.getServer().getPluginManager().registerEvents(entityDamageListener, plugin);
         plugin.getServer().getPluginManager().registerEvents(guiInteractListener, plugin);
+        plugin.getServer().getPluginManager().registerEvents(hungerLossListener, plugin);
 
         unregisterableListeners.add(mapIllegalMovementsListener);
         unregisterableListeners.add(mapProtectionListener);
@@ -134,6 +143,7 @@ public abstract class ActiveGame {
         unregisterableListeners.add(merchantListener);
         unregisterableListeners.add(entityDamageListener);
         unregisterableListeners.add(guiInteractListener);
+        unregisterableListeners.add(hungerLossListener);
     }
 
     public final void unregisterAllListeners() {
@@ -169,9 +179,22 @@ public abstract class ActiveGame {
 
     public abstract void start();
 
+    public void healAll() {
+        associatedWorld.getPlayers().forEach(p -> {
+            p.setHealth(p.getMaxHealth());
+            p.setFoodLevel(0x14);
+        });
+    }
+
     public abstract void moveTeamsToSpawns();
 
     public abstract void stop();
+
+    public abstract void givePlayerDefaultSet(final Player p);
+
+    public void giveAllDefaultSet() {
+        associatedQueue.perform(this::givePlayerDefaultSet);
+    }
 
     public void removePlayer(final Player p) {
         associatedQueue.removeFromQueue(p);
@@ -220,6 +243,13 @@ public abstract class ActiveGame {
             activeSpawner.spawn();
     }
 
+    public boolean isOutOfGame(final Player p) {
+        if (p != null) {
+            return playersOutOfGame.contains(p);
+        }
+        return true;
+    }
+
     public void destroyMap() {
         final boolean unloaded = plugin.getServer().unloadWorld(associatedWorld, false);
         plugin.getLogger().info((unloaded ? "Successfully" : "Failed") + " Unloaded game " + associatedWorldFilename);
@@ -244,8 +274,13 @@ public abstract class ActiveGame {
     }
 
     protected String getTeamChar(final BedwarsTeam t) {
-        if (assignedTeams.get(t) == null || assignedTeams.get(t).isEmpty()) {
-            return " §c§l✘";
+        if (destroyedTeams.contains(t)) {
+            final Set<Player> teamMembers = getTeamPlayers(t);
+            if (teamMembers.stream().allMatch(this::isOutOfGame)) {
+                return " §c§l✘";
+            } else {
+                return " §f§l" + teamMembers.size();
+            }
         } else {
             return " §a§l✓";
         }
@@ -351,5 +386,17 @@ public abstract class ActiveGame {
 
     public void setHasStarted(boolean hasStarted) {
         this.hasStarted = hasStarted;
+    }
+
+    public Map<Player, ArmorSet> getPlayerSetMap() {
+        return playerSetMap;
+    }
+
+    public Map<Player, Tools> getToolsMap() {
+        return toolsMap;
+    }
+
+    public GameLobbyTicker getGameLobbyTicker() {
+        return gameLobbyTicker;
     }
 }

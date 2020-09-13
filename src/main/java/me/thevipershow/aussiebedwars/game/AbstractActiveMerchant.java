@@ -4,11 +4,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.aussiebedwars.config.objects.BedwarsGame;
 import me.thevipershow.aussiebedwars.config.objects.Merchant;
 import me.thevipershow.aussiebedwars.config.objects.ShopItem;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
@@ -21,34 +24,51 @@ public abstract class AbstractActiveMerchant {
     protected final ActiveGame activeGame;
     protected final Merchant merchant;
     protected final Inventory cachedInventory;
-    protected final HashMap<ItemStack, ShopItem> cachedShopItems = new HashMap<>();
+    protected final Map<ItemStack, ShopItem> cachedShopItems = new HashMap<>();
+    protected final BedwarsTeam team;
 
     protected Villager villager = null;
 
-    public AbstractActiveMerchant(ActiveGame activeGame, Merchant merchant) {
+    public AbstractActiveMerchant(final ActiveGame activeGame, final Merchant merchant, final BedwarsTeam team) {
         this.activeGame = activeGame;
         this.merchant = merchant;
-        this.cachedInventory = invFromMerchant(merchant, activeGame.getBedwarsGame());
+        this.team = team;
+        this.cachedInventory = invFromMerchant(activeGame.getBedwarsGame());
     }
 
-    protected static Inventory invFromMerchant(final Merchant merchant, final BedwarsGame bedwarsGame) {
-        final Inventory inv = Bukkit.createInventory(null, bedwarsGame.getShop().getSlots());
+    protected Inventory invFromMerchant(final BedwarsGame bedwarsGame) {
+        final Inventory inv = Bukkit.createInventory(null, bedwarsGame.getShop().getSlots(), "§7[§eAussieBedwars§7] §e§lShop");
+        for (final int glassSlot : bedwarsGame.getShop().getGlassSlots()) {
+            final ItemStack glassStack = new ItemStack(Material.STAINED_GLASS, 1, (short) bedwarsGame.getShop().getGlassColor());
+            final ItemMeta glassMeta = glassStack.getItemMeta();
+            glassMeta.setDisplayName(" ");
+            glassMeta.setLore(Collections.singletonList(" "));
+            glassStack.setItemMeta(glassMeta);
+            inv.setItem(glassSlot, glassStack);
+        }
+
         for (final ShopItem shopItem : bedwarsGame.getShop().getItems()) {
-            final ItemStack stacc = new ItemStack(shopItem.getMaterial(), shopItem.getAmount());
-            final ItemMeta meta = stacc.getItemMeta();
+            ItemStack stack; // = new ItemStack(shopItem.getMaterial(), shopItem.getAmount());
+            if (shopItem.getMaterial() == Material.WOOL) {
+                stack = new ItemStack(shopItem.getMaterial(), shopItem.getAmount(), team.getWoolColor());
+            } else {
+                stack = new ItemStack(shopItem.getMaterial(), shopItem.getAmount());
+            }
+            final ItemMeta meta = stack.getItemMeta();
             meta.setDisplayName(shopItem.getItemName());
             meta.setLore(loreFromShopItem(shopItem));
-            stacc.setItemMeta(meta);
-            inv.setItem(shopItem.getSlot(), stacc);
+            stack.setItemMeta(meta);
+            inv.setItem(shopItem.getSlot(), stack);
+            cachedShopItems.put(stack, shopItem);
         }
         return inv;
     }
 
     protected static List<String> loreFromShopItem(final ShopItem i) {
         return Collections.unmodifiableList(Arrays.asList(
-                "§7- §ePrice§7: §6" + i.getBuyCost() + 'x',
-                "§7- §eBuy with§7: §6" + i.getItemName()
-                ));
+                "§7- §ePrice§7: §6§l" + i.getBuyCost(),
+                "§7- §eBuy with§7: §6§l" + GameUtils.beautifyCaps(i.getBuyWith().name())
+        ));
     }
 
     public boolean isActive() {
@@ -91,7 +111,7 @@ public abstract class AbstractActiveMerchant {
         return cachedInventory;
     }
 
-    public HashMap<ItemStack, ShopItem> getCachedShopItems() {
+    public Map<ItemStack, ShopItem> getCachedShopItems() {
         return cachedShopItems;
     }
 

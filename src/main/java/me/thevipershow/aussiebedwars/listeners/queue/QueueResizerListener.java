@@ -18,6 +18,5 @@ public class QueueResizerListener implements Listener {
     public void onPlayerQuit(PlayerQuitEvent event) {
         gameManager.removeFromAllQueues(event.getPlayer());
         event.getPlayer().setGameMode(GameMode.SURVIVAL);
-
     }
 }

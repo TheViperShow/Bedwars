@@ -1,6 +1,8 @@
 package me.thevipershow.aussiebedwars.listeners.game;
 
 import com.google.common.collect.Lists;
+import java.util.Map;
+import java.util.stream.Collectors;
 import me.thevipershow.aussiebedwars.AussieBedwars;
 import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.aussiebedwars.config.objects.SpawnPosition;
@@ -22,10 +24,11 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public final class DeathListener extends UnregisterableListener {
@@ -71,7 +74,7 @@ public final class DeathListener extends UnregisterableListener {
                 cancel();
             } else {
                 final PlayerConnection conn = GameUtils.getPlayerConnection(p);
-                final PacketPlayOutTitle emptyTitle = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.TITLE, new ChatMessage(" "), 2, 16,2);
+                final PacketPlayOutTitle emptyTitle = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.TITLE, new ChatMessage(" "), 2, 16, 2);
                 final IChatBaseComponent iChat = new ChatMessage(AussieBedwars.PREFIX + String.format("§eRespawning in §7%d §es", secondsLeft));
                 final PacketPlayOutTitle titlePacket = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.SUBTITLE, iChat, 2, 16, 2);
                 conn.sendPacket(emptyTitle);
@@ -94,11 +97,23 @@ public final class DeathListener extends UnregisterableListener {
 
     }
 
-    private static void clearEverythingExceptArmour(final Player player) {
-        final PlayerInventory playerInventory = player.getInventory();
-        final ItemStack[] armorContents = playerInventory.getArmorContents().clone();
-        playerInventory.clear();
-        playerInventory.setArmorContents(armorContents);
+    private static void clearEverythingExceptArmour(final Player player, final ActiveGame game) {
+        final PlayerInventory inv = player.getInventory();
+        final ItemStack[] contents = inv.getContents();
+
+        final Map<Player, Tools> toolsMap = game.getToolsMap();
+        final Map<Player, ArmorSet> armorSetMap = game.getPlayerSetMap();
+        final Tools playerTools = toolsMap.get(player);
+        final ArmorSet playerArmorSet = armorSetMap.get(player);
+
+        for (int i = 0; i < contents.length; i++) {
+            ItemStack stack = contents[i];
+            if (stack == null || playerTools.getItems().stream().anyMatch(s -> s.getType().equals(stack.getType())) || playerArmorSet.getItems().stream().anyMatch(s -> s.getType().equals(stack.getType()))) {
+                continue;
+            }
+
+            inv.setItem(i, null);
+        }
     }
 
     private String generateDeathMessage(final EntityDamageEvent e, final BedwarsTeam killedPlayerTeam) {
@@ -152,12 +167,18 @@ public final class DeathListener extends UnregisterableListener {
 
         if (!w.equals(activeGame.getAssociatedWorld())) return;
 
+        if (activeGame.isOutOfGame(p)) {
+            event.setCancelled(true);
+            return;
+        }
+
         final double playerHealth = p.getHealth();
         final double damage = event.getDamage();
         if (playerHealth - damage <= 0.0) {
             final BedwarsTeam b = activeGame.getPlayerTeam(p);
             if (activeGame.getDestroyedTeams().contains(b)) { // Checking if players' team's bed has been broken previously.
                 // here player has lost the game.
+                p.getInventory().clear();
                 givePlayerLobbyCompass(p);
                 if (!activeGame.getPlayersOutOfGame().contains(p)) {
                     p.sendMessage("§cYou have been eliminated.");
@@ -167,6 +188,9 @@ public final class DeathListener extends UnregisterableListener {
 
                 activeGame.getPlayersOutOfGame().add(p);
                 activeGame.removePlayer(p);
+                p.setAllowFlight(true);
+                p.setFlying(true);
+                p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, true), true);
 
                 if (!activeGame.isWinnerDeclared()) {
                     final BedwarsTeam bedwarsTeam = activeGame.findWinningTeam();
@@ -185,7 +209,7 @@ public final class DeathListener extends UnregisterableListener {
                 }
             }
             p.setHealth(p.getMaxHealth());
-            clearEverythingExceptArmour(p); //TODO: ->
+            clearEverythingExceptArmour(p, activeGame); //TODO: ->
             event.setCancelled(true);
         }
     }

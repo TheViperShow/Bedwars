@@ -12,11 +12,15 @@ public class Shop implements ConfigurationSerializable {
     private final String name;
     private final int slots;
     private final List<ShopItem> items;
+    private final int glassColor;
+    private final List<Integer> glassSlots;
 
-    public Shop(String name, int slots, List<ShopItem> items) {
+    public Shop(String name, int slots, List<ShopItem> items, int glassColor, List<Integer> glassSlots) {
         this.name = name;
         this.slots = slots;
         this.items = items;
+        this.glassColor = glassColor;
+        this.glassSlots = glassSlots;
     }
 
     @Override
@@ -30,7 +34,10 @@ public class Shop implements ConfigurationSerializable {
         List<Map<String, Object>> objectMap1 = (List<Map<String, Object>>) objectMap.get("items");
         final List<ShopItem> itemsShop = new ArrayList<>();
         objectMap1.forEach(o -> itemsShop.add(ShopItem.deserialize(o)));
-        return new Shop(title, slots, itemsShop);
+        final Map<String, Object> glass = (Map<String, Object>) objectMap.get("glass");
+        final int glassColor = (int) glass.get("color");
+        final List<Integer> glassSlots = (List<Integer>) glass.get("slots");
+        return new Shop(title, slots, itemsShop, glassColor, glassSlots);
     }
 
     public String getName() {
@@ -43,5 +50,13 @@ public class Shop implements ConfigurationSerializable {
 
     public List<ShopItem> getItems() {
         return items;
+    }
+
+    public int getGlassColor() {
+        return glassColor;
+    }
+
+    public List<Integer> getGlassSlots() {
+        return glassSlots;
     }
 }

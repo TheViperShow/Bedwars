@@ -12,6 +12,8 @@ import me.thevipershow.aussiebedwars.game.AbstractActiveMerchant;
 import me.thevipershow.aussiebedwars.game.ActiveGame;
 import me.thevipershow.aussiebedwars.game.ActiveSpawner;
 import me.thevipershow.aussiebedwars.listeners.UnregisterableListener;
+import me.thevipershow.aussiebedwars.listeners.game.ArmorSet;
+import me.thevipershow.aussiebedwars.listeners.game.Tools;
 import me.tigerhix.lib.scoreboard.ScoreboardLib;
 import me.tigerhix.lib.scoreboard.common.EntryBuilder;
 import me.tigerhix.lib.scoreboard.type.Entry;
@@ -38,10 +40,12 @@ public final class SoloActiveGame extends ActiveGame {
                 return;
             }
             assignTeams(); // putting each player in a different team in the map .
-            assignScoreboards(); // starting and assiging a scoreboard for each player. //TODO: FINISH (DONE) - CHECK
-            createSpawners(); // creating and spawning ore spawners for this map. //TODO: FINISH
-            createMerchants(); // creating and spawning merchants for this map. //TODO: FINISH
+            assignScoreboards(); // starting and assiging a scoreboard for each player.
+            createSpawners(); // creating and spawning ore spawners for this map.
+            createMerchants(); // creating and spawning merchants for this map.
             moveTeamsToSpawns(); // moving everyone to their team's spawn.
+            giveAllDefaultSet();
+            healAll();
         }
     }
 
@@ -115,9 +119,11 @@ public final class SoloActiveGame extends ActiveGame {
                 @Override
                 public List<Entry> getEntries(final Player player) {
                     final EntryBuilder builder = new EntryBuilder();
+                    builder.blank();
                     for (BedwarsTeam t : assignedTeams.keySet()) {
-                        builder.next(" §7Team " + "§" + t.getColorCode() + t.name() + getTeamChar(t));
+                        builder.next(" §7Team " + "§l§" + t.getColorCode() + t.name() + getTeamChar(t));
                     }
+                    builder.blank();
                     return builder.build();
                 }
 
@@ -126,6 +132,16 @@ public final class SoloActiveGame extends ActiveGame {
             super.activeScoreboards.add(scoreboard);
             scoreboard.activate();
         }
+    }
+
+    @Override
+    public void givePlayerDefaultSet(final Player p) {
+        final ArmorSet startingSet = new ArmorSet(getPlayerTeam(p));
+        startingSet.getArmorSet().forEach((k,v) -> ArmorSet.SLOTS.setArmorPiece(k, p, startingSet.getArmorSet().get(k)));
+        final Tools tools = new Tools();
+        tools.giveToPlayer(p);
+        this.toolsMap.put(p, tools);
+        this.playerSetMap.put(p, startingSet);
     }
 
     @Override

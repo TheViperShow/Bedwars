@@ -5,6 +5,7 @@ import java.util.Map;
 import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
+import org.bukkit.inventory.ItemStack;
 
 @SerializableAs("Item")
 public class ShopItem implements ConfigurationSerializable {
@@ -69,5 +70,9 @@ public class ShopItem implements ConfigurationSerializable {
 
     public String getItemName() {
         return itemName;
+    }
+
+    public ItemStack generateWithoutLore() {
+        return new ItemStack(this.getMaterial(), this.amount);
     }
 }

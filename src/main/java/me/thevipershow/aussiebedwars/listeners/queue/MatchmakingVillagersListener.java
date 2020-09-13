@@ -1,6 +1,7 @@
 package me.thevipershow.aussiebedwars.listeners.queue;
 
 import java.sql.Connection;
+import java.util.HashMap;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -24,6 +25,8 @@ public class MatchmakingVillagersListener implements Listener {
     private final GameManager gameManager;
     // private final QueueLoader queueLoader;
 
+    private final HashMap<Player, Long> lastClick = new HashMap<>();
+
     public MatchmakingVillagersListener(Plugin plugin, GameManager gameManager) {
         this.plugin = plugin;
         this.gameManager = gameManager;
@@ -36,7 +39,20 @@ public class MatchmakingVillagersListener implements Listener {
         if (!(entity instanceof Villager)) return;
         final UUID uuid = entity.getUniqueId();
         if (!player.getWorld().equals(gameManager.getWorldsManager().getLobbyWorld())) return;
+
         event.setCancelled(true);
+
+        if (lastClick.containsKey(player)) {
+            final long lastClick = this.lastClick.get(player);
+            final long now = System.currentTimeMillis();
+            if (now - lastClick < 1000) {
+                return;
+            } else {
+                this.lastClick.put(player, now);
+            }
+        }
+
+        lastClick.put(player, System.currentTimeMillis());
 
         final Optional<Connection> conn = MySQLDatabase.getConnection();
 

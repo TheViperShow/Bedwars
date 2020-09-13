@@ -1,5 +1,6 @@
 package me.thevipershow.aussiebedwars.listeners.game;
 
+import me.thevipershow.aussiebedwars.AussieBedwars;
 import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.aussiebedwars.game.ActiveGame;
 import me.thevipershow.aussiebedwars.listeners.UnregisterableListener;
@@ -22,7 +23,15 @@ public final class PlayerQuitDuringGameListener extends UnregisterableListener {
         final World w = p.getWorld();
         if (!w.equals(activeGame.getAssociatedWorld())) return;
 
+        activeGame.getAssociatedWorld().getPlayers().forEach(P -> P.sendMessage(AussieBedwars.PREFIX + "§7" + p.getName() + " §ehas left this game."));
+        if (!activeGame.isHasStarted()) {
+            activeGame.getAssociatedWorld().getPlayers().forEach(P -> P.sendMessage(AussieBedwars.PREFIX + String.format("§7§l[§e%d§7\\§e%d§7§l]",
+                    activeGame.getAssociatedQueue().queueSize(), activeGame.getAssociatedQueue().getMaximumSize())));
+        }
+
         activeGame.removePlayer(p);
+        activeGame.getPlayersOutOfGame().add(p);
+
         if (!activeGame.isWinnerDeclared()) {
             final BedwarsTeam bedwarsTeam = activeGame.findWinningTeam();
             if (bedwarsTeam != null) {

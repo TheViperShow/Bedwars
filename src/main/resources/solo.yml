@@ -71,7 +71,10 @@ solo:
         levels:
           - number: 1
             increase-drop: 0
-            after-seconds: 60
+            after-seconds: 0
+          - number: 2
+            increase-drop: 1
+            after-seconds: 180
       - type: "EMERALD"
         invisible: false
         location:
@@ -84,6 +87,9 @@ solo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
+          - number: 2
+            increase-drop: 1
+            after-seconds: 180
       - type: "EMERALD"
         invisible: false
         location:
@@ -96,6 +102,9 @@ solo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
+          - number: 2
+            increase-drop: 1
+            after-seconds: 180
       - type: "EMERALD"
         invisible: false
         location:
@@ -108,6 +117,9 @@ solo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
+          - number: 2
+            increase-drop: 1
+            after-seconds: 180
       # DIAMONDS SPAWNERS
       #---------------------------------------
       - type: "DIAMOND"
@@ -122,6 +134,9 @@ solo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
+          - number: 2
+            increase-drop: 1
+            after-seconds: 180
       - type: "DIAMOND"
         invisible: false
         location:
@@ -134,6 +149,9 @@ solo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
+          - number: 2
+            increase-drop: 1
+            after-seconds: 180
       - type: "DIAMOND"
         invisible: false
         location:
@@ -146,6 +164,9 @@ solo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
+          - number: 2
+            increase-drop: 1
+            after-seconds: 180
       - type: "DIAMOND"
         invisible: false
         location:
@@ -157,7 +178,10 @@ solo:
         levels:
           - number: 1
             increase-drop: 0
-            after-seconds: 60
+            after-seconds: 180
+          - number: 2
+            increase-drop: 1
+            after-seconds: 180
             #--------------------------------------- Dark
       - type: "IRON"
         invisible: true
@@ -166,7 +190,7 @@ solo:
           y: 61.5
           z: -37.5
         drop-amount: 1
-        drop-delay: 120 # in seconds
+        drop-delay: 2 # in seconds
         levels:
           - number: 1
             increase-drop: 0
@@ -178,7 +202,7 @@ solo:
           y: 61.5
           z: -37.5
         drop-amount: 1
-        drop-delay: 120 # in seconds
+        drop-delay: 5 # in seconds
         levels:
           - number: 1
             increase-drop: 0
@@ -190,7 +214,7 @@ solo:
           x: -37.5
           y: 61.5
           z: -96.5
-        drop-amount: 1
+        drop-amount: 2
         drop-delay: 120 # in seconds
         levels:
           - number: 1
@@ -202,7 +226,7 @@ solo:
           x: -37.5
           y: 61.5
           z: -96.5
-        drop-amount: 1
+        drop-amount: 5
         drop-delay: 120 # in seconds
         levels:
           - number: 1
@@ -216,7 +240,7 @@ solo:
           y: 61.5
           z: -96.5
         drop-amount: 1
-        drop-delay: 120 # in seconds
+        drop-delay: 2 # in seconds
         levels:
           - number: 1
             increase-drop: 0
@@ -228,7 +252,7 @@ solo:
           y: 61.5
           z: -96.5
         drop-amount: 1
-        drop-delay: 120 # in seconds
+        drop-delay: 5 # in seconds
         levels:
           - number: 1
             increase-drop: 0
@@ -241,7 +265,7 @@ solo:
           y: 61.5
           z: -37.5
         drop-amount: 1
-        drop-delay: 120 # in seconds
+        drop-delay: 2 # in seconds
         levels:
           - number: 1
             increase-drop: 0
@@ -253,7 +277,7 @@ solo:
           y: 61.5
           z: 37.5
         drop-amount: 1
-        drop-delay: 120 # in seconds
+        drop-delay: 5 # in seconds
         levels:
           - number: 1
             increase-drop: 0
@@ -266,7 +290,7 @@ solo:
           y: 61.5
           z: 38.5
         drop-amount: 1
-        drop-delay: 120 # in seconds
+        drop-delay: 2 # in seconds
         levels:
           - number: 1
             increase-drop: 0
@@ -278,7 +302,7 @@ solo:
           y: 61.5
           z: 38.5
         drop-amount: 1
-        drop-delay: 120 # in seconds
+        drop-delay: 5 # in seconds
         levels:
           - number: 1
             increase-drop: 0
@@ -291,7 +315,7 @@ solo:
           y: 61.5
           z: 97.5
         drop-amount: 1
-        drop-delay: 120 # in seconds
+        drop-delay: 2 # in seconds
         levels:
           - number: 1
             increase-drop: 0
@@ -303,7 +327,7 @@ solo:
           y: 61.5
           z: 97.5
         drop-amount: 1
-        drop-delay: 120 # in seconds
+        drop-delay: 5 # in seconds
         levels:
           - number: 1
             increase-drop: 0
@@ -316,7 +340,7 @@ solo:
           y: 61.5
           z: 97.5
         drop-amount: 1
-        drop-delay: 120 # in seconds
+        drop-delay: 2 # in seconds
         levels:
           - number: 1
             increase-drop: 0
@@ -328,7 +352,7 @@ solo:
           y: 61.5
           z: 97.5
         drop-amount: 1
-        drop-delay: 120 # in seconds
+        drop-delay: 5 # in seconds
         levels:
           - number: 1
             increase-drop: 0
@@ -341,7 +365,7 @@ solo:
           y: 61.5
           z: 38.5
         drop-amount: 1
-        drop-delay: 120 # in seconds
+        drop-delay: 2 # in seconds
         levels:
           - number: 1
             increase-drop: 0
@@ -353,7 +377,7 @@ solo:
           y: 61.5
           z: 38.5
         drop-amount: 1
-        drop-delay: 120 # in seconds
+        drop-delay: 5 # in seconds
         levels:
           - number: 1
             increase-drop: 0
@@ -418,10 +442,22 @@ solo:
     shop:
       title: "{TEAM} Shop"
       slots: 54
+      glass:
+        color: 7
+        slots:
+          - 9
+          - 10
+          - 11
+          - 12
+          - 13
+          - 14
+          - 15
+          - 16
+          - 17
       items:
         - material: "WOOL"
-          item-name: "§eWool x16"
-          slot: 12
+          item-name: "§eWool Block"
+          slot: 20
           amount: 16
           buy-with: "IRON_INGOT"
           price: 12

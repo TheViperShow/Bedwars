@@ -1,6 +1,10 @@
 package me.thevipershow.aussiebedwars.game;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
 import me.thevipershow.aussiebedwars.bedwars.objects.spawners.SpawnerType;
 import me.thevipershow.aussiebedwars.bedwars.spawner.SpawnerLevel;
 import me.thevipershow.aussiebedwars.config.objects.Spawner;
@@ -9,6 +13,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 public class ActiveSpawner {
@@ -20,10 +25,11 @@ public class ActiveSpawner {
     private final SpawnerType type;
     private final Spawner spawner;
     private final ActiveGame game;
-    private final SpawnerLevel currentLevel;
     private final ImmutableTraversableList<Location> cachedAnimation;
+    private final List<BukkitTask> levelUpTasks;
 
     private long lastDrop = -1L;
+    private SpawnerLevel currentLevel;
     private BukkitTask animationTask = null;
     private BukkitTask dropTask = null;
     private BukkitTask updateNameTask = null;
@@ -60,6 +66,20 @@ public class ActiveSpawner {
         this.game = game;
         this.currentLevel = spawner.getSpawnerLevels().get(0);
         this.cachedAnimation = generateAnimation(spawner.getSpawnPosition().toLocation(game.getAssociatedWorld()));
+
+        this.levelUpTasks = new ArrayList<>();
+        final Iterator<SpawnerLevel> levelIterator = spawner.getSpawnerLevels().iterator();
+        if (levelIterator.hasNext()) levelIterator.next();
+        while (levelIterator.hasNext()) {
+            final SpawnerLevel lvl = levelIterator.next();
+            final BukkitTask task = new BukkitRunnable() {
+                @Override
+                public void run() {
+                    currentLevel = lvl;
+                }
+            }.runTaskLater(game.getPlugin(), lvl.getAfterSeconds() * 20L);
+            this.levelUpTasks.add(task);
+        }
     }
 
     private String generateStandName() {
@@ -124,6 +144,8 @@ public class ActiveSpawner {
             updateNameTask.cancel();
             dropTask.cancel();
             getCachedAnimation().clear();
+            getLevelUpTasks().forEach(BukkitTask::cancel);
+            getLevelUpTasks().clear();
             stand.remove();
         }
     }
@@ -168,5 +190,9 @@ public class ActiveSpawner {
 
     public long getLastDrop() {
         return lastDrop;
+    }
+
+    public List<BukkitTask> getLevelUpTasks() {
+        return levelUpTasks;
     }
 }
