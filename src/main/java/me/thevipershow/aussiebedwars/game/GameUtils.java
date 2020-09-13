@@ -1,11 +1,14 @@
 package me.thevipershow.aussiebedwars.game;
 
+import java.util.Collection;
+import java.util.Collections;
 import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.aussiebedwars.config.objects.Merchant;
 import me.thevipershow.aussiebedwars.config.objects.SpawnPosition;
 import me.thevipershow.aussiebedwars.config.objects.TeamSpawnPosition;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
 import net.minecraft.server.v1_8_R3.PlayerConnection;
+import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
@@ -94,5 +97,9 @@ public final class GameUtils {
                 return new UpgradeActiveMerchant(activeGame, merchant, findMerchantTeam(merchant, activeGame));
         }
         return null;
+    }
+
+    public static boolean anyMatchMaterial(final Collection<ItemStack> stack, final Material material) {
+        return stack.stream().anyMatch(s -> s.getType() == material);
     }
 }

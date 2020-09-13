@@ -27,8 +27,10 @@ public final class GameManager {
     private final JavaPlugin plugin;
     private final WorldsManager worldsManager;
     private final Set<BedwarsGame> bedwarsGameSet = new HashSet<>();
+    private boolean loading = false;
 
     public void loadBaseAmount() {
+        loading = true;
         bedwarsGameSet.forEach(bedwarsGame -> {
             int count = 0;
             while (count < bedwarsGame.getMinGames()) {
@@ -36,6 +38,13 @@ public final class GameManager {
                 count++;
             }
         });
+        loading = false;
+    }
+
+    public final void loadRandom(final Gamemode gamemode) {
+        loading = true;
+        bedwarsGameSet.stream().filter(bgame -> bgame.getGamemode() == gamemode).findAny().ifPresent(worldsManager::load);
+        loading = false;
     }
 
     public Optional<ActiveGame> findOptimalGame(final Gamemode gamemode) {
@@ -78,6 +87,10 @@ public final class GameManager {
                 plugin.getServer().getPluginManager().callEvent(leaveQueueEvent);
             }
         });
+    }
+
+    public boolean isLoading() {
+        return loading;
     }
 
     public final WorldsManager getWorldsManager() {

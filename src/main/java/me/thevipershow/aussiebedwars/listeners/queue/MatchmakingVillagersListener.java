@@ -67,6 +67,11 @@ public class MatchmakingVillagersListener implements Listener {
             final Optional<ActiveGame> opt = gameManager.findOptimalGame(g.get());
 
             if (!opt.isPresent()) {
+
+                if (!gameManager.isLoading()) {
+                    gameManager.loadRandom(g.get());
+                }
+
                 player.sendMessage(AussieBedwars.PREFIX + "§eWe could not find a game.");
                 return;
             }

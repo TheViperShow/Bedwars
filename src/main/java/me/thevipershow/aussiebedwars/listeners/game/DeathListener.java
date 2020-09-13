@@ -2,7 +2,6 @@ package me.thevipershow.aussiebedwars.listeners.game;
 
 import com.google.common.collect.Lists;
 import java.util.Map;
-import java.util.stream.Collectors;
 import me.thevipershow.aussiebedwars.AussieBedwars;
 import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.aussiebedwars.config.objects.SpawnPosition;
@@ -97,7 +96,7 @@ public final class DeathListener extends UnregisterableListener {
 
     }
 
-    private static void clearEverythingExceptArmour(final Player player, final ActiveGame game) {
+    private static void clearInvExceptArmorAndTools(final Player player, final ActiveGame game) {
         final PlayerInventory inv = player.getInventory();
         final ItemStack[] contents = inv.getContents();
 
@@ -108,7 +107,9 @@ public final class DeathListener extends UnregisterableListener {
 
         for (int i = 0; i < contents.length; i++) {
             ItemStack stack = contents[i];
-            if (stack == null || playerTools.getItems().stream().anyMatch(s -> s.getType().equals(stack.getType())) || playerArmorSet.getItems().stream().anyMatch(s -> s.getType().equals(stack.getType()))) {
+            if (stack == null
+                    || GameUtils.anyMatchMaterial(playerTools.getItems(), stack.getType())
+                    || GameUtils.anyMatchMaterial(playerArmorSet.getItems(), stack.getType())) {
                 continue;
             }
 
@@ -209,7 +210,7 @@ public final class DeathListener extends UnregisterableListener {
                 }
             }
             p.setHealth(p.getMaxHealth());
-            clearEverythingExceptArmour(p, activeGame); //TODO: ->
+            clearInvExceptArmorAndTools(p, activeGame); //TODO: ->
             event.setCancelled(true);
         }
     }

@@ -57,6 +57,7 @@ public abstract class ActiveGame {
     protected final Set<Block> playerPlacedBlocks = new HashSet<>();
     protected final Set<UnregisterableListener> unregisterableListeners = new HashSet<>();
     protected final Map<Player, ArmorSet> playerSetMap = new HashMap<>();
+    protected final Map<String, Integer> topKills = new HashMap<>();
     protected final Map<Player, Tools> toolsMap = new HashMap<>();
 
     ///////////////////////////////////////////////////
