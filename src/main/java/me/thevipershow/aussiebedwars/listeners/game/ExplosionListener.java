@@ -24,8 +24,7 @@ public class ExplosionListener extends UnregisterableListener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onEntityExplode(final EntityExplodeEvent event) {
         final Entity entity = event.getEntity();
-        if (!(entity instanceof TNTPrimed)) return;
-        if (!(entity instanceof Fireball)) return;
+        if (!(entity instanceof TNTPrimed) && !(entity instanceof Fireball)) return;
 
         final List<Block> affectedBlocks = event.blockList();
         final List<Block> toDestroy = affectedBlocks.stream()

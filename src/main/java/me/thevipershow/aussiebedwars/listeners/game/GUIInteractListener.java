@@ -71,6 +71,8 @@ public final class GUIInteractListener extends UnregisterableListener {
 
         final ItemStack cloned = clickedItem.clone();
         if (cloned.getType() == Material.WOOL) {
+            final BedwarsTeam playerTeam = activeGame.getPlayerTeam(player);
+            cloned.setDurability(playerTeam.getWoolColor());
             final BedwarsTeam coloredWoolTeam = activeGame.getPlayerTeam(player);
             final ItemMeta clonedMeta = cloned.getItemMeta();
             clonedMeta.setDisplayName("§" + coloredWoolTeam.getColorCode() + "§l" + coloredWoolTeam.name() + " §7Wool");
