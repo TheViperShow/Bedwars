@@ -60,8 +60,7 @@ public class MatchmakingVillagersListener implements Listener {
 
         final CompletableFuture<Optional<Gamemode>> future = QueueTableUtils.getVillagerGamemode(uuid, conn.get());
 
-        future.thenAccept((g) -> {
-
+        future.thenAccept((g) -> plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
             if (!g.isPresent()) return;
 
             final Optional<ActiveGame> opt = gameManager.findOptimalGame(g.get());
@@ -70,6 +69,21 @@ public class MatchmakingVillagersListener implements Listener {
 
                 if (!gameManager.isLoading()) {
                     gameManager.loadRandom(g.get());
+
+                    plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+                        final Optional<ActiveGame> opt2 = gameManager.findOptimalGame(g.get());
+                        if (!opt2.isPresent()) {
+                            player.sendMessage(AussieBedwars.PREFIX + "§eWe could not find a game.");
+                        } else {
+                            final ActiveGame activeGame = opt.get();
+
+                            gameManager.removeFromAllQueues(player);
+
+                            plugin.getServer().getScheduler().runTaskLater(plugin, () -> gameManager.addToQueue(player, activeGame), 1L);
+                            return;
+                        }
+                    }, 45L);
+                    return;
                 }
 
                 player.sendMessage(AussieBedwars.PREFIX + "§eWe could not find a game.");
@@ -80,8 +94,8 @@ public class MatchmakingVillagersListener implements Listener {
 
             gameManager.removeFromAllQueues(player);
 
-            plugin.getServer().getScheduler().runTaskLater(plugin, () -> activeGame.moveToWaitingRoom(player), 1L);
-        });
+            plugin.getServer().getScheduler().runTaskLater(plugin, () -> gameManager.addToQueue(player, activeGame), 1L);
+        }, 1L));
 
     }
 }

@@ -3,6 +3,7 @@ package me.thevipershow.aussiebedwars.listeners.game;
 import me.thevipershow.aussiebedwars.AussieBedwars;
 import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.aussiebedwars.game.ActiveGame;
+import me.thevipershow.aussiebedwars.game.GameUtils;
 import me.thevipershow.aussiebedwars.listeners.UnregisterableListener;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -31,6 +32,11 @@ public final class PlayerQuitDuringGameListener extends UnregisterableListener {
 
         activeGame.removePlayer(p);
         activeGame.getPlayersOutOfGame().add(p);
+        GameUtils.clearAllEffects(p);
+        GameUtils.clearArmor(p);
+        p.getInventory().clear();
+        p.setAllowFlight(false);
+        p.setFlying(false);
 
         if (!activeGame.isWinnerDeclared()) {
             final BedwarsTeam bedwarsTeam = activeGame.findWinningTeam();

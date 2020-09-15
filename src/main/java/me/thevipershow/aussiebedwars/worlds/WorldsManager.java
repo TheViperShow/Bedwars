@@ -2,9 +2,9 @@ package me.thevipershow.aussiebedwars.worlds;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 import me.thevipershow.aussiebedwars.config.BedwarsGamemodeConfig;
 import me.thevipershow.aussiebedwars.config.ConfigManager;
 import me.thevipershow.aussiebedwars.config.objects.BedwarsGame;
@@ -14,9 +14,23 @@ import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
+import org.bukkit.WorldType;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class WorldsManager {
+
+    private static WorldsManager instance = null;
+
+    public static WorldsManager getInstanceSafe(final ConfigManager configManager, final JavaPlugin plugin) {
+        if (instance == null) {
+            instance = new WorldsManager(configManager, plugin);
+        }
+        return instance;
+    }
+
+    public static WorldsManager getInstanceUnsafe() {
+        return instance;
+    }
 
     private final ConfigManager configManager;
     private final JavaPlugin plugin;
@@ -24,23 +38,24 @@ public class WorldsManager {
     private final File pluginFolder;
     private final World lobbyWorld;
     private final HashMap<BedwarsGame, Integer> createdAmountsMap;
-    private final Set<ActiveGame> activeGameSet;
+    private final List<ActiveGame> activeGameSet;
 
-    public WorldsManager(ConfigManager configManager, final JavaPlugin plugin) {
+    private WorldsManager(final ConfigManager configManager, final JavaPlugin plugin) {
         this.configManager = configManager;
         this.plugin = plugin;
         this.lobbyWorld = Bukkit.getWorld(configManager.getDefaultConfiguration().getLobbyName());
         this.worldContainer = plugin.getServer().getWorldContainer();
         this.pluginFolder = plugin.getDataFolder();
-        this.activeGameSet = new HashSet<>();
+        this.activeGameSet = new ArrayList<>();
         this.createdAmountsMap = new HashMap<>();
     }
 
     public final void cleanPreviousDirs() {
         final File[] filez = worldContainer.listFiles();
+        assert filez != null;
         if (filez.length == 0) return;
         for (final BedwarsGamemodeConfig<? extends BedwarsGame> config : configManager.getConfigs()) {
-            for (final BedwarsGame game : config.getSoloBedwarsObjects()) {
+            for (final BedwarsGame game : config.getBedwarsObjects()) {
                 for (final File file : filez) {
                     if (file.getName().contains(game.getMapFilename())) {
                         try {
@@ -75,12 +90,16 @@ public class WorldsManager {
 
         plugin.getLogger().info(String.format("Attempting to create instance of bukkit World [%s].", tempName));
 
+        plugin.getLogger().info("Copied status: " + copyResult);
         final World w = WorldCreator.name(tempName)
                 .environment(World.Environment.NORMAL)
                 .generateStructures(false)
+                .type(WorldType.CUSTOMIZED)
                 .createWorld();
 
-        plugin.getLogger().info(String.format("Loading [%s] into active games.", tempName));
+        plugin.getLogger().info("LOADED WORLD -> " + w.toString());
+
+        plugin.getLogger().info(String.format("Loading [%s] into active games...", tempName));
 
         final ActiveGame activeGame = GamemodeUtilities.fromGamemode(tempName, game, lobbyWorld, plugin);
 
@@ -90,7 +109,8 @@ public class WorldsManager {
             if (activeGame == null) {
                 plugin.getLogger().severe(String.format("Could not create active game for [%s].", tempName));
             } else {
-                this.activeGameSet.add(activeGame);
+                plugin.getLogger().info("Added new ActiveGame [" + tempName + "].");
+                activeGameSet.add(activeGame);
             }
         } else {
             plugin.getLogger().warning(String.format("Something went wrong when creating world [%s].", tempName));
@@ -102,7 +122,7 @@ public class WorldsManager {
         return lobbyWorld;
     }
 
-    public Set<ActiveGame> getActiveGameSet() {
+    public List<ActiveGame> getActiveGameList() {
         return activeGameSet;
     }
 

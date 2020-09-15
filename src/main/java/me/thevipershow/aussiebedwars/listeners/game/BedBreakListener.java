@@ -49,7 +49,6 @@ public final class BedBreakListener extends UnregisterableListener {
         final Block b = event.getBlock();
         if (!b.getWorld().equals(activeGame.getAssociatedWorld())) return;
 
-
         if (activeGame.getPlayerPlacedBlocks().contains(b)) {
             activeGame.getPlayerPlacedBlocks().remove(b);
         } else {
@@ -59,7 +58,7 @@ public final class BedBreakListener extends UnregisterableListener {
                 if (playerTeam == destroyedBedTeam) {
                     p.sendMessage(AussieBedwars.PREFIX + "§eYou cannot destroy your own bed.");
                     event.setCancelled(true);
-                } else {
+                } else if (activeGame.getAssignedTeams().containsKey(destroyedBedTeam)) {
                     final TeamBedDestroyEvent e = new TeamBedDestroyEvent(activeGame, destroyedBedTeam);
                     activeGame.getPlugin().getServer().getPluginManager().callEvent(e);
 

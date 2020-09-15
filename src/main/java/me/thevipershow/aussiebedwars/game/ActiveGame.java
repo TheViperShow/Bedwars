@@ -2,9 +2,11 @@ package me.thevipershow.aussiebedwars.game;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -17,19 +19,28 @@ import me.thevipershow.aussiebedwars.listeners.game.ArmorSet;
 import me.thevipershow.aussiebedwars.listeners.game.BedBreakListener;
 import me.thevipershow.aussiebedwars.listeners.game.DeathListener;
 import me.thevipershow.aussiebedwars.listeners.game.EntityDamageListener;
+import me.thevipershow.aussiebedwars.listeners.game.ExplosionListener;
 import me.thevipershow.aussiebedwars.listeners.game.GUIInteractListener;
 import me.thevipershow.aussiebedwars.listeners.game.HungerLossListener;
 import me.thevipershow.aussiebedwars.listeners.game.LobbyCompassListener;
 import me.thevipershow.aussiebedwars.listeners.game.MapIllegalMovementsListener;
 import me.thevipershow.aussiebedwars.listeners.game.MapProtectionListener;
 import me.thevipershow.aussiebedwars.listeners.game.MerchantInteractListener;
+import me.thevipershow.aussiebedwars.listeners.game.PlayerFireballInteractListener;
 import me.thevipershow.aussiebedwars.listeners.game.PlayerQuitDuringGameListener;
+import me.thevipershow.aussiebedwars.listeners.game.SpectatorsInteractListener;
+import me.thevipershow.aussiebedwars.listeners.game.TNTPlaceListener;
 import me.thevipershow.aussiebedwars.listeners.game.Tools;
+import me.thevipershow.aussiebedwars.worlds.WorldsManager;
+import me.tigerhix.lib.scoreboard.common.EntryBuilder;
+import me.tigerhix.lib.scoreboard.type.Entry;
 import me.tigerhix.lib.scoreboard.type.Scoreboard;
+import me.tigerhix.lib.scoreboard.type.ScoreboardHandler;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -47,15 +58,15 @@ public abstract class ActiveGame {
     protected final Plugin plugin;
     protected final AbstractQueue<Player> associatedQueue;
     protected final Location cachedWaitingLocation;
-    protected final Map<BedwarsTeam, Set<Player>> assignedTeams;
+    protected final Map<BedwarsTeam, List<Player>> assignedTeams;
     protected final Set<ActiveSpawner> activeSpawners;
 
-    protected final Set<Scoreboard> activeScoreboards = new HashSet<>();
-    protected final Set<BedwarsTeam> destroyedTeams = new HashSet<>();
-    protected final Set<Player> playersOutOfGame = new HashSet<>();
-    protected final Set<AbstractActiveMerchant> activeMerchants = new HashSet<>();
-    protected final Set<Block> playerPlacedBlocks = new HashSet<>();
-    protected final Set<UnregisterableListener> unregisterableListeners = new HashSet<>();
+    protected final List<Scoreboard> activeScoreboards = new ArrayList<>();
+    protected final List<BedwarsTeam> destroyedTeams = new ArrayList<>();
+    protected final List<Player> playersOutOfGame = new ArrayList<>();
+    protected final List<AbstractActiveMerchant> activeMerchants = new ArrayList<>();
+    protected final List<Block> playerPlacedBlocks = new ArrayList<>();
+    protected final List<UnregisterableListener> unregisterableListeners = new ArrayList<>();
     protected final Map<Player, ArmorSet> playerSetMap = new HashMap<>();
     protected final Map<String, Integer> topKills = new HashMap<>();
     protected final Map<Player, Tools> toolsMap = new HashMap<>();
@@ -91,6 +102,65 @@ public abstract class ActiveGame {
         gameLobbyTicker.startTicking();
     }
 
+    protected final ScoreboardHandler scoreboardHandler = new ScoreboardHandler() {
+
+        @Override
+        public String getTitle(final Player player) {
+            return AussieBedwars.PREFIX;
+        }
+
+        @Override
+        public List<Entry> getEntries(final Player player) {
+            final EntryBuilder builder = new EntryBuilder();
+            builder.blank();
+            for (BedwarsTeam t : assignedTeams.keySet()) {
+                builder.next(" §7Team " + "§l§" + t.getColorCode() + t.name() + getTeamChar(t));
+            }
+            builder.blank();
+            return builder.build();
+        }
+
+    };
+
+    public void destroyTeamBed(final BedwarsTeam team) {
+        associatedQueue.perform(p -> {
+            if (p.isOnline() && p.getWorld().equals(associatedWorld)) {
+                if (getPlayerTeam(p) == team) {
+                    p.sendTitle("§e§lYour bed has been broken!", "");
+                    p.playSound(p.getLocation(), Sound.ENDERDRAGON_GROWL, 10.0f, 1.0f);
+                } else {
+                    p.sendMessage("§" + team.getColorCode() + team.name() + " §7team's bed has been broken!");
+                }
+            }
+        });
+    }
+
+    public final void cleanAllAndFinalize() {
+        unregisterAllListeners();
+        associatedQueue.cleanQueue();
+        assignedTeams.clear();
+        activeSpawners.forEach(ActiveSpawner::despawn);
+        activeSpawners.clear();
+        activeScoreboards.forEach(Scoreboard::deactivate);
+        activeScoreboards.clear();
+        destroyedTeams.clear();
+        playersOutOfGame.clear();
+        activeMerchants.forEach(AbstractActiveMerchant::delete);
+        activeMerchants.clear();
+        playerPlacedBlocks.clear();
+        playerSetMap.clear();
+        toolsMap.clear();
+        topKills.clear();
+        gameLobbyTicker.stopTicking();
+        hasStarted = false;
+        destroyMap();
+        try {
+            finalize();
+        } catch (final Throwable t) {
+            t.printStackTrace();
+        }
+    }
+
     public void handleError(String text) {
         associatedQueue.perform(p -> p.sendMessage(AussieBedwars.PREFIX + "§c" + text));
     }
@@ -101,7 +171,14 @@ public abstract class ActiveGame {
 
     public void moveAllToLobby() {
         associatedWorld.getPlayers().forEach(p -> {
+            GameUtils.clearAllEffects(p);
+            p.setGameMode(GameMode.SURVIVAL);
+            p.setFallDistance(0.100f);
+            GameUtils.clearArmor(p);
+            p.getInventory().clear();
             p.teleport(getCachedLobbySpawnLocation());
+            p.setAllowFlight(false);
+            p.setFlying(false);
         });
     }
 
@@ -123,6 +200,10 @@ public abstract class ActiveGame {
         final UnregisterableListener entityDamageListener = new EntityDamageListener(this);
         final UnregisterableListener guiInteractListener = new GUIInteractListener(this);
         final UnregisterableListener hungerLossListener = new HungerLossListener(this);
+        final UnregisterableListener spectatorInteractListener = new SpectatorsInteractListener(this);
+        final UnregisterableListener tntPlaceListener = new TNTPlaceListener(this);
+        final UnregisterableListener fireballInteract = new PlayerFireballInteractListener(this);
+        final UnregisterableListener explosionListener = new ExplosionListener(this);
 
         plugin.getServer().getPluginManager().registerEvents(mapProtectionListener, plugin);
         plugin.getServer().getPluginManager().registerEvents(mapIllegalMovementsListener, plugin);
@@ -134,6 +215,10 @@ public abstract class ActiveGame {
         plugin.getServer().getPluginManager().registerEvents(entityDamageListener, plugin);
         plugin.getServer().getPluginManager().registerEvents(guiInteractListener, plugin);
         plugin.getServer().getPluginManager().registerEvents(hungerLossListener, plugin);
+        plugin.getServer().getPluginManager().registerEvents(spectatorInteractListener, plugin);
+        plugin.getServer().getPluginManager().registerEvents(tntPlaceListener, plugin);
+        plugin.getServer().getPluginManager().registerEvents(fireballInteract, plugin);
+        plugin.getServer().getPluginManager().registerEvents(explosionListener, plugin);
 
         unregisterableListeners.add(mapIllegalMovementsListener);
         unregisterableListeners.add(mapProtectionListener);
@@ -145,19 +230,24 @@ public abstract class ActiveGame {
         unregisterableListeners.add(entityDamageListener);
         unregisterableListeners.add(guiInteractListener);
         unregisterableListeners.add(hungerLossListener);
+        unregisterableListeners.add(spectatorInteractListener);
+        unregisterableListeners.add(tntPlaceListener);
+        unregisterableListeners.add(fireballInteract);
+        unregisterableListeners.add(explosionListener);
     }
 
     public final void unregisterAllListeners() {
-        for (final UnregisterableListener unregisterableListener : unregisterableListeners)
-            if (!unregisterableListener.isUnregistered())
+        for (final UnregisterableListener unregisterableListener : unregisterableListeners) {
+            if (!unregisterableListener.isUnregistered()) {
                 unregisterableListener.unregister();
+            }
+        }
     }
 
     public void moveToWaitingRoom(final Player player) {
         if (cachedWaitingLocation != null) {
             if (player.teleport(cachedWaitingLocation)) {
                 connectedToQueue(player, this);
-                associatedQueue.addToQueue(player);
                 player.setGameMode(GameMode.ADVENTURE);
             }
         } else
@@ -165,7 +255,7 @@ public abstract class ActiveGame {
     }
 
     public BedwarsTeam getPlayerTeam(final Player player) {
-        for (final Map.Entry<BedwarsTeam, Set<Player>> entry : assignedTeams.entrySet())
+        for (final Map.Entry<BedwarsTeam, List<Player>> entry : assignedTeams.entrySet())
             if (entry.getValue().contains(player))
                 return entry.getKey();
         return null;
@@ -178,7 +268,22 @@ public abstract class ActiveGame {
         return false;
     }
 
-    public abstract void start();
+    public void start() {
+        setHasStarted(true);
+        if (associatedQueue.queueSize() >= bedwarsGame.getMinPlayers()) {
+            if (associatedWorld == null) {
+                handleError("Something went wrong while you were being sent into game.");
+                return;
+            }
+            assignTeams();
+            assignScoreboards();
+            createSpawners();
+            createMerchants();
+            moveTeamsToSpawns();
+            giveAllDefaultSet();
+            healAll();
+        }
+    }
 
     public void healAll() {
         associatedWorld.getPlayers().forEach(p -> {
@@ -189,9 +294,14 @@ public abstract class ActiveGame {
 
     public abstract void moveTeamsToSpawns();
 
-    public abstract void stop();
-
-    public abstract void givePlayerDefaultSet(final Player p);
+    public void givePlayerDefaultSet(final Player p) {
+        final ArmorSet startingSet = new ArmorSet(getPlayerTeam(p));
+        startingSet.getArmorSet().forEach((k, v) -> ArmorSet.Slots.setArmorPiece(k, p, startingSet.getArmorSet().get(k)));
+        final Tools tools = new Tools();
+        tools.giveToPlayer(p);
+        this.toolsMap.put(p, tools);
+        this.playerSetMap.put(p, startingSet);
+    }
 
     public void giveAllDefaultSet() {
         associatedQueue.perform(this::givePlayerDefaultSet);
@@ -209,8 +319,8 @@ public abstract class ActiveGame {
         }
     }
 
-    public Set<Player> getTeamPlayers(final BedwarsTeam bedwarsTeam) {
-        for (final Map.Entry<BedwarsTeam, Set<Player>> entry : assignedTeams.entrySet()) {
+    public List<Player> getTeamPlayers(final BedwarsTeam bedwarsTeam) {
+        for (final Map.Entry<BedwarsTeam, List<Player>> entry : assignedTeams.entrySet()) {
             if (entry.getKey() == bedwarsTeam)
                 return entry.getValue();
         }
@@ -220,9 +330,9 @@ public abstract class ActiveGame {
     public Set<BedwarsTeam> teamsLeft() {
         if (playersOutOfGame.isEmpty()) return Collections.emptySet();
         final Set<BedwarsTeam> bedwarsTeams = new HashSet<>();
-        for (final Map.Entry<BedwarsTeam, Set<Player>> entry : assignedTeams.entrySet()) {
+        for (final Map.Entry<BedwarsTeam, List<Player>> entry : assignedTeams.entrySet()) {
             final BedwarsTeam team = entry.getKey();
-            final Set<Player> playerSet = entry.getValue();
+            final List<Player> playerSet = entry.getValue();
             final boolean isTeamOutOfGame = playersOutOfGame.containsAll(playerSet);
             if (!isTeamOutOfGame) {
                 bedwarsTeams.add(team);
@@ -231,17 +341,38 @@ public abstract class ActiveGame {
         return bedwarsTeams;
     }
 
-    public abstract void declareWinner(final BedwarsTeam player);
+    public void declareWinner(final BedwarsTeam team) {
+        if (winnerDeclared) return;
+        associatedQueue.perform(p -> {
+            if (p.isOnline() && p.getWorld().equals(associatedWorld)) {
+                p.sendTitle("§7Team " + '§' + team.getColorCode() + team.name() + " §7has won the game!", "§7Returning to lobby in 15s");
+            }
+        });
+        this.winnerDeclared = true;
+    }
+
+    public void stop() {
+        moveAllToLobby();
+        cleanAllAndFinalize();
+    }
 
     public abstract void assignTeams();
 
     public abstract void assignScoreboards();
 
-    public abstract void destroyTeamBed(final BedwarsTeam team);
-
     public void createSpawners() {
         for (final ActiveSpawner activeSpawner : getActiveSpawners())
             activeSpawner.spawn();
+    }
+
+    public void upgradePlayerArmorSet(final Player player, final String type) {
+        final ArmorSet pSet = playerSetMap.get(player);
+        pSet.upgradeAll(type);
+        pSet.getArmorSet().forEach((k, v) -> ArmorSet.Slots.setArmorPiece(k, player, pSet.getArmorSet().get(k)));
+    }
+
+    public void downgradePlayerArmorSet(final Player player) {
+        // NO
     }
 
     public boolean isOutOfGame(final Player p) {
@@ -257,6 +388,7 @@ public abstract class ActiveGame {
         final File wDir = associatedWorld.getWorldFolder();
         try {
             FileUtils.deleteDirectory(wDir);
+            WorldsManager.getInstanceUnsafe().getActiveGameList().remove(this);
         } catch (IOException e) {
             plugin.getLogger().severe("Something went wrong while destroying map of " + associatedWorldFilename);
             e.printStackTrace();
@@ -276,7 +408,7 @@ public abstract class ActiveGame {
 
     protected String getTeamChar(final BedwarsTeam t) {
         if (destroyedTeams.contains(t)) {
-            final Set<Player> teamMembers = getTeamPlayers(t);
+            final List<Player> teamMembers = getTeamPlayers(t);
             if (teamMembers.stream().allMatch(this::isOutOfGame)) {
                 return " §c§l✘";
             } else {
@@ -287,7 +419,7 @@ public abstract class ActiveGame {
         }
     }
 
-    public Set<UnregisterableListener> getUnregisterableListeners() {
+    public List<UnregisterableListener> getUnregisterableListeners() {
         return unregisterableListeners;
     }
 
@@ -307,7 +439,7 @@ public abstract class ActiveGame {
         return associatedWorld;
     }
 
-    public Set<Block> getPlayerPlacedBlocks() {
+    public List<Block> getPlayerPlacedBlocks() {
         return playerPlacedBlocks;
     }
 
@@ -315,7 +447,7 @@ public abstract class ActiveGame {
         return lobbyWorld;
     }
 
-    public Set<Player> getPlayersOutOfGame() {
+    public List<Player> getPlayersOutOfGame() {
         return playersOutOfGame;
     }
 
@@ -335,7 +467,7 @@ public abstract class ActiveGame {
         return activeSpawners;
     }
 
-    public Set<AbstractActiveMerchant> getActiveMerchants() {
+    public List<AbstractActiveMerchant> getActiveMerchants() {
         return activeMerchants;
     }
 
@@ -361,7 +493,7 @@ public abstract class ActiveGame {
                 '}';
     }
 
-    public Set<BedwarsTeam> getDestroyedTeams() {
+    public List<BedwarsTeam> getDestroyedTeams() {
         return destroyedTeams;
     }
 
@@ -373,11 +505,11 @@ public abstract class ActiveGame {
         return hasStarted;
     }
 
-    public Map<BedwarsTeam, Set<Player>> getAssignedTeams() {
+    public Map<BedwarsTeam, List<Player>> getAssignedTeams() {
         return assignedTeams;
     }
 
-    public Set<Scoreboard> getActiveScoreboards() {
+    public List<Scoreboard> getActiveScoreboards() {
         return activeScoreboards;
     }
 
@@ -399,5 +531,9 @@ public abstract class ActiveGame {
 
     public GameLobbyTicker getGameLobbyTicker() {
         return gameLobbyTicker;
+    }
+
+    public Map<String, Integer> getTopKills() {
+        return topKills;
     }
 }

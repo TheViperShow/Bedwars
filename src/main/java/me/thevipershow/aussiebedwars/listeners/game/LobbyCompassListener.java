@@ -24,6 +24,7 @@ public final class LobbyCompassListener extends UnregisterableListener {
     public void onInventoryClick(final PlayerInteractEvent event) {
         final Player clicker = event.getPlayer();
 
+        if (!activeGame.getPlayersOutOfGame().contains(clicker)) return;
         if (!clicker.getWorld().equals(activeGame.getAssociatedWorld())) return;
 
         final ItemStack clickedItem = clicker.getItemInHand();

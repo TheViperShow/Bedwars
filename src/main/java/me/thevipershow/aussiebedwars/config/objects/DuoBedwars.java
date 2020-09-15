@@ -7,21 +7,26 @@ import java.util.stream.Collectors;
 import me.thevipershow.aussiebedwars.bedwars.Gamemode;
 import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.bukkit.configuration.serialization.SerializableAs;
 
-@SerializableAs("Solo")
-public class SoloBedwars extends BedwarsGame implements ConfigurationSerializable {
-
-    protected SoloBedwars(Gamemode gamemode, int minGames, int maxGames, int minPlayers, int players, List<BedwarsTeam> teams, SpawnPosition lobbySpawn, String mapFilename, Set<TeamSpawnPosition> mapSpawns, List<Spawner> spawners, List<Merchant> merchants, Shop shop, int startTimer) {
+public class DuoBedwars extends BedwarsGame implements ConfigurationSerializable {
+    protected DuoBedwars(Gamemode gamemode, int minGames, int maxGames, int minPlayers, int players, List<BedwarsTeam> teams, SpawnPosition lobbySpawn, String mapFilename, Set<TeamSpawnPosition> mapSpawns, List<Spawner> spawners, List<Merchant> merchants, Shop shop, int startTimer) {
         super(gamemode, minGames, maxGames, minPlayers, players, teams, lobbySpawn, mapFilename, mapSpawns, spawners, merchants, shop, startTimer);
     }
 
+    /**
+     * Creates a Map representation of this class.
+     * <p>
+     * This class must provide a method to restore this class, as defined in
+     * the {@link ConfigurationSerializable} interface javadocs.
+     *
+     * @return Map containing the current state of this class
+     */
     @Override
     public Map<String, Object> serialize() {
-        throw new UnsupportedOperationException("Cannot serialize SoloBedwars.");
+        throw new UnsupportedOperationException("You can't serialize this.");
     }
 
-    public static SoloBedwars deserialize(Map<String, Object> objectMap) {
+    public static DuoBedwars deserialize(final Map<String, Object> objectMap) {
         String filename = (String) objectMap.get("map-filename");
         int minGames = (int) objectMap.get("minimum-games");
         int maxGames = (int) objectMap.get("maximum-games");
@@ -49,8 +54,6 @@ public class SoloBedwars extends BedwarsGame implements ConfigurationSerializabl
                 .collect(Collectors.toList());
         Map<String, Object> shopSection = (Map<String, Object>) objectMap.get("shop");
         Shop shop = Shop.deserialize(shopSection);
-
-        return new SoloBedwars(Gamemode.SOLO, minGames, maxGames, minPlayers, players, actualTeams, mapLobbySpawnPos, filename, mapSpawnPos, spawnerList, merchantsList, shop, startTimer);
+        return new DuoBedwars(Gamemode.DUO, minGames, maxGames, minPlayers, players, actualTeams, mapLobbySpawnPos, filename, mapSpawnPos, spawnerList, merchantsList, shop, startTimer);
     }
-
 }

@@ -5,7 +5,9 @@ import me.thevipershow.aussiebedwars.commands.CommandsManager;
 import me.thevipershow.aussiebedwars.config.BedwarsGamemodeConfig;
 import me.thevipershow.aussiebedwars.config.ConfigManager;
 import me.thevipershow.aussiebedwars.config.DefaultConfiguration;
+import me.thevipershow.aussiebedwars.config.DuoConfig;
 import me.thevipershow.aussiebedwars.config.SoloConfig;
+import me.thevipershow.aussiebedwars.config.objects.DuoBedwars;
 import me.thevipershow.aussiebedwars.config.objects.Merchant;
 import me.thevipershow.aussiebedwars.config.objects.Shop;
 import me.thevipershow.aussiebedwars.config.objects.ShopItem;
@@ -19,6 +21,7 @@ import me.thevipershow.aussiebedwars.storage.sql.Database;
 import me.thevipershow.aussiebedwars.storage.sql.MySQLDatabase;
 import me.thevipershow.aussiebedwars.worlds.WorldsManager;
 import me.tigerhix.lib.scoreboard.ScoreboardLib;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -35,6 +38,7 @@ public final class AussieBedwars extends JavaPlugin {
     private DefaultConfiguration defaultConfiguration;
     // loading file configurations:
     private BedwarsGamemodeConfig<SoloBedwars> soloConfig;
+    private BedwarsGamemodeConfig<DuoBedwars> duoConfig;
     private ConfigManager configManager;
 
     // Global Listeners section
@@ -58,7 +62,9 @@ public final class AussieBedwars extends JavaPlugin {
         ConfigurationSerialization.registerClass(SoloBedwars.class);
         ConfigurationSerialization.registerClass(ShopItem.class);
         ConfigurationSerialization.registerClass(TeamSpawnPosition.class);
+        ConfigurationSerialization.registerClass(DuoBedwars.class);
     }
+
 //
 //         _nnnn_
 //        dGGGGMMb     ,"""""""""""""".
@@ -79,22 +85,30 @@ public final class AussieBedwars extends JavaPlugin {
 
 
     @Override
+    public void onLoad() {
+        registerSerializers();
+    }
+
+    @Override
     public void onEnable() { // Plugin startup logic
         ScoreboardLib.setPluginInstance(this);
         defaultConfiguration = new DefaultConfiguration(this);
         soloConfig = new SoloConfig(this);
         soloConfig.saveDefaultConfig();
 
-        configManager = new ConfigManager(defaultConfiguration, soloConfig); // TODO: add extras
+        duoConfig = new DuoConfig(this);
+        duoConfig.saveDefaultConfig();
 
-        worldsManager = new WorldsManager(configManager, this);
+        configManager = new ConfigManager(defaultConfiguration, soloConfig, duoConfig); // TODO: add extras
+
+        worldsManager = WorldsManager.getInstanceSafe(configManager, this);
         worldsManager.cleanPreviousDirs();
 
         commandsManager = CommandsManager.getInstance(this);
         commandsManager.registerAll();
 
         database = new MySQLDatabase(this, defaultConfiguration);
-        gameManager = new GameManager(this, worldsManager, soloConfig);
+        gameManager = new GameManager(this, worldsManager, soloConfig, duoConfig);
         gameManager.loadBaseAmount();
 
         matchmakingVillagerListener = new MatchmakingVillagersListener(this, gameManager);
@@ -106,7 +120,7 @@ public final class AussieBedwars extends JavaPlugin {
     @Override
     public void onDisable() {
         
-        worldsManager.getActiveGameSet().forEach(game -> getServer().unloadWorld(game.getAssociatedWorld(), false));
+        worldsManager.getActiveGameList().forEach(game -> getServer().unloadWorld(game.getAssociatedWorld(), false));
     }
 
 }

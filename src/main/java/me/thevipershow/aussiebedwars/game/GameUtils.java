@@ -1,10 +1,10 @@
 package me.thevipershow.aussiebedwars.game;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.aussiebedwars.config.objects.Merchant;
-import me.thevipershow.aussiebedwars.config.objects.SpawnPosition;
 import me.thevipershow.aussiebedwars.config.objects.TeamSpawnPosition;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
 import net.minecraft.server.v1_8_R3.PlayerConnection;
@@ -13,7 +13,10 @@ import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.potion.PotionEffect;
 
 public final class GameUtils {
     public final static String NO_AI_TAG = "NoAi";
@@ -23,7 +26,7 @@ public final class GameUtils {
     }
 
     public static String capitalize(String str) {
-        if(str == null || str.isEmpty()) {
+        if (str == null || str.isEmpty()) {
             return str;
         }
 
@@ -74,19 +77,129 @@ public final class GameUtils {
     }
 
     public static void giveStackToPlayer(final ItemStack itemStack, final Player player, final ItemStack[] contents) {
-        boolean couldGive = false;
+        final PlayerInventory inv = player.getInventory();
+
+        if (isInventoryEmpty(contents)) {
+            inv.setItem(0, itemStack);
+            return;
+        }
+
+        if (isInventoryFull(contents)) {
+            player.getWorld().dropItem(player.getLocation(), itemStack);
+            return;
+        }
+
+        final Map<Integer, Integer> matchingTypeSlots = new HashMap<>();
+
         for (int i = 0; i < contents.length; i++) {
-            final ItemStack item = contents[i];
-            if (item == null) {
-                player.getInventory().setItem(i, itemStack);
-                couldGive = true;
-                break;
+            final ItemStack stack = contents[i];
+            if (stack == null) continue;
+            final int stackAmount = stack.getAmount();
+            if (stack.getType() == itemStack.getType() && stack.getAmount() != 64) {
+                matchingTypeSlots.put(i, stackAmount);
             }
         }
 
-        if (!couldGive) {
-            player.getWorld().dropItem(player.getLocation(), itemStack);
+        if (matchingTypeSlots.isEmpty()) {
+            inv.setItem(findFirstEmptySlot(contents), itemStack);
+            return;
         }
+
+        int given = 0;
+        final int toGive = itemStack.getAmount();
+
+        for (Map.Entry<Integer, Integer> entry : matchingTypeSlots.entrySet()) {
+            if (toGive - given <= 0) break;
+            final int key = entry.getKey();
+            final int slotItemsCount = entry.getValue();
+            final int canAddToThisSlot = 64 - slotItemsCount;
+            final int leftToGive = (toGive - given);
+            final int willGive = leftToGive > canAddToThisSlot ? (slotItemsCount + canAddToThisSlot) : leftToGive;
+            final ItemStack s = contents[key];
+            if (slotItemsCount + willGive > 64) {
+                // Bro wtf you're doing get out immediately
+                continue;
+            }
+            s.setAmount(slotItemsCount + willGive);
+            inv.setItem(key, s);
+            given += willGive;
+        }
+
+        //TODO : Maybe fix stacks overflowing
+    }
+
+    /**
+     * Searches for the first empty slot if someone's inventory;
+     *
+     * @return any integer if found, -1 if no slots are found.
+     */
+    public static int findFirstEmptySlot(final ItemStack contents[]) {
+        int empty = -1;
+        for (int i = 0; i < contents.length; i++) {
+            final ItemStack content = contents[i];
+            if (content == null) {
+                empty = i;
+                break;
+            }
+        }
+        return empty;
+    }
+
+    public static void clearAllEffects(final Player player) {
+        for (final PotionEffect potionEffect : player.getActivePotionEffects()) {
+            player.removePotionEffect(potionEffect.getType());
+        }
+    }
+
+    public static void clearArmor(final Player player) {
+        final PlayerInventory inv = player.getInventory();
+        inv.setHelmet(null);
+        inv.setChestplate(null);
+        inv.setLeggings(null);
+        inv.setBoots(null);
+    }
+
+    public static void decreaseItemInHand(final Player player) {
+        final ItemStack i = player.getItemInHand();
+        if (i == null) return;
+        if (i.getAmount() == 1) {
+            player.setItemInHand(null);
+        } else {
+            i.setAmount(i.getAmount() - 1);
+            player.setItemInHand(i);
+        }
+    }
+
+    /**
+     * Evaluates if someone's inventory is empty
+     *
+     * @return true if completely empty, false otherwise.
+     */
+    public static boolean isInventoryEmpty(final ItemStack[] contents) {
+        boolean empty = true;
+        for (final ItemStack content : contents) {
+            if (content != null) {
+                empty = false;
+                break;
+            }
+        }
+        return empty;
+    }
+
+    /**
+     * Evaluates if someone's inventor is full
+     *
+     * @return true if completely full, false otherwise.
+     */
+    public static boolean isInventoryFull(final ItemStack[] contents) {
+        boolean full = true;
+        for (final ItemStack content : contents) {
+            if (content == null) {
+                full = false;
+                break;
+            }
+        }
+        return full;
     }
 
     public static AbstractActiveMerchant fromMerchant(final Merchant merchant, final ActiveGame activeGame) {

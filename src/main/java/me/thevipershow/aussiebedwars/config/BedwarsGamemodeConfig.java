@@ -11,14 +11,14 @@ public abstract class BedwarsGamemodeConfig<T extends BedwarsGame> extends Custo
         super(plugin, name);
     }
 
-    protected Set<T> soloBedwarsObjects = Collections.emptySet();
+    protected Set<T> bedwarsObjects = Collections.emptySet();
 
-    public Set<T> getSoloBedwarsObjects() {
-        return soloBedwarsObjects;
+    public Set<T> getBedwarsObjects() {
+        return bedwarsObjects;
     }
 
     public void clear() {
-        this.soloBedwarsObjects.clear();
+        this.bedwarsObjects.clear();
     }
 
 }

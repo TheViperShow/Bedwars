@@ -84,8 +84,7 @@ public final class DeathListener extends UnregisterableListener {
     }
 
     private void givePlayerLobbyCompass(final Player p) {
-        p.getInventory().clear();
-        p.getInventory().setItem(p.getInventory().getHeldItemSlot(), LOBBY_COMPASS);
+        p.getInventory().setItem(1, LOBBY_COMPASS);
     }
 
     private void doDeathTimer(final Player p) {
@@ -179,7 +178,13 @@ public final class DeathListener extends UnregisterableListener {
             final BedwarsTeam b = activeGame.getPlayerTeam(p);
             if (activeGame.getDestroyedTeams().contains(b)) { // Checking if players' team's bed has been broken previously.
                 // here player has lost the game.
+                activeGame.getPlayersOutOfGame().add(p);
+                activeGame.removePlayer(p);
+                p.setAllowFlight(true);
+                p.setFlying(true);
+                p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 100000, 1, true), true);
                 p.getInventory().clear();
+                GameUtils.clearArmor(p);
                 givePlayerLobbyCompass(p);
                 if (!activeGame.getPlayersOutOfGame().contains(p)) {
                     p.sendMessage("§cYou have been eliminated.");
@@ -187,11 +192,9 @@ public final class DeathListener extends UnregisterableListener {
                     activeGame.getAssociatedWorld().getPlayers().forEach(player -> player.sendMessage(generatedDeathMsg));
                 }
 
-                activeGame.getPlayersOutOfGame().add(p);
-                activeGame.removePlayer(p);
-                p.setAllowFlight(true);
-                p.setFlying(true);
-                p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, true), true);
+                if (p.getLocation().getY() <= 1.00) {
+                    p.teleport(p.getLocation().add(0, 60,0 ));
+                }
 
                 if (!activeGame.isWinnerDeclared()) {
                     final BedwarsTeam bedwarsTeam = activeGame.findWinningTeam();

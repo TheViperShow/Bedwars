@@ -31,7 +31,7 @@ public final class ArmorSet {
         }
     }
 
-    public enum SLOTS {
+    public enum Slots {
         HELMET(new MapBuilder<String, Material>(new HashMap<>())
                 .put("LEATHER", Material.LEATHER_HELMET)
                 .put("IRON", Material.IRON_HELMET)
@@ -51,7 +51,7 @@ public final class ArmorSet {
 
         private final Map<String, Material> bindMap;
 
-        SLOTS(Map<String, Material> bindMap) {
+        Slots(Map<String, Material> bindMap) {
             this.bindMap = bindMap;
         }
 
@@ -76,7 +76,7 @@ public final class ArmorSet {
             return i;
         }
 
-        public static void setArmorPiece(final SLOTS slots, final Player p, final ItemStack stack) {
+        public static void setArmorPiece(final Slots slots, final Player p, final ItemStack stack) {
             final PlayerInventory inv = p.getInventory();
             switch (slots) {
                 case HELMET:
@@ -97,10 +97,16 @@ public final class ArmorSet {
         }
     }
 
-    private final EnumMap<SLOTS, ItemStack> armorSet = new EnumMap<>(SLOTS.class);
+    private final EnumMap<Slots, ItemStack> armorSet = new EnumMap<>(Slots.class);
+
+    public final void upgradeAll(final String type) {
+        for (final Slots slots : Slots.values()) {
+            armorSet.put(slots, slots.generateItemStack(type));
+        }
+    }
 
     public ArmorSet(final BedwarsTeam team) {
-        for (final SLOTS slots : SLOTS.values())
+        for (final Slots slots : Slots.values())
             armorSet.put(slots, slots.generateColoredItemStack(team, "LEATHER"));
     }
 
@@ -108,7 +114,7 @@ public final class ArmorSet {
         return getArmorSet().values();
     }
 
-    public EnumMap<SLOTS, ItemStack> getArmorSet() {
+    public EnumMap<Slots, ItemStack> getArmorSet() {
         return armorSet;
     }
 }

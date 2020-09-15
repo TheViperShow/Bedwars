@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import me.thevipershow.aussiebedwars.AussieBedwars;
 import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
-import me.thevipershow.aussiebedwars.bedwars.objects.shops.MerchantType;
 import me.thevipershow.aussiebedwars.config.objects.ShopItem;
 import me.thevipershow.aussiebedwars.game.AbstractActiveMerchant;
 import me.thevipershow.aussiebedwars.game.ActiveGame;
@@ -58,27 +57,38 @@ public final class GUIInteractListener extends UnregisterableListener {
             }
         }
 
-        if (took < toTake) {
-            player.sendMessage(AussieBedwars.PREFIX + "§eYou do not have enough currency.");
+        if (took < toTake) { // player does not have enough money, exiting function.
+            player.sendMessage(AussieBedwars.PREFIX + "§eYou do not have enough " + GameUtils.beautifyCaps(shopItem.getBuyWith().name()));
             return false;
         }
 
+        // player has money, taking it.
         for (final Map.Entry<Integer, Integer> entry : takeFromMap.entrySet()) {
-            //     entry.getKey().setAmount(entry.getValue());
             final ItemStack item = playerInventory.getItem(entry.getKey());
             item.setAmount(item.getAmount() - entry.getValue());
             playerInventory.setItem(entry.getKey(), item);
         }
 
         final ItemStack cloned = clickedItem.clone();
-        final BedwarsTeam coloredWoolTeam = BedwarsTeam.fromWoolDurability(cloned.getDurability());
-        final ItemMeta clonedMeta = cloned.getItemMeta();
-        clonedMeta.setDisplayName("§" + coloredWoolTeam.getColorCode() + "§l" + coloredWoolTeam.name() + " §7Wool");
-        clonedMeta.setLore(Collections.singletonList("§7Your team's wool."));
-        cloned.setItemMeta(clonedMeta);
+        if (cloned.getType() == Material.WOOL) {
+            final BedwarsTeam coloredWoolTeam = activeGame.getPlayerTeam(player);
+            final ItemMeta clonedMeta = cloned.getItemMeta();
+            clonedMeta.setDisplayName("§" + coloredWoolTeam.getColorCode() + "§l" + coloredWoolTeam.name() + " §7Wool");
+            clonedMeta.setLore(Collections.singletonList("§7Your team's wool."));
+            cloned.setItemMeta(clonedMeta);
+        } else if (cloned.getType() == Material.IRON_CHESTPLATE) {
+            activeGame.upgradePlayerArmorSet(player, "IRON");
+            return true;
+        } else if (cloned.getType() == Material.DIAMOND_CHESTPLATE) {
+            activeGame.upgradePlayerArmorSet(player, "DIAMOND");
+            return true;
+        } else {
+            final ItemMeta clonedMeta = cloned.getItemMeta();
+            clonedMeta.setLore(null);
+            cloned.setItemMeta(clonedMeta);
+        }
 
         GameUtils.giveStackToPlayer(cloned, player, contents);
-
         return true;
     }
 
@@ -98,6 +108,7 @@ public final class GUIInteractListener extends UnregisterableListener {
         final HumanEntity humanEntity = event.getWhoClicked();
         if (!humanEntity.getWorld().equals(activeGame.getAssociatedWorld())) return;
         if (!(humanEntity instanceof Player)) return;
+
         event.setCancelled(inventory.getTitle().contains("§7[§eAussieBedwars§7]"));
         final AbstractActiveMerchant abstractActiveMerchant = merchantOfShop(inventory);
         if (abstractActiveMerchant == null) return;

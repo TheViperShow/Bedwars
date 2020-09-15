@@ -13,7 +13,7 @@ public abstract class BedwarsGame {
     protected final int maxGames;
     protected final int minPlayers;
     protected final int players;
-    protected final Set<BedwarsTeam> teams;
+    protected final List<BedwarsTeam> teams;
     protected final SpawnPosition lobbySpawn;
     protected final String mapFilename;
     protected final Set<TeamSpawnPosition> mapSpawns;
@@ -28,7 +28,7 @@ public abstract class BedwarsGame {
             int maxGames,
             int minPlayers,
             int players,
-            Set<BedwarsTeam> teams,
+            List<BedwarsTeam> teams,
             SpawnPosition lobbySpawn,
             String mapFilename,
             Set<TeamSpawnPosition> mapSpawns,
@@ -74,7 +74,7 @@ public abstract class BedwarsGame {
         return players;
     }
 
-    public Set<BedwarsTeam> getTeams() {
+    public List<BedwarsTeam> getTeams() {
         return teams;
     }
 

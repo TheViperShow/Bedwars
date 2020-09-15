@@ -1,6 +1,5 @@
 package me.thevipershow.aussiebedwars.listeners.game;
 
-import me.thevipershow.aussiebedwars.bedwars.objects.shops.MerchantType;
 import me.thevipershow.aussiebedwars.game.AbstractActiveMerchant;
 import me.thevipershow.aussiebedwars.game.ActiveGame;
 import me.thevipershow.aussiebedwars.listeners.UnregisterableListener;

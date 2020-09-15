@@ -1,5 +1,6 @@
 package me.thevipershow.aussiebedwars.game;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.function.Consumer;
 
@@ -51,6 +52,10 @@ public abstract class AbstractQueue<T> {
 
     public boolean isFull() {
         return maximumSize - inQueue.size() < 1;
+    }
+
+    public Iterator<T> getIterator() {
+        return inQueue.iterator();
     }
 
     public int getMaximumSize() {

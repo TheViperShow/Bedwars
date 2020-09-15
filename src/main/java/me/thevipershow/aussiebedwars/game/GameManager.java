@@ -1,8 +1,8 @@
 package me.thevipershow.aussiebedwars.game;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import me.thevipershow.aussiebedwars.bedwars.Gamemode;
 import me.thevipershow.aussiebedwars.config.BedwarsGamemodeConfig;
 import me.thevipershow.aussiebedwars.config.objects.BedwarsGame;
@@ -20,13 +20,14 @@ public final class GameManager {
                        BedwarsGamemodeConfig<? extends BedwarsGame>... configs) {
         this.plugin = plugin;
         this.worldsManager = worldsManager;
-        for (final BedwarsGamemodeConfig<? extends BedwarsGame> config : configs)
-            this.bedwarsGameSet.addAll(config.getSoloBedwarsObjects());
+        for (final BedwarsGamemodeConfig<? extends BedwarsGame> config : configs) {
+            this.bedwarsGameSet.addAll(config.getBedwarsObjects());
+        }
     }
 
     private final JavaPlugin plugin;
     private final WorldsManager worldsManager;
-    private final Set<BedwarsGame> bedwarsGameSet = new HashSet<>();
+    private final List<BedwarsGame> bedwarsGameSet = new ArrayList<>();
     private boolean loading = false;
 
     public void loadBaseAmount() {
@@ -43,7 +44,12 @@ public final class GameManager {
 
     public final void loadRandom(final Gamemode gamemode) {
         loading = true;
-        bedwarsGameSet.stream().filter(bgame -> bgame.getGamemode() == gamemode).findAny().ifPresent(worldsManager::load);
+        for (final BedwarsGame bedwarsGame : bedwarsGameSet) {
+            if (bedwarsGame.getGamemode() == gamemode) {
+                worldsManager.load(bedwarsGame);
+                break;
+            }
+        }
         loading = false;
     }
 
@@ -51,8 +57,8 @@ public final class GameManager {
         Integer diff = null;
         ActiveGame bestGame = null;
 
-        for (final ActiveGame game : worldsManager.getActiveGameSet()) {
-            //plugin.getLogger().info(game.toString());
+        System.out.println(worldsManager.getActiveGameList().size());
+        for (final ActiveGame game : worldsManager.getActiveGameList()) {
             if (game.bedwarsGame.getGamemode() != gamemode) continue;
             if (game.isHasStarted()) continue;
             final AbstractQueue<Player> queue = game.getAssociatedQueue();
@@ -64,6 +70,7 @@ public final class GameManager {
                 diff = newDiff;
                 bestGame = game;
             }
+            System.out.println(game.associatedWorld.toString() + " | ");
         }
 
         return bestGame == null ? Optional.empty() : Optional.of(bestGame);
@@ -75,11 +82,12 @@ public final class GameManager {
         plugin.getServer().getPluginManager().callEvent(event);
         if (event.isCancelled()) return false;
         activeGame.moveToWaitingRoom(player);
-        return false;
+        queue.addToQueue(player);
+        return true;
     }
 
     public void removeFromAllQueues(final Player player) {
-        worldsManager.getActiveGameSet().forEach(b -> {
+        worldsManager.getActiveGameList().forEach(b -> {
             final AbstractQueue<Player> queue = b.getAssociatedQueue();
             if (queue.contains(player)) {
                 final LeaveQueueEvent leaveQueueEvent = new LeaveQueueEvent(b);
@@ -97,7 +105,7 @@ public final class GameManager {
         return worldsManager;
     }
 
-    public final Set<BedwarsGame> getBedwarsGameSet() {
+    public final List<BedwarsGame> getBedwarsGameSet() {
         return bedwarsGameSet;
     }
 
