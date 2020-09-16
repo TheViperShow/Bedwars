@@ -84,6 +84,12 @@ public final class GUIInteractListener extends UnregisterableListener {
         } else if (cloned.getType() == Material.DIAMOND_CHESTPLATE) {
             activeGame.upgradePlayerArmorSet(player, "DIAMOND");
             return true;
+        } else if (cloned.getType().name().endsWith("_PICKAXE")) {
+            GameUtils.upgradeTool("_PICKAXE", player);
+            return true;
+        } else if (cloned.getType().name().endsWith("_AXE")) {
+            GameUtils.upgradeTool("_AXE", player);
+            return true;
         } else {
             final ItemMeta clonedMeta = cloned.getItemMeta();
             clonedMeta.setLore(null);

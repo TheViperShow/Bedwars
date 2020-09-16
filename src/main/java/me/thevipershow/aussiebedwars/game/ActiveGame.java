@@ -30,7 +30,6 @@ import me.thevipershow.aussiebedwars.listeners.game.PlayerFireballInteractListen
 import me.thevipershow.aussiebedwars.listeners.game.PlayerQuitDuringGameListener;
 import me.thevipershow.aussiebedwars.listeners.game.SpectatorsInteractListener;
 import me.thevipershow.aussiebedwars.listeners.game.TNTPlaceListener;
-import me.thevipershow.aussiebedwars.listeners.game.Tools;
 import me.thevipershow.aussiebedwars.worlds.WorldsManager;
 import me.tigerhix.lib.scoreboard.common.EntryBuilder;
 import me.tigerhix.lib.scoreboard.type.Entry;
@@ -40,11 +39,13 @@ import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -69,7 +70,6 @@ public abstract class ActiveGame {
     protected final List<UnregisterableListener> unregisterableListeners = new ArrayList<>();
     protected final Map<Player, ArmorSet> playerSetMap = new HashMap<>();
     protected final Map<String, Integer> topKills = new HashMap<>();
-    protected final Map<Player, Tools> toolsMap = new HashMap<>();
 
     ///////////////////////////////////////////////////
     // Internal ActiveGame fields                    //
@@ -149,7 +149,6 @@ public abstract class ActiveGame {
         activeMerchants.clear();
         playerPlacedBlocks.clear();
         playerSetMap.clear();
-        toolsMap.clear();
         topKills.clear();
         gameLobbyTicker.stopTicking();
         hasStarted = false;
@@ -297,9 +296,7 @@ public abstract class ActiveGame {
     public void givePlayerDefaultSet(final Player p) {
         final ArmorSet startingSet = new ArmorSet(getPlayerTeam(p));
         startingSet.getArmorSet().forEach((k, v) -> ArmorSet.Slots.setArmorPiece(k, p, startingSet.getArmorSet().get(k)));
-        final Tools tools = new Tools();
-        tools.giveToPlayer(p);
-        this.toolsMap.put(p, tools);
+        GameUtils.giveStackToPlayer(new ItemStack(Material.WOOD_SWORD, 1), p, p.getInventory().getContents());
         this.playerSetMap.put(p, startingSet);
     }
 
@@ -471,28 +468,6 @@ public abstract class ActiveGame {
         return activeMerchants;
     }
 
-    @Override
-    public String toString() {
-        return "ActiveGame{" +
-                "associatedWorldFilename='" + associatedWorldFilename + '\'' +
-                ", bedwarsGame=" + bedwarsGame +
-                ", associatedWorld=" + associatedWorld +
-                ", lobbyWorld=" + lobbyWorld +
-                ", cachedLobbySpawnLocation=" + cachedLobbySpawnLocation +
-                ", plugin=" + plugin +
-                ", associatedQueue=" + associatedQueue +
-                ", cachedWaitingLocation=" + cachedWaitingLocation +
-                ", assignedTeams=" + assignedTeams +
-                ", activeSpawners=" + activeSpawners +
-                ", activeScoreboards=" + activeScoreboards +
-                ", destroyedTeams=" + destroyedTeams +
-                ", activeMerchants=" + activeMerchants +
-                ", unregisterableListeners=" + unregisterableListeners +
-                ", hasStarted=" + hasStarted +
-                ", timerTask=" + timerTask +
-                '}';
-    }
-
     public List<BedwarsTeam> getDestroyedTeams() {
         return destroyedTeams;
     }
@@ -523,10 +498,6 @@ public abstract class ActiveGame {
 
     public Map<Player, ArmorSet> getPlayerSetMap() {
         return playerSetMap;
-    }
-
-    public Map<Player, Tools> getToolsMap() {
-        return toolsMap;
     }
 
     public GameLobbyTicker getGameLobbyTicker() {

@@ -99,19 +99,18 @@ public final class DeathListener extends UnregisterableListener {
         final PlayerInventory inv = player.getInventory();
         final ItemStack[] contents = inv.getContents();
 
-        final Map<Player, Tools> toolsMap = game.getToolsMap();
         final Map<Player, ArmorSet> armorSetMap = game.getPlayerSetMap();
-        final Tools playerTools = toolsMap.get(player);
         final ArmorSet playerArmorSet = armorSetMap.get(player);
 
         for (int i = 0; i < contents.length; i++) {
             ItemStack stack = contents[i];
-            if (stack == null
-                    || GameUtils.anyMatchMaterial(playerTools.getItems(), stack.getType())
-                    || GameUtils.anyMatchMaterial(playerArmorSet.getItems(), stack.getType())) {
+            //if (stack == null || GameUtils.anyMatchMaterial(playerTools.getItems(), stack.getType())
+            //        || GameUtils.anyMatchMaterial(playerArmorSet.getItems(), stack.getType())) {
+            //    continue;
+            //}
+            if (stack == null || GameUtils.anyMatchMaterial(playerArmorSet.getItems(), stack.getType()) || (stack.getType().name().contains("WOOD"))) {
                 continue;
             }
-
             inv.setItem(i, null);
         }
     }
@@ -200,7 +199,7 @@ public final class DeathListener extends UnregisterableListener {
                     final BedwarsTeam bedwarsTeam = activeGame.findWinningTeam();
                     if (bedwarsTeam != null) {
                         activeGame.declareWinner(bedwarsTeam);
-                        activeGame.getPlugin().getServer().getScheduler().runTaskLater(activeGame.getPlugin(), activeGame::stop, 20 * 15L);
+                        activeGame.getPlugin().getServer().getScheduler().runTaskLater(activeGame.getPlugin(), activeGame::stop, 20 * 10L);
                     }
                 }
             } else { // team is still in game

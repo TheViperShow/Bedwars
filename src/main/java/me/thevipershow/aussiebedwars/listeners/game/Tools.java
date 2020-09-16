@@ -11,18 +11,26 @@ import org.bukkit.inventory.ItemStack;
 
 public final class Tools {
 
+    private Tools() {
+        throw new UnsupportedOperationException("Cannot initialize " + getClass().getName());
+    }
+
+    /*
     public enum TYPE {
         SWORD(new ArmorSet.MapBuilder<String, Material>(new HashMap<>())
                 .put("WOOD", Material.WOOD_SWORD)
-                .put("STONE", Material.STONE_SWORD)
                 .put("IRON", Material.IRON_SWORD)
                 .put("DIAMOND", Material.DIAMOND_SWORD)
                 .build()),
         PICKAXE(new ArmorSet.MapBuilder<String, Material>(new HashMap<>())
                 .put("WOOD", Material.WOOD_PICKAXE)
-                .put("STONE", Material.STONE_PICKAXE)
                 .put("IRON", Material.IRON_PICKAXE)
                 .put("DIAMOND", Material.DIAMOND_PICKAXE)
+                .build()),
+        AXE(new ArmorSet.MapBuilder<String, Material>(new HashMap<>())
+                .put("WOOD", Material.WOOD_AXE)
+                .put("IRON", Material.IRON_AXE)
+                .put("DIAMOND", Material.DIAMOND_AXE)
                 .build());
 
         private final Map<String, Material> map;
@@ -40,7 +48,7 @@ public final class Tools {
         }
     }
 
-    public EnumMap<TYPE, ItemStack> getToolsMap() {
+    public final EnumMap<TYPE, ItemStack> getToolsMap() {
         return toolsMap;
     }
 
@@ -48,8 +56,24 @@ public final class Tools {
         return getToolsMap().values();
     }
 
-    public void giveToPlayer(final Player p) {
+    public final void giveToPlayer(final Player p) {
         getItems().forEach(i -> GameUtils.giveStackToPlayer(i, p, p.getInventory().getContents()));
+    }
+
+    public final void upgradeTool(final Tools.TYPE type) {
+        final Material current = this.toolsMap.get(type).getType();
+        if (current == null) return;
+        final String startsWith = current.name().split("_")[0];
+        switch (startsWith) {
+            case "WOOD":
+                this.toolsMap.put(type, type.getItem("IRON"));
+                break;
+            case "IRON":
+                this.toolsMap.put(type, type.getItem("DIAMOND"));
+                break;
+            case "DIAMOND":
+                break;
+        }
     }
 
     private final EnumMap<TYPE, ItemStack> toolsMap = new EnumMap<>(TYPE.class);
@@ -57,4 +81,6 @@ public final class Tools {
     public Tools() {
         this.toolsMap.put(TYPE.SWORD, TYPE.SWORD.getItem("WOOD"));
     }
+
+     */
 }

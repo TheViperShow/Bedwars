@@ -515,4 +515,22 @@ duo:
           amount: 1
           price: 6
           buy-with: "DIAMOND"
+        - material: "DIAMOND_SWORD"
+          item-name: "§7§lUpgrade your sword."
+          slot: 40
+          amount: 1
+          price: 16
+          buy-with: "IRON_INGOT"
+        - material: "DIAMOND_AXE"
+          item-name: "§7§lUpgrade your axe."
+          slot: 39
+          amount: 1
+          price: 14
+          buy-with: "IRON_INGOT"
+        - material: "DIAMOND_PICKAXE"
+          item-name: "§7§lUpgrade your pickaxe."
+          slot: 38
+          amount: 1
+          price: 14
+          buy-with: "IRON_INGOT"
           # others items below...

@@ -212,6 +212,56 @@ public final class GameUtils {
         return null;
     }
 
+    public static void replaceIfPresent(final ItemStack toGive, final Material toReplace, final Player player) {
+        final ItemStack[] contents = player.getInventory().getContents();
+        for (int i = 0; i < contents.length; i++) {
+            final ItemStack stack = contents[i];
+            if (stack == null) continue;
+            if (stack.getType() == toReplace) {
+                player.getInventory().setItem(i, toGive);
+                break;
+            }
+        }
+
+        //giveStackToPlayer(toGive, player, contents);
+    }
+
+    public static String getUpgradeString(final String oreName) {
+        switch (oreName) {
+            case "WOOD":
+                return "IRON";
+            case "IRON":
+                return "DIAMOND";
+            default:
+                return null;
+        }
+    }
+
+    public static void upgradeTool(final String toolType, final Player player) {
+        final ItemStack[] contents = player.getInventory().getContents();
+        ItemStack foundTool = null;
+        int slot = -1;
+        for (int i = 0; i < contents.length; i++) {
+            ItemStack stack = contents[i];
+            if (stack == null) continue;
+            if (stack.getType().name().endsWith(toolType)) {
+                slot = i;
+                foundTool = stack;
+                break;
+            }
+        }
+
+        if (slot != -1) {
+            final String materialName = foundTool.getType().name();
+            final String[] strings = materialName.split("_");
+            final String nextToolLevel = getUpgradeString(strings[0]);
+            if (nextToolLevel == null) return;
+            final ItemStack newItem = new ItemStack(Material.valueOf(nextToolLevel + '_' + strings[1]), 1);
+            player.getInventory().setItem(slot, newItem);
+        }
+
+    }
+
     public static boolean anyMatchMaterial(final Collection<ItemStack> stack, final Material material) {
         return stack.stream().anyMatch(s -> s.getType() == material);
     }
