@@ -181,10 +181,14 @@ public abstract class ActiveGame {
         });
     }
 
-    public static void connectedToQueue(final Player player, final ActiveGame activeGame) {
-        activeGame.getAssociatedWorld().getPlayers().forEach(p -> {
-            player.sendMessage(AussieBedwars.PREFIX + p.getName() + " §ehas joined §7" + activeGame.getAssociatedWorld().getName() + " §equeue");
-            player.sendMessage(AussieBedwars.PREFIX + String.format("§eStatus §7[§a%d§8/§a%d§7]", activeGame.getAssociatedQueue().queueSize() + 1, activeGame.getBedwarsGame().getPlayers()));
+    public void connectedToQueue(final Player player) {
+        //activeGame.getAssociatedWorld().getPlayers().forEach(p -> {
+        //    player.sendMessage(AussieBedwars.PREFIX + p.getName() + " §ehas joined §7" + activeGame.getAssociatedWorld().getName() + " §equeue");
+        //    player.sendMessage(AussieBedwars.PREFIX + String.format("§eStatus §7[§a%d§8/§a%d§7]", activeGame.getAssociatedQueue().queueSize() + 1, activeGame.getBedwarsGame().getPlayers()));
+        //});
+        associatedQueue.perform(p -> {
+            p.sendMessage(AussieBedwars.PREFIX + player.getName() + " §ehas joined §7§l" + getAssociatedWorld().getName() + " §r§equeue");
+            p.sendMessage(AussieBedwars.PREFIX + String.format("§eStatus §7[§a%d§8/§a%d§7]", getAssociatedQueue().queueSize() + 1, getBedwarsGame().getPlayers()));
         });
     }
 
@@ -246,7 +250,7 @@ public abstract class ActiveGame {
     public void moveToWaitingRoom(final Player player) {
         if (cachedWaitingLocation != null) {
             if (player.teleport(cachedWaitingLocation)) {
-                connectedToQueue(player, this);
+                connectedToQueue(player);
                 player.setGameMode(GameMode.ADVENTURE);
             }
         } else

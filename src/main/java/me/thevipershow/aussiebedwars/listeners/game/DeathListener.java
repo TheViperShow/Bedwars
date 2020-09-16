@@ -84,7 +84,7 @@ public final class DeathListener extends UnregisterableListener {
     }
 
     private void givePlayerLobbyCompass(final Player p) {
-        p.getInventory().setItem(1, LOBBY_COMPASS);
+        p.getInventory().setItemInHand(LOBBY_COMPASS);
     }
 
     private void doDeathTimer(final Player p) {
@@ -181,7 +181,7 @@ public final class DeathListener extends UnregisterableListener {
                 activeGame.removePlayer(p);
                 p.setAllowFlight(true);
                 p.setFlying(true);
-                p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 100000, 1, true), true);
+                p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 42069, 1, false), true);
                 p.getInventory().clear();
                 GameUtils.clearArmor(p);
                 givePlayerLobbyCompass(p);
