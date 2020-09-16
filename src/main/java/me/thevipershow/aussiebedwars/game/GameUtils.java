@@ -251,13 +251,16 @@ public final class GameUtils {
             }
         }
 
+        final String materialName = foundTool.getType().name();
+        final String[] strings = materialName.split("_");
+
         if (slot != -1) {
-            final String materialName = foundTool.getType().name();
-            final String[] strings = materialName.split("_");
             final String nextToolLevel = getUpgradeString(strings[0]);
             if (nextToolLevel == null) return;
             final ItemStack newItem = new ItemStack(Material.valueOf(nextToolLevel + '_' + strings[1]), 1);
             player.getInventory().setItem(slot, newItem);
+        } else {
+            giveStackToPlayer(new ItemStack(Material.valueOf("WOOD" + toolType), 1), player, contents);
         }
 
     }
