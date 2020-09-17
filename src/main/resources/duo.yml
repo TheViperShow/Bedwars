@@ -1,8 +1,8 @@
-duo:
+solo:
   - map-filename: "bedwars-duo"
     start-timer: 15
     minimum-games: 2
-    maximum-games: 8
+    maximum-games: 4
     min-players: 4
     players: 16
     teams:
@@ -59,7 +59,7 @@ duo:
         z: 94.0 # Please set this
         team: "CYAN"
     spawners:
-      # EMERALD SPAWNERS
+# EMERALD SPAWNERS
       - type: "EMERALD"
         invisible: false
         location:
@@ -207,7 +207,7 @@ duo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
-            #--------------------------------------- Red
+              #--------------------------------------- Red
       - type: "IRON"
         invisible: true
         location:
@@ -232,7 +232,7 @@ duo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
-            #--------------------------------------- Blue
+              #--------------------------------------- Blue
       - type: "IRON"
         invisible: true
         location:
@@ -257,7 +257,7 @@ duo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
-            #--------------------------------------- Green
+              #--------------------------------------- Green
       - type: "IRON"
         invisible: true
         location:
@@ -282,7 +282,7 @@ duo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
-            #--------------------------------------- Yellow
+              #--------------------------------------- Yellow
       - type: "IRON"
         invisible: true
         location:
@@ -307,7 +307,7 @@ duo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
-            #---------------------------------------  cyan
+              #---------------------------------------  cyan
       - type: "IRON"
         invisible: true
         location:
@@ -332,7 +332,7 @@ duo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
-            #--------------------------------------- White
+              #--------------------------------------- White
       - type: "IRON"
         invisible: true
         location:
@@ -432,7 +432,7 @@ duo:
           x: -32.50 # Please set this
           y: 62.0 # Please set this
           z: -93.0 # Plz set this
-    # UPGRADE SHOPS SECTION
+# UPGRADE SHOPS SECTION
     #  - name: "[AussieBedwars] Upgrades"
     #    type: "UPGRADE"
     #    location:
@@ -454,6 +454,69 @@ duo:
           - 15
           - 16
           - 17
+      upgradable-items:
+        - slot: 34 # pickaxe upgrades ->
+          amount: 1
+          levels:
+            - level: 1
+              material: "WOOD_PICKAXE"
+              item-name: "§eWooden Pickaxe (Efficiency I)"
+              buy-with: "IRON_INGOT"
+              price: 10
+              lore:
+                - "§7This is an upgradable item."
+                - "§7It will lose 1 tier upon death!"
+                - ""
+                - "§7You will permanently respawn at least"
+                - "§7with the lowest tier"
+              enchantments:
+                - level: 1
+                  type: "DIG_SPEED"
+            - level: 2
+              material: "IRON_PICKAXE"
+              item-name: "§eIron Pickaxe (Efficiency II)"
+              buy-with: "IRON_INGOT"
+              price: 10
+              lore:
+                - "§7This is an upgradable item."
+                - "§7It will lose 1 tier upon death!"
+                - ""
+                - "§7You will permanently respawn at least"
+                - "§7with the lowest tier"
+              enchantments:
+                - level: 2
+                  type: "DIG_SPEED"
+        - slot: 38 # axe upgrades ->
+          amount: 1
+          levels:
+            - level: 1
+              material: "WOOD_AXE"
+              item-name: "§eWooden Axe (Sharpness I)"
+              buy-with: "IRON_INGOT"
+              price: 12
+              lore:
+                - "§7This is an upgradable item."
+                - "§7It will lose 1 tier upon death!"
+                - ""
+                - "§7You will permanently respawn at least"
+                - "§7with the lowest tier"
+              enchantments:
+                - level: 1
+                  type: "DAMAGE_ALL"
+            - level: 2
+              material: "IRON_AXE"
+              item-name: "§eIron Axe (Sharpness II)"
+              buy-with: "IRON_INGOT"
+              price: 20
+              lore:
+                - "§7This is an upgradable item."
+                - "§7It will lose 1 tier upon death!"
+                - ""
+                - "§7You will permanently respawn at least"
+                - "§7with the lowest tier"
+              enchantments:
+                - level: 2
+                  type: "DAMAGE_ALL"
       items:
         - material: "WOOL"
           item-name: "§eWool Block"
@@ -461,76 +524,88 @@ duo:
           amount: 16
           buy-with: "IRON_INGOT"
           price: 4
+          lore:
+            - "§7This is the wool with the colour of your team,"
+            - "§7you can use it to build bridges and"
+            - "§7reach your enemies base!"
         - material: "ENDER_PEARL"
           item-name: "§2Ender Pearl"
           slot: 21
           amount: 2
           buy-with: "GOLD_INGOT"
           price: 4
+          lore:
+            - "§7This is an enderpearl,"
+            - "§7you can throw it you will get teleported"
+            - "§7in the same place it landed."
         - material: "FIREBALL"
           item-name: "§cExplosive Charge"
           slot: 22
           amount: 1
           price: 1
           buy-with: "DIAMOND"
+          lore:
+            - "§7This is an explosive charge,"
+            - "§7you can click while holding it and"
+            - "§7a fireball which can kill your enemies will be shot!"
         - material: "GOLDEN_APPLE"
           item-name: "§eGolden Apple"
           slot: 23
           amount: 1
           price: 2
           buy-with: "DIAMOND"
+          lore:
+            - "§7A golden apple."
         - material: "TNT"
           item-name: "§cDynamite"
           slot: 24
           amount: 1
           price: 4
           buy-with: "GOLD_INGOT"
+          lore:
+            - "§7This is a special dynamite block,"
+            - "§7it will lit as soon as you place it"
+            - "§7so watch out for the explosion!"
         - material: "WOOD"
           item-name: "§eWooden Planks"
           slot: 29
           amount: 16
           price: 12
           buy-with: "IRON_INGOT"
+          lore:
+            - "§7Wood planks."
         - material: "GLASS"
           item-name: "§f§lGlass"
           slot: 30
           amount: 16
           price: 8
           buy-with: "GOLD_INGOT"
+          lore:
+            - "§7Glass blocks."
         - material: "OBSIDIAN"
           item-name: "§5§lObsidian Block"
           slot: 31
           amount: 4
           price: 4
           buy-with: "EMERALD"
+          lore:
+            - "§7Obsidian blocks."
         - material: "DIAMOND_CHESTPLATE"
-          item-name: "§b§lDiamond Kit"
+          item-name: "§b§lPermanent Diamond Armor"
           slot: 32
           amount: 1
           price: 6
           buy-with: "EMERALD"
+          lore:
+            - "§7Buying this will give you a complete §b§lDIAMOND §r§7armor set"
+            - "§7It will be permanent upon death."
         - material: "IRON_CHESTPLATE"
-          item-name: "§7§lIron Kit"
+          item-name: "§7§lPermanent Iron Armor"
           slot: 33
           amount: 1
           price: 6
           buy-with: "DIAMOND"
-        - material: "DIAMOND_SWORD"
-          item-name: "§7§lUpgrade your sword."
-          slot: 40
-          amount: 1
-          price: 16
-          buy-with: "IRON_INGOT"
-        - material: "DIAMOND_AXE"
-          item-name: "§7§lUpgrade your axe."
-          slot: 39
-          amount: 1
-          price: 14
-          buy-with: "IRON_INGOT"
-        - material: "DIAMOND_PICKAXE"
-          item-name: "§7§lUpgrade your pickaxe."
-          slot: 38
-          amount: 1
-          price: 14
-          buy-with: "IRON_INGOT"
+          lore:
+            - "§7Buying this will give you a complete §f§lIRON §r§7armor set"
+            - "§7It will be permanent upon death."
           # others items below...

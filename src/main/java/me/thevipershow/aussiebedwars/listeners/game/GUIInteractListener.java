@@ -21,7 +21,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 
+@Deprecated
 public final class GUIInteractListener extends UnregisterableListener {
+    /*
     private final ActiveGame activeGame;
 
     public GUIInteractListener(final ActiveGame activeGame) {
@@ -85,13 +87,13 @@ public final class GUIInteractListener extends UnregisterableListener {
             activeGame.upgradePlayerArmorSet(player, "DIAMOND");
             return true;
         } else if (cloned.getType().name().endsWith("_PICKAXE")) {
-            GameUtils.upgradeTool("_PICKAXE", player);
+            // GameUtils.upgradeTool("_PICKAXE", player);
             return true;
         } else if (cloned.getType().name().endsWith("_AXE")) {
-            GameUtils.upgradeTool("_AXE", player);
+            // GameUtils.upgradeTool("_AXE", player);
             return true;
         } else if (cloned.getType().name().endsWith("_SWORD")) {
-            GameUtils.upgradeTool("_SWORD", player);
+            // GameUtils.upgradeTool("_SWORD", player);
             return true;
         } else {
             final ItemMeta clonedMeta = cloned.getItemMeta();
@@ -136,4 +138,6 @@ public final class GUIInteractListener extends UnregisterableListener {
             break;
         }
     }
+
+     */
 }

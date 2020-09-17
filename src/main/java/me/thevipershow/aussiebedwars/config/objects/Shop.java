@@ -1,8 +1,10 @@
 package me.thevipershow.aussiebedwars.config.objects;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
 
@@ -14,13 +16,16 @@ public class Shop implements ConfigurationSerializable {
     private final List<ShopItem> items;
     private final int glassColor;
     private final List<Integer> glassSlots;
+    private final List<UpgradeItem> upgradeItems;
 
-    public Shop(String name, int slots, List<ShopItem> items, int glassColor, List<Integer> glassSlots) {
+    public Shop(String name, int slots, List<ShopItem> items, int glassColor, List<Integer> glassSlots, List<UpgradeItem> upgradeItems) {
         this.name = name;
         this.slots = slots;
         this.items = items;
         this.glassColor = glassColor;
         this.glassSlots = glassSlots;
+        this.upgradeItems = upgradeItems;
+
     }
 
     @Override
@@ -37,7 +42,9 @@ public class Shop implements ConfigurationSerializable {
         final Map<String, Object> glass = (Map<String, Object>) objectMap.get("glass");
         final int glassColor = (int) glass.get("color");
         final List<Integer> glassSlots = (List<Integer>) glass.get("slots");
-        return new Shop(title, slots, itemsShop, glassColor, glassSlots);
+        final List<Map<String, Object>> upgradableItems = (List<Map<String, Object>>) objectMap.get("upgradable-items");
+        final List<UpgradeItem> upgradeItems = upgradableItems.stream().map(UpgradeItem::deserialize).collect(Collectors.toList());
+        return new Shop(title, slots, itemsShop, glassColor, glassSlots, upgradeItems);
     }
 
     public String getName() {
@@ -59,4 +66,9 @@ public class Shop implements ConfigurationSerializable {
     public List<Integer> getGlassSlots() {
         return glassSlots;
     }
+
+    public List<UpgradeItem> getUpgradeItems() {
+        return upgradeItems;
+    }
+
 }

@@ -1,6 +1,7 @@
 package me.thevipershow.aussiebedwars.config.objects;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
@@ -16,18 +17,20 @@ public class ShopItem implements ConfigurationSerializable {
     private final int buyCost;
     private final int slot;
     private final String itemName;
+    private final List<String> lore;
 
-    public ShopItem(String material, int amount, String buyWith, int buyCost, int slot, String itemName) {
+    public ShopItem(String material, int amount, String buyWith, int buyCost, int slot, String itemName, List<String> lore) {
         this.material = Material.valueOf(material);
         this.amount = amount;
         this.buyWith = Material.valueOf(buyWith);
         this.buyCost = buyCost;
         this.slot = slot;
         this.itemName = itemName;
+        this.lore = lore;
     }
 
     @Override
-    public Map<String, Object> serialize() {
+    public final Map<String, Object> serialize() {
         final Map<String, Object> map = new HashMap<>();
         map.put("material", material.name());
         map.put("amount", amount);
@@ -35,6 +38,7 @@ public class ShopItem implements ConfigurationSerializable {
         map.put("price", buyCost);
         map.put("slot", slot);
         map.put("item-name", itemName);
+        map.put("lore", lore);
         return map;
     }
 
@@ -45,7 +49,8 @@ public class ShopItem implements ConfigurationSerializable {
         int c = (int) objectMap.get("price");
         int s = (int) objectMap.get("slot");
         String itemName = (String) objectMap.get("item-name");
-        return new ShopItem(m, a, b, c, s, itemName);
+        final List<String> lore = (List<String>) objectMap.get("lore");
+        return new ShopItem(m, a, b, c, s, itemName, lore);
     }
 
     public Material getMaterial() {
@@ -74,5 +79,9 @@ public class ShopItem implements ConfigurationSerializable {
 
     public ItemStack generateWithoutLore() {
         return new ItemStack(this.getMaterial(), this.amount);
+    }
+
+    public List<String> getLore() {
+        return lore;
     }
 }

@@ -3,17 +3,27 @@ package me.thevipershow.aussiebedwars.game;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import me.thevipershow.aussiebedwars.AussieBedwars;
 import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
+import me.thevipershow.aussiebedwars.bedwars.objects.shops.MerchantType;
 import me.thevipershow.aussiebedwars.config.objects.BedwarsGame;
+import me.thevipershow.aussiebedwars.config.objects.Enchantment;
 import me.thevipershow.aussiebedwars.config.objects.Merchant;
+import me.thevipershow.aussiebedwars.config.objects.Shop;
+import me.thevipershow.aussiebedwars.config.objects.ShopItem;
+import me.thevipershow.aussiebedwars.config.objects.UpgradeItem;
+import me.thevipershow.aussiebedwars.config.objects.UpgradeLevel;
 import me.thevipershow.aussiebedwars.listeners.UnregisterableListener;
 import me.thevipershow.aussiebedwars.listeners.game.ArmorSet;
 import me.thevipershow.aussiebedwars.listeners.game.BedBreakListener;
@@ -28,6 +38,7 @@ import me.thevipershow.aussiebedwars.listeners.game.MapProtectionListener;
 import me.thevipershow.aussiebedwars.listeners.game.MerchantInteractListener;
 import me.thevipershow.aussiebedwars.listeners.game.PlayerFireballInteractListener;
 import me.thevipershow.aussiebedwars.listeners.game.PlayerQuitDuringGameListener;
+import me.thevipershow.aussiebedwars.listeners.game.ShopInteractListener;
 import me.thevipershow.aussiebedwars.listeners.game.SpectatorsInteractListener;
 import me.thevipershow.aussiebedwars.listeners.game.TNTPlaceListener;
 import me.thevipershow.aussiebedwars.worlds.WorldsManager;
@@ -45,7 +56,9 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -61,6 +74,7 @@ public abstract class ActiveGame {
     protected final Location cachedWaitingLocation;
     protected final Map<BedwarsTeam, List<Player>> assignedTeams;
     protected final Set<ActiveSpawner> activeSpawners;
+    protected final Inventory defaultShopInv;
 
     protected final List<Scoreboard> activeScoreboards = new ArrayList<>();
     protected final List<BedwarsTeam> destroyedTeams = new ArrayList<>();
@@ -70,6 +84,10 @@ public abstract class ActiveGame {
     protected final List<UnregisterableListener> unregisterableListeners = new ArrayList<>();
     protected final Map<Player, ArmorSet> playerSetMap = new HashMap<>();
     protected final Map<String, Integer> topKills = new HashMap<>();
+
+    protected final Map<Player, Inventory> associatedGui = new HashMap<>();
+    protected final Map<ItemStack, ShopItem> shopItemStacks = new HashMap<>();
+    protected final Map<ItemStack, UpgradeItem> upgradeItemStacks = new HashMap<>();
 
     ///////////////////////////////////////////////////
     // Internal ActiveGame fields                    //
@@ -100,6 +118,69 @@ public abstract class ActiveGame {
 
         registerMapListeners();
         gameLobbyTicker.startTicking();
+        this.defaultShopInv = Objects.requireNonNull(setupGUIs(), "The default shop inventory was null.");
+    }
+
+    protected static List<String> priceDescriptorSection(final ShopItem i) {
+        return Collections.unmodifiableList(Arrays.asList(" ",
+                "§7- Price§f: §e§l" + i.getBuyCost(),
+                "§7- Buy with§f: §e§l" + GameUtils.beautifyCaps(i.getBuyWith().name())
+        ));
+    }
+
+    protected static List<String> priceDescriptorSection(final UpgradeLevel level) {
+        return Collections.unmodifiableList(Arrays.asList(" ",
+                "§7- Price§f: §e§l" + level.getPrice(),
+                "§7- Buy with§f: §e§l" + GameUtils.beautifyCaps(level.getBuyWith().name())
+        ));
+    }
+
+    protected final Inventory setupGUIs() {
+        final Inventory inv = Bukkit.createInventory(null, bedwarsGame.getShop().getSlots(), "§7[§eAussieBedwars§7] §eShop");
+        final Shop shop = bedwarsGame.getShop();
+
+        for (final ShopItem item : shop.getItems()) {
+            final ItemStack i = new ItemStack(item.getMaterial(), item.getAmount());
+            final ItemMeta m = i.getItemMeta();
+            m.setDisplayName(item.getItemName());
+            final List<String> lore = new ArrayList<>();
+            if (item.getLore() != null) {
+                lore.addAll(item.getLore());
+            }
+            lore.addAll(priceDescriptorSection(item));
+            m.setLore(lore);
+            i.setItemMeta(m);
+            shopItemStacks.put(i, item);
+            inv.setItem(item.getSlot(), i);
+        }
+
+        for (final Integer glassSlot : shop.getGlassSlots()) {
+            final ItemStack glass = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) shop.getGlassColor());
+            final ItemMeta glassMeta = glass.getItemMeta();
+            glassMeta.setDisplayName(" ");
+            glassMeta.setLore(null);
+            glass.setItemMeta(glassMeta);
+            inv.setItem(glassSlot, glass);
+        }
+
+        for (final UpgradeItem item : shop.getUpgradeItems()) {
+            final UpgradeLevel first = item.getLevels().get(0);
+            final ItemStack s = new ItemStack(first.getLevelMaterial(), item.getAmount());
+            final ItemMeta meta = s.getItemMeta();
+            meta.setDisplayName(first.getItemName());
+            final List<String> lore = new ArrayList<>(first.getLore());
+            lore.addAll(priceDescriptorSection(first));
+            meta.setLore(lore);
+            s.setItemMeta(meta);
+            for (Enchantment enchant : first.getEnchants()) {
+                s.addEnchantment(enchant.getEnchant(), enchant.getLevel());
+            }
+            upgradeItemStacks.put(s, item);
+            inv.setItem(item.getSlot(), s);
+        }
+
+        plugin.getLogger().warning("Returning the setupGUI, is it null?" + String.valueOf(inv == null));
+        return inv;
     }
 
     protected final ScoreboardHandler scoreboardHandler = new ScoreboardHandler() {
@@ -201,12 +282,13 @@ public abstract class ActiveGame {
         final UnregisterableListener quitListener = new PlayerQuitDuringGameListener(this);
         final UnregisterableListener merchantListener = new MerchantInteractListener(this);
         final UnregisterableListener entityDamageListener = new EntityDamageListener(this);
-        final UnregisterableListener guiInteractListener = new GUIInteractListener(this);
+      //  final UnregisterableListener guiInteractListener = new GUIInteractListener(this);
         final UnregisterableListener hungerLossListener = new HungerLossListener(this);
         final UnregisterableListener spectatorInteractListener = new SpectatorsInteractListener(this);
         final UnregisterableListener tntPlaceListener = new TNTPlaceListener(this);
         final UnregisterableListener fireballInteract = new PlayerFireballInteractListener(this);
         final UnregisterableListener explosionListener = new ExplosionListener(this);
+        final UnregisterableListener shopListener = new ShopInteractListener(this);
 
         plugin.getServer().getPluginManager().registerEvents(mapProtectionListener, plugin);
         plugin.getServer().getPluginManager().registerEvents(mapIllegalMovementsListener, plugin);
@@ -216,12 +298,13 @@ public abstract class ActiveGame {
         plugin.getServer().getPluginManager().registerEvents(quitListener, plugin);
         plugin.getServer().getPluginManager().registerEvents(merchantListener, plugin);
         plugin.getServer().getPluginManager().registerEvents(entityDamageListener, plugin);
-        plugin.getServer().getPluginManager().registerEvents(guiInteractListener, plugin);
+      //  plugin.getServer().getPluginManager().registerEvents(guiInteractListener, plugin);
         plugin.getServer().getPluginManager().registerEvents(hungerLossListener, plugin);
         plugin.getServer().getPluginManager().registerEvents(spectatorInteractListener, plugin);
         plugin.getServer().getPluginManager().registerEvents(tntPlaceListener, plugin);
         plugin.getServer().getPluginManager().registerEvents(fireballInteract, plugin);
         plugin.getServer().getPluginManager().registerEvents(explosionListener, plugin);
+        plugin.getServer().getPluginManager().registerEvents(shopListener, plugin);
 
         unregisterableListeners.add(mapIllegalMovementsListener);
         unregisterableListeners.add(mapProtectionListener);
@@ -231,12 +314,13 @@ public abstract class ActiveGame {
         unregisterableListeners.add(quitListener);
         unregisterableListeners.add(merchantListener);
         unregisterableListeners.add(entityDamageListener);
-        unregisterableListeners.add(guiInteractListener);
+    //    unregisterableListeners.add(guiInteractListener);
         unregisterableListeners.add(hungerLossListener);
         unregisterableListeners.add(spectatorInteractListener);
         unregisterableListeners.add(tntPlaceListener);
         unregisterableListeners.add(fireballInteract);
         unregisterableListeners.add(explosionListener);
+        unregisterableListeners.add(shopListener);
     }
 
     public final void unregisterAllListeners() {
@@ -416,8 +500,92 @@ public abstract class ActiveGame {
                 return " §f§l" + teamMembers.size();
             }
         } else {
-            return " §a§l✓";
+            return " §a✓";
         }
+    }
+
+    public ShopActiveMerchant getTeamShopActiveMerchant(final BedwarsTeam team) {
+        for (AbstractActiveMerchant activeMerchant : activeMerchants) {
+            if (activeMerchant instanceof ShopActiveMerchant) {
+                if (team == activeMerchant.team) {
+                    return (ShopActiveMerchant) activeMerchant;
+                }
+            }
+        }
+        return null;
+    }
+
+
+    public static Inventory cloneInventory(final Inventory inv) {
+        final Inventory inventory = Bukkit.createInventory(null, inv.getSize(), inv.getTitle());
+        final ItemStack[] originalContents = inv.getContents();
+        for (int i = 0; i < originalContents.length; i++) {
+            ItemStack o = originalContents[i];
+            if (o == null) continue;
+            inventory.setItem(i, o.clone());
+        }
+        return inventory;
+    }
+
+    public void openShop(final Player player) {
+        Inventory associated = associatedGui.get(player);
+        if (associated == null) {
+            associated = cloneInventory(Objects.requireNonNull(defaultShopInv, "Illegal null inventory has been created."));
+
+            final BedwarsTeam pTeam = getPlayerTeam(player);
+            final ItemStack[] contents = player.getInventory().getContents();
+            for (int i = 0; i < contents.length; i++) {
+                final ItemStack c = contents[i];
+                if (c == null) continue;
+                if (c.getType() == Material.WOOL) {
+                    c.setDurability(pTeam.getWoolColor());
+                    final ItemMeta m = c.getItemMeta();
+                    m.setDisplayName("§" + pTeam.getColorCode() + "§l" + pTeam.name() + " §7Wool");
+                    m.setLore(Collections.singletonList("§7Your team's wool."));
+                    c.setItemMeta(m);
+                    associated.setItem(i, c);
+                    break;
+                }
+            }
+
+            associatedGui.put(player, associated);
+        }
+
+        player.openInventory(associated);
+    }
+
+    public Optional<UpgradeLevel> getNextUpgrade(final Player player, final ItemStack clickedItem, final int clickedSlot) {
+        //  final ItemStack[] contents = shopInventory.getContents();
+        final ItemMeta clickedMeta = clickedItem.getItemMeta();
+        label:
+        for (Map.Entry<ItemStack, UpgradeItem> entry : upgradeItemStacks.entrySet()) {
+            final UpgradeItem upgradeItem = entry.getValue();
+            if (upgradeItem.getSlot() == clickedSlot) {
+                final List<UpgradeLevel> lvls = upgradeItem.getLevels();
+                for (int i = 0; i < lvls.size(); i++) {
+                    final UpgradeLevel lvl = lvls.get(i);
+                    if (lvl.getItemName().equals(clickedMeta.getDisplayName())) {
+                        final UpgradeLevel nextLvl = lvls.get(i + 1);
+                        if (nextLvl == null) break label;
+                        return Optional.of(nextLvl);
+                    }
+                }
+                break;
+            }
+        }
+        return Optional.empty();
+    }
+
+    public Inventory getDefaultShopInv() {
+        return defaultShopInv;
+    }
+
+    public Map<ItemStack, ShopItem> getShopItemStacks() {
+        return shopItemStacks;
+    }
+
+    public Map<ItemStack, UpgradeItem> getUpgradeItemStacks() {
+        return upgradeItemStacks;
     }
 
     public List<UnregisterableListener> getUnregisterableListeners() {
@@ -510,5 +678,13 @@ public abstract class ActiveGame {
 
     public Map<String, Integer> getTopKills() {
         return topKills;
+    }
+
+    public ScoreboardHandler getScoreboardHandler() {
+        return scoreboardHandler;
+    }
+
+    public Map<Player, Inventory> getAssociatedGui() {
+        return associatedGui;
     }
 }

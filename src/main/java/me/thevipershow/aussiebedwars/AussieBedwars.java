@@ -8,12 +8,15 @@ import me.thevipershow.aussiebedwars.config.DefaultConfiguration;
 import me.thevipershow.aussiebedwars.config.DuoConfig;
 import me.thevipershow.aussiebedwars.config.SoloConfig;
 import me.thevipershow.aussiebedwars.config.objects.DuoBedwars;
+import me.thevipershow.aussiebedwars.config.objects.Enchantment;
 import me.thevipershow.aussiebedwars.config.objects.Merchant;
 import me.thevipershow.aussiebedwars.config.objects.Shop;
 import me.thevipershow.aussiebedwars.config.objects.ShopItem;
 import me.thevipershow.aussiebedwars.config.objects.SoloBedwars;
 import me.thevipershow.aussiebedwars.config.objects.Spawner;
 import me.thevipershow.aussiebedwars.config.objects.TeamSpawnPosition;
+import me.thevipershow.aussiebedwars.config.objects.UpgradeItem;
+import me.thevipershow.aussiebedwars.config.objects.UpgradeLevel;
 import me.thevipershow.aussiebedwars.game.GameManager;
 import me.thevipershow.aussiebedwars.listeners.queue.MatchmakingVillagersListener;
 import me.thevipershow.aussiebedwars.listeners.queue.QueueResizerListener;
@@ -54,6 +57,9 @@ public final class AussieBedwars extends JavaPlugin {
     }
 
     private static void registerSerializers() {
+        ConfigurationSerialization.registerClass(Enchantment.class);
+        ConfigurationSerialization.registerClass(UpgradeItem.class);
+        ConfigurationSerialization.registerClass(UpgradeLevel.class);
         ConfigurationSerialization.registerClass(SpawnerLevel.class);
         ConfigurationSerialization.registerClass(Spawner.class);
         ConfigurationSerialization.registerClass(ShopItem.class);

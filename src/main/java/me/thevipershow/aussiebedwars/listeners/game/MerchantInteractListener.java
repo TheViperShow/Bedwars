@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 
 public final class MerchantInteractListener extends UnregisterableListener {
@@ -41,6 +42,6 @@ public final class MerchantInteractListener extends UnregisterableListener {
         if (aMerchant == null) return;
 
         event.setCancelled(true);
-        aMerchant.openUI(p);
+        activeGame.openShop(p);
     }
 }

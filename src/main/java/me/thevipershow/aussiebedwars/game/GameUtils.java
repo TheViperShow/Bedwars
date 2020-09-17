@@ -43,6 +43,41 @@ public final class GameUtils {
         return stringBuilder.toString();
     }
 
+    public static boolean makePlayerPay(final PlayerInventory inventory, final Material currency, final int price) {
+
+        final ItemStack[] contents = inventory.getContents();
+
+        final HashMap<Integer, Integer> playerTakeFromMap = new HashMap<>();
+        int took = 0;
+
+        for (int i = 0; i < contents.length; i++) {
+            final ItemStack stack = contents[i];
+            if (stack == null) continue;
+            if (stack.getType() != currency) continue;
+            final boolean shouldWeExit = (price - took) <= 0;
+            if (shouldWeExit) break;
+            final int leftToTake = (price - took);
+            final int takeFromThisSlot = Math.min(leftToTake, stack.getAmount());
+            playerTakeFromMap.put(i, takeFromThisSlot);
+            took += takeFromThisSlot;
+        }
+
+        if (playerTakeFromMap.isEmpty()) return false;
+        if (took < price) return false;
+
+        for (Map.Entry<Integer, Integer> entry : playerTakeFromMap.entrySet()) {
+            final ItemStack at = inventory.getItem(entry.getKey());
+            final int newAmount = at.getAmount() - entry.getValue();
+            if (newAmount <= 0) {
+                inventory.setItem(entry.getKey(), null);
+            } else {
+                at.setAmount(newAmount);
+                inventory.setItem(entry.getKey(), at);
+            }
+        }
+        return true;
+    }
+
     /**
      * Unsafe check
      *
