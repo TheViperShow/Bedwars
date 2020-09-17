@@ -82,7 +82,7 @@ public class MatchmakingVillagersListener implements Listener {
                             plugin.getServer().getScheduler().runTaskLater(plugin, () -> gameManager.addToQueue(player, activeGame), 1L);
                             return;
                         }
-                    }, 45L);
+                    }, 60L);
                     return;
                 }
 

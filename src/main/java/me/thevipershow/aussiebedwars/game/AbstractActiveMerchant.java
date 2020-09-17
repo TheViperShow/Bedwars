@@ -37,18 +37,19 @@ public abstract class AbstractActiveMerchant {
         this.team = team;
     }
 
-    public static List<String> priceDescriptorSection(final ShopItem i) {
-        return Collections.unmodifiableList(Arrays.asList(" ",
-                "§7- Price§f: §e§l" + i.getBuyCost(),
-                "§7- Buy with§f: §e§l" + GameUtils.beautifyCaps(i.getBuyWith().name())
+    public static List<String> priceDescriptorSection(final int price, final Material buyWith) {
+        return Collections.unmodifiableList(Arrays.asList("",
+                "§7- Price§f: §e§l" + price,
+                "§7- Buy with§f: §e§l" + GameUtils.beautifyCaps(buyWith.name())
         ));
     }
 
+    public static List<String> priceDescriptorSection(final ShopItem i) {
+        return priceDescriptorSection(i.getBuyCost(), i.getBuyWith());
+    }
+
     public static List<String> priceDescriptorSection(final UpgradeLevel level) {
-        return Collections.unmodifiableList(Arrays.asList(" ",
-                "§7- Price§f: §e§l" + level.getPrice(),
-                "§7- Buy with§f: §e§l" + GameUtils.beautifyCaps(level.getBuyWith().name())
-        ));
+        return priceDescriptorSection(level.getPrice(), level.getBuyWith());
     }
 
     public boolean isActive() {

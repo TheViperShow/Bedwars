@@ -57,7 +57,6 @@ public final class GameManager {
         Integer diff = null;
         ActiveGame bestGame = null;
 
-        System.out.println(worldsManager.getActiveGameList().size());
         for (final ActiveGame game : worldsManager.getActiveGameList()) {
             if (game.bedwarsGame.getGamemode() != gamemode) continue;
             if (game.isHasStarted()) continue;
@@ -70,7 +69,6 @@ public final class GameManager {
                 diff = newDiff;
                 bestGame = game;
             }
-            System.out.println(game.associatedWorld.toString() + " | ");
         }
 
         return bestGame == null ? Optional.empty() : Optional.of(bestGame);

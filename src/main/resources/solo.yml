@@ -455,7 +455,7 @@ solo:
           - 16
           - 17
       upgradable-items:
-        - slot: 34 # pickaxe upgrades ->
+        - slot: 39 # pickaxe upgrades ->
           amount: 1
           levels:
             - level: 1
@@ -476,7 +476,7 @@ solo:
               material: "IRON_PICKAXE"
               item-name: "§eIron Pickaxe (Efficiency II)"
               buy-with: "IRON_INGOT"
-              price: 10
+              price: 15
               lore:
                 - "§7This is an upgradable item."
                 - "§7It will lose 1 tier upon death!"
@@ -485,6 +485,21 @@ solo:
                 - "§7with the lowest tier"
               enchantments:
                 - level: 2
+                  type: "DIG_SPEED"
+            - level: 3
+              material: "DIAMOND_PICKAXE"
+              item-name: "§eDiamond Pickaxe (Efficiency III)"
+              buy-with: "DIAMOND"
+              price: 4
+              lore:
+                - "§7This is an upgradable item."
+                - "§7It will lose 1 tier upon death!"
+                - ""
+                - "§7You will permanently respawn at least"
+                - "§7with the lowest tier"
+                - "§4NOTE§7: §cThis is the last upgrade available."
+              enchantments:
+                - level: 3
                   type: "DIG_SPEED"
         - slot: 38 # axe upgrades ->
           amount: 1
@@ -516,6 +531,21 @@ solo:
                 - "§7with the lowest tier"
               enchantments:
                 - level: 2
+                  type: "DAMAGE_ALL"
+            - level: 3
+              material: "DIAMOND_AXE"
+              item-name: "§eDiamond Axe (Sharpness III)"
+              buy-with: "DIAMOND"
+              price: 4
+              lore:
+                - "§7This is an upgradable item."
+                - "§7It will lose 1 tier upon death!"
+                - ""
+                - "§7You will permanently respawn at least"
+                - "§7with the lowest tier"
+                - "§4NOTE§7: §cThis is the last upgrade available."
+              enchantments:
+                - level: 3
                   type: "DAMAGE_ALL"
       items:
         - material: "WOOL"

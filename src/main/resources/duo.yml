@@ -455,7 +455,7 @@ solo:
           - 16
           - 17
       upgradable-items:
-        - slot: 34 # pickaxe upgrades ->
+        - slot: 39 # pickaxe upgrades ->
           amount: 1
           levels:
             - level: 1

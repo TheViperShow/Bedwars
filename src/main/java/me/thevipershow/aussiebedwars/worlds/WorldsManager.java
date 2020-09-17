@@ -86,18 +86,14 @@ public class WorldsManager {
         final WorldLoader worldLoader = new WorldLoader(sourceFile, outputFile);
         plugin.getLogger().info(String.format("Attempting to copy directory of bukkit World [%s].", tempName));
         final boolean copyResult = worldLoader.copyToDir();
-        plugin.getLogger().info(String.format("loaded world [%s].", tempName));
 
         plugin.getLogger().info(String.format("Attempting to create instance of bukkit World [%s].", tempName));
 
-        plugin.getLogger().info("Copied status: " + copyResult);
         final World w = WorldCreator.name(tempName)
                 .environment(World.Environment.NORMAL)
                 .generateStructures(false)
                 .type(WorldType.CUSTOMIZED)
                 .createWorld();
-
-        plugin.getLogger().info("LOADED WORLD -> " + w.toString());
 
         plugin.getLogger().info(String.format("Loading [%s] into active games...", tempName));
 

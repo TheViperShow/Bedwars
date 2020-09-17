@@ -1,12 +1,15 @@
 package me.thevipershow.aussiebedwars.config.objects;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import me.thevipershow.aussiebedwars.game.AbstractActiveMerchant;
 import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 @SerializableAs("Item")
 public class ShopItem implements ConfigurationSerializable {
@@ -18,6 +21,22 @@ public class ShopItem implements ConfigurationSerializable {
     private final int slot;
     private final String itemName;
     private final List<String> lore;
+
+    private ItemStack cachedFancyStack = null;
+    private ItemStack cachedGameStack = null;
+
+    public ItemStack generateFancyStack() {
+        if (cachedFancyStack != null) return cachedFancyStack;
+        final ItemStack stack = new ItemStack(material, amount);
+        final ItemMeta meta = stack.getItemMeta();
+        meta.setDisplayName(itemName);
+        final List<String> list = new ArrayList<>(this.lore);
+        list.addAll(AbstractActiveMerchant.priceDescriptorSection(this));
+        meta.setLore(list);
+        stack.setItemMeta(meta);
+        this.cachedFancyStack = stack;
+        return cachedFancyStack;
+    }
 
     public ShopItem(String material, int amount, String buyWith, int buyCost, int slot, String itemName, List<String> lore) {
         this.material = Material.valueOf(material);
@@ -78,7 +97,29 @@ public class ShopItem implements ConfigurationSerializable {
     }
 
     public ItemStack generateWithoutLore() {
-        return new ItemStack(this.getMaterial(), this.amount);
+        if (cachedGameStack != null) return cachedGameStack;
+        this.cachedGameStack = new ItemStack(material, amount);
+        return cachedGameStack;
+        // return new ItemStack(this.getMaterial(), this.amount);
+    }
+
+    public ItemStack getCachedFancyStack() {
+        return cachedFancyStack;
+    }
+
+    @Override
+    public String toString() {
+        return "ShopItem{" +
+                "material=" + material +
+                ", amount=" + amount +
+                ", buyWith=" + buyWith +
+                ", buyCost=" + buyCost +
+                ", slot=" + slot +
+                ", itemName='" + itemName + '\'' +
+                ", lore=" + lore +
+                ", cachedFancyStack=" + cachedFancyStack +
+                ", cachedGameStack=" + cachedGameStack +
+                '}';
     }
 
     public List<String> getLore() {

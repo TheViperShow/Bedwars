@@ -84,19 +84,19 @@ public abstract class ActiveGame {
     protected final List<UnregisterableListener> unregisterableListeners = new ArrayList<>();
     protected final Map<Player, ArmorSet> playerSetMap = new HashMap<>();
     protected final Map<String, Integer> topKills = new HashMap<>();
-
     protected final Map<Player, Inventory> associatedGui = new HashMap<>();
     protected final Map<ItemStack, ShopItem> shopItemStacks = new HashMap<>();
     protected final Map<ItemStack, UpgradeItem> upgradeItemStacks = new HashMap<>();
+    protected final Map<Player, Map<UpgradeItem, Integer>> playerUpgradeLevelsMap = new HashMap<>();
 
     ///////////////////////////////////////////////////
     // Internal ActiveGame fields                    //
     //-----------------------------------------------//
     //                                               //
     protected boolean hasStarted = false;            //
-    protected boolean winnerDeclared = false;
+    protected boolean winnerDeclared = false;        //
     protected BukkitTask timerTask = null;           //
-    protected final GameLobbyTicker gameLobbyTicker;
+    protected final GameLobbyTicker gameLobbyTicker; //
     //-----------------------------------------------//
 
     public ActiveGame(String associatedWorldFilename, BedwarsGame bedwarsGame, World lobbyWorld, Plugin plugin) {
@@ -135,46 +135,38 @@ public abstract class ActiveGame {
         ));
     }
 
+    protected final void setupUpgradeLevelsMap() {
+
+        associatedQueue.perform(p -> {
+            final Map<UpgradeItem, Integer> emptyMap = new HashMap<>();
+            this.playerUpgradeLevelsMap.put(p, emptyMap);
+        });
+
+        bedwarsGame.getShop().getUpgradeItems().forEach(upgradeItem -> associatedQueue.perform(p -> this.playerUpgradeLevelsMap.get(p).put(upgradeItem, 0)));
+    }
+
     protected final Inventory setupGUIs() {
         final Inventory inv = Bukkit.createInventory(null, bedwarsGame.getShop().getSlots(), "§7[§eAussieBedwars§7] §eShop");
         final Shop shop = bedwarsGame.getShop();
 
-        for (final ShopItem item : shop.getItems()) {
-            final ItemStack i = new ItemStack(item.getMaterial(), item.getAmount());
-            final ItemMeta m = i.getItemMeta();
-            m.setDisplayName(item.getItemName());
-            final List<String> lore = new ArrayList<>();
-            if (item.getLore() != null) {
-                lore.addAll(item.getLore());
-            }
-            lore.addAll(priceDescriptorSection(item));
-            m.setLore(lore);
-            i.setItemMeta(m);
-            shopItemStacks.put(i, item);
-            inv.setItem(item.getSlot(), i);
-        }
-
-        for (final Integer glassSlot : shop.getGlassSlots()) {
+        for (final int glassSlot : shop.getGlassSlots()) {
             final ItemStack glass = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) shop.getGlassColor());
             final ItemMeta glassMeta = glass.getItemMeta();
-            glassMeta.setDisplayName(" ");
+            glassMeta.setDisplayName("");
             glassMeta.setLore(null);
             glass.setItemMeta(glassMeta);
             inv.setItem(glassSlot, glass);
         }
 
+        for (final ShopItem item : shop.getItems()) {
+            final ItemStack stack = item.generateFancyStack();
+            shopItemStacks.put(stack, item);
+            inv.setItem(item.getSlot(), stack);
+        }
+
         for (final UpgradeItem item : shop.getUpgradeItems()) {
             final UpgradeLevel first = item.getLevels().get(0);
-            final ItemStack s = new ItemStack(first.getLevelMaterial(), item.getAmount());
-            final ItemMeta meta = s.getItemMeta();
-            meta.setDisplayName(first.getItemName());
-            final List<String> lore = new ArrayList<>(first.getLore());
-            lore.addAll(priceDescriptorSection(first));
-            meta.setLore(lore);
-            s.setItemMeta(meta);
-            for (Enchantment enchant : first.getEnchants()) {
-                s.addEnchantment(enchant.getEnchant(), enchant.getLevel());
-            }
+            final ItemStack s = first.generateFancyStack();
             upgradeItemStacks.put(s, item);
             inv.setItem(item.getSlot(), s);
         }
@@ -241,11 +233,11 @@ public abstract class ActiveGame {
         }
     }
 
-    public void handleError(String text) {
+    public void handleError(final String text) {
         associatedQueue.perform(p -> p.sendMessage(AussieBedwars.PREFIX + "§c" + text));
     }
 
-    public void moveToLobby(Player player) {
+    public void moveToLobby(final Player player) {
         player.teleport(cachedLobbySpawnLocation);
     }
 
@@ -263,10 +255,6 @@ public abstract class ActiveGame {
     }
 
     public void connectedToQueue(final Player player) {
-        //activeGame.getAssociatedWorld().getPlayers().forEach(p -> {
-        //    player.sendMessage(AussieBedwars.PREFIX + p.getName() + " §ehas joined §7" + activeGame.getAssociatedWorld().getName() + " §equeue");
-        //    player.sendMessage(AussieBedwars.PREFIX + String.format("§eStatus §7[§a%d§8/§a%d§7]", activeGame.getAssociatedQueue().queueSize() + 1, activeGame.getBedwarsGame().getPlayers()));
-        //});
         associatedQueue.perform(p -> {
             p.sendMessage(AussieBedwars.PREFIX + player.getName() + " §ehas joined §7§l" + getAssociatedWorld().getName() + " §r§equeue");
             p.sendMessage(AussieBedwars.PREFIX + String.format("§eStatus §7[§a%d§8/§a%d§7]", getAssociatedQueue().queueSize() + 1, getBedwarsGame().getPlayers()));
@@ -282,7 +270,6 @@ public abstract class ActiveGame {
         final UnregisterableListener quitListener = new PlayerQuitDuringGameListener(this);
         final UnregisterableListener merchantListener = new MerchantInteractListener(this);
         final UnregisterableListener entityDamageListener = new EntityDamageListener(this);
-      //  final UnregisterableListener guiInteractListener = new GUIInteractListener(this);
         final UnregisterableListener hungerLossListener = new HungerLossListener(this);
         final UnregisterableListener spectatorInteractListener = new SpectatorsInteractListener(this);
         final UnregisterableListener tntPlaceListener = new TNTPlaceListener(this);
@@ -298,7 +285,6 @@ public abstract class ActiveGame {
         plugin.getServer().getPluginManager().registerEvents(quitListener, plugin);
         plugin.getServer().getPluginManager().registerEvents(merchantListener, plugin);
         plugin.getServer().getPluginManager().registerEvents(entityDamageListener, plugin);
-      //  plugin.getServer().getPluginManager().registerEvents(guiInteractListener, plugin);
         plugin.getServer().getPluginManager().registerEvents(hungerLossListener, plugin);
         plugin.getServer().getPluginManager().registerEvents(spectatorInteractListener, plugin);
         plugin.getServer().getPluginManager().registerEvents(tntPlaceListener, plugin);
@@ -314,7 +300,6 @@ public abstract class ActiveGame {
         unregisterableListeners.add(quitListener);
         unregisterableListeners.add(merchantListener);
         unregisterableListeners.add(entityDamageListener);
-    //    unregisterableListeners.add(guiInteractListener);
         unregisterableListeners.add(hungerLossListener);
         unregisterableListeners.add(spectatorInteractListener);
         unregisterableListeners.add(tntPlaceListener);
@@ -369,6 +354,7 @@ public abstract class ActiveGame {
             moveTeamsToSpawns();
             giveAllDefaultSet();
             healAll();
+            setupUpgradeLevelsMap();
         }
     }
 
@@ -529,7 +515,7 @@ public abstract class ActiveGame {
 
     public void openShop(final Player player) {
         Inventory associated = associatedGui.get(player);
-        if (associated == null) {
+        if (associated == null) { // initializing inventory for player.
             associated = cloneInventory(Objects.requireNonNull(defaultShopInv, "Illegal null inventory has been created."));
 
             final BedwarsTeam pTeam = getPlayerTeam(player);
@@ -547,10 +533,8 @@ public abstract class ActiveGame {
                     break;
                 }
             }
-
             associatedGui.put(player, associated);
         }
-
         player.openInventory(associated);
     }
 
@@ -686,5 +670,9 @@ public abstract class ActiveGame {
 
     public Map<Player, Inventory> getAssociatedGui() {
         return associatedGui;
+    }
+
+    public Map<Player, Map<UpgradeItem, Integer>> getPlayerUpgradeLevelsMap() {
+        return playerUpgradeLevelsMap;
     }
 }

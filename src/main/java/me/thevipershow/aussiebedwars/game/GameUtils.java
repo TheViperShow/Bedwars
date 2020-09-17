@@ -43,8 +43,7 @@ public final class GameUtils {
         return stringBuilder.toString();
     }
 
-    public static boolean makePlayerPay(final PlayerInventory inventory, final Material currency, final int price) {
-
+    public static Pair<HashMap<Integer, Integer>, Boolean> canAfford(final PlayerInventory inventory, final Material currency, final int price) {
         final ItemStack[] contents = inventory.getContents();
 
         final HashMap<Integer, Integer> playerTakeFromMap = new HashMap<>();
@@ -62,10 +61,14 @@ public final class GameUtils {
             took += takeFromThisSlot;
         }
 
-        if (playerTakeFromMap.isEmpty()) return false;
-        if (took < price) return false;
+        if (playerTakeFromMap.isEmpty() || took < price) return new Pair<>(playerTakeFromMap, false);
 
-        for (Map.Entry<Integer, Integer> entry : playerTakeFromMap.entrySet()) {
+        return new Pair<>(playerTakeFromMap, true);
+    }
+
+    public static void makePlayerPay(final PlayerInventory inventory, final Material currency, final int price, final HashMap<Integer, Integer> takeFrom) {
+
+        for (Map.Entry<Integer, Integer> entry : takeFrom.entrySet()) {
             final ItemStack at = inventory.getItem(entry.getKey());
             final int newAmount = at.getAmount() - entry.getValue();
             if (newAmount <= 0) {
@@ -75,7 +78,6 @@ public final class GameUtils {
                 inventory.setItem(entry.getKey(), at);
             }
         }
-        return true;
     }
 
     /**
@@ -109,6 +111,23 @@ public final class GameUtils {
             }
         }
         return nearest.getBedwarsTeam();
+    }
+
+    public static void upgradePlayerStack(final Player player, final ItemStack oldStack, final ItemStack newStack) {
+        final PlayerInventory inv = player.getInventory();
+        final ItemStack[] contents = inv.getContents();
+
+        for (int i = 0; i < contents.length; i++) {
+            final ItemStack content = contents[i];
+            if (content == null) continue;
+
+            if (content.isSimilar(oldStack)) {
+                inv.setItem(i, newStack);
+                return;
+            }
+        }
+
+        giveStackToPlayer(newStack, player, contents);
     }
 
     public static void giveStackToPlayer(final ItemStack itemStack, final Player player, final ItemStack[] contents) {
@@ -160,7 +179,7 @@ public final class GameUtils {
             given += willGive;
         }
 
-        //TODO : Maybe fix stacks overflowing
+        //TODO : Maybe fix stacks overflowing (it should be fixed.)
     }
 
     /**

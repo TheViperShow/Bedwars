@@ -5,10 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import me.thevipershow.aussiebedwars.game.AbstractActiveMerchant;
-import net.minecraft.server.v1_8_R3.Items;
 import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -21,6 +19,8 @@ public final class UpgradeLevel implements ConfigurationSerializable {
     private final Material buyWith;
     private final List<String> lore;
     private final List<Enchantment> enchants;
+    private final ItemStack cachedFancyStack;
+    private final ItemStack cachedGameStack;
 
     public UpgradeLevel(int level, Material levelMaterial, String itemName, int price, Material buyWith, List<String> lore, List<Enchantment> enchants) {
         this.level = level;
@@ -30,6 +30,28 @@ public final class UpgradeLevel implements ConfigurationSerializable {
         this.buyWith = buyWith;
         this.lore = lore;
         this.enchants = enchants;
+
+        final ItemStack fancyStack = new ItemStack(levelMaterial, 1);
+        final ItemMeta fancyMeta = fancyStack.getItemMeta();
+        final ArrayList<String> newlore = new ArrayList<>(lore);
+        newlore.addAll(AbstractActiveMerchant.priceDescriptorSection(price, buyWith));
+        fancyMeta.setLore(newlore);
+        fancyStack.setItemMeta(fancyMeta);
+        for (final Enchantment enchant : enchants) {
+            fancyStack.addEnchantment(enchant.getEnchant(), enchant.getLevel());
+        }
+        this.cachedFancyStack = fancyStack;
+
+        final ItemStack gameStack = new ItemStack(levelMaterial, 1);
+        final ItemMeta gameMeta = gameStack.getItemMeta();
+        gameMeta.setDisplayName(itemName);
+        gameStack.setItemMeta(gameMeta);
+        for (final Enchantment enchant : enchants) {
+            gameStack.addEnchantment(enchant.getEnchant(), enchant.getLevel());
+        }
+
+        this.cachedGameStack = gameStack;
+
     }
 
     @Override
@@ -50,23 +72,11 @@ public final class UpgradeLevel implements ConfigurationSerializable {
     }
 
     public final ItemStack generateFancyStack() {
-        final ItemStack stack = generateGameStack();
-        final ItemMeta meta = stack.getItemMeta();
-        final List<String> lore = new ArrayList<>(this.lore);
-        lore.addAll(AbstractActiveMerchant.priceDescriptorSection(this));
-        stack.setItemMeta(meta);
-        return stack;
+        return cachedFancyStack.clone();
     }
 
     public final ItemStack generateGameStack() {
-        final ItemStack stack = new ItemStack(levelMaterial, 1);
-        final ItemMeta meta = stack.getItemMeta();
-        meta.setDisplayName(itemName);
-        stack.setItemMeta(meta);
-        for (final Enchantment enchant : enchants) {
-            stack.addEnchantment(enchant.getEnchant(), enchant.getLevel());
-        }
-        return stack;
+        return cachedGameStack.clone();
     }
 
 
@@ -96,5 +106,28 @@ public final class UpgradeLevel implements ConfigurationSerializable {
 
     public List<Enchantment> getEnchants() {
         return enchants;
+    }
+
+    public final ItemStack getCachedFancyStack() {
+        return cachedFancyStack;
+    }
+
+    public final ItemStack getCachedGameStack() {
+        return cachedGameStack;
+    }
+
+    @Override
+    public String toString() {
+        return "UpgradeLevel{" +
+                "level=" + level +
+                ", levelMaterial=" + levelMaterial +
+                ", itemName='" + itemName + '\'' +
+                ", price=" + price +
+                ", buyWith=" + buyWith +
+                ", lore=" + lore +
+                ", enchants=" + enchants +
+                ", cachedFancyStack=" + cachedFancyStack +
+                ", cachedGameStack=" + cachedGameStack +
+                '}';
     }
 }
