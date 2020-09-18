@@ -432,13 +432,7 @@ solo:
           x: -32.50 # Please set this
           y: 62.0 # Please set this
           z: -93.0 # Plz set this
-# UPGRADE SHOPS SECTION
-    #  - name: "[AussieBedwars] Upgrades"
-    #    type: "UPGRADE"
-    #    location:
-    #      x: 1.0
-    #      y: 1.0
-    #      z: 1.0
+# SHOPS SECTION
     shop:
       title: "{TEAM} Shop"
       slots: 45
@@ -638,4 +632,32 @@ solo:
           lore:
             - "§7Buying this will give you a complete §f§lIRON §r§7armor set"
             - "§7It will be permanent upon death."
+        - material: "STONE_SWORD"
+          item-name: "§7§lStone Sword"
+          slot: 25
+          amount: 1
+          price: 6
+          buy-with: "IRON_INGOT"
+          lore:
+            - "§7Buying this will give you an §7§lStone §r§7sword."
+            - "§7It will lose one tier upon death."
+        - material: "IRON_SWORD"
+          item-name: "§f§lIron Sword"
+          slot: 34
+          amount: 1
+          price: 12
+          buy-with: "IRON_INGOT"
+          lore:
+            - "§7Buying this will give you an §f§lIRON §r§7sword."
+            - "§7It will lose one tier upon death."
+        - material: "DIAMOND_SWORD"
+          item-name: "§b§lDiamond Sword"
+          slot: 42
+          amount: 1
+          price: 8
+          buy-with: "GOLD_INGOT"
+          lore:
+            - "§7Buying this will give you an §b§lDIAMOND §r§7sword."
+            - "§7It will lose one tier upon death."
           # others items below...
+    upgrades:

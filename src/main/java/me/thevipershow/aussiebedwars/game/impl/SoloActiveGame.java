@@ -21,24 +21,6 @@ public final class SoloActiveGame extends ActiveGame {
     }
 
     @Override
-    public void start() {
-        setHasStarted(true);
-        if (associatedQueue.queueSize() >= bedwarsGame.getMinPlayers()) {
-            if (associatedWorld == null) {
-                handleError("Something went wrong while you were being sent into the game.");
-                return;
-            }
-            assignTeams(); // putting each player in a different team in the map .
-            assignScoreboards(); // starting and assiging a scoreboard for each player.
-            createSpawners(); // creating and spawning ore spawners for this map.
-            createMerchants(); // creating and spawning merchants for this map.
-            moveTeamsToSpawns(); // moving everyone to their team's spawn.
-            giveAllDefaultSet();
-            healAll();
-        }
-    }
-
-    @Override
     public void moveTeamsToSpawns() {
         super.assignedTeams.forEach((k, v) -> {
             final Player p = v.stream().findAny().get();
@@ -51,12 +33,6 @@ public final class SoloActiveGame extends ActiveGame {
                         p.setGameMode(GameMode.SURVIVAL);
                     });
         });
-    }
-
-    @Override
-    public void stop() {
-        moveAllToLobby();
-        cleanAllAndFinalize();
     }
 
     @Override
@@ -76,9 +52,7 @@ public final class SoloActiveGame extends ActiveGame {
         for (Map.Entry<BedwarsTeam, List<Player>> entry : assignedTeams.entrySet()) {
             final Player p = entry.getValue().stream().findAny().get();
             final Scoreboard scoreboard = ScoreboardLib.createScoreboard(p);
-
             scoreboard.setHandler(super.scoreboardHandler).setUpdateInterval(20L);
-
             super.activeScoreboards.add(scoreboard);
             scoreboard.activate();
         }

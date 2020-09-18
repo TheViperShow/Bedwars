@@ -36,6 +36,7 @@ public final class UpgradeLevel implements ConfigurationSerializable {
         final ArrayList<String> newlore = new ArrayList<>(lore);
         newlore.addAll(AbstractActiveMerchant.priceDescriptorSection(price, buyWith));
         fancyMeta.setLore(newlore);
+        fancyMeta.setDisplayName(itemName);
         fancyStack.setItemMeta(fancyMeta);
         for (final Enchantment enchant : enchants) {
             fancyStack.addEnchantment(enchant.getEnchant(), enchant.getLevel());

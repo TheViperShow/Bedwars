@@ -2,7 +2,7 @@ solo:
   - map-filename: "bedwars-duo"
     start-timer: 15
     minimum-games: 2
-    maximum-games: 4
+    maximum-games: 8
     min-players: 4
     players: 16
     teams:
@@ -59,7 +59,7 @@ solo:
         z: 94.0 # Please set this
         team: "CYAN"
     spawners:
-# EMERALD SPAWNERS
+      # EMERALD SPAWNERS
       - type: "EMERALD"
         invisible: false
         location:
@@ -207,7 +207,7 @@ solo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
-              #--------------------------------------- Red
+            #--------------------------------------- Red
       - type: "IRON"
         invisible: true
         location:
@@ -232,7 +232,7 @@ solo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
-              #--------------------------------------- Blue
+            #--------------------------------------- Blue
       - type: "IRON"
         invisible: true
         location:
@@ -257,7 +257,7 @@ solo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
-              #--------------------------------------- Green
+            #--------------------------------------- Green
       - type: "IRON"
         invisible: true
         location:
@@ -282,7 +282,7 @@ solo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
-              #--------------------------------------- Yellow
+            #--------------------------------------- Yellow
       - type: "IRON"
         invisible: true
         location:
@@ -307,7 +307,7 @@ solo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
-              #---------------------------------------  cyan
+            #---------------------------------------  cyan
       - type: "IRON"
         invisible: true
         location:
@@ -332,7 +332,7 @@ solo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
-              #--------------------------------------- White
+            #--------------------------------------- White
       - type: "IRON"
         invisible: true
         location:
@@ -432,7 +432,7 @@ solo:
           x: -32.50 # Please set this
           y: 62.0 # Please set this
           z: -93.0 # Plz set this
-# UPGRADE SHOPS SECTION
+    # UPGRADE SHOPS SECTION
     #  - name: "[AussieBedwars] Upgrades"
     #    type: "UPGRADE"
     #    location:
@@ -476,7 +476,7 @@ solo:
               material: "IRON_PICKAXE"
               item-name: "§eIron Pickaxe (Efficiency II)"
               buy-with: "IRON_INGOT"
-              price: 10
+              price: 15
               lore:
                 - "§7This is an upgradable item."
                 - "§7It will lose 1 tier upon death!"
@@ -485,6 +485,21 @@ solo:
                 - "§7with the lowest tier"
               enchantments:
                 - level: 2
+                  type: "DIG_SPEED"
+            - level: 3
+              material: "DIAMOND_PICKAXE"
+              item-name: "§eDiamond Pickaxe (Efficiency III)"
+              buy-with: "DIAMOND"
+              price: 4
+              lore:
+                - "§7This is an upgradable item."
+                - "§7It will lose 1 tier upon death!"
+                - ""
+                - "§7You will permanently respawn at least"
+                - "§7with the lowest tier"
+                - "§4NOTE§7: §cThis is the last upgrade available."
+              enchantments:
+                - level: 3
                   type: "DIG_SPEED"
         - slot: 38 # axe upgrades ->
           amount: 1
@@ -516,6 +531,21 @@ solo:
                 - "§7with the lowest tier"
               enchantments:
                 - level: 2
+                  type: "DAMAGE_ALL"
+            - level: 3
+              material: "DIAMOND_AXE"
+              item-name: "§eDiamond Axe (Sharpness III)"
+              buy-with: "DIAMOND"
+              price: 4
+              lore:
+                - "§7This is an upgradable item."
+                - "§7It will lose 1 tier upon death!"
+                - ""
+                - "§7You will permanently respawn at least"
+                - "§7with the lowest tier"
+                - "§4NOTE§7: §cThis is the last upgrade available."
+              enchantments:
+                - level: 3
                   type: "DAMAGE_ALL"
       items:
         - material: "WOOL"
@@ -608,4 +638,31 @@ solo:
           lore:
             - "§7Buying this will give you a complete §f§lIRON §r§7armor set"
             - "§7It will be permanent upon death."
+        - material: "STONE_SWORD"
+          item-name: "§7§lStone Sword"
+          slot: 25
+          amount: 1
+          price: 6
+          buy-with: "IRON_INGOT"
+          lore:
+            - "§7Buying this will give you an §7§lStone §r§7sword."
+            - "§7It will lose one tier upon death."
+        - material: "IRON_SWORD"
+          item-name: "§f§lIron Sword"
+          slot: 34
+          amount: 1
+          price: 12
+          buy-with: "IRON_INGOT"
+          lore:
+            - "§7Buying this will give you an §f§lIRON §r§7sword."
+            - "§7It will lose one tier upon death."
+        - material: "DIAMOND_SWORD"
+          item-name: "§b§lDiamond Sword"
+          slot: 42
+          amount: 1
+          price: 8
+          buy-with: "GOLD_INGOT"
+          lore:
+            - "§7Buying this will give you an §b§lDIAMOND §r§7sword."
+            - "§7It will lose one tier upon death."
           # others items below...

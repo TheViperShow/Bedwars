@@ -1,7 +1,6 @@
 package me.thevipershow.aussiebedwars.listeners.game;
 
 import com.google.common.collect.Lists;
-import java.util.Map;
 import me.thevipershow.aussiebedwars.AussieBedwars;
 import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.aussiebedwars.config.objects.SpawnPosition;
@@ -33,7 +32,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 public final class DeathListener extends UnregisterableListener {
 
     private final ActiveGame activeGame;
-    private RespawnRunnable respawnRunnable = null;
     private static final ItemStack LOBBY_COMPASS = new ItemStack(Material.COMPASS, 1);
 
     public DeathListener(final ActiveGame activeGame) {
@@ -99,23 +97,32 @@ public final class DeathListener extends UnregisterableListener {
         final PlayerInventory inv = player.getInventory();
         final ItemStack[] contents = inv.getContents();
 
-        final Map<Player, ArmorSet> armorSetMap = game.getPlayerSetMap();
-        final ArmorSet playerArmorSet = armorSetMap.get(player);
-
         for (int i = 0; i < contents.length; i++) {
-            ItemStack stack = contents[i];
-            //if (stack == null || GameUtils.anyMatchMaterial(playerTools.getItems(), stack.getType())
-            //        || GameUtils.anyMatchMaterial(playerArmorSet.getItems(), stack.getType())) {
-            //    continue;
-            //}
-            if (stack == null || GameUtils.anyMatchMaterial(playerArmorSet.getItems(), stack.getType()) || (stack.getType().name().contains("WOOD"))) {
+            final ItemStack stack = contents[i];
+            if (stack == null) {
                 continue;
+            } else if (game.getBedwarsGame().getShop().getUpgradeItems()
+                    .stream()
+                    .flatMap(shop -> shop.getLevels().stream())
+                    .anyMatch(lvl -> lvl.getCachedGameStack().isSimilar(stack))) {
+                continue;
+            } else if (game.getSwordUpgrades().getLevels().stream().anyMatch(stacc -> stacc.getType() == stack.getType())) {
+                final ItemStack prev = game.getSwordUpgrades().getPrevious(stack.getType());
+                if (prev != null) {
+                    GameUtils.upgradePlayerStack(player, stack, prev);
+                    continue;
+                } else if (stack.getType() == game.getSwordUpgrades().getLevels().get(0).getType()) {
+                    continue;
+                }
             }
             inv.setItem(i, null);
         }
+
+        game.downgradePlayerTools(player);
     }
 
     private String generateDeathMessage(final EntityDamageEvent e, final BedwarsTeam killedPlayerTeam) {
+
         final StringBuilder msg = new StringBuilder("§" + killedPlayerTeam.getColorCode() + e.getEntity().getName());
         if (e instanceof EntityDamageByEntityEvent) {
             final EntityDamageByEntityEvent ee = (EntityDamageByEntityEvent) e;
@@ -191,8 +198,10 @@ public final class DeathListener extends UnregisterableListener {
                     activeGame.getAssociatedWorld().getPlayers().forEach(player -> player.sendMessage(generatedDeathMsg));
                 }
 
-                if (p.getLocation().getY() <= 1.00) {
-                    p.teleport(p.getLocation().add(0, 60,0 ));
+                final Location pLoc = p.getLocation();
+                if (pLoc.getY() <= 1.00) {
+                    pLoc.setY(100.00);
+                    p.teleport(pLoc);
                 }
 
                 if (!activeGame.isWinnerDeclared()) {
@@ -204,6 +213,7 @@ public final class DeathListener extends UnregisterableListener {
                 }
             } else { // team is still in game
                 p.setGameMode(GameMode.SPECTATOR);
+                clearInvExceptArmorAndTools(p, activeGame);
                 doDeathTimer(p);
                 final Location pLoc = p.getLocation();
                 if (pLoc.getY() <= 5.00) {
@@ -212,7 +222,6 @@ public final class DeathListener extends UnregisterableListener {
                 }
             }
             p.setHealth(p.getMaxHealth());
-            clearInvExceptArmorAndTools(p, activeGame); //TODO: ->
             event.setCancelled(true);
         }
     }

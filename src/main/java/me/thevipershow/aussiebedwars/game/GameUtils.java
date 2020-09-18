@@ -6,8 +6,10 @@ import java.util.Map;
 import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.aussiebedwars.config.objects.Merchant;
 import me.thevipershow.aussiebedwars.config.objects.TeamSpawnPosition;
+import me.thevipershow.aussiebedwars.listeners.game.ArmorSet;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
 import net.minecraft.server.v1_8_R3.PlayerConnection;
+import org.apache.commons.lang3.ObjectUtils;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
@@ -16,6 +18,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 
 public final class GameUtils {
@@ -42,6 +45,7 @@ public final class GameUtils {
         stringBuilder.setLength(stringBuilder.length() - 1);
         return stringBuilder.toString();
     }
+
 
     public static Pair<HashMap<Integer, Integer>, Boolean> canAfford(final PlayerInventory inventory, final Material currency, final int price) {
         final ItemStack[] contents = inventory.getContents();
@@ -113,6 +117,21 @@ public final class GameUtils {
         return nearest.getBedwarsTeam();
     }
 
+    public static ItemStack copyClean(final ItemStack stack) {
+        if (stack == null) return null;
+        Material type = stack.getType();
+        return new ItemStack(type, stack.getAmount(), stack.getDurability());
+    }
+
+    public static ItemStack hasItemOfType(final Player player, final Material material) {
+        for (ItemStack content : player.getInventory().getContents()) {
+            if (content != null && content.getType() == material) {
+                return content;
+            }
+        }
+        return null;
+    }
+
     public static void upgradePlayerStack(final Player player, final ItemStack oldStack, final ItemStack newStack) {
         final PlayerInventory inv = player.getInventory();
         final ItemStack[] contents = inv.getContents();
@@ -128,6 +147,19 @@ public final class GameUtils {
         }
 
         giveStackToPlayer(newStack, player, contents);
+    }
+
+    public static boolean isArmor(final ItemStack stack) {
+        final Material material = stack.getType();
+        if (material.isBlock() || material.isSolid()) {
+            return false;
+        }
+        for (ArmorSet.Slots value : ArmorSet.Slots.values()) {
+            for (Material m : value.getBindMap().values()) {
+                if (m == material) return true;
+            }
+        }
+        return false;
     }
 
     public static void giveStackToPlayer(final ItemStack itemStack, final Player player, final ItemStack[] contents) {

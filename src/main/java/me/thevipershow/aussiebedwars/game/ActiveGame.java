@@ -7,18 +7,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import me.thevipershow.aussiebedwars.AussieBedwars;
 import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
-import me.thevipershow.aussiebedwars.bedwars.objects.shops.MerchantType;
 import me.thevipershow.aussiebedwars.config.objects.BedwarsGame;
-import me.thevipershow.aussiebedwars.config.objects.Enchantment;
 import me.thevipershow.aussiebedwars.config.objects.Merchant;
 import me.thevipershow.aussiebedwars.config.objects.Shop;
 import me.thevipershow.aussiebedwars.config.objects.ShopItem;
@@ -30,7 +26,6 @@ import me.thevipershow.aussiebedwars.listeners.game.BedBreakListener;
 import me.thevipershow.aussiebedwars.listeners.game.DeathListener;
 import me.thevipershow.aussiebedwars.listeners.game.EntityDamageListener;
 import me.thevipershow.aussiebedwars.listeners.game.ExplosionListener;
-import me.thevipershow.aussiebedwars.listeners.game.GUIInteractListener;
 import me.thevipershow.aussiebedwars.listeners.game.HungerLossListener;
 import me.thevipershow.aussiebedwars.listeners.game.LobbyCompassListener;
 import me.thevipershow.aussiebedwars.listeners.game.MapIllegalMovementsListener;
@@ -76,6 +71,7 @@ public abstract class ActiveGame {
     protected final Set<ActiveSpawner> activeSpawners;
     protected final Inventory defaultShopInv;
 
+    protected final SwordUpgrades swordUpgrades = new SwordUpgrades();
     protected final List<Scoreboard> activeScoreboards = new ArrayList<>();
     protected final List<BedwarsTeam> destroyedTeams = new ArrayList<>();
     protected final List<Player> playersOutOfGame = new ArrayList<>();
@@ -136,13 +132,18 @@ public abstract class ActiveGame {
     }
 
     protected final void setupUpgradeLevelsMap() {
-
         associatedQueue.perform(p -> {
             final Map<UpgradeItem, Integer> emptyMap = new HashMap<>();
+
+            for (final UpgradeItem upgradeItem : bedwarsGame.getShop().getUpgradeItems()) {
+                emptyMap.put(upgradeItem, -1);
+            }
             this.playerUpgradeLevelsMap.put(p, emptyMap);
         });
+    }
 
-        bedwarsGame.getShop().getUpgradeItems().forEach(upgradeItem -> associatedQueue.perform(p -> this.playerUpgradeLevelsMap.get(p).put(upgradeItem, 0)));
+    protected final void announceNoTeaming() {
+        associatedQueue.perform(p -> p.sendMessage(AussieBedwars.PREFIX + "§c§lRemember that TEAMING between different teams is strictly PROHIBITED!"));
     }
 
     protected final Inventory setupGUIs() {
@@ -355,6 +356,7 @@ public abstract class ActiveGame {
             giveAllDefaultSet();
             healAll();
             setupUpgradeLevelsMap();
+            announceNoTeaming();
         }
     }
 
@@ -442,8 +444,20 @@ public abstract class ActiveGame {
         pSet.getArmorSet().forEach((k, v) -> ArmorSet.Slots.setArmorPiece(k, player, pSet.getArmorSet().get(k)));
     }
 
-    public void downgradePlayerArmorSet(final Player player) {
-        // NO
+    public void downgradePlayerTools(final Player player) {
+        final Map<UpgradeItem, Integer> map = this.getPlayerUpgradeLevelsMap().get(player);
+        for (Map.Entry<UpgradeItem, Integer> entry : map.entrySet()) {
+            final UpgradeItem item = entry.getKey();
+            final int level = entry.getValue();
+            if (level > 0) {
+                final List<UpgradeLevel> lvls = item.getLevels();
+                map.put(item, level - 1);
+                final ItemStack downgradedItem = lvls.get(level - 1).getCachedGameStack();
+                GameUtils.upgradePlayerStack(player, lvls.get(level).getCachedGameStack(), downgradedItem);
+                this.associatedGui.get(player).setItem(item.getSlot(), downgradedItem);
+                player.updateInventory();
+            }
+        }
     }
 
     public boolean isOutOfGame(final Player p) {
@@ -454,8 +468,6 @@ public abstract class ActiveGame {
     }
 
     public void destroyMap() {
-        final boolean unloaded = plugin.getServer().unloadWorld(associatedWorld, false);
-        plugin.getLogger().info((unloaded ? "Successfully" : "Failed") + " Unloaded game " + associatedWorldFilename);
         final File wDir = associatedWorld.getWorldFolder();
         try {
             FileUtils.deleteDirectory(wDir);
@@ -538,28 +550,6 @@ public abstract class ActiveGame {
         player.openInventory(associated);
     }
 
-    public Optional<UpgradeLevel> getNextUpgrade(final Player player, final ItemStack clickedItem, final int clickedSlot) {
-        //  final ItemStack[] contents = shopInventory.getContents();
-        final ItemMeta clickedMeta = clickedItem.getItemMeta();
-        label:
-        for (Map.Entry<ItemStack, UpgradeItem> entry : upgradeItemStacks.entrySet()) {
-            final UpgradeItem upgradeItem = entry.getValue();
-            if (upgradeItem.getSlot() == clickedSlot) {
-                final List<UpgradeLevel> lvls = upgradeItem.getLevels();
-                for (int i = 0; i < lvls.size(); i++) {
-                    final UpgradeLevel lvl = lvls.get(i);
-                    if (lvl.getItemName().equals(clickedMeta.getDisplayName())) {
-                        final UpgradeLevel nextLvl = lvls.get(i + 1);
-                        if (nextLvl == null) break label;
-                        return Optional.of(nextLvl);
-                    }
-                }
-                break;
-            }
-        }
-        return Optional.empty();
-    }
-
     public Inventory getDefaultShopInv() {
         return defaultShopInv;
     }
@@ -602,6 +592,10 @@ public abstract class ActiveGame {
 
     public List<Player> getPlayersOutOfGame() {
         return playersOutOfGame;
+    }
+
+    public SwordUpgrades getSwordUpgrades() {
+        return swordUpgrades;
     }
 
     public Location getCachedLobbySpawnLocation() {
