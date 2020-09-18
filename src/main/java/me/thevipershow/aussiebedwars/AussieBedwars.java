@@ -17,6 +17,13 @@ import me.thevipershow.aussiebedwars.config.objects.Spawner;
 import me.thevipershow.aussiebedwars.config.objects.TeamSpawnPosition;
 import me.thevipershow.aussiebedwars.config.objects.UpgradeItem;
 import me.thevipershow.aussiebedwars.config.objects.UpgradeLevel;
+import me.thevipershow.aussiebedwars.config.objects.upgradeshop.DragonBuffUpgrade;
+import me.thevipershow.aussiebedwars.config.objects.upgradeshop.HealPoolUpgrade;
+import me.thevipershow.aussiebedwars.config.objects.upgradeshop.IronForgeUpgrade;
+import me.thevipershow.aussiebedwars.config.objects.upgradeshop.ManiacMinerUpgrade;
+import me.thevipershow.aussiebedwars.config.objects.upgradeshop.ReinforcedArmorUpgrade;
+import me.thevipershow.aussiebedwars.config.objects.upgradeshop.SharpnessUpgrade;
+import me.thevipershow.aussiebedwars.config.objects.upgradeshop.UpgradeShop;
 import me.thevipershow.aussiebedwars.game.GameManager;
 import me.thevipershow.aussiebedwars.listeners.queue.MatchmakingVillagersListener;
 import me.thevipershow.aussiebedwars.listeners.queue.QueueResizerListener;
@@ -57,6 +64,13 @@ public final class AussieBedwars extends JavaPlugin {
     }
 
     private static void registerSerializers() {
+        ConfigurationSerialization.registerClass(DragonBuffUpgrade.class);
+        ConfigurationSerialization.registerClass(HealPoolUpgrade.class);
+        ConfigurationSerialization.registerClass(IronForgeUpgrade.class);
+        ConfigurationSerialization.registerClass(ManiacMinerUpgrade.class);
+        ConfigurationSerialization.registerClass(ReinforcedArmorUpgrade.class);
+        ConfigurationSerialization.registerClass(SharpnessUpgrade.class);
+        ConfigurationSerialization.registerClass(UpgradeShop.class);
         ConfigurationSerialization.registerClass(Enchantment.class);
         ConfigurationSerialization.registerClass(UpgradeItem.class);
         ConfigurationSerialization.registerClass(UpgradeLevel.class);
@@ -125,7 +139,6 @@ public final class AussieBedwars extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        
         worldsManager.getActiveGameList().forEach(game -> getServer().unloadWorld(game.getAssociatedWorld(), false));
     }
 

@@ -59,7 +59,7 @@ solo:
         z: 94.0 # Please set this
         team: "CYAN"
     spawners:
-# EMERALD SPAWNERS
+      # EMERALD SPAWNERS
       - type: "EMERALD"
         invisible: false
         location:
@@ -207,7 +207,7 @@ solo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
-              #--------------------------------------- Red
+            #--------------------------------------- Red
       - type: "IRON"
         invisible: true
         location:
@@ -232,7 +232,7 @@ solo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
-              #--------------------------------------- Blue
+            #--------------------------------------- Blue
       - type: "IRON"
         invisible: true
         location:
@@ -257,7 +257,7 @@ solo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
-              #--------------------------------------- Green
+            #--------------------------------------- Green
       - type: "IRON"
         invisible: true
         location:
@@ -282,7 +282,7 @@ solo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
-              #--------------------------------------- Yellow
+            #--------------------------------------- Yellow
       - type: "IRON"
         invisible: true
         location:
@@ -307,7 +307,7 @@ solo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
-              #---------------------------------------  cyan
+            #---------------------------------------  cyan
       - type: "IRON"
         invisible: true
         location:
@@ -332,7 +332,7 @@ solo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
-              #--------------------------------------- White
+            #--------------------------------------- White
       - type: "IRON"
         invisible: true
         location:
@@ -432,7 +432,50 @@ solo:
           x: -32.50 # Please set this
           y: 62.0 # Please set this
           z: -93.0 # Plz set this
-# SHOPS SECTION
+      # upgrade merchant sections
+      - name: "§7[§eAussieBedwars§7] §eUpgrades"
+        type: "UPGRADE"
+        location:
+          x: 33.50
+          y: 62.0
+          z: -90.0
+      - name: "§7[§eAussieBedwars§7] §eUpgrades"
+        type: "UPGRADE"
+        location:
+          x: 91.00
+          y: 62.0
+          z: -32.50
+      - name: "§7[§eAussieBedwars§7] §eUpgrades"
+        type: "UPGRADE"
+        location:
+          x: 91.50
+          y: 62.0
+          z: 33.50
+      - name: "§7[§eAussieBedwars§7] §eUpgrades"
+        type: "UPGRADE"
+        location:
+          x: -32.50
+          y: 62.0
+          z: 91.0
+      - name: "§7[§eAussieBedwars§7] §eUpgrades"
+        type: "UPGRADE"
+        location:
+          x: -90.0
+          y: 62.0
+          z: 33.50
+      - name: "§7[§eAussieBedwars§7] §eUpgrades"
+        type: "UPGRADE"
+        location:
+          x: -90.0
+          y: 62.0
+          z: -32.50
+      - name: "§7[§eAussieBedwars§7] §eUpgrades"
+        type: "UPGRADE"
+        location:
+          x: -32.50
+          y: 62.0
+          z: -90.0
+    # SHOPS SECTION
     shop:
       title: "{TEAM} Shop"
       slots: 45
@@ -661,3 +704,174 @@ solo:
             - "§7It will lose one tier upon death."
           # others items below...
     upgrades:
+      slots: 45
+      sharpness:
+        material: "IRON_SWORD"
+        item-name: "§eSharpened Swords"
+        slot: 10
+        amount: 1
+        price: 2
+        buy-with: "DIAMOND"
+        lore:
+          - "§7Your team permanently gains"
+          - "§7Sharpness effect on their swords"
+          - "§and axes."
+      reinforced-armor:
+        levels:
+          - level: 1
+            material: "IRON_CHESTPLATE"
+            item-name: "§eReinforced Armor I"
+            slot: 11
+            amount: 1
+            price: 2
+            buy-with: "DIAMOND"
+            lore:
+              - "§7Your team permanently gains"
+              - "§7Protection on all armor pieces!"
+              - ""
+              - "§7Level 1: Protection I"
+              - "§7Level 2: Protection II"
+              - "§7Level 3: Protection III"
+              - "§7Level 3: Protection IV"
+          - level: 2
+            material: "IRON_CHESTPLATE"
+            item-name: "§eReinforced Armor 2"
+            slot: 11
+            amount: 1
+            price: 4
+            buy-with: "DIAMOND"
+            lore:
+              - "§7Your team permanently gains"
+              - "§7Protection on all armor pieces!"
+              - ""
+              - "§7Level 2: Protection II"
+              - "§7Level 3: Protection III"
+              - "§7Level 3: Protection IV"
+          - level: 3
+            material: "IRON_CHESTPLATE"
+            item-name: "§eReinforced Armor 3"
+            slot: 11
+            amount: 1
+            price: 8
+            buy-with: "DIAMOND"
+            lore:
+              - "§7Your team permanently gains"
+              - "§7Protection on all armor pieces!"
+              - ""
+              - "§7Level 3: Protection III"
+              - "§7Level 3: Protection IV"
+          - level: 4
+            material: "IRON_CHESTPLATE"
+            item-name: "§eReinforced Armor 4"
+            slot: 11
+            amount: 1
+            price: 16
+            buy-with: "DIAMOND"
+            lore:
+              - "§7Your team permanently gains"
+              - "§7Protection on all armor pieces!"
+              - ""
+              - "§7Level 3: Protection IV"
+      maniac-miner:
+        levels:
+          - level: 1
+            material: "GOLDEN_PICKAXE"
+            item-name: "§eManiac Miner I"
+            slot: 12
+            amount: 1
+            price: 2
+            buy-with: "DIAMOND"
+            lore:
+              - "§7All players on your team"
+              - "§7will permanently gain Haste."
+              - ""
+              - "§7Level 1: Haste I"
+              - "§7Level 2: Haste II"
+          - level: 2
+            material: "GOLDEN_PICKAXE"
+            item-name: "§eManiac Miner II"
+            slot: 12
+            amount: 1
+            price: 4
+            buy-with: "DIAMOND"
+            lore:
+              - "§7All players on your team"
+              - "§7will permanently gain Haste."
+              - ""
+              - "§7Level 2: Haste II"
+      iron-forge:
+        levels:
+          - level: 1
+            material: "FURNACE"
+            item-name: "§eIron Forge I"
+            slot: 13
+            amount: 1
+            price: 2
+            buy-with: "DIAMOND"
+            lore:
+              - "§7Upgrade resource spawning on"
+              - "§7your island."
+              - ""
+              - "§7Tier 1: +50% Resources"
+              - "§7Tier 2: +100% Resources"
+              - "§7Tier 3: +150% Resources"
+              - "§7Tier 4: +200% Resources"
+          - level: 2
+            material: "FURNACE"
+            item-name: "§eIron Forge II"
+            slot: 13
+            amount: 1
+            price: 4
+            buy-with: "DIAMOND"
+            lore:
+              - "§7Upgrade resource spawning on"
+              - "§7your island."
+              - ""
+              - "§7Tier 2: +100% Resources"
+              - "§7Tier 3: +150% Resources"
+              - "§7Tier 4: +200% Resources"
+          - level: 3
+            material: "FURNACE"
+            item-name: "§eIron Forge III"
+            slot: 13
+            amount: 1
+            price: 6
+            buy-with: "DIAMOND"
+            lore:
+              - "§7Upgrade resource spawning on"
+              - "§7your island."
+              - ""
+              - "§7Tier 3: +150% Resources"
+              - "§7Tier 4: +200% Resources"
+          - level: 4
+            material: "FURNACE"
+            item-name: "§eIron Forge IV"
+            slot: 13
+            amount: 1
+            price: 8
+            buy-with: "DIAMOND"
+            lore:
+              - "§7Upgrade resource spawning on"
+              - "§7your island."
+              - ""
+              - "§7Tier 4: +200% Resources"
+      heal-pool:
+        material: "BEACON"
+        slot: 14
+        item-name: "§eHeal Pool"
+        amount: 1
+        price: 1
+        buy-with: "DIAMOND"
+        lore:
+          - "§7Creates a Regeneration field"
+          - "§7around your base!"
+      dragon-buff:
+        material: "DRAGON_EGG"
+        slot: 15
+        item-name: "§eDragon Boost"
+        amount: 1
+        price: 5
+        buy-with: "DIAMOND"
+        lore:
+          - "§7Your team will have 2 dragons"
+          - "§7instead of 1 during death-match!"

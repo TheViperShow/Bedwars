@@ -1,7 +1,6 @@
 package me.thevipershow.aussiebedwars.listeners.game;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import me.thevipershow.aussiebedwars.AussieBedwars;
@@ -104,7 +103,7 @@ public final class ShopInteractListener extends UnregisterableListener {
                     player.sendMessage(AussieBedwars.PREFIX + "§7You did not have enough " + GameUtils.beautifyCaps(boughtLevel.getBuyWith().name()));
                 } else {
                     GameUtils.makePlayerPay(player.getInventory(), boughtLevel.getBuyWith(), boughtLevel.getPrice(), transaction.getA());
-                    final Inventory inv = activeGame.getAssociatedGui().get(player);
+                    final Inventory inv = activeGame.getAssociatedShopGUI().get(player);
                     final ItemStack currentBoughtItem = boughtLevel.getCachedGameStack();
                     if (loadedLvls.size() > currentLevel + 2) {
                         final UpgradeLevel toSetInGui = loadedLvls.get(currentLevel + 2);
@@ -130,7 +129,7 @@ public final class ShopInteractListener extends UnregisterableListener {
         final Player player = (Player) entity;
         if (!player.getWorld().equals(activeGame.getAssociatedWorld())) return;
 
-        final Inventory ui = activeGame.getAssociatedGui().get(player);
+        final Inventory ui = activeGame.getAssociatedShopGUI().get(player);
         if (ui == null) return;
 
         if (event.getClickedInventory() == null) return;

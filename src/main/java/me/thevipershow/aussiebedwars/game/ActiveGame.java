@@ -20,6 +20,13 @@ import me.thevipershow.aussiebedwars.config.objects.Shop;
 import me.thevipershow.aussiebedwars.config.objects.ShopItem;
 import me.thevipershow.aussiebedwars.config.objects.UpgradeItem;
 import me.thevipershow.aussiebedwars.config.objects.UpgradeLevel;
+import me.thevipershow.aussiebedwars.config.objects.upgradeshop.DragonBuffUpgrade;
+import me.thevipershow.aussiebedwars.config.objects.upgradeshop.HealPoolUpgrade;
+import me.thevipershow.aussiebedwars.config.objects.upgradeshop.IronForgeUpgrade;
+import me.thevipershow.aussiebedwars.config.objects.upgradeshop.ManiacMinerUpgrade;
+import me.thevipershow.aussiebedwars.config.objects.upgradeshop.ReinforcedArmorUpgrade;
+import me.thevipershow.aussiebedwars.config.objects.upgradeshop.SharpnessUpgrade;
+import me.thevipershow.aussiebedwars.config.objects.upgradeshop.UpgradeShop;
 import me.thevipershow.aussiebedwars.listeners.UnregisterableListener;
 import me.thevipershow.aussiebedwars.listeners.game.ArmorSet;
 import me.thevipershow.aussiebedwars.listeners.game.BedBreakListener;
@@ -30,12 +37,13 @@ import me.thevipershow.aussiebedwars.listeners.game.HungerLossListener;
 import me.thevipershow.aussiebedwars.listeners.game.LobbyCompassListener;
 import me.thevipershow.aussiebedwars.listeners.game.MapIllegalMovementsListener;
 import me.thevipershow.aussiebedwars.listeners.game.MapProtectionListener;
-import me.thevipershow.aussiebedwars.listeners.game.MerchantInteractListener;
+import me.thevipershow.aussiebedwars.listeners.game.ShopMerchantListener;
 import me.thevipershow.aussiebedwars.listeners.game.PlayerFireballInteractListener;
 import me.thevipershow.aussiebedwars.listeners.game.PlayerQuitDuringGameListener;
 import me.thevipershow.aussiebedwars.listeners.game.ShopInteractListener;
 import me.thevipershow.aussiebedwars.listeners.game.SpectatorsInteractListener;
 import me.thevipershow.aussiebedwars.listeners.game.TNTPlaceListener;
+import me.thevipershow.aussiebedwars.listeners.game.UpgradeMerchantListener;
 import me.thevipershow.aussiebedwars.worlds.WorldsManager;
 import me.tigerhix.lib.scoreboard.common.EntryBuilder;
 import me.tigerhix.lib.scoreboard.type.Entry;
@@ -69,7 +77,9 @@ public abstract class ActiveGame {
     protected final Location cachedWaitingLocation;
     protected final Map<BedwarsTeam, List<Player>> assignedTeams;
     protected final Set<ActiveSpawner> activeSpawners;
+
     protected final Inventory defaultShopInv;
+    protected final Inventory defaultUpgradeInv;
 
     protected final SwordUpgrades swordUpgrades = new SwordUpgrades();
     protected final List<Scoreboard> activeScoreboards = new ArrayList<>();
@@ -80,7 +90,8 @@ public abstract class ActiveGame {
     protected final List<UnregisterableListener> unregisterableListeners = new ArrayList<>();
     protected final Map<Player, ArmorSet> playerSetMap = new HashMap<>();
     protected final Map<String, Integer> topKills = new HashMap<>();
-    protected final Map<Player, Inventory> associatedGui = new HashMap<>();
+    protected final Map<Player, Inventory> associatedShopGUI = new HashMap<>();
+    protected final Map<Player, Inventory> associatedUpgradeGUI = new HashMap<>();
     protected final Map<ItemStack, ShopItem> shopItemStacks = new HashMap<>();
     protected final Map<ItemStack, UpgradeItem> upgradeItemStacks = new HashMap<>();
     protected final Map<Player, Map<UpgradeItem, Integer>> playerUpgradeLevelsMap = new HashMap<>();
@@ -114,7 +125,8 @@ public abstract class ActiveGame {
 
         registerMapListeners();
         gameLobbyTicker.startTicking();
-        this.defaultShopInv = Objects.requireNonNull(setupGUIs(), "The default shop inventory was null.");
+        this.defaultShopInv = Objects.requireNonNull(setupShopGUIs(), "The default shop inventory was null.");
+        this.defaultUpgradeInv = Objects.requireNonNull(setupUpgradeGUIs(), "The default upgrade inventory was null.");
     }
 
     protected static List<String> priceDescriptorSection(final ShopItem i) {
@@ -146,7 +158,7 @@ public abstract class ActiveGame {
         associatedQueue.perform(p -> p.sendMessage(AussieBedwars.PREFIX + "§c§lRemember that TEAMING between different teams is strictly PROHIBITED!"));
     }
 
-    protected final Inventory setupGUIs() {
+    protected final Inventory setupShopGUIs() {
         final Inventory inv = Bukkit.createInventory(null, bedwarsGame.getShop().getSlots(), "§7[§eAussieBedwars§7] §eShop");
         final Shop shop = bedwarsGame.getShop();
 
@@ -160,7 +172,7 @@ public abstract class ActiveGame {
         }
 
         for (final ShopItem item : shop.getItems()) {
-            final ItemStack stack = item.generateFancyStack();
+            final ItemStack stack = item.getCachedFancyStack(); // <-
             shopItemStacks.put(stack, item);
             inv.setItem(item.getSlot(), stack);
         }
@@ -172,7 +184,34 @@ public abstract class ActiveGame {
             inv.setItem(item.getSlot(), s);
         }
 
-        plugin.getLogger().warning("Returning the setupGUI, is it null?" + String.valueOf(inv == null));
+        return inv;
+    }
+
+    public final Inventory setupUpgradeGUIs() {
+        final Inventory inv = Bukkit.createInventory(null, bedwarsGame.getUpgradeShop().getSlots(), "§7[§eAussieBedwars§7] §eUpgrades");
+        final UpgradeShop upgradeShop = bedwarsGame.getUpgradeShop();
+
+        DragonBuffUpgrade dragonBuffUpgrade = upgradeShop.getDragonBuffUpgrade();
+        HealPoolUpgrade healPoolUpgrade = upgradeShop.getHealPoolUpgrade();
+        IronForgeUpgrade ironForgeUpgrade = upgradeShop.getIronForgeUpgrade();
+        ManiacMinerUpgrade maniacMinerUpgrade = upgradeShop.getManiacMinerUpgrade();
+        ReinforcedArmorUpgrade reinforcedArmorUpgrade = upgradeShop.getReinforcedArmorUpgrade();
+        SharpnessUpgrade sharpnessUpgrade = upgradeShop.getSharpnessUpgrade();
+
+        final ShopItem dragonBuffItem = dragonBuffUpgrade.getShopItem();
+        final ShopItem healPoolItem = healPoolUpgrade.getItem();
+        final ShopItem ironForgeItem = ironForgeUpgrade.getLevels().get(0);
+        final ShopItem maniacMinerItem = maniacMinerUpgrade.getLevels().get(0);
+        final ShopItem reinforcedArmorItem = reinforcedArmorUpgrade.getLevels().get(0);
+        final ShopItem sharpnessItem = sharpnessUpgrade.getItem();
+
+        inv.setItem(dragonBuffItem.getSlot(), dragonBuffItem.getCachedFancyStack());
+        inv.setItem(healPoolItem.getSlot(), healPoolItem.getCachedFancyStack());
+        inv.setItem(ironForgeItem.getSlot(), ironForgeItem.getCachedFancyStack());
+        inv.setItem(maniacMinerItem.getSlot(), maniacMinerItem.getCachedFancyStack());
+        inv.setItem(reinforcedArmorItem.getSlot(), reinforcedArmorItem.getCachedFancyStack());
+        inv.setItem(sharpnessItem.getSlot(), sharpnessItem.getCachedFancyStack());
+
         return inv;
     }
 
@@ -269,7 +308,7 @@ public abstract class ActiveGame {
         final UnregisterableListener lobbyCompassListener = new LobbyCompassListener(this);
         final UnregisterableListener deathListener = new DeathListener(this);
         final UnregisterableListener quitListener = new PlayerQuitDuringGameListener(this);
-        final UnregisterableListener merchantListener = new MerchantInteractListener(this);
+        final UnregisterableListener merchantListener = new ShopMerchantListener(this);
         final UnregisterableListener entityDamageListener = new EntityDamageListener(this);
         final UnregisterableListener hungerLossListener = new HungerLossListener(this);
         final UnregisterableListener spectatorInteractListener = new SpectatorsInteractListener(this);
@@ -277,6 +316,7 @@ public abstract class ActiveGame {
         final UnregisterableListener fireballInteract = new PlayerFireballInteractListener(this);
         final UnregisterableListener explosionListener = new ExplosionListener(this);
         final UnregisterableListener shopListener = new ShopInteractListener(this);
+        final UnregisterableListener upgradeMerchant = new UpgradeMerchantListener(this);
 
         plugin.getServer().getPluginManager().registerEvents(mapProtectionListener, plugin);
         plugin.getServer().getPluginManager().registerEvents(mapIllegalMovementsListener, plugin);
@@ -292,6 +332,7 @@ public abstract class ActiveGame {
         plugin.getServer().getPluginManager().registerEvents(fireballInteract, plugin);
         plugin.getServer().getPluginManager().registerEvents(explosionListener, plugin);
         plugin.getServer().getPluginManager().registerEvents(shopListener, plugin);
+        plugin.getServer().getPluginManager().registerEvents(upgradeMerchant, plugin);
 
         unregisterableListeners.add(mapIllegalMovementsListener);
         unregisterableListeners.add(mapProtectionListener);
@@ -307,6 +348,7 @@ public abstract class ActiveGame {
         unregisterableListeners.add(fireballInteract);
         unregisterableListeners.add(explosionListener);
         unregisterableListeners.add(shopListener);
+        unregisterableListeners.add(upgradeMerchant);
     }
 
     public final void unregisterAllListeners() {
@@ -454,7 +496,7 @@ public abstract class ActiveGame {
                 map.put(item, level - 1);
                 final ItemStack downgradedItem = lvls.get(level - 1).getCachedGameStack();
                 GameUtils.upgradePlayerStack(player, lvls.get(level).getCachedGameStack(), downgradedItem);
-                this.associatedGui.get(player).setItem(item.getSlot(), downgradedItem);
+                this.associatedShopGUI.get(player).setItem(item.getSlot(), downgradedItem);
                 player.updateInventory();
             }
         }
@@ -525,8 +567,17 @@ public abstract class ActiveGame {
         return inventory;
     }
 
+    public void openUpgrade(final Player player) {
+        Inventory associated = associatedUpgradeGUI.get(player);
+        if (associated == null) {
+            associated = cloneInventory(Objects.requireNonNull(defaultUpgradeInv, "Illegal null upgrade inv has been created."));
+            associatedUpgradeGUI.put(player, associated);
+        }
+        player.openInventory(associated);
+    }
+
     public void openShop(final Player player) {
-        Inventory associated = associatedGui.get(player);
+        Inventory associated = associatedShopGUI.get(player);
         if (associated == null) { // initializing inventory for player.
             associated = cloneInventory(Objects.requireNonNull(defaultShopInv, "Illegal null inventory has been created."));
 
@@ -545,7 +596,7 @@ public abstract class ActiveGame {
                     break;
                 }
             }
-            associatedGui.put(player, associated);
+            associatedShopGUI.put(player, associated);
         }
         player.openInventory(associated);
     }
@@ -662,11 +713,15 @@ public abstract class ActiveGame {
         return scoreboardHandler;
     }
 
-    public Map<Player, Inventory> getAssociatedGui() {
-        return associatedGui;
+    public Map<Player, Inventory> getAssociatedShopGUI() {
+        return associatedShopGUI;
     }
 
     public Map<Player, Map<UpgradeItem, Integer>> getPlayerUpgradeLevelsMap() {
         return playerUpgradeLevelsMap;
+    }
+
+    public Map<Player, Inventory> getAssociatedUpgradeGUI() {
+        return associatedUpgradeGUI;
     }
 }

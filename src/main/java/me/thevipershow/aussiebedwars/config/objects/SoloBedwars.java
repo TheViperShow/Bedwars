@@ -6,14 +6,15 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import me.thevipershow.aussiebedwars.bedwars.Gamemode;
 import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
+import me.thevipershow.aussiebedwars.config.objects.upgradeshop.UpgradeShop;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
 
 @SerializableAs("Solo")
 public class SoloBedwars extends BedwarsGame implements ConfigurationSerializable {
 
-    protected SoloBedwars(Gamemode gamemode, int minGames, int maxGames, int minPlayers, int players, List<BedwarsTeam> teams, SpawnPosition lobbySpawn, String mapFilename, Set<TeamSpawnPosition> mapSpawns, List<Spawner> spawners, List<Merchant> merchants, Shop shop, int startTimer) {
-        super(gamemode, minGames, maxGames, minPlayers, players, teams, lobbySpawn, mapFilename, mapSpawns, spawners, merchants, shop, startTimer);
+    protected SoloBedwars(Gamemode gamemode, int minGames, int maxGames, int minPlayers, int players, List<BedwarsTeam> teams, SpawnPosition lobbySpawn, String mapFilename, Set<TeamSpawnPosition> mapSpawns, List<Spawner> spawners, List<Merchant> merchants, Shop shop, UpgradeShop upgradeShop, int startTimer) {
+        super(gamemode, minGames, maxGames, minPlayers, players, teams, lobbySpawn, mapFilename, mapSpawns, spawners, merchants, shop, upgradeShop, startTimer);
     }
 
     @Override
@@ -49,8 +50,8 @@ public class SoloBedwars extends BedwarsGame implements ConfigurationSerializabl
                 .collect(Collectors.toList());
         Map<String, Object> shopSection = (Map<String, Object>) objectMap.get("shop");
         Shop shop = Shop.deserialize(shopSection);
-
-        return new SoloBedwars(Gamemode.SOLO, minGames, maxGames, minPlayers, players, actualTeams, mapLobbySpawnPos, filename, mapSpawnPos, spawnerList, merchantsList, shop, startTimer);
+        UpgradeShop upgradeShop = UpgradeShop.deserialize((Map<String, Object>) objectMap.get("upgrades"));
+        return new SoloBedwars(Gamemode.SOLO, minGames, maxGames, minPlayers, players, actualTeams, mapLobbySpawnPos, filename, mapSpawnPos, spawnerList, merchantsList, shop, upgradeShop, startTimer);
     }
 
 }

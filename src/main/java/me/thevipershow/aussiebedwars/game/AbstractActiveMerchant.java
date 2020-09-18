@@ -1,26 +1,16 @@
 package me.thevipershow.aussiebedwars.game;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
-import me.thevipershow.aussiebedwars.config.objects.BedwarsGame;
-import me.thevipershow.aussiebedwars.config.objects.Enchantment;
 import me.thevipershow.aussiebedwars.config.objects.Merchant;
 import me.thevipershow.aussiebedwars.config.objects.ShopItem;
-import me.thevipershow.aussiebedwars.config.objects.UpgradeItem;
 import me.thevipershow.aussiebedwars.config.objects.UpgradeLevel;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Villager;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 public abstract class AbstractActiveMerchant {
 

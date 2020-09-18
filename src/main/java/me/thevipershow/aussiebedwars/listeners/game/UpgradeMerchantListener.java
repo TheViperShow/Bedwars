@@ -1,5 +1,6 @@
 package me.thevipershow.aussiebedwars.listeners.game;
 
+import me.thevipershow.aussiebedwars.bedwars.objects.shops.MerchantType;
 import me.thevipershow.aussiebedwars.game.AbstractActiveMerchant;
 import me.thevipershow.aussiebedwars.game.ActiveGame;
 import me.thevipershow.aussiebedwars.listeners.UnregisterableListener;
@@ -11,11 +12,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 
-public final class MerchantInteractListener extends UnregisterableListener {
+public final class UpgradeMerchantListener extends UnregisterableListener {
 
     private final ActiveGame activeGame;
 
-    public MerchantInteractListener(ActiveGame activeGame) {
+    public UpgradeMerchantListener(ActiveGame activeGame) {
         this.activeGame = activeGame;
     }
 
@@ -32,7 +33,7 @@ public final class MerchantInteractListener extends UnregisterableListener {
 
         for (final AbstractActiveMerchant activeMerchant : activeGame.getActiveMerchants()) {
             final Villager activeMerchantVillager = activeMerchant.getVillager();
-            if (activeMerchantVillager == villager) {
+            if (activeMerchantVillager == villager && activeMerchant.getMerchant().getMerchantType() == MerchantType.UPGRADE) {
                 aMerchant = activeMerchant;
                 break;
             }
@@ -41,6 +42,6 @@ public final class MerchantInteractListener extends UnregisterableListener {
         if (aMerchant == null) return;
 
         event.setCancelled(true);
-        activeGame.openShop(p);
+        activeGame.openUpgrade(p);
     }
 }

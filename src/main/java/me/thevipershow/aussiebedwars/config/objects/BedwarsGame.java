@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 import me.thevipershow.aussiebedwars.bedwars.Gamemode;
 import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
+import me.thevipershow.aussiebedwars.config.objects.upgradeshop.UpgradeShop;
 
 public abstract class BedwarsGame {
 
@@ -20,6 +21,7 @@ public abstract class BedwarsGame {
     protected final List<Spawner> spawners;
     protected final List<Merchant> merchants;
     protected final Shop shop;
+    protected final UpgradeShop upgradeShop;
     protected final int startTimer;
 
     protected BedwarsGame(
@@ -35,7 +37,7 @@ public abstract class BedwarsGame {
             List<Spawner> spawners,
             List<Merchant> merchants,
             Shop shop,
-            int startTimer) {
+            UpgradeShop upgradeShop, int startTimer) {
         this.gamemode = gamemode;
         this.minGames = minGames;
         this.maxGames = maxGames;
@@ -48,6 +50,7 @@ public abstract class BedwarsGame {
         this.spawners = spawners;
         this.merchants = merchants;
         this.shop = shop;
+        this.upgradeShop = upgradeShop;
         this.startTimer = startTimer;
     }
 
@@ -108,5 +111,9 @@ public abstract class BedwarsGame {
 
     public int getStartTimer() {
         return startTimer;
+    }
+
+    public UpgradeShop getUpgradeShop() {
+        return upgradeShop;
     }
 }
