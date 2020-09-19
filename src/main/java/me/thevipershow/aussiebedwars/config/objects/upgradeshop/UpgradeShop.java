@@ -13,9 +13,10 @@ public final class UpgradeShop implements ConfigurationSerializable {
     private final DragonBuffUpgrade dragonBuffUpgrade;
     private final int slots;
 
-    public UpgradeShop(SharpnessUpgrade sharpnessUpgrade, ReinforcedArmorUpgrade reinforcedArmorUpgrade,
-                       ManiacMinerUpgrade maniacMinerUpgrade, IronForgeUpgrade ironForgeUpgrade,
-                       HealPoolUpgrade healPoolUpgrade, DragonBuffUpgrade dragonBuffUpgrade, int slots) {
+    public UpgradeShop(final SharpnessUpgrade sharpnessUpgrade, final ReinforcedArmorUpgrade reinforcedArmorUpgrade,
+                       final ManiacMinerUpgrade maniacMinerUpgrade, final IronForgeUpgrade ironForgeUpgrade,
+                       final HealPoolUpgrade healPoolUpgrade, final DragonBuffUpgrade dragonBuffUpgrade,
+                       final int slots) {
         this.sharpnessUpgrade = sharpnessUpgrade;
         this.reinforcedArmorUpgrade = reinforcedArmorUpgrade;
         this.maniacMinerUpgrade = maniacMinerUpgrade;

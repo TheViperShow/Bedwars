@@ -1,8 +1,8 @@
-solo:
+duo:
   - map-filename: "bedwars-duo"
     start-timer: 15
-    minimum-games: 2
-    maximum-games: 8
+    minimum-games: 1
+    maximum-games: 4
     min-players: 4
     players: 16
     teams:
@@ -432,13 +432,50 @@ solo:
           x: -32.50 # Please set this
           y: 62.0 # Please set this
           z: -93.0 # Plz set this
-    # UPGRADE SHOPS SECTION
-    #  - name: "[AussieBedwars] Upgrades"
-    #    type: "UPGRADE"
-    #    location:
-    #      x: 1.0
-    #      y: 1.0
-    #      z: 1.0
+      # upgrade merchant sections
+      - name: "§7[§eAussieBedwars§7] §eUpgrades"
+        type: "UPGRADE"
+        location:
+          x: 33.50
+          y: 62.0
+          z: -90.0
+      - name: "§7[§eAussieBedwars§7] §eUpgrades"
+        type: "UPGRADE"
+        location:
+          x: 91.00
+          y: 62.0
+          z: -32.50
+      - name: "§7[§eAussieBedwars§7] §eUpgrades"
+        type: "UPGRADE"
+        location:
+          x: 91.50
+          y: 62.0
+          z: 33.50
+      - name: "§7[§eAussieBedwars§7] §eUpgrades"
+        type: "UPGRADE"
+        location:
+          x: -32.50
+          y: 62.0
+          z: 91.0
+      - name: "§7[§eAussieBedwars§7] §eUpgrades"
+        type: "UPGRADE"
+        location:
+          x: -90.0
+          y: 62.0
+          z: 33.50
+      - name: "§7[§eAussieBedwars§7] §eUpgrades"
+        type: "UPGRADE"
+        location:
+          x: -90.0
+          y: 62.0
+          z: -32.50
+      - name: "§7[§eAussieBedwars§7] §eUpgrades"
+        type: "UPGRADE"
+        location:
+          x: -32.50
+          y: 62.0
+          z: -90.0
+    # SHOPS SECTION
     shop:
       title: "{TEAM} Shop"
       slots: 45
@@ -585,7 +622,7 @@ solo:
           price: 2
           buy-with: "DIAMOND"
           lore:
-            - "§7A golden apple."
+            - "§7A gold apple."
         - material: "TNT"
           item-name: "§cDynamite"
           slot: 24
@@ -658,11 +695,175 @@ solo:
             - "§7It will lose one tier upon death."
         - material: "DIAMOND_SWORD"
           item-name: "§b§lDiamond Sword"
-          slot: 42
+          slot: 43
           amount: 1
           price: 8
           buy-with: "GOLD_INGOT"
           lore:
             - "§7Buying this will give you an §b§lDIAMOND §r§7sword."
             - "§7It will lose one tier upon death."
-          # others items below...
+    upgrades:
+      slots: 45
+      sharpness:
+        material: "IRON_SWORD"
+        item-name: "§eSharpened Swords"
+        slot: 10
+        amount: 1
+        price: 2
+        buy-with: "DIAMOND"
+        lore:
+          - "§7Your team permanently gains"
+          - "§7Sharpness effect on their swords"
+          - "§7and axes."
+      reinforced-armor:
+        slot: 11
+        levels:
+          - level: 1
+            material: "IRON_CHESTPLATE"
+            item-name: "§eReinforced Armor I"
+            amount: 1
+            price: 2
+            buy-with: "DIAMOND"
+            lore:
+              - "§7Your team permanently gains"
+              - "§7Protection on all armor pieces!"
+              - ""
+              - "§7Level 1: Protection I"
+              - "§7Level 2: Protection II"
+              - "§7Level 3: Protection III"
+              - "§7Level 3: Protection IV"
+          - level: 2
+            material: "IRON_CHESTPLATE"
+            item-name: "§eReinforced Armor 2"
+            amount: 1
+            price: 4
+            buy-with: "DIAMOND"
+            lore:
+              - "§7Your team permanently gains"
+              - "§7Protection on all armor pieces!"
+              - ""
+              - "§7Level 2: Protection II"
+              - "§7Level 3: Protection III"
+              - "§7Level 3: Protection IV"
+          - level: 3
+            material: "IRON_CHESTPLATE"
+            item-name: "§eReinforced Armor 3"
+            amount: 1
+            price: 8
+            buy-with: "DIAMOND"
+            lore:
+              - "§7Your team permanently gains"
+              - "§7Protection on all armor pieces!"
+              - ""
+              - "§7Level 3: Protection III"
+              - "§7Level 3: Protection IV"
+          - level: 4
+            material: "IRON_CHESTPLATE"
+            item-name: "§eReinforced Armor 4"
+            amount: 1
+            price: 16
+            buy-with: "DIAMOND"
+            lore:
+              - "§7Your team permanently gains"
+              - "§7Protection on all armor pieces!"
+              - ""
+              - "§7Level 3: Protection IV"
+      maniac-miner:
+        slot: 12
+        levels:
+          - level: 1
+            material: "GOLD_PICKAXE"
+            item-name: "§eManiac Miner I"
+            amount: 1
+            price: 2
+            buy-with: "DIAMOND"
+            lore:
+              - "§7All players on your team"
+              - "§7will permanently gain Haste."
+              - ""
+              - "§7Level 1: Haste I"
+              - "§7Level 2: Haste II"
+          - level: 2
+            material: "GOLD_PICKAXE"
+            item-name: "§eManiac Miner II"
+            amount: 1
+            price: 4
+            buy-with: "DIAMOND"
+            lore:
+              - "§7All players on your team"
+              - "§7will permanently gain Haste."
+              - ""
+              - "§7Level 2: Haste II"
+      iron-forge:
+        slot: 13
+        levels:
+          - level: 1
+            material: "FURNACE"
+            item-name: "§eIron Forge I"
+            amount: 1
+            price: 2
+            buy-with: "DIAMOND"
+            lore:
+              - "§7Upgrade resource spawning on"
+              - "§7your island."
+              - ""
+              - "§7Tier 1: +50% Resources"
+              - "§7Tier 2: +100% Resources"
+              - "§7Tier 3: +150% Resources"
+              - "§7Tier 4: +200% Resources"
+          - level: 2
+            material: "FURNACE"
+            item-name: "§eIron Forge II"
+            amount: 1
+            price: 4
+            buy-with: "DIAMOND"
+            lore:
+              - "§7Upgrade resource spawning on"
+              - "§7your island."
+              - ""
+              - "§7Tier 2: +100% Resources"
+              - "§7Tier 3: +150% Resources"
+              - "§7Tier 4: +200% Resources"
+          - level: 3
+            material: "FURNACE"
+            item-name: "§eIron Forge III"
+            amount: 1
+            price: 6
+            buy-with: "DIAMOND"
+            lore:
+              - "§7Upgrade resource spawning on"
+              - "§7your island."
+              - ""
+              - "§7Tier 3: +150% Resources"
+              - "§7Tier 4: +200% Resources"
+          - level: 4
+            material: "FURNACE"
+            item-name: "§eIron Forge IV"
+            amount: 1
+            price: 8
+            buy-with: "DIAMOND"
+            lore:
+              - "§7Upgrade resource spawning on"
+              - "§7your island."
+              - ""
+              - "§7Tier 4: +200% Resources"
+      heal-pool:
+        material: "BEACON"
+        slot: 14
+        item-name: "§eHeal Pool"
+        amount: 1
+        price: 1
+        buy-with: "DIAMOND"
+        lore:
+          - "§7Creates a Regeneration field"
+          - "§7around your base!"
+      dragon-buff:
+        material: "DRAGON_EGG"
+        slot: 15
+        item-name: "§eDragon Boost"
+        amount: 1
+        price: 5
+        buy-with: "DIAMOND"
+        lore:
+          - "§7Your team will have 2 dragons"
+          - "§7instead of 1 during death-match!"

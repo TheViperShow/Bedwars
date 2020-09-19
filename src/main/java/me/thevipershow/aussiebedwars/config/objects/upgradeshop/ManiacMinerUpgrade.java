@@ -3,7 +3,6 @@ package me.thevipershow.aussiebedwars.config.objects.upgradeshop;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import me.thevipershow.aussiebedwars.config.objects.ShopItem;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
 public final class ManiacMinerUpgrade implements ConfigurationSerializable {
@@ -13,21 +12,28 @@ public final class ManiacMinerUpgrade implements ConfigurationSerializable {
         throw new UnsupportedOperationException("no");
     }
 
-    private final List<ShopItem> levels;
+    private final int slot;
+    private final List<UpgradeShopItem> levels;
 
-    public ManiacMinerUpgrade(List<ShopItem> levels) {
+    public ManiacMinerUpgrade(int slot, List<UpgradeShopItem> levels) {
+        this.slot = slot;
         this.levels = levels;
     }
 
     public static ManiacMinerUpgrade deserialize(final Map<String, Object> map) {
+        final int slot = (int) map.get("slot");
         return new ManiacMinerUpgrade(
-                ((List<Map<String, Object>>) map.get("levels"))
-                        .stream().map(ShopItem::deserialize)
+                slot, ((List<Map<String, Object>>) map.get("levels"))
+                        .stream().map(UpgradeShopItem::deserialize)
                         .collect(Collectors.toList())
         );
     }
 
-    public List<ShopItem> getLevels() {
+    public int getSlot() {
+        return slot;
+    }
+
+    public List<UpgradeShopItem> getLevels() {
         return levels;
     }
 }

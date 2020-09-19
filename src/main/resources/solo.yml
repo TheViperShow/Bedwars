@@ -622,7 +622,7 @@ solo:
           price: 2
           buy-with: "DIAMOND"
           lore:
-            - "§7A golden apple."
+            - "§7A gold apple."
         - material: "TNT"
           item-name: "§cDynamite"
           slot: 24
@@ -695,14 +695,13 @@ solo:
             - "§7It will lose one tier upon death."
         - material: "DIAMOND_SWORD"
           item-name: "§b§lDiamond Sword"
-          slot: 42
+          slot: 43
           amount: 1
           price: 8
           buy-with: "GOLD_INGOT"
           lore:
             - "§7Buying this will give you an §b§lDIAMOND §r§7sword."
             - "§7It will lose one tier upon death."
-          # others items below...
     upgrades:
       slots: 45
       sharpness:
@@ -715,13 +714,13 @@ solo:
         lore:
           - "§7Your team permanently gains"
           - "§7Sharpness effect on their swords"
-          - "§and axes."
+          - "§7and axes."
       reinforced-armor:
+        slot: 11
         levels:
           - level: 1
             material: "IRON_CHESTPLATE"
             item-name: "§eReinforced Armor I"
-            slot: 11
             amount: 1
             price: 2
             buy-with: "DIAMOND"
@@ -736,7 +735,6 @@ solo:
           - level: 2
             material: "IRON_CHESTPLATE"
             item-name: "§eReinforced Armor 2"
-            slot: 11
             amount: 1
             price: 4
             buy-with: "DIAMOND"
@@ -750,7 +748,6 @@ solo:
           - level: 3
             material: "IRON_CHESTPLATE"
             item-name: "§eReinforced Armor 3"
-            slot: 11
             amount: 1
             price: 8
             buy-with: "DIAMOND"
@@ -763,7 +760,6 @@ solo:
           - level: 4
             material: "IRON_CHESTPLATE"
             item-name: "§eReinforced Armor 4"
-            slot: 11
             amount: 1
             price: 16
             buy-with: "DIAMOND"
@@ -773,11 +769,11 @@ solo:
               - ""
               - "§7Level 3: Protection IV"
       maniac-miner:
+        slot: 12
         levels:
           - level: 1
-            material: "GOLDEN_PICKAXE"
+            material: "GOLD_PICKAXE"
             item-name: "§eManiac Miner I"
-            slot: 12
             amount: 1
             price: 2
             buy-with: "DIAMOND"
@@ -788,9 +784,8 @@ solo:
               - "§7Level 1: Haste I"
               - "§7Level 2: Haste II"
           - level: 2
-            material: "GOLDEN_PICKAXE"
+            material: "GOLD_PICKAXE"
             item-name: "§eManiac Miner II"
-            slot: 12
             amount: 1
             price: 4
             buy-with: "DIAMOND"
@@ -800,11 +795,11 @@ solo:
               - ""
               - "§7Level 2: Haste II"
       iron-forge:
+        slot: 13
         levels:
           - level: 1
             material: "FURNACE"
             item-name: "§eIron Forge I"
-            slot: 13
             amount: 1
             price: 2
             buy-with: "DIAMOND"
@@ -819,7 +814,6 @@ solo:
           - level: 2
             material: "FURNACE"
             item-name: "§eIron Forge II"
-            slot: 13
             amount: 1
             price: 4
             buy-with: "DIAMOND"
@@ -833,7 +827,6 @@ solo:
           - level: 3
             material: "FURNACE"
             item-name: "§eIron Forge III"
-            slot: 13
             amount: 1
             price: 6
             buy-with: "DIAMOND"
@@ -846,7 +839,6 @@ solo:
           - level: 4
             material: "FURNACE"
             item-name: "§eIron Forge IV"
-            slot: 13
             amount: 1
             price: 8
             buy-with: "DIAMOND"

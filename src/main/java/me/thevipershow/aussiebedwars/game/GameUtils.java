@@ -7,6 +7,7 @@ import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.aussiebedwars.config.objects.Merchant;
 import me.thevipershow.aussiebedwars.config.objects.TeamSpawnPosition;
 import me.thevipershow.aussiebedwars.listeners.game.ArmorSet;
+import net.minecraft.server.v1_8_R3.Items;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
 import net.minecraft.server.v1_8_R3.PlayerConnection;
 import org.apache.commons.lang3.ObjectUtils;
@@ -296,6 +297,16 @@ public final class GameUtils {
                 return new UpgradeActiveMerchant(activeGame, merchant, findMerchantTeam(merchant, activeGame));
         }
         return null;
+    }
+
+    public static void printInventory(final Inventory inventory) {
+        System.out.println(inventory.getTitle());
+        final ItemStack[] contents = inventory.getContents();
+        for (int i = 0; i < contents.length; i++) {
+            final ItemStack s = contents[i];
+            if (s == null) continue;
+            System.out.println("Slot: " + i + " Type: " + s.getType().name());
+        }
     }
 
     public static void replaceIfPresent(final ItemStack toGive, final Material toReplace, final Player player) {

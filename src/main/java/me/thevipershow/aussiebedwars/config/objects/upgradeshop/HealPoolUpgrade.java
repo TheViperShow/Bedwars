@@ -6,7 +6,6 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
 public final class HealPoolUpgrade implements ConfigurationSerializable {
 
-
     @Override
     public Map<String, Object> serialize() {
         throw new UnsupportedOperationException("no");

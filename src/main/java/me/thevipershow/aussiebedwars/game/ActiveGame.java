@@ -27,6 +27,7 @@ import me.thevipershow.aussiebedwars.config.objects.upgradeshop.ManiacMinerUpgra
 import me.thevipershow.aussiebedwars.config.objects.upgradeshop.ReinforcedArmorUpgrade;
 import me.thevipershow.aussiebedwars.config.objects.upgradeshop.SharpnessUpgrade;
 import me.thevipershow.aussiebedwars.config.objects.upgradeshop.UpgradeShop;
+import me.thevipershow.aussiebedwars.config.objects.upgradeshop.UpgradeShopItem;
 import me.thevipershow.aussiebedwars.listeners.UnregisterableListener;
 import me.thevipershow.aussiebedwars.listeners.game.ArmorSet;
 import me.thevipershow.aussiebedwars.listeners.game.BedBreakListener;
@@ -37,12 +38,13 @@ import me.thevipershow.aussiebedwars.listeners.game.HungerLossListener;
 import me.thevipershow.aussiebedwars.listeners.game.LobbyCompassListener;
 import me.thevipershow.aussiebedwars.listeners.game.MapIllegalMovementsListener;
 import me.thevipershow.aussiebedwars.listeners.game.MapProtectionListener;
-import me.thevipershow.aussiebedwars.listeners.game.ShopMerchantListener;
 import me.thevipershow.aussiebedwars.listeners.game.PlayerFireballInteractListener;
 import me.thevipershow.aussiebedwars.listeners.game.PlayerQuitDuringGameListener;
 import me.thevipershow.aussiebedwars.listeners.game.ShopInteractListener;
+import me.thevipershow.aussiebedwars.listeners.game.ShopMerchantListener;
 import me.thevipershow.aussiebedwars.listeners.game.SpectatorsInteractListener;
 import me.thevipershow.aussiebedwars.listeners.game.TNTPlaceListener;
+import me.thevipershow.aussiebedwars.listeners.game.UpgradeInteractListener;
 import me.thevipershow.aussiebedwars.listeners.game.UpgradeMerchantListener;
 import me.thevipershow.aussiebedwars.worlds.WorldsManager;
 import me.tigerhix.lib.scoreboard.common.EntryBuilder;
@@ -63,6 +65,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.scheduler.BukkitTask;
 
 public abstract class ActiveGame {
@@ -159,8 +162,8 @@ public abstract class ActiveGame {
     }
 
     protected final Inventory setupShopGUIs() {
-        final Inventory inv = Bukkit.createInventory(null, bedwarsGame.getShop().getSlots(), "§7[§eAussieBedwars§7] §eShop");
         final Shop shop = bedwarsGame.getShop();
+        final Inventory inv = Bukkit.createInventory(null, shop.getSlots(), "§7[§eAussieBedwars§7] §eShop");
 
         for (final int glassSlot : shop.getGlassSlots()) {
             final ItemStack glass = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) shop.getGlassColor());
@@ -172,7 +175,7 @@ public abstract class ActiveGame {
         }
 
         for (final ShopItem item : shop.getItems()) {
-            final ItemStack stack = item.getCachedFancyStack(); // <-
+            final ItemStack stack = item.generateFancyStack(); // <-
             shopItemStacks.put(stack, item);
             inv.setItem(item.getSlot(), stack);
         }
@@ -188,31 +191,31 @@ public abstract class ActiveGame {
     }
 
     public final Inventory setupUpgradeGUIs() {
-        final Inventory inv = Bukkit.createInventory(null, bedwarsGame.getUpgradeShop().getSlots(), "§7[§eAussieBedwars§7] §eUpgrades");
+        final Inventory upgradeInv = Bukkit.createInventory(null, bedwarsGame.getUpgradeShop().getSlots(), "§7[§eAussieBedwars§7] §eUpgrades");
         final UpgradeShop upgradeShop = bedwarsGame.getUpgradeShop();
 
-        DragonBuffUpgrade dragonBuffUpgrade = upgradeShop.getDragonBuffUpgrade();
-        HealPoolUpgrade healPoolUpgrade = upgradeShop.getHealPoolUpgrade();
-        IronForgeUpgrade ironForgeUpgrade = upgradeShop.getIronForgeUpgrade();
-        ManiacMinerUpgrade maniacMinerUpgrade = upgradeShop.getManiacMinerUpgrade();
-        ReinforcedArmorUpgrade reinforcedArmorUpgrade = upgradeShop.getReinforcedArmorUpgrade();
-        SharpnessUpgrade sharpnessUpgrade = upgradeShop.getSharpnessUpgrade();
+        final DragonBuffUpgrade dragonBuffUpgrade = upgradeShop.getDragonBuffUpgrade();
+        final HealPoolUpgrade healPoolUpgrade = upgradeShop.getHealPoolUpgrade();
+        final IronForgeUpgrade ironForgeUpgrade = upgradeShop.getIronForgeUpgrade();
+        final ManiacMinerUpgrade maniacMinerUpgrade = upgradeShop.getManiacMinerUpgrade();
+        final ReinforcedArmorUpgrade reinforcedArmorUpgrade = upgradeShop.getReinforcedArmorUpgrade();
+        final SharpnessUpgrade sharpnessUpgrade = upgradeShop.getSharpnessUpgrade();
 
         final ShopItem dragonBuffItem = dragonBuffUpgrade.getShopItem();
         final ShopItem healPoolItem = healPoolUpgrade.getItem();
-        final ShopItem ironForgeItem = ironForgeUpgrade.getLevels().get(0);
-        final ShopItem maniacMinerItem = maniacMinerUpgrade.getLevels().get(0);
-        final ShopItem reinforcedArmorItem = reinforcedArmorUpgrade.getLevels().get(0);
+        final UpgradeShopItem ironForgeItem = ironForgeUpgrade.getLevels().get(0);
+        final UpgradeShopItem maniacMinerItem = maniacMinerUpgrade.getLevels().get(0);
+        final UpgradeShopItem reinforcedArmorItem = reinforcedArmorUpgrade.getLevels().get(0);
         final ShopItem sharpnessItem = sharpnessUpgrade.getItem();
 
-        inv.setItem(dragonBuffItem.getSlot(), dragonBuffItem.getCachedFancyStack());
-        inv.setItem(healPoolItem.getSlot(), healPoolItem.getCachedFancyStack());
-        inv.setItem(ironForgeItem.getSlot(), ironForgeItem.getCachedFancyStack());
-        inv.setItem(maniacMinerItem.getSlot(), maniacMinerItem.getCachedFancyStack());
-        inv.setItem(reinforcedArmorItem.getSlot(), reinforcedArmorItem.getCachedFancyStack());
-        inv.setItem(sharpnessItem.getSlot(), sharpnessItem.getCachedFancyStack());
+        upgradeInv.setItem(dragonBuffItem.getSlot(), dragonBuffItem.generateFancyStack());
+        upgradeInv.setItem(healPoolItem.getSlot(), healPoolItem.generateFancyStack());
+        upgradeInv.setItem(ironForgeUpgrade.getSlot(), ironForgeItem.getCachedFancyStack());
+        upgradeInv.setItem(maniacMinerUpgrade.getSlot(), maniacMinerItem.getCachedFancyStack());
+        upgradeInv.setItem(reinforcedArmorUpgrade.getSlot(), reinforcedArmorItem.getCachedFancyStack());
+        upgradeInv.setItem(sharpnessItem.getSlot(), sharpnessItem.generateFancyStack());
 
-        return inv;
+        return upgradeInv;
     }
 
     protected final ScoreboardHandler scoreboardHandler = new ScoreboardHandler() {
@@ -316,23 +319,27 @@ public abstract class ActiveGame {
         final UnregisterableListener fireballInteract = new PlayerFireballInteractListener(this);
         final UnregisterableListener explosionListener = new ExplosionListener(this);
         final UnregisterableListener shopListener = new ShopInteractListener(this);
-        final UnregisterableListener upgradeMerchant = new UpgradeMerchantListener(this);
+        final UnregisterableListener upgradeMerchantListener = new UpgradeMerchantListener(this);
+        final UnregisterableListener upgradeInteractListener = new UpgradeInteractListener(this);
 
-        plugin.getServer().getPluginManager().registerEvents(mapProtectionListener, plugin);
-        plugin.getServer().getPluginManager().registerEvents(mapIllegalMovementsListener, plugin);
-        plugin.getServer().getPluginManager().registerEvents(bedDestroyListener, plugin);
-        plugin.getServer().getPluginManager().registerEvents(lobbyCompassListener, plugin);
-        plugin.getServer().getPluginManager().registerEvents(deathListener, plugin);
-        plugin.getServer().getPluginManager().registerEvents(quitListener, plugin);
-        plugin.getServer().getPluginManager().registerEvents(merchantListener, plugin);
-        plugin.getServer().getPluginManager().registerEvents(entityDamageListener, plugin);
-        plugin.getServer().getPluginManager().registerEvents(hungerLossListener, plugin);
-        plugin.getServer().getPluginManager().registerEvents(spectatorInteractListener, plugin);
-        plugin.getServer().getPluginManager().registerEvents(tntPlaceListener, plugin);
-        plugin.getServer().getPluginManager().registerEvents(fireballInteract, plugin);
-        plugin.getServer().getPluginManager().registerEvents(explosionListener, plugin);
-        plugin.getServer().getPluginManager().registerEvents(shopListener, plugin);
-        plugin.getServer().getPluginManager().registerEvents(upgradeMerchant, plugin);
+        final PluginManager pluginManager = plugin.getServer().getPluginManager();
+
+        pluginManager.registerEvents(mapProtectionListener, plugin);
+        pluginManager.registerEvents(mapIllegalMovementsListener, plugin);
+        pluginManager.registerEvents(bedDestroyListener, plugin);
+        pluginManager.registerEvents(lobbyCompassListener, plugin);
+        pluginManager.registerEvents(deathListener, plugin);
+        pluginManager.registerEvents(quitListener, plugin);
+        pluginManager.registerEvents(merchantListener, plugin);
+        pluginManager.registerEvents(entityDamageListener, plugin);
+        pluginManager.registerEvents(hungerLossListener, plugin);
+        pluginManager.registerEvents(spectatorInteractListener, plugin);
+        pluginManager.registerEvents(tntPlaceListener, plugin);
+        pluginManager.registerEvents(fireballInteract, plugin);
+        pluginManager.registerEvents(explosionListener, plugin);
+        pluginManager.registerEvents(shopListener, plugin);
+        pluginManager.registerEvents(upgradeMerchantListener, plugin);
+        pluginManager.registerEvents(upgradeInteractListener, plugin);
 
         unregisterableListeners.add(mapIllegalMovementsListener);
         unregisterableListeners.add(mapProtectionListener);
@@ -348,7 +355,8 @@ public abstract class ActiveGame {
         unregisterableListeners.add(fireballInteract);
         unregisterableListeners.add(explosionListener);
         unregisterableListeners.add(shopListener);
-        unregisterableListeners.add(upgradeMerchant);
+        unregisterableListeners.add(upgradeMerchantListener);
+        unregisterableListeners.add(upgradeInteractListener);
     }
 
     public final void unregisterAllListeners() {
@@ -570,7 +578,7 @@ public abstract class ActiveGame {
     public void openUpgrade(final Player player) {
         Inventory associated = associatedUpgradeGUI.get(player);
         if (associated == null) {
-            associated = cloneInventory(Objects.requireNonNull(defaultUpgradeInv, "Illegal null upgrade inv has been created."));
+            associated = cloneInventory(Objects.requireNonNull(this.defaultUpgradeInv, "Illegal null upgrade inv has been created."));
             associatedUpgradeGUI.put(player, associated);
         }
         player.openInventory(associated);
@@ -578,150 +586,154 @@ public abstract class ActiveGame {
 
     public void openShop(final Player player) {
         Inventory associated = associatedShopGUI.get(player);
-        if (associated == null) { // initializing inventory for player.
-            associated = cloneInventory(Objects.requireNonNull(defaultShopInv, "Illegal null inventory has been created."));
+        if (associated == null) { // initializing inventory for player since it was not found.
+            associated = cloneInventory(Objects.requireNonNull(this.defaultShopInv, "Illegal null inventory has been created."));
 
             final BedwarsTeam pTeam = getPlayerTeam(player);
             final ItemStack[] contents = player.getInventory().getContents();
-            for (int i = 0; i < contents.length; i++) {
-                final ItemStack c = contents[i];
-                if (c == null) continue;
-                if (c.getType() == Material.WOOL) {
-                    c.setDurability(pTeam.getWoolColor());
-                    final ItemMeta m = c.getItemMeta();
-                    m.setDisplayName("§" + pTeam.getColorCode() + "§l" + pTeam.name() + " §7Wool");
-                    m.setLore(Collections.singletonList("§7Your team's wool."));
-                    c.setItemMeta(m);
-                    associated.setItem(i, c);
-                    break;
+
+            if (pTeam != null) {
+                for (int i = 0; i < contents.length; i++) {
+                    final ItemStack stack = contents[i];
+                    if (stack != null && stack.getType() == Material.WOOL) {
+                        stack.setDurability(pTeam.getWoolColor());
+                        associated.setItem(i, stack);
+                        System.out.println("Set the wool color as " + pTeam.getWoolColor() + " for team " + pTeam.name());
+                        break;
+                    }
                 }
             }
-            associatedShopGUI.put(player, associated);
+
+            this.associatedShopGUI.put(player, associated);
         }
         player.openInventory(associated);
     }
 
-    public Inventory getDefaultShopInv() {
+    public final Inventory getDefaultShopInv() {
         return defaultShopInv;
     }
 
-    public Map<ItemStack, ShopItem> getShopItemStacks() {
+    public final Map<ItemStack, ShopItem> getShopItemStacks() {
         return shopItemStacks;
     }
 
-    public Map<ItemStack, UpgradeItem> getUpgradeItemStacks() {
+    public final Map<ItemStack, UpgradeItem> getUpgradeItemStacks() {
         return upgradeItemStacks;
     }
 
-    public List<UnregisterableListener> getUnregisterableListeners() {
+    public final List<UnregisterableListener> getUnregisterableListeners() {
         return unregisterableListeners;
     }
 
-    public BedwarsGame getBedwarsGame() {
+    public final BedwarsGame getBedwarsGame() {
         return bedwarsGame;
     }
 
-    public String getAssociatedWorldFilename() {
+    public final String getAssociatedWorldFilename() {
         return associatedWorldFilename;
     }
 
-    public Location getCachedWaitingLocation() {
+    public final Location getCachedWaitingLocation() {
         return cachedWaitingLocation;
     }
 
-    public World getAssociatedWorld() {
+    public final World getAssociatedWorld() {
         return associatedWorld;
     }
 
-    public List<Block> getPlayerPlacedBlocks() {
+    public final List<Block> getPlayerPlacedBlocks() {
         return playerPlacedBlocks;
     }
 
-    public World getLobbyWorld() {
+    public final World getLobbyWorld() {
         return lobbyWorld;
     }
 
-    public List<Player> getPlayersOutOfGame() {
+    public final List<Player> getPlayersOutOfGame() {
         return playersOutOfGame;
     }
 
-    public SwordUpgrades getSwordUpgrades() {
+    public final SwordUpgrades getSwordUpgrades() {
         return swordUpgrades;
     }
 
-    public Location getCachedLobbySpawnLocation() {
+    public final Location getCachedLobbySpawnLocation() {
         return cachedLobbySpawnLocation;
     }
 
-    public Plugin getPlugin() {
+    public final Plugin getPlugin() {
         return plugin;
     }
 
-    public AbstractQueue<Player> getAssociatedQueue() {
+    public final AbstractQueue<Player> getAssociatedQueue() {
         return associatedQueue;
     }
 
-    public Set<ActiveSpawner> getActiveSpawners() {
+    public final Set<ActiveSpawner> getActiveSpawners() {
         return activeSpawners;
     }
 
-    public List<AbstractActiveMerchant> getActiveMerchants() {
+    public final List<AbstractActiveMerchant> getActiveMerchants() {
         return activeMerchants;
     }
 
-    public List<BedwarsTeam> getDestroyedTeams() {
+    public final List<BedwarsTeam> getDestroyedTeams() {
         return destroyedTeams;
     }
 
-    public boolean isWinnerDeclared() {
+    public final boolean isWinnerDeclared() {
         return winnerDeclared;
     }
 
-    public boolean isHasStarted() {
+    public final boolean isHasStarted() {
         return hasStarted;
     }
 
-    public Map<BedwarsTeam, List<Player>> getAssignedTeams() {
+    public final Map<BedwarsTeam, List<Player>> getAssignedTeams() {
         return assignedTeams;
     }
 
-    public List<Scoreboard> getActiveScoreboards() {
+    public final List<Scoreboard> getActiveScoreboards() {
         return activeScoreboards;
     }
 
-    public BukkitTask getTimerTask() {
+    public final BukkitTask getTimerTask() {
         return timerTask;
     }
 
-    public void setHasStarted(boolean hasStarted) {
+    public final void setHasStarted(boolean hasStarted) {
         this.hasStarted = hasStarted;
     }
 
-    public Map<Player, ArmorSet> getPlayerSetMap() {
+    public final Map<Player, ArmorSet> getPlayerSetMap() {
         return playerSetMap;
     }
 
-    public GameLobbyTicker getGameLobbyTicker() {
+    public final GameLobbyTicker getGameLobbyTicker() {
         return gameLobbyTicker;
     }
 
-    public Map<String, Integer> getTopKills() {
+    public final Map<String, Integer> getTopKills() {
         return topKills;
     }
 
-    public ScoreboardHandler getScoreboardHandler() {
+    public final ScoreboardHandler getScoreboardHandler() {
         return scoreboardHandler;
     }
 
-    public Map<Player, Inventory> getAssociatedShopGUI() {
+    public final Map<Player, Inventory> getAssociatedShopGUI() {
         return associatedShopGUI;
     }
 
-    public Map<Player, Map<UpgradeItem, Integer>> getPlayerUpgradeLevelsMap() {
+    public final Map<Player, Map<UpgradeItem, Integer>> getPlayerUpgradeLevelsMap() {
         return playerUpgradeLevelsMap;
     }
 
-    public Map<Player, Inventory> getAssociatedUpgradeGUI() {
+    public final Inventory getDefaultUpgradeInv() {
+        return defaultUpgradeInv;
+    }
+
+    public final Map<Player, Inventory> getAssociatedUpgradeGUI() {
         return associatedUpgradeGUI;
     }
 }

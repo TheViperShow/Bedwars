@@ -26,7 +26,7 @@ public class ShopItem implements ConfigurationSerializable {
     private ItemStack cachedGameStack = null;
 
     public ItemStack generateFancyStack() {
-        if (cachedFancyStack != null) return cachedFancyStack;
+        if (cachedFancyStack != null) return cachedFancyStack.clone();
         final ItemStack stack = new ItemStack(material, amount);
         final ItemMeta meta = stack.getItemMeta();
         meta.setDisplayName(itemName);
@@ -35,7 +35,7 @@ public class ShopItem implements ConfigurationSerializable {
         meta.setLore(list);
         stack.setItemMeta(meta);
         this.cachedFancyStack = stack;
-        return cachedFancyStack;
+        return cachedFancyStack.clone();
     }
 
     public ShopItem(String material, int amount, String buyWith, int buyCost, int slot, String itemName, List<String> lore) {
@@ -101,10 +101,6 @@ public class ShopItem implements ConfigurationSerializable {
         this.cachedGameStack = new ItemStack(material, amount);
         return cachedGameStack;
         // return new ItemStack(this.getMaterial(), this.amount);
-    }
-
-    public ItemStack getCachedFancyStack() {
-        return cachedFancyStack;
     }
 
     @Override
