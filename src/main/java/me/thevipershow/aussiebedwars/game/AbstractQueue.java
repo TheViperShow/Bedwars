@@ -61,4 +61,8 @@ public abstract class AbstractQueue<T> {
     public int getMaximumSize() {
         return maximumSize;
     }
+
+    public LinkedList<T> getInQueue() {
+        return inQueue;
+    }
 }

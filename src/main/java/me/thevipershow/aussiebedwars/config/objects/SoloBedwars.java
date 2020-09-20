@@ -13,8 +13,8 @@ import org.bukkit.configuration.serialization.SerializableAs;
 @SerializableAs("Solo")
 public class SoloBedwars extends BedwarsGame implements ConfigurationSerializable {
 
-    protected SoloBedwars(Gamemode gamemode, int minGames, int maxGames, int minPlayers, int players, List<BedwarsTeam> teams, SpawnPosition lobbySpawn, String mapFilename, Set<TeamSpawnPosition> mapSpawns, List<Spawner> spawners, List<Merchant> merchants, Shop shop, UpgradeShop upgradeShop, int startTimer) {
-        super(gamemode, minGames, maxGames, minPlayers, players, teams, lobbySpawn, mapFilename, mapSpawns, spawners, merchants, shop, upgradeShop, startTimer);
+    protected SoloBedwars(Gamemode gamemode, int minGames, int maxGames, int minPlayers, int players, List<BedwarsTeam> teams, SpawnPosition lobbySpawn, String mapFilename, Set<TeamSpawnPosition> mapSpawns, List<Spawner> spawners, List<Merchant> merchants, Shop shop, UpgradeShop upgradeShop, int startTimer, int deathmatchStart) {
+        super(gamemode, minGames, maxGames, minPlayers, players, teams, lobbySpawn, mapFilename, mapSpawns, spawners, merchants, shop, upgradeShop, startTimer, deathmatchStart);
     }
 
     @Override
@@ -27,6 +27,7 @@ public class SoloBedwars extends BedwarsGame implements ConfigurationSerializabl
         int minGames = (int) objectMap.get("minimum-games");
         int maxGames = (int) objectMap.get("maximum-games");
         int players = (int) objectMap.get("players");
+        int deathmatchStart = (int) objectMap.get("deathmatch-start");
         int minPlayers = (int) objectMap.get("min-players");
         int startTimer = (int) objectMap.get("start-timer");
         List<String> teams = (List<String>) objectMap.get("teams");
@@ -51,7 +52,7 @@ public class SoloBedwars extends BedwarsGame implements ConfigurationSerializabl
         Map<String, Object> shopSection = (Map<String, Object>) objectMap.get("shop");
         Shop shop = Shop.deserialize(shopSection);
         UpgradeShop upgradeShop = UpgradeShop.deserialize((Map<String, Object>) objectMap.get("upgrades"));
-        return new SoloBedwars(Gamemode.SOLO, minGames, maxGames, minPlayers, players, actualTeams, mapLobbySpawnPos, filename, mapSpawnPos, spawnerList, merchantsList, shop, upgradeShop, startTimer);
+        return new SoloBedwars(Gamemode.SOLO, minGames, maxGames, minPlayers, players, actualTeams, mapLobbySpawnPos, filename, mapSpawnPos, spawnerList, merchantsList, shop, upgradeShop, startTimer, deathmatchStart);
     }
 
 }

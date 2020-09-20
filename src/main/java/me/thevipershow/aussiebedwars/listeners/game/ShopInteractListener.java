@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import me.thevipershow.aussiebedwars.AussieBedwars;
+import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.aussiebedwars.config.objects.ShopItem;
 import me.thevipershow.aussiebedwars.config.objects.UpgradeItem;
 import me.thevipershow.aussiebedwars.config.objects.UpgradeLevel;
@@ -11,9 +12,11 @@ import me.thevipershow.aussiebedwars.game.ActiveGame;
 import me.thevipershow.aussiebedwars.game.GameUtils;
 import me.thevipershow.aussiebedwars.game.Pair;
 import me.thevipershow.aussiebedwars.listeners.UnregisterableListener;
+import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -54,11 +57,13 @@ public final class ShopInteractListener extends UnregisterableListener {
                             GameUtils.makePlayerPay(player.getInventory(), clickedShopItem.getBuyWith(), clickedShopItem.getBuyCost(), transaction.getA());
                             activeGame.upgradePlayerArmorSet(player, armorType);
                         } else {
+                            GameUtils.buyFailSound(player);
                             player.sendMessage(AussieBedwars.PREFIX + "§7You already have the highest upgrade available.");
                         }
                     } else if (clickedItem.getType().name().endsWith("SWORD")) {
                         final ItemStack prevSword = activeGame.getSwordUpgrades().getPrevious(clickedItem.getType());
                         if (prevSword == null) {
+                            GameUtils.paySound(player);
                             GameUtils.makePlayerPay(player.getInventory(), clickedShopItem.getBuyWith(), clickedShopItem.getBuyCost(), transaction.getA());
                             GameUtils.giveStackToPlayer(clickedShopItem.generateWithoutLore(), player, player.getInventory().getContents());
                         } else { // we should always usually enter this:
@@ -66,6 +71,7 @@ public final class ShopInteractListener extends UnregisterableListener {
                             final ItemStack dupe = GameUtils.hasItemOfType(player, clickedShopItem.getMaterial());
                             final ItemStack toGive = clickedShopItem.generateWithoutLore();
                             if (dupe != null) {
+                                GameUtils.buyFailSound(player);
                                 player.sendMessage(AussieBedwars.PREFIX + "§7You have already picked this sword level.");
                                 return;
                             } else if (search == null) {
@@ -73,13 +79,21 @@ public final class ShopInteractListener extends UnregisterableListener {
                             } else {
                                 GameUtils.upgradePlayerStack(player, search, toGive);
                             }
+                            GameUtils.paySound(player);
                             GameUtils.makePlayerPay(player.getInventory(), clickedShopItem.getBuyWith(), clickedShopItem.getBuyCost(), transaction.getA());
                         }
                     } else {
+                        GameUtils.paySound(player);
+                        final ItemStack toGive = clickedShopItem.generateWithoutLore();
+                        if (toGive.getType() == Material.WOOL) {
+                            final BedwarsTeam pTeam = activeGame.getPlayerTeam(player);
+                            toGive.setDurability(pTeam.getWoolColor());
+                        }
                         GameUtils.makePlayerPay(player.getInventory(), clickedShopItem.getBuyWith(), clickedShopItem.getBuyCost(), transaction.getA());
-                        GameUtils.giveStackToPlayer(clickedShopItem.generateWithoutLore(), player, player.getInventory().getContents());
+                        GameUtils.giveStackToPlayer(toGive, player, player.getInventory().getContents());
                     }
                 } else {
+                    GameUtils.buyFailSound(player);
                     player.sendMessage(AussieBedwars.PREFIX + "§7You did not have enough " + GameUtils.beautifyCaps(clickedShopItem.getBuyWith().name()));
                 }
                 return;
@@ -94,12 +108,14 @@ public final class ShopInteractListener extends UnregisterableListener {
             final Integer currentLevel = playerLevels.get(clickedUpgradeItem);
             if (currentLevel == null) return;
             if (loadedLvls.size() <= currentLevel + 1) {
+                GameUtils.buyFailSound(player);
                 player.sendMessage(AussieBedwars.PREFIX + "§7You already have the highest upgrade available.");
             } else {
                 final UpgradeLevel boughtLevel = clickedUpgradeItem.getLevels().get(currentLevel + 1);
                 final Pair<HashMap<Integer, Integer>, Boolean> transaction = GameUtils.canAfford(player.getInventory(), boughtLevel.getBuyWith(), boughtLevel.getPrice());
 
                 if (!transaction.getB()) {
+                    GameUtils.buyFailSound(player);
                     player.sendMessage(AussieBedwars.PREFIX + "§7You did not have enough " + GameUtils.beautifyCaps(boughtLevel.getBuyWith().name()));
                 } else {
                     GameUtils.makePlayerPay(player.getInventory(), boughtLevel.getBuyWith(), boughtLevel.getPrice(), transaction.getA());
@@ -116,13 +132,14 @@ public final class ShopInteractListener extends UnregisterableListener {
                     }
                     player.updateInventory();
                     playerLevels.computeIfPresent(clickedUpgradeItem, (k, v) -> v = v + 1);
+                    GameUtils.upgradeSound(player);
                     player.sendMessage(AussieBedwars.PREFIX + "§7You successfully upgraded this item to §eLvl. " + (currentLevel + 2));
                 }
             }
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onInventoryClick(final InventoryClickEvent event) {
         final HumanEntity entity = event.getWhoClicked();
         if (!(entity instanceof Player)) return;

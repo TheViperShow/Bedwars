@@ -1,8 +1,10 @@
 package me.thevipershow.aussiebedwars.game.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
@@ -36,25 +38,46 @@ public final class DuoActiveGame extends ActiveGame {
     public void assignTeams() {
         final List<BedwarsTeam> teams = bedwarsGame.getTeams();
         Collections.shuffle(teams);
-        final Iterator<Player> availablePlayers = associatedQueue.getIterator();
-        final Iterator<BedwarsTeam> teamsIterator = teams.iterator();
 
-        label:
-        while (teamsIterator.hasNext()) {
-            final BedwarsTeam currentTeam = teamsIterator.next();
-            int picked = 0;
-            final List<Player> pickedPlayers = new ArrayList<>(2);
-            while (availablePlayers.hasNext() && !(picked > 2)) {
-                final Player player = availablePlayers.next();
-                pickedPlayers.add(player);
-                picked++;
-                if (!availablePlayers.hasNext()) {
-                    assignedTeams.put(currentTeam, pickedPlayers);
-                    break label;
+        final Iterator<BedwarsTeam> teamIterator = teams.iterator();
+        final LinkedList<Player> inQueue = associatedQueue.getInQueue();
+        final int qsize = inQueue.size();
+        final boolean isEven = qsize % 2 == 0;
+        if (isEven) {
+            for (int i = 0; i < 2; i++) {
+                final Player p1 = inQueue.get(i);
+                final Player p2 = inQueue.get(i + 1);
+                assignedTeams.put(teamIterator.next(), Arrays.asList(p1, p2));
+            }
+        } else {
+            for (int i = 0; i < 2; i++) {
+                final Player p1 = inQueue.get(i);
+                if (qsize - 1 < i + 1) {
+                    assignedTeams.put(teamIterator.next(), Collections.singletonList(p1));
+                    break;
+                } else {
+                    final Player p2 = inQueue.get(i + 1);
+                    assignedTeams.put(teamIterator.next(), Arrays.asList(p1, p2));
                 }
             }
-            assignedTeams.put(currentTeam, pickedPlayers);
         }
+
+        //label:
+        //while (teamsIterator.hasNext()) {
+        //   final BedwarsTeam currentTeam = teamsIterator.next();
+        //   int picked = 0;
+        //   final List<Player> pickedPlayers = new ArrayList<>(2);
+        //   while (availablePlayers.hasNext() && !(picked > 2)) {
+        //       final Player player = availablePlayers.next();
+        //       pickedPlayers.add(player);
+        //       picked++;
+        //       if (!availablePlayers.hasNext()) {
+        //           assignedTeams.put(currentTeam, pickedPlayers);
+        //            break label;
+        //        }
+        //    }
+        //    assignedTeams.put(currentTeam, pickedPlayers);
+        //}
 
     }
 

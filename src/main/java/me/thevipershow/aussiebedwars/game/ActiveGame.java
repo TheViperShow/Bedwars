@@ -10,10 +10,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import me.thevipershow.aussiebedwars.AussieBedwars;
 import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
+import me.thevipershow.aussiebedwars.bedwars.objects.spawners.SpawnerType;
+import me.thevipershow.aussiebedwars.bedwars.spawner.SpawnerLevel;
 import me.thevipershow.aussiebedwars.config.objects.BedwarsGame;
 import me.thevipershow.aussiebedwars.config.objects.Merchant;
 import me.thevipershow.aussiebedwars.config.objects.Shop;
@@ -28,6 +31,7 @@ import me.thevipershow.aussiebedwars.config.objects.upgradeshop.ReinforcedArmorU
 import me.thevipershow.aussiebedwars.config.objects.upgradeshop.SharpnessUpgrade;
 import me.thevipershow.aussiebedwars.config.objects.upgradeshop.UpgradeShop;
 import me.thevipershow.aussiebedwars.config.objects.upgradeshop.UpgradeShopItem;
+import me.thevipershow.aussiebedwars.config.objects.upgradeshop.UpgradeType;
 import me.thevipershow.aussiebedwars.listeners.UnregisterableListener;
 import me.thevipershow.aussiebedwars.listeners.game.ArmorSet;
 import me.thevipershow.aussiebedwars.listeners.game.BedBreakListener;
@@ -42,6 +46,7 @@ import me.thevipershow.aussiebedwars.listeners.game.PlayerFireballInteractListen
 import me.thevipershow.aussiebedwars.listeners.game.PlayerQuitDuringGameListener;
 import me.thevipershow.aussiebedwars.listeners.game.ShopInteractListener;
 import me.thevipershow.aussiebedwars.listeners.game.ShopMerchantListener;
+import me.thevipershow.aussiebedwars.listeners.game.SpawnersMultigiveListener;
 import me.thevipershow.aussiebedwars.listeners.game.SpectatorsInteractListener;
 import me.thevipershow.aussiebedwars.listeners.game.TNTPlaceListener;
 import me.thevipershow.aussiebedwars.listeners.game.UpgradeInteractListener;
@@ -80,9 +85,12 @@ public abstract class ActiveGame {
     protected final Location cachedWaitingLocation;
     protected final Map<BedwarsTeam, List<Player>> assignedTeams;
     protected final Set<ActiveSpawner> activeSpawners;
-
     protected final Inventory defaultShopInv;
     protected final Inventory defaultUpgradeInv;
+    protected final AbstractDeathmatch abstractDeathmatch;
+
+    protected ActiveSpawner diamondSampleSpawner = null;
+    protected ActiveSpawner emeraldSampleSpawner = null;
 
     protected final SwordUpgrades swordUpgrades = new SwordUpgrades();
     protected final List<Scoreboard> activeScoreboards = new ArrayList<>();
@@ -98,6 +106,8 @@ public abstract class ActiveGame {
     protected final Map<ItemStack, ShopItem> shopItemStacks = new HashMap<>();
     protected final Map<ItemStack, UpgradeItem> upgradeItemStacks = new HashMap<>();
     protected final Map<Player, Map<UpgradeItem, Integer>> playerUpgradeLevelsMap = new HashMap<>();
+
+    private final Map<UpgradeType, Map<BedwarsTeam, Integer>> upgradesLevelsMap = new HashMap<>();
 
     ///////////////////////////////////////////////////
     // Internal ActiveGame fields                    //
@@ -125,11 +135,11 @@ public abstract class ActiveGame {
                 .map(spawner -> new ActiveSpawner(spawner, this))
                 .collect(Collectors.toSet());
 
-
         registerMapListeners();
         gameLobbyTicker.startTicking();
         this.defaultShopInv = Objects.requireNonNull(setupShopGUIs(), "The default shop inventory was null.");
         this.defaultUpgradeInv = Objects.requireNonNull(setupUpgradeGUIs(), "The default upgrade inventory was null.");
+        this.abstractDeathmatch = GameUtils.deathmatchFromGamemode(bedwarsGame.getGamemode(), this);
     }
 
     protected static List<String> priceDescriptorSection(final ShopItem i) {
@@ -228,11 +238,47 @@ public abstract class ActiveGame {
         @Override
         public List<Entry> getEntries(final Player player) {
             final EntryBuilder builder = new EntryBuilder();
+
             builder.blank();
-            for (BedwarsTeam t : assignedTeams.keySet()) {
+
+            if (diamondSampleSpawner != null) {
+
+                final long lastLevelUp = diamondSampleSpawner.getLastLevelUp();
+
+                if (diamondSampleSpawner.getCurrentLevel().getLevel() >= diamondSampleSpawner.getSpawner().getSpawnerLevels().size()) {
+                    builder.next("§b§lDIAMOND §r§7Spawner (§eMax§7)");
+                } else if (lastLevelUp > 0) {
+                    final long timePassedSinceCreation = (System.currentTimeMillis() - diamondSampleSpawner.getCreationTime()) / 1000;
+                    if (diamondSampleSpawner.getSpawner().getSpawnerLevels().size() >= diamondSampleSpawner.getCurrentLevel().getLevel() + 1) {
+                        final SpawnerLevel nextLevel = diamondSampleSpawner.getSpawner().getSpawnerLevels().get(diamondSampleSpawner.getCurrentLevel().getLevel());
+                        final long untilNextLevel = nextLevel.getAfterSeconds() - timePassedSinceCreation;
+                        builder.next("§b§lDIAMOND §r§7Lvl. §e§l" + GameUtils.toRoman(nextLevel.getLevel()) + " §7in: §e" + untilNextLevel + "§7s");
+                    }
+                }
+            }
+
+            if (emeraldSampleSpawner != null) {
+
+                final long lastLevelUp = emeraldSampleSpawner.getLastLevelUp();
+
+                if (emeraldSampleSpawner.getCurrentLevel().getLevel() >= emeraldSampleSpawner.getSpawner().getSpawnerLevels().size()) {
+                    builder.next("§b§lEMERALD §r§7Spawner (§eMax§7)");
+                } else if (lastLevelUp > 0) {
+                    final long timePassedSinceCreation = (System.currentTimeMillis() - emeraldSampleSpawner.getCreationTime()) / 1000;
+                    if (emeraldSampleSpawner.getSpawner().getSpawnerLevels().size() >= emeraldSampleSpawner.getCurrentLevel().getLevel() + 1) {
+                        final SpawnerLevel nextLevel = emeraldSampleSpawner.getSpawner().getSpawnerLevels().get(emeraldSampleSpawner.getCurrentLevel().getLevel());
+                        final long untilNextLevel = nextLevel.getAfterSeconds() - timePassedSinceCreation;
+                        builder.next("§a§lEMERALD §r§7Lvl. §e§l" + GameUtils.toRoman(nextLevel.getLevel()) + " §7in: §e" + untilNextLevel + "§7s");
+                    }
+                }
+                builder.blank();
+            }
+
+            for (final BedwarsTeam t : assignedTeams.keySet()) {
                 builder.next(" §7Team " + "§l§" + t.getColorCode() + t.name() + getTeamChar(t));
             }
             builder.blank();
+            builder.next(" §emc.aussiebedwars.net");
             return builder.build();
         }
 
@@ -242,11 +288,11 @@ public abstract class ActiveGame {
         associatedQueue.perform(p -> {
             if (p.isOnline() && p.getWorld().equals(associatedWorld)) {
                 if (getPlayerTeam(p) == team) {
-                    p.sendTitle("§e§lYour bed has been broken!", "");
-                    p.playSound(p.getLocation(), Sound.ENDERDRAGON_GROWL, 10.0f, 1.0f);
+                    p.sendTitle("", "§c§lYour bed has been broken!");
                 } else {
-                    p.sendMessage("§" + team.getColorCode() + team.name() + " §7team's bed has been broken!");
+                    p.sendMessage(AussieBedwars.PREFIX + "§" + team.getColorCode() + team.name() + " §7team's bed has been broken!");
                 }
+                p.playSound(p.getLocation(), Sound.ENDERDRAGON_GROWL, 9.0f, 1.0f);
             }
         });
     }
@@ -267,6 +313,7 @@ public abstract class ActiveGame {
         playerSetMap.clear();
         topKills.clear();
         gameLobbyTicker.stopTicking();
+        abstractDeathmatch.stop();
         hasStarted = false;
         destroyMap();
         try {
@@ -321,6 +368,7 @@ public abstract class ActiveGame {
         final UnregisterableListener shopListener = new ShopInteractListener(this);
         final UnregisterableListener upgradeMerchantListener = new UpgradeMerchantListener(this);
         final UnregisterableListener upgradeInteractListener = new UpgradeInteractListener(this);
+        final UnregisterableListener spawnersMultigiveListener = new SpawnersMultigiveListener(this);
 
         final PluginManager pluginManager = plugin.getServer().getPluginManager();
 
@@ -340,6 +388,7 @@ public abstract class ActiveGame {
         pluginManager.registerEvents(shopListener, plugin);
         pluginManager.registerEvents(upgradeMerchantListener, plugin);
         pluginManager.registerEvents(upgradeInteractListener, plugin);
+        pluginManager.registerEvents(spawnersMultigiveListener, plugin);
 
         unregisterableListeners.add(mapIllegalMovementsListener);
         unregisterableListeners.add(mapProtectionListener);
@@ -357,6 +406,7 @@ public abstract class ActiveGame {
         unregisterableListeners.add(shopListener);
         unregisterableListeners.add(upgradeMerchantListener);
         unregisterableListeners.add(upgradeInteractListener);
+        unregisterableListeners.add(spawnersMultigiveListener);
     }
 
     public final void unregisterAllListeners() {
@@ -399,6 +449,7 @@ public abstract class ActiveGame {
                 return;
             }
             assignTeams();
+            fillUpgradeMaps();
             assignScoreboards();
             createSpawners();
             createMerchants();
@@ -407,6 +458,17 @@ public abstract class ActiveGame {
             healAll();
             setupUpgradeLevelsMap();
             announceNoTeaming();
+            abstractDeathmatch.start();
+        }
+    }
+
+    public void fillUpgradeMaps() {
+        for (final UpgradeType type : UpgradeType.values()) {
+            for (final BedwarsTeam team : assignedTeams.keySet()) {
+                final Map<BedwarsTeam, Integer> tempMap = new HashMap<>();
+                tempMap.put(team, 0);
+                this.upgradesLevelsMap.put(type, tempMap);
+            }
         }
     }
 
@@ -484,8 +546,19 @@ public abstract class ActiveGame {
     public abstract void assignScoreboards();
 
     public void createSpawners() {
-        for (final ActiveSpawner activeSpawner : getActiveSpawners())
+        for (final ActiveSpawner activeSpawner : getActiveSpawners()) {
+            if (this.diamondSampleSpawner == null) {
+                if (activeSpawner.getType() == SpawnerType.DIAMOND) {
+                    this.diamondSampleSpawner = activeSpawner;
+                }
+            }
+            if (this.emeraldSampleSpawner == null) {
+                if (activeSpawner.getType() == SpawnerType.EMERALD) {
+                    this.emeraldSampleSpawner = activeSpawner;
+                }
+            }
             activeSpawner.spawn();
+        }
     }
 
     public void upgradePlayerArmorSet(final Player player, final String type) {
@@ -563,7 +636,6 @@ public abstract class ActiveGame {
         return null;
     }
 
-
     public static Inventory cloneInventory(final Inventory inv) {
         final Inventory inventory = Bukkit.createInventory(null, inv.getSize(), inv.getTitle());
         final ItemStack[] originalContents = inv.getContents();
@@ -588,22 +660,6 @@ public abstract class ActiveGame {
         Inventory associated = associatedShopGUI.get(player);
         if (associated == null) { // initializing inventory for player since it was not found.
             associated = cloneInventory(Objects.requireNonNull(this.defaultShopInv, "Illegal null inventory has been created."));
-
-            final BedwarsTeam pTeam = getPlayerTeam(player);
-            final ItemStack[] contents = player.getInventory().getContents();
-
-            if (pTeam != null) {
-                for (int i = 0; i < contents.length; i++) {
-                    final ItemStack stack = contents[i];
-                    if (stack != null && stack.getType() == Material.WOOL) {
-                        stack.setDurability(pTeam.getWoolColor());
-                        associated.setItem(i, stack);
-                        System.out.println("Set the wool color as " + pTeam.getWoolColor() + " for team " + pTeam.name());
-                        break;
-                    }
-                }
-            }
-
             this.associatedShopGUI.put(player, associated);
         }
         player.openInventory(associated);
@@ -715,6 +771,10 @@ public abstract class ActiveGame {
 
     public final Map<String, Integer> getTopKills() {
         return topKills;
+    }
+
+    public Map<UpgradeType, Map<BedwarsTeam, Integer>> getUpgradesLevelsMap() {
+        return upgradesLevelsMap;
     }
 
     public final ScoreboardHandler getScoreboardHandler() {

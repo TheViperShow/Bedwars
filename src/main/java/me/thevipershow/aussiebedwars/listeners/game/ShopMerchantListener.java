@@ -20,7 +20,7 @@ public final class ShopMerchantListener extends UnregisterableListener {
         this.activeGame = activeGame;
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onPlayerInteractEntity(final PlayerInteractEntityEvent event) {
         final Entity entity = event.getRightClicked();
         if (!(entity instanceof Villager)) return;

@@ -3,6 +3,7 @@ package me.thevipershow.aussiebedwars.game;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import me.thevipershow.aussiebedwars.bedwars.Gamemode;
 import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.aussiebedwars.config.objects.Merchant;
 import me.thevipershow.aussiebedwars.config.objects.TeamSpawnPosition;
@@ -12,6 +13,7 @@ import net.minecraft.server.v1_8_R3.NBTTagCompound;
 import net.minecraft.server.v1_8_R3.PlayerConnection;
 import org.apache.commons.lang3.ObjectUtils;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
@@ -299,6 +301,36 @@ public final class GameUtils {
         return null;
     }
 
+
+    public static String toRoman(int number) {
+        return String.valueOf(new char[number]).replace('\0', 'I')
+                .replace("IIIII", "V")
+                .replace("IIII", "IV")
+                .replace("VV", "X")
+                .replace("VIV", "IX")
+                .replace("XXXXX", "L")
+                .replace("XXXX", "XL")
+                .replace("LL", "C")
+                .replace("LXL", "XC")
+                .replace("CCCCC", "D")
+                .replace("CCCC", "CD")
+                .replace("DD", "M")
+                .replace("DCD", "CM");
+    }
+
+
+    public static void buyFailSound(final Player player) {
+        player.playSound(player.getLocation(), Sound.ANVIL_BREAK, 5.0f, 1.0f);
+    }
+
+    public static void paySound(final Player player) {
+        player.playSound(player.getLocation(), Sound.ORB_PICKUP, 10.0f, 1.0f);
+    }
+
+    public static void upgradeSound(final Player player) {
+        player.playSound(player.getLocation(), Sound.LEVEL_UP, 9.0f, 1.0f);
+    }
+
     public static void printInventory(final Inventory inventory) {
         System.out.println(inventory.getTitle());
         final ItemStack[] contents = inventory.getContents();
@@ -359,6 +391,18 @@ public final class GameUtils {
             giveStackToPlayer(new ItemStack(Material.valueOf("WOOD" + toolType), 1), player, contents);
         }
 
+    }
+
+    public static AbstractDeathmatch deathmatchFromGamemode(final Gamemode gamemode, final ActiveGame activeGame) {
+        switch (gamemode) {
+            case SOLO:
+                return new SoloDeathmatch(activeGame);
+            case DUO:
+            case QUAD:
+                return new TeamDeathmatch(activeGame);
+            default:
+                throw new IllegalArgumentException("bro what gamemode u playing?");
+        }
     }
 
     public static boolean anyMatchMaterial(final Collection<ItemStack> stack, final Material material) {

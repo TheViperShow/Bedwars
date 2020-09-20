@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
-public final class ReinforcedArmorUpgrade implements ConfigurationSerializable {
+public final class ReinforcedArmorUpgrade implements ConfigurationSerializable, Upgrade {
 
     @Override
     public Map<String, Object> serialize() {
@@ -35,5 +35,10 @@ public final class ReinforcedArmorUpgrade implements ConfigurationSerializable {
 
     public List<UpgradeShopItem> getLevels() {
         return levels;
+    }
+
+    @Override
+    public final UpgradeType getType() {
+        return UpgradeType.REINFORCED_ARMOR;
     }
 }

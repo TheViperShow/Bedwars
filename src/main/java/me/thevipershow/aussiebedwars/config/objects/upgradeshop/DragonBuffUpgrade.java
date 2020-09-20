@@ -4,7 +4,7 @@ import java.util.Map;
 import me.thevipershow.aussiebedwars.config.objects.ShopItem;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
-public final class DragonBuffUpgrade implements ConfigurationSerializable {
+public final class DragonBuffUpgrade implements ConfigurationSerializable, Upgrade {
 
     @Override
     public Map<String, Object> serialize() {
@@ -23,5 +23,10 @@ public final class DragonBuffUpgrade implements ConfigurationSerializable {
 
     public ShopItem getShopItem() {
         return shopItem;
+    }
+
+    @Override
+    public final UpgradeType getType() {
+        return UpgradeType.DRAGON_BUFF;
     }
 }

@@ -1,10 +1,11 @@
 duo:
   - map-filename: "bedwars-duo"
     start-timer: 15
-    minimum-games: 1
-    maximum-games: 4
+    minimum-games: 2
+    maximum-games: 8
     min-players: 4
     players: 16
+    deathmatch-start: 600 # in seconds
     teams:
       - "CYAN"
       - "PINK"
@@ -74,7 +75,10 @@ duo:
             after-seconds: 0
           - number: 2
             increase-drop: 1
-            after-seconds: 180
+            after-seconds: 240
+          - number: 3
+            increase-drop: 2
+            after-seconds: 420
       - type: "EMERALD"
         invisible: false
         location:
@@ -86,10 +90,13 @@ duo:
         levels:
           - number: 1
             increase-drop: 0
-            after-seconds: 60
+            after-seconds: 0
           - number: 2
             increase-drop: 1
-            after-seconds: 180
+            after-seconds: 240
+          - number: 3
+            increase-drop: 2
+            after-seconds: 420
       - type: "EMERALD"
         invisible: false
         location:
@@ -101,10 +108,13 @@ duo:
         levels:
           - number: 1
             increase-drop: 0
-            after-seconds: 60
+            after-seconds: 0
           - number: 2
             increase-drop: 1
-            after-seconds: 180
+            after-seconds: 240
+          - number: 3
+            increase-drop: 2
+            after-seconds: 420
       - type: "EMERALD"
         invisible: false
         location:
@@ -116,10 +126,13 @@ duo:
         levels:
           - number: 1
             increase-drop: 0
-            after-seconds: 60
+            after-seconds: 0
           - number: 2
             increase-drop: 1
-            after-seconds: 180
+            after-seconds: 240
+          - number: 3
+            increase-drop: 2
+            after-seconds: 420
       # DIAMONDS SPAWNERS
       #---------------------------------------
       - type: "DIAMOND"
@@ -133,10 +146,13 @@ duo:
         levels:
           - number: 1
             increase-drop: 0
-            after-seconds: 60
+            after-seconds: 0
           - number: 2
             increase-drop: 1
-            after-seconds: 180
+            after-seconds: 240
+          - number: 3
+            increase-drop: 2
+            after-seconds: 420
       - type: "DIAMOND"
         invisible: false
         location:
@@ -148,10 +164,13 @@ duo:
         levels:
           - number: 1
             increase-drop: 0
-            after-seconds: 60
+            after-seconds: 0
           - number: 2
             increase-drop: 1
-            after-seconds: 180
+            after-seconds: 240
+          - number: 3
+            increase-drop: 2
+            after-seconds: 420
       - type: "DIAMOND"
         invisible: false
         location:
@@ -163,10 +182,13 @@ duo:
         levels:
           - number: 1
             increase-drop: 0
-            after-seconds: 60
+            after-seconds: 0
           - number: 2
             increase-drop: 1
-            after-seconds: 180
+            after-seconds: 240
+          - number: 3
+            increase-drop: 2
+            after-seconds: 420
       - type: "DIAMOND"
         invisible: false
         location:
@@ -178,10 +200,13 @@ duo:
         levels:
           - number: 1
             increase-drop: 0
-            after-seconds: 180
+            after-seconds: 0
           - number: 2
             increase-drop: 1
-            after-seconds: 180
+            after-seconds: 240
+          - number: 3
+            increase-drop: 2
+            after-seconds: 420
             #--------------------------------------- Dark
       - type: "IRON"
         invisible: true
@@ -475,6 +500,12 @@ duo:
           x: -32.50
           y: 62.0
           z: -90.0
+      - name: "§7[§eAussieBedwars§7] §eUpgrades"
+        type: "UPGRADE"
+        location:
+          x: 33.500
+          y: 62.000
+          z: 91.000
     # SHOPS SECTION
     shop:
       title: "{TEAM} Shop"

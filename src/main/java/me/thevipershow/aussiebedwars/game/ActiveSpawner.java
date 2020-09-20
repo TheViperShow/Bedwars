@@ -1,20 +1,28 @@
 package me.thevipershow.aussiebedwars.game;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
+import me.thevipershow.aussiebedwars.bedwars.Gamemode;
 import me.thevipershow.aussiebedwars.bedwars.objects.spawners.SpawnerType;
 import me.thevipershow.aussiebedwars.bedwars.spawner.SpawnerLevel;
 import me.thevipershow.aussiebedwars.config.objects.Spawner;
 import me.thevipershow.aussiebedwars.game.data.ImmutableTraversableList;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.Vector;
 
 public class ActiveSpawner {
 
@@ -29,11 +37,15 @@ public class ActiveSpawner {
     private final List<BukkitTask> levelUpTasks;
 
     private long lastDrop = -1L;
+    private long lastLevelUp = -1L;
+    private long creationTime = -1L;
+
     private SpawnerLevel currentLevel;
     private BukkitTask animationTask = null;
     private BukkitTask dropTask = null;
     private BukkitTask updateNameTask = null;
     private ArmorStand stand = null;
+    private final int maxNearby;
 
     private final static double FOURTH_OF_PI = Math.PI / 4.000;
     private final static double START = -4.000;
@@ -66,37 +78,74 @@ public class ActiveSpawner {
         this.game = game;
         this.currentLevel = spawner.getSpawnerLevels().get(0);
         this.cachedAnimation = generateAnimation(spawner.getSpawnPosition().toLocation(game.getAssociatedWorld()));
+        final int gamemodeMultiplier = game.bedwarsGame.getGamemode() == Gamemode.SOLO ? 1 : 2;
+        switch (type) {
+            case DIAMOND:
+                this.maxNearby = 4 * gamemodeMultiplier;
+                break;
+            case EMERALD:
+                this.maxNearby = 2 * gamemodeMultiplier;
+                break;
+            default:
+                this.maxNearby = -1;
+                break;
+        }
 
         this.levelUpTasks = new ArrayList<>();
         final Iterator<SpawnerLevel> levelIterator = spawner.getSpawnerLevels().iterator();
         if (levelIterator.hasNext()) levelIterator.next();
-        while (levelIterator.hasNext()) {
+
+        while (levelIterator.hasNext()) { // assigning level up tasks.
             final SpawnerLevel lvl = levelIterator.next();
+            if (lvl.getLevel() == 1) continue;
             final BukkitTask task = new BukkitRunnable() {
+
                 @Override
-                public void run() {
+                public final void run() {
                     currentLevel = lvl;
+                    lastLevelUp = System.currentTimeMillis();
                 }
+
             }.runTaskLater(game.getPlugin(), lvl.getAfterSeconds() * 20L);
             this.levelUpTasks.add(task);
         }
     }
 
     private String generateStandName() {
-        return String.format("§7Level: §7[§e%s§7] Next in: (§e%d§7)s",
+        return String.format("§7§lLevel§r§7: §r§7§e%s§7| Drop in: §e§l%d§7s",
                 currentLevel.getLevel(),
                 spawner.getDropDelay() - ((now() - lastDrop) / 1000));
     }
 
     private void drop() {
-        game.associatedWorld.dropItem(spawner.getSpawnPosition().toLocation(game.associatedWorld).add(0, 1, 0),
-                new ItemStack(type.getDropItem(), spawner.getDropAmount() + currentLevel.getDropIncrease()));
+        final World w = game.associatedWorld;
+        final Location dropSpawnPos = spawner.getSpawnPosition().toLocation(w);
+        final Collection<Entity> nearbyEntities = w.getNearbyEntities(dropSpawnPos, 1.01, 3.00, 1.01);
+        if (maxNearby == -1 || nearbyEntities.stream().filter(entity -> {
+            if (entity instanceof Item) {
+                final Item item = (Item) entity;
+                final Material type = item.getItemStack().getType();
+                switch (type) {
+                    case EMERALD:
+                    case DIAMOND:
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+            return false;
+        }).count() < maxNearby) {
+
+            final ItemStack toDrop = new ItemStack(type.getDropItem(), spawner.getDropAmount() + currentLevel.getDropIncrease());
+            w.dropItem(dropSpawnPos, toDrop).setVelocity(new Vector());
+        }
     }
 
     public void spawn() {
         if (active()) {
             return;
         }
+
 
         final Location spawnStandAt = spawner.getSpawnPosition().toLocation(game.associatedWorld);
         if (!spawnStandAt.getWorld().isChunkLoaded(spawnStandAt.getChunk()))
@@ -119,7 +168,8 @@ public class ActiveSpawner {
                     .runTaskTimer(game.plugin, () -> stand.teleport(cachedAnimation.move()), 1L, 1L);
         }
 
-        // game.plugin.getLogger().info("Created spawner " + spawner.toString() + '\n');
+        this.lastLevelUp = System.currentTimeMillis();
+        this.creationTime = this.lastLevelUp;
 
         this.dropTask = game.plugin.getServer()
                 .getScheduler()
@@ -152,47 +202,59 @@ public class ActiveSpawner {
 
     /*--------------------------------------------------------------------------------------------------------------*/
 
-    public SpawnerType getType() {
+    public final long getCreationTime() {
+        return creationTime;
+    }
+
+    public final int getMaxNearby() {
+        return maxNearby;
+    }
+
+    public final SpawnerType getType() {
         return type;
     }
 
-    public Spawner getSpawner() {
+    public final Spawner getSpawner() {
         return spawner;
     }
 
-    public ImmutableTraversableList<Location> getCachedAnimation() {
+    public final ImmutableTraversableList<Location> getCachedAnimation() {
         return cachedAnimation;
     }
 
-    public BukkitTask getAnimationTask() {
+    public final long getLastLevelUp() {
+        return lastLevelUp;
+    }
+
+    public final BukkitTask getAnimationTask() {
         return animationTask;
     }
 
-    public BukkitTask getDropTask() {
+    public final BukkitTask getDropTask() {
         return dropTask;
     }
 
-    public BukkitTask getUpdateNameTask() {
+    public final BukkitTask getUpdateNameTask() {
         return updateNameTask;
     }
 
-    public ArmorStand getStand() {
+    public final ArmorStand getStand() {
         return stand;
     }
 
-    public ActiveGame getGame() {
+    public final ActiveGame getGame() {
         return game;
     }
 
-    public SpawnerLevel getCurrentLevel() {
+    public final SpawnerLevel getCurrentLevel() {
         return currentLevel;
     }
 
-    public long getLastDrop() {
+    public final long getLastDrop() {
         return lastDrop;
     }
 
-    public List<BukkitTask> getLevelUpTasks() {
+    public final List<BukkitTask> getLevelUpTasks() {
         return levelUpTasks;
     }
 }

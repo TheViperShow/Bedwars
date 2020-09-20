@@ -69,31 +69,15 @@ public class MatchmakingVillagersListener implements Listener {
 
                 if (!gameManager.isLoading()) {
                     gameManager.loadRandom(g.get());
-
-                    plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
-                        final Optional<ActiveGame> opt2 = gameManager.findOptimalGame(g.get());
-                        if (!opt2.isPresent()) {
-                            player.sendMessage(AussieBedwars.PREFIX + "§eWe could not find a game.");
-                        } else {
-                            final ActiveGame activeGame = opt.get();
-
-                            gameManager.removeFromAllQueues(player);
-
-                            plugin.getServer().getScheduler().runTaskLater(plugin, () -> gameManager.addToQueue(player, activeGame), 1L);
-                            return;
-                        }
-                    }, 60L);
                     return;
                 }
 
-                player.sendMessage(AussieBedwars.PREFIX + "§eWe could not find a game.");
+                player.sendMessage(AussieBedwars.PREFIX + "§eWe could not find a game, try clicking again.");
                 return;
             }
 
             final ActiveGame activeGame = opt.get();
-
             gameManager.removeFromAllQueues(player);
-
             plugin.getServer().getScheduler().runTaskLater(plugin, () -> gameManager.addToQueue(player, activeGame), 1L);
         }, 1L));
 

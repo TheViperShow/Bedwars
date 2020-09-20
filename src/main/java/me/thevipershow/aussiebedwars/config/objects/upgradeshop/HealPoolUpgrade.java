@@ -4,7 +4,7 @@ import java.util.Map;
 import me.thevipershow.aussiebedwars.config.objects.ShopItem;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
-public final class HealPoolUpgrade implements ConfigurationSerializable {
+public final class HealPoolUpgrade implements ConfigurationSerializable , Upgrade {
 
     @Override
     public Map<String, Object> serialize() {
@@ -23,5 +23,10 @@ public final class HealPoolUpgrade implements ConfigurationSerializable {
 
     public ShopItem getItem() {
         return item;
+    }
+
+    @Override
+    public final UpgradeType getType() {
+        return UpgradeType.HEAL_POOL;
     }
 }

@@ -4,7 +4,7 @@ import java.util.Map;
 import me.thevipershow.aussiebedwars.config.objects.ShopItem;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
-public final class SharpnessUpgrade implements ConfigurationSerializable {
+public final class SharpnessUpgrade implements ConfigurationSerializable , Upgrade {
 
     public SharpnessUpgrade(ShopItem item) {
         this.item = item;
@@ -23,5 +23,10 @@ public final class SharpnessUpgrade implements ConfigurationSerializable {
 
     public ShopItem getItem() {
         return item;
+    }
+
+    @Override
+    public final UpgradeType getType() {
+        return UpgradeType.SHARPNESS;
     }
 }
