@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import me.thevipershow.aussiebedwars.AussieBedwars;
@@ -32,6 +31,7 @@ import me.thevipershow.aussiebedwars.config.objects.upgradeshop.SharpnessUpgrade
 import me.thevipershow.aussiebedwars.config.objects.upgradeshop.UpgradeShop;
 import me.thevipershow.aussiebedwars.config.objects.upgradeshop.UpgradeShopItem;
 import me.thevipershow.aussiebedwars.config.objects.upgradeshop.UpgradeType;
+import me.thevipershow.aussiebedwars.game.upgrades.ActiveHealPool;
 import me.thevipershow.aussiebedwars.listeners.UnregisterableListener;
 import me.thevipershow.aussiebedwars.listeners.game.ArmorSet;
 import me.thevipershow.aussiebedwars.listeners.game.BedBreakListener;
@@ -106,8 +106,8 @@ public abstract class ActiveGame {
     protected final Map<ItemStack, ShopItem> shopItemStacks = new HashMap<>();
     protected final Map<ItemStack, UpgradeItem> upgradeItemStacks = new HashMap<>();
     protected final Map<Player, Map<UpgradeItem, Integer>> playerUpgradeLevelsMap = new HashMap<>();
-
-    private final Map<UpgradeType, Map<BedwarsTeam, Integer>> upgradesLevelsMap = new HashMap<>();
+    protected final List<ActiveHealPool> healPools = new ArrayList<>();
+    protected final Map<UpgradeType, Map<BedwarsTeam, Integer>> upgradesLevelsMap = new HashMap<>();
 
     ///////////////////////////////////////////////////
     // Internal ActiveGame fields                    //
@@ -262,7 +262,7 @@ public abstract class ActiveGame {
                 final long lastLevelUp = emeraldSampleSpawner.getLastLevelUp();
 
                 if (emeraldSampleSpawner.getCurrentLevel().getLevel() >= emeraldSampleSpawner.getSpawner().getSpawnerLevels().size()) {
-                    builder.next("§b§lEMERALD §r§7Spawner (§eMax§7)");
+                    builder.next("§a§lEMERALD §r§7Spawner (§eMax§7)");
                 } else if (lastLevelUp > 0) {
                     final long timePassedSinceCreation = (System.currentTimeMillis() - emeraldSampleSpawner.getCreationTime()) / 1000;
                     if (emeraldSampleSpawner.getSpawner().getSpawnerLevels().size() >= emeraldSampleSpawner.getCurrentLevel().getLevel() + 1) {
@@ -314,13 +314,13 @@ public abstract class ActiveGame {
         topKills.clear();
         gameLobbyTicker.stopTicking();
         abstractDeathmatch.stop();
+        healPools.forEach(ActiveHealPool::stop);
+        healPools.clear();
+        upgradesLevelsMap.clear();
+        playerUpgradeLevelsMap.clear();
+        upgradeItemStacks.clear();
         hasStarted = false;
         destroyMap();
-        try {
-            finalize();
-        } catch (final Throwable t) {
-            t.printStackTrace();
-        }
     }
 
     public void handleError(final String text) {
@@ -528,8 +528,8 @@ public abstract class ActiveGame {
 
     public void declareWinner(final BedwarsTeam team) {
         if (winnerDeclared) return;
-        associatedQueue.perform(p -> {
-            if (p.isOnline() && p.getWorld().equals(associatedWorld)) {
+        associatedWorld.getPlayers().forEach(p -> {
+            if (p.isOnline()) {
                 p.sendTitle("§7Team " + '§' + team.getColorCode() + team.name() + " §7has won the game!", "§7Returning to lobby in 15s");
             }
         });
@@ -593,8 +593,9 @@ public abstract class ActiveGame {
     public void destroyMap() {
         final File wDir = associatedWorld.getWorldFolder();
         try {
-            FileUtils.deleteDirectory(wDir);
+            plugin.getServer().unloadWorld(associatedWorld, false);
             WorldsManager.getInstanceUnsafe().getActiveGameList().remove(this);
+            FileUtils.deleteDirectory(wDir);
         } catch (IOException e) {
             plugin.getLogger().severe("Something went wrong while destroying map of " + associatedWorldFilename);
             e.printStackTrace();
@@ -795,5 +796,21 @@ public abstract class ActiveGame {
 
     public final Map<Player, Inventory> getAssociatedUpgradeGUI() {
         return associatedUpgradeGUI;
+    }
+
+    public AbstractDeathmatch getAbstractDeathmatch() {
+        return abstractDeathmatch;
+    }
+
+    public ActiveSpawner getDiamondSampleSpawner() {
+        return diamondSampleSpawner;
+    }
+
+    public ActiveSpawner getEmeraldSampleSpawner() {
+        return emeraldSampleSpawner;
+    }
+
+    public List<ActiveHealPool> getHealPools() {
+        return healPools;
     }
 }

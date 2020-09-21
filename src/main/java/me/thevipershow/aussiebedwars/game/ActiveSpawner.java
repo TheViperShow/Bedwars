@@ -77,6 +77,7 @@ public class ActiveSpawner {
         this.type = spawner.getSpawnerType();
         this.game = game;
         this.currentLevel = spawner.getSpawnerLevels().get(0);
+        // System.out.println("Created spawner with starting level: " + this.currentLevel);
         this.cachedAnimation = generateAnimation(spawner.getSpawnPosition().toLocation(game.getAssociatedWorld()));
         final int gamemodeMultiplier = game.bedwarsGame.getGamemode() == Gamemode.SOLO ? 1 : 2;
         switch (type) {
@@ -169,7 +170,7 @@ public class ActiveSpawner {
         }
 
         this.lastLevelUp = System.currentTimeMillis();
-        this.creationTime = this.lastLevelUp;
+        this.creationTime = System.currentTimeMillis();
 
         this.dropTask = game.plugin.getServer()
                 .getScheduler()

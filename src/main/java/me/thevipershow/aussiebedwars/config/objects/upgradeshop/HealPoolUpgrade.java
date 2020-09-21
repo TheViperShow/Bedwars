@@ -12,17 +12,38 @@ public final class HealPoolUpgrade implements ConfigurationSerializable , Upgrad
     }
 
     private final ShopItem item;
+    private final int healRadius;
+    private final int healFrequency;
+    private final double healAmount;
 
-    public HealPoolUpgrade(ShopItem item) {
+    public HealPoolUpgrade(ShopItem item, int healRadius, int healFrequency, double healAmount) {
         this.item = item;
+        this.healRadius = healRadius;
+        this.healFrequency = healFrequency;
+        this.healAmount = healAmount;
     }
 
     public static HealPoolUpgrade deserialize(final Map<String, Object> map) {
-        return new HealPoolUpgrade(ShopItem.deserialize(map));
+        final int healRadius = (int) map.get("heal-radius");
+        final int healFrequency = (int) map.get("heal-frequency");
+        final double healAmount = (double) map.get("heal-amount");
+        return new HealPoolUpgrade(ShopItem.deserialize(map), healRadius, healFrequency, healAmount);
     }
 
-    public ShopItem getItem() {
+    public final ShopItem getItem() {
         return item;
+    }
+
+    public final int getHealRadius() {
+        return healRadius;
+    }
+
+    public final int getHealFrequency() {
+        return healFrequency;
+    }
+
+    public final double getHealAmount() {
+        return healAmount;
     }
 
     @Override

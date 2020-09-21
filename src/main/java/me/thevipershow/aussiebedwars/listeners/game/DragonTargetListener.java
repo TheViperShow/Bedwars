@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.aussiebedwars.game.ActiveGame;
 import me.thevipershow.aussiebedwars.listeners.UnregisterableListener;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEnderDragon;
@@ -16,7 +17,7 @@ import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 
 public final class DragonTargetListener extends UnregisterableListener {
 
-    private final Map<CraftEnderDragon, List<Player>> dragonPlayerMap = new HashMap<>();
+    private final Map<CraftEnderDragon, BedwarsTeam> dragonPlayerMap = new HashMap<>();
 
     private final ActiveGame activeGame;
 
@@ -28,14 +29,21 @@ public final class DragonTargetListener extends UnregisterableListener {
     public void onEntityTargetLivingEntity(final EntityTargetLivingEntityEvent event) {
         if (!event.getEntity().getWorld().equals(activeGame.getAssociatedWorld())) return;
         if (!(event.getEntity() instanceof EnderDragon)) return;
+        if (!(event.getTarget() instanceof Player)) return;
+        final Player target = (Player) event.getTarget();
         final EnderDragon enderDragon = (EnderDragon) event.getEntity();
         final CraftEnderDragon craftEnderDragon = (CraftEnderDragon) enderDragon;
         if (dragonPlayerMap.containsKey(craftEnderDragon)) {
-            final List<Player> dragonOwner = dragonPlayerMap.get(craftEnderDragon);
-            if (event.getTarget().equals(dragonOwner)) {
+            final BedwarsTeam dragonOwnerTeam = dragonPlayerMap.get(craftEnderDragon);
+            if (activeGame.getPlayerTeam(target) == dragonOwnerTeam) {
                 event.setCancelled(true);
-                final Optional<Player> newTarget = activeGame.getAssociatedQueue().getInQueue()
-                        .stream().filter(p -> !activeGame.getPlayersOutOfGame().contains(p) && dragonOwner.stream().noneMatch(o -> o.equals(p)))
+
+                final Optional<Player> newTarget = activeGame.getAssignedTeams()
+                        .entrySet()
+                        .stream()
+                        .filter(k -> k.getKey() != dragonOwnerTeam)
+                        .flatMap(v -> v.getValue().stream())
+                        .filter(p -> activeGame.getPlayersOutOfGame().contains(p))
                         .findAny();
 
                 newTarget.ifPresent(p -> craftEnderDragon.getHandle().setGoalTarget(((CraftPlayer) p).getHandle()));
@@ -43,7 +51,7 @@ public final class DragonTargetListener extends UnregisterableListener {
         }
     }
 
-    public final Map<CraftEnderDragon, List<Player>> getDragonPlayerMap() {
+    public final Map<CraftEnderDragon, BedwarsTeam> getDragonPlayerMap() {
         return dragonPlayerMap;
     }
 }

@@ -19,12 +19,10 @@ public final class SoloDeathmatch extends AbstractDeathmatch {
         activeGame.getAssociatedQueue().perform(p -> p.sendMessage(AussieBedwars.PREFIX + "§6The dragons have been released!"));
         activeGame.getAssociatedQueue().perform(p -> {
             if (!activeGame.getPlayersOutOfGame().contains(p)) {
-                final BedwarsTeam playerTeam = activeGame.getPlayerTeam(p);
-                final SpawnPosition teamSpawn = activeGame.getBedwarsGame().spawnPosOfTeam(playerTeam);
-                final EnderDragon enderDragon = (EnderDragon) activeGame.associatedWorld.spawnEntity(teamSpawn.toLocation(activeGame.getAssociatedWorld()).add(0.0, 30.0, 0.0), EntityType.ENDER_DRAGON);
-                enderDragon.setRemoveWhenFarAway(false);
-                final CraftEnderDragon coolDragon = ((CraftEnderDragon) enderDragon);
-                dragonTargetListener.getDragonPlayerMap().put(coolDragon, Collections.singletonList(p));
+                final BedwarsTeam pTeam = activeGame.getPlayerTeam(p);
+                if (pTeam != null) {
+                    spawnDragon(pTeam);
+                }
                 // todo: upgrade dragon buff
             }
         });

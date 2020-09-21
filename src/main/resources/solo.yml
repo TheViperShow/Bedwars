@@ -879,6 +879,9 @@ solo:
               - ""
               - "§7Tier 4: +200% Resources"
       heal-pool:
+        heal-radius: 10
+        heal-frequency: 5
+        heal-amount: 1.0
         material: "BEACON"
         slot: 14
         item-name: "§eHeal Pool"

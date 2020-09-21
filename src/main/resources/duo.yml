@@ -1,7 +1,7 @@
 duo:
   - map-filename: "bedwars-duo"
     start-timer: 15
-    minimum-games: 2
+    minimum-games: 1
     maximum-games: 8
     min-players: 4
     players: 16
@@ -72,7 +72,7 @@ duo:
         levels:
           - number: 1
             increase-drop: 0
-            after-seconds: 0
+            after-seconds: 1
           - number: 2
             increase-drop: 1
             after-seconds: 240
@@ -90,7 +90,7 @@ duo:
         levels:
           - number: 1
             increase-drop: 0
-            after-seconds: 0
+            after-seconds: 1
           - number: 2
             increase-drop: 1
             after-seconds: 240
@@ -108,7 +108,7 @@ duo:
         levels:
           - number: 1
             increase-drop: 0
-            after-seconds: 0
+            after-seconds: 1
           - number: 2
             increase-drop: 1
             after-seconds: 240
@@ -126,7 +126,7 @@ duo:
         levels:
           - number: 1
             increase-drop: 0
-            after-seconds: 0
+            after-seconds: 1
           - number: 2
             increase-drop: 1
             after-seconds: 240
@@ -146,7 +146,7 @@ duo:
         levels:
           - number: 1
             increase-drop: 0
-            after-seconds: 0
+            after-seconds: 1
           - number: 2
             increase-drop: 1
             after-seconds: 240
@@ -164,7 +164,7 @@ duo:
         levels:
           - number: 1
             increase-drop: 0
-            after-seconds: 0
+            after-seconds: 1
           - number: 2
             increase-drop: 1
             after-seconds: 240
@@ -182,7 +182,7 @@ duo:
         levels:
           - number: 1
             increase-drop: 0
-            after-seconds: 0
+            after-seconds: 1
           - number: 2
             increase-drop: 1
             after-seconds: 240
@@ -200,7 +200,7 @@ duo:
         levels:
           - number: 1
             increase-drop: 0
-            after-seconds: 0
+            after-seconds: 1
           - number: 2
             increase-drop: 1
             after-seconds: 240
@@ -879,6 +879,9 @@ duo:
               - ""
               - "§7Tier 4: +200% Resources"
       heal-pool:
+        heal-radius: 10
+        heal-frequency: 5
+        heal-amount: 1.0
         material: "BEACON"
         slot: 14
         item-name: "§eHeal Pool"
