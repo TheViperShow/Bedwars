@@ -1,5 +1,6 @@
 package me.thevipershow.aussiebedwars.listeners.game;
 
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -13,6 +14,7 @@ import me.thevipershow.aussiebedwars.config.objects.upgradeshop.ManiacMinerUpgra
 import me.thevipershow.aussiebedwars.config.objects.upgradeshop.ReinforcedArmorUpgrade;
 import me.thevipershow.aussiebedwars.config.objects.upgradeshop.SharpnessUpgrade;
 import me.thevipershow.aussiebedwars.config.objects.upgradeshop.UpgradeShop;
+import me.thevipershow.aussiebedwars.config.objects.upgradeshop.UpgradeShopItem;
 import me.thevipershow.aussiebedwars.config.objects.upgradeshop.UpgradeType;
 import me.thevipershow.aussiebedwars.game.ActiveGame;
 import me.thevipershow.aussiebedwars.game.GameUtils;
@@ -67,7 +69,8 @@ public final class UpgradeInteractListener extends UnregisterableListener {
         final ReinforcedArmorUpgrade reinforcedArmorUpgrade = upgradeShop.getReinforcedArmorUpgrade();
         final SharpnessUpgrade sharpnessUpgrade = upgradeShop.getSharpnessUpgrade();
 
-        final Map<UpgradeType, Map<BedwarsTeam, Integer>> upgradesAvailable = activeGame.getUpgradesLevelsMap();
+        final EnumMap<UpgradeType, Map<BedwarsTeam, Integer>> upgradesAvailable = activeGame.getUpgradesLevelsMap();
+
         if (clickedSlot == dragonBuffUpgrade.getShopItem().getSlot()) {
             final int currentLevel = upgradesAvailable.get(dragonBuffUpgrade.getType()).get(pTeam);
             if (currentLevel == 1) {
@@ -78,8 +81,7 @@ public final class UpgradeInteractListener extends UnregisterableListener {
                 if(pay(pay, player, shopItem.getBuyWith(), shopItem.getBuyCost(), "Dragon Buff")) {
                     upgradesAvailable.get(dragonBuffUpgrade.getType()).put(pTeam, 1);
                 }
-                // TODO: test dragon buff logic
-                // here
+                // Dragon Buff ^
             }
         } else if (clickedSlot == healPoolUpgrade.getItem().getSlot()) {
             final Map<BedwarsTeam, Integer> healPoolTeamLevelsMap = Objects.requireNonNull(upgradesAvailable.get(healPoolUpgrade.getType()));
@@ -97,8 +99,7 @@ public final class UpgradeInteractListener extends UnregisterableListener {
 
                     upgradesAvailable.get(healPoolUpgrade.getType()).put(pTeam, 1);
                 }
-                // TODO: Add Heal pool logic
-                // here
+                // Heal Pool ^
             }
         } else if (clickedSlot == ironForgeUpgrade.getSlot()) {
             final int currentLevel = upgradesAvailable.get(ironForgeUpgrade.getType()).get(pTeam);
@@ -106,9 +107,15 @@ public final class UpgradeInteractListener extends UnregisterableListener {
             if (currentLevel == maxLevel) {
                 maxLevel(player);
             } else {
+                final UpgradeShopItem itemToBuy = ironForgeUpgrade.getLevels().get(currentLevel);
                 // TODO: Add Iron Forge logic
                 // here
-                upgradesAvailable.get(ironForgeUpgrade.getType()).put(pTeam, maxLevel);
+                final Pair<HashMap<Integer, Integer>, Boolean> pay = GameUtils.canAfford(playerInventory, itemToBuy.getBuyWith(), itemToBuy.getPrice());
+                if (pay(pay, player, itemToBuy.getBuyWith(), itemToBuy.getPrice(), "Iron Forge")) {
+                    upgradesAvailable.get(ironForgeUpgrade.getType()).put(pTeam, currentLevel + 1);
+                    activeGame.getTeamSpawners(pTeam).forEach(s -> s.setDropSpeedRegulator((currentLevel + 1) * 50));
+                }
+                upgradesAvailable.get(ironForgeUpgrade.getType()).put(pTeam, currentLevel + 1);
             }
         } else if (clickedSlot == maniacMinerUpgrade.getSlot()) {
             final int currentLevel = upgradesAvailable.get(maniacMinerUpgrade.getType()).get(pTeam);

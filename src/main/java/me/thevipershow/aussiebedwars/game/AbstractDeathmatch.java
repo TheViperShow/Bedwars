@@ -1,6 +1,9 @@
 package me.thevipershow.aussiebedwars.game;
 
 import java.util.Collections;
+import java.util.Map;
+import java.util.Objects;
+import me.thevipershow.aussiebedwars.AussieBedwars;
 import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.aussiebedwars.config.objects.SpawnPosition;
 import me.thevipershow.aussiebedwars.config.objects.upgradeshop.UpgradeType;
@@ -27,7 +30,9 @@ public abstract class AbstractDeathmatch {
     }
 
     public final int numberOfDragonsToSpawn(final BedwarsTeam team) {
-        return activeGame.getUpgradesLevelsMap().get(UpgradeType.DRAGON_BUFF).get(team) > 0 ? 2 : 1;
+        final Map<BedwarsTeam, Integer> m = this.activeGame.getUpgradesLevelsMap().get(UpgradeType.DRAGON_BUFF);
+        final Integer i = Objects.requireNonNull(m.get(team));
+        return i == 0 ? 1 : 2;
     }
 
     public final void spawnDragon(final BedwarsTeam bedwarsTeam) {
@@ -45,7 +50,12 @@ public abstract class AbstractDeathmatch {
 
     public abstract void spawnEnderdragons();
 
-    public abstract void announceDeathmatch();
+    public void announceDeathmatch() {
+        activeGame.getAssociatedQueue().perform(p -> {
+            p.sendMessage(AussieBedwars.PREFIX + "§6§lDEATHMATCH §r§6Mode has started§7...");
+            p.sendMessage(AussieBedwars.PREFIX + "§6Kill all of your enemies to win!");
+        });
+    }
 
     public abstract void startDeathMatch();
 

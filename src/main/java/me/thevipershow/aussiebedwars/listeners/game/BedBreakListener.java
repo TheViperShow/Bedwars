@@ -53,20 +53,30 @@ public final class BedBreakListener extends UnregisterableListener {
             activeGame.getPlayerPlacedBlocks().remove(b);
         } else {
             if (b.getType() == Material.BED_BLOCK) {
-                final BedwarsTeam playerTeam = activeGame.getPlayerTeam(p);
-                final BedwarsTeam destroyedBedTeam = teamOfBed(b);
-                if (playerTeam == destroyedBedTeam) {
-                    p.sendMessage(AussieBedwars.PREFIX + "§eYou cannot destroy your own bed.");
+
+                if (!activeGame.getAbstractDeathmatch().isRunning()) {
+
+                    final BedwarsTeam playerTeam = activeGame.getPlayerTeam(p);
+                    final BedwarsTeam destroyedBedTeam = teamOfBed(b);
+                    if (playerTeam == destroyedBedTeam) {
+                        p.sendMessage(AussieBedwars.PREFIX + "§eYou cannot destroy your own bed.");
+                        event.setCancelled(true);
+                    } else if (activeGame.getAssignedTeams().containsKey(destroyedBedTeam)) {
+                        final TeamBedDestroyEvent e = new TeamBedDestroyEvent(activeGame, destroyedBedTeam);
+                        activeGame.getPlugin().getServer().getPluginManager().callEvent(e);
+
+                        if (e.isCancelled()) return;
+
+                        activeGame.getDestroyedTeams().add(destroyedBedTeam);
+                        activeGame.destroyTeamBed(destroyedBedTeam);
+                    }
+
+                } else {
                     event.setCancelled(true);
-                } else if (activeGame.getAssignedTeams().containsKey(destroyedBedTeam)) {
-                    final TeamBedDestroyEvent e = new TeamBedDestroyEvent(activeGame, destroyedBedTeam);
-                    activeGame.getPlugin().getServer().getPluginManager().callEvent(e);
-
-                    if (e.isCancelled()) return;
-
-                    activeGame.getDestroyedTeams().add(destroyedBedTeam);
-                    activeGame.destroyTeamBed(destroyedBedTeam);
+                    p.sendMessage(AussieBedwars.PREFIX + "§6Beds cannot be broken during §6§lDEATHMATCH");
+                    p.sendMessage(AussieBedwars.PREFIX + "§6You must kill all of your enemies to win!");
                 }
+
             } else {
                 event.setCancelled(true);
             }

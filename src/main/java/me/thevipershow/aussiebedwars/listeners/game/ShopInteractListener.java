@@ -53,13 +53,9 @@ public final class ShopInteractListener extends UnregisterableListener {
                 if (transaction.getB()) { // Give player to item
                     if (GameUtils.isArmor(clickedItem)) {
                         final String armorType = clickedItem.getType().name().split("_")[0];
-                        if (!armorType.equals("DIAMOND")) {
-                            GameUtils.makePlayerPay(player.getInventory(), clickedShopItem.getBuyWith(), clickedShopItem.getBuyCost(), transaction.getA());
-                            activeGame.upgradePlayerArmorSet(player, armorType);
-                        } else {
-                            GameUtils.buyFailSound(player);
-                            player.sendMessage(AussieBedwars.PREFIX + "§7You already have the highest upgrade available.");
-                        }
+                        GameUtils.makePlayerPay(player.getInventory(), clickedShopItem.getBuyWith(), clickedShopItem.getBuyCost(), transaction.getA());
+                        activeGame.upgradePlayerArmorSet(player, armorType);
+                        GameUtils.paySound(player);
                     } else if (clickedItem.getType().name().endsWith("SWORD")) {
                         final ItemStack prevSword = activeGame.getSwordUpgrades().getPrevious(clickedItem.getType());
                         if (prevSword == null) {
@@ -88,6 +84,9 @@ public final class ShopInteractListener extends UnregisterableListener {
                         if (toGive.getType() == Material.WOOL) {
                             final BedwarsTeam pTeam = activeGame.getPlayerTeam(player);
                             toGive.setDurability(pTeam.getWoolColor());
+                        } else if (toGive.getType() == Material.STAINED_GLASS) {
+                            final BedwarsTeam pTeam = activeGame.getPlayerTeam(player);
+                            toGive.setDurability(pTeam.getGlassColor());
                         }
                         GameUtils.makePlayerPay(player.getInventory(), clickedShopItem.getBuyWith(), clickedShopItem.getBuyCost(), transaction.getA());
                         GameUtils.giveStackToPlayer(toGive, player, player.getInventory().getContents());

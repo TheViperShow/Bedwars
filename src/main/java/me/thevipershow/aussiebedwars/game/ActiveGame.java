@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -20,6 +21,8 @@ import me.thevipershow.aussiebedwars.config.objects.BedwarsGame;
 import me.thevipershow.aussiebedwars.config.objects.Merchant;
 import me.thevipershow.aussiebedwars.config.objects.Shop;
 import me.thevipershow.aussiebedwars.config.objects.ShopItem;
+import me.thevipershow.aussiebedwars.config.objects.SpawnPosition;
+import me.thevipershow.aussiebedwars.config.objects.TeamSpawnPosition;
 import me.thevipershow.aussiebedwars.config.objects.UpgradeItem;
 import me.thevipershow.aussiebedwars.config.objects.UpgradeLevel;
 import me.thevipershow.aussiebedwars.config.objects.upgradeshop.DragonBuffUpgrade;
@@ -107,7 +110,7 @@ public abstract class ActiveGame {
     protected final Map<ItemStack, UpgradeItem> upgradeItemStacks = new HashMap<>();
     protected final Map<Player, Map<UpgradeItem, Integer>> playerUpgradeLevelsMap = new HashMap<>();
     protected final List<ActiveHealPool> healPools = new ArrayList<>();
-    protected final Map<UpgradeType, Map<BedwarsTeam, Integer>> upgradesLevelsMap = new HashMap<>();
+    protected final EnumMap<UpgradeType, Map<BedwarsTeam, Integer>> upgradesLevelsMap = new EnumMap<>(UpgradeType.class);
 
     ///////////////////////////////////////////////////
     // Internal ActiveGame fields                    //
@@ -140,20 +143,6 @@ public abstract class ActiveGame {
         this.defaultShopInv = Objects.requireNonNull(setupShopGUIs(), "The default shop inventory was null.");
         this.defaultUpgradeInv = Objects.requireNonNull(setupUpgradeGUIs(), "The default upgrade inventory was null.");
         this.abstractDeathmatch = GameUtils.deathmatchFromGamemode(bedwarsGame.getGamemode(), this);
-    }
-
-    protected static List<String> priceDescriptorSection(final ShopItem i) {
-        return Collections.unmodifiableList(Arrays.asList(" ",
-                "§7- Price§f: §e§l" + i.getBuyCost(),
-                "§7- Buy with§f: §e§l" + GameUtils.beautifyCaps(i.getBuyWith().name())
-        ));
-    }
-
-    protected static List<String> priceDescriptorSection(final UpgradeLevel level) {
-        return Collections.unmodifiableList(Arrays.asList(" ",
-                "§7- Price§f: §e§l" + level.getPrice(),
-                "§7- Buy with§f: §e§l" + GameUtils.beautifyCaps(level.getBuyWith().name())
-        ));
     }
 
     protected final void setupUpgradeLevelsMap() {
@@ -239,44 +228,18 @@ public abstract class ActiveGame {
         public List<Entry> getEntries(final Player player) {
             final EntryBuilder builder = new EntryBuilder();
 
-            builder.blank();
-
-            if (diamondSampleSpawner != null) {
-
-                final long lastLevelUp = diamondSampleSpawner.getLastLevelUp();
-
-                if (diamondSampleSpawner.getCurrentLevel().getLevel() >= diamondSampleSpawner.getSpawner().getSpawnerLevels().size()) {
-                    builder.next("§b§lDIAMOND §r§7Spawner (§eMax§7)");
-                } else if (lastLevelUp > 0) {
-                    final long timePassedSinceCreation = (System.currentTimeMillis() - diamondSampleSpawner.getCreationTime()) / 1000;
-                    if (diamondSampleSpawner.getSpawner().getSpawnerLevels().size() >= diamondSampleSpawner.getCurrentLevel().getLevel() + 1) {
-                        final SpawnerLevel nextLevel = diamondSampleSpawner.getSpawner().getSpawnerLevels().get(diamondSampleSpawner.getCurrentLevel().getLevel());
-                        final long untilNextLevel = nextLevel.getAfterSeconds() - timePassedSinceCreation;
-                        builder.next("§b§lDIAMOND §r§7Lvl. §e§l" + GameUtils.toRoman(nextLevel.getLevel()) + " §7in: §e" + untilNextLevel + "§7s");
-                    }
-                }
-            }
-
-            if (emeraldSampleSpawner != null) {
-
-                final long lastLevelUp = emeraldSampleSpawner.getLastLevelUp();
-
-                if (emeraldSampleSpawner.getCurrentLevel().getLevel() >= emeraldSampleSpawner.getSpawner().getSpawnerLevels().size()) {
-                    builder.next("§a§lEMERALD §r§7Spawner (§eMax§7)");
-                } else if (lastLevelUp > 0) {
-                    final long timePassedSinceCreation = (System.currentTimeMillis() - emeraldSampleSpawner.getCreationTime()) / 1000;
-                    if (emeraldSampleSpawner.getSpawner().getSpawnerLevels().size() >= emeraldSampleSpawner.getCurrentLevel().getLevel() + 1) {
-                        final SpawnerLevel nextLevel = emeraldSampleSpawner.getSpawner().getSpawnerLevels().get(emeraldSampleSpawner.getCurrentLevel().getLevel());
-                        final long untilNextLevel = nextLevel.getAfterSeconds() - timePassedSinceCreation;
-                        builder.next("§a§lEMERALD §r§7Lvl. §e§l" + GameUtils.toRoman(nextLevel.getLevel()) + " §7in: §e" + untilNextLevel + "§7s");
-                    }
-                }
+            if (diamondSampleSpawner != null && emeraldSampleSpawner != null) {
+                final String diamondText = GameUtils.generateScoreboardMissingTimeSpawners(getDiamondSampleSpawner());
+                final String emeraldText = GameUtils.generateScoreboardMissingTimeSpawners(getEmeraldSampleSpawner());
+                builder.next(emeraldText);
+                builder.next(diamondText);
                 builder.blank();
             }
 
             for (final BedwarsTeam t : assignedTeams.keySet()) {
-                builder.next(" §7Team " + "§l§" + t.getColorCode() + t.name() + getTeamChar(t));
+                builder.next("✦ §7Team " + "§" + t.getColorCode() + "§l" + t.name() + getTeamChar(t));
             }
+
             builder.blank();
             builder.next(" §emc.aussiebedwars.net");
             return builder.build();
@@ -321,6 +284,47 @@ public abstract class ActiveGame {
         upgradeItemStacks.clear();
         hasStarted = false;
         destroyMap();
+    }
+
+    public SpawnPosition getTeamSpawn(final BedwarsTeam bedwarsTeam) {
+        for (final TeamSpawnPosition mapSpawn : bedwarsGame.getMapSpawns()) {
+            if (mapSpawn.getBedwarsTeam() == bedwarsTeam) {
+                return mapSpawn;
+            }
+        }
+        return null;
+    }
+
+    public List<ActiveSpawner> getTeamSpawners(final BedwarsTeam team) {
+        double squaredDistanceGold = -1;
+        double squaredDistanceIron = -1;
+        ActiveSpawner nearestGold = null;
+        ActiveSpawner nearestIron = null;
+        for (ActiveSpawner activeSpawner : activeSpawners) {
+            if (activeSpawner.getType() == SpawnerType.GOLD) {
+                final double tempDistance = activeSpawner.getSpawner().getSpawnPosition().squaredDistance(getTeamSpawn(team));
+                if (nearestGold == null) {
+                    nearestGold = activeSpawner;
+                    squaredDistanceGold = tempDistance;
+                } else if (squaredDistanceGold > tempDistance) {
+                    squaredDistanceGold = tempDistance;
+                }
+            } else if (activeSpawner.getType() == SpawnerType.IRON) {
+                final double tempDistance = activeSpawner.getSpawner().getSpawnPosition().squaredDistance(getTeamSpawn(team));
+                if (nearestIron == null) {
+                    nearestIron = activeSpawner;
+                    squaredDistanceIron = tempDistance;
+                } else if (squaredDistanceIron > tempDistance) {
+                    squaredDistanceIron = tempDistance;
+                }
+            }
+        }
+
+        final List<ActiveSpawner> s = new ArrayList<>();
+        s.add(nearestIron);
+        s.add(nearestGold);
+        return s;
+
     }
 
     public void handleError(final String text) {
@@ -449,11 +453,11 @@ public abstract class ActiveGame {
                 return;
             }
             assignTeams();
-            fillUpgradeMaps();
             assignScoreboards();
             createSpawners();
             createMerchants();
             moveTeamsToSpawns();
+            fillUpgradeMaps();
             giveAllDefaultSet();
             healAll();
             setupUpgradeLevelsMap();
@@ -462,14 +466,15 @@ public abstract class ActiveGame {
         }
     }
 
-    public void fillUpgradeMaps() {
-        for (final UpgradeType type : UpgradeType.values()) {
-            for (final BedwarsTeam team : assignedTeams.keySet()) {
-                final Map<BedwarsTeam, Integer> tempMap = new HashMap<>();
-                tempMap.put(team, 0);
-                this.upgradesLevelsMap.put(type, tempMap);
-            }
+    public final void fillUpgradeMaps() {
+
+        for (final UpgradeType upgradeType : UpgradeType.values()) {
+            final Map<BedwarsTeam, Integer> teamIntegerMap = new HashMap<>();
+            for (final BedwarsTeam bedwarsTeam : assignedTeams.keySet())
+                teamIntegerMap.put(bedwarsTeam, 0x00);
+            this.upgradesLevelsMap.put(upgradeType, teamIntegerMap);
         }
+
     }
 
     public void healAll() {
@@ -547,6 +552,7 @@ public abstract class ActiveGame {
 
     public void createSpawners() {
         for (final ActiveSpawner activeSpawner : getActiveSpawners()) {
+            activeSpawner.spawn();
             if (this.diamondSampleSpawner == null) {
                 if (activeSpawner.getType() == SpawnerType.DIAMOND) {
                     this.diamondSampleSpawner = activeSpawner;
@@ -557,7 +563,6 @@ public abstract class ActiveGame {
                     this.emeraldSampleSpawner = activeSpawner;
                 }
             }
-            activeSpawner.spawn();
         }
     }
 
@@ -774,7 +779,7 @@ public abstract class ActiveGame {
         return topKills;
     }
 
-    public Map<UpgradeType, Map<BedwarsTeam, Integer>> getUpgradesLevelsMap() {
+    public EnumMap<UpgradeType, Map<BedwarsTeam, Integer>> getUpgradesLevelsMap() {
         return upgradesLevelsMap;
     }
 
@@ -798,16 +803,16 @@ public abstract class ActiveGame {
         return associatedUpgradeGUI;
     }
 
-    public AbstractDeathmatch getAbstractDeathmatch() {
+    public final AbstractDeathmatch getAbstractDeathmatch() {
         return abstractDeathmatch;
     }
 
-    public ActiveSpawner getDiamondSampleSpawner() {
-        return diamondSampleSpawner;
+    public final ActiveSpawner getDiamondSampleSpawner() {
+        return this.diamondSampleSpawner;
     }
 
-    public ActiveSpawner getEmeraldSampleSpawner() {
-        return emeraldSampleSpawner;
+    public final ActiveSpawner getEmeraldSampleSpawner() {
+        return this.emeraldSampleSpawner;
     }
 
     public List<ActiveHealPool> getHealPools() {

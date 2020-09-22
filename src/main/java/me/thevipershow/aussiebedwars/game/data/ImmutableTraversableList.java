@@ -24,7 +24,11 @@ public final class ImmutableTraversableList<T> {
         }
     }
 
-    public void clear() {
+    public final boolean hasNext() {
+        return (this.list.size()) >= (currentIndex + 1);
+    }
+
+    public final void clear() {
         list.clear();
     }
 

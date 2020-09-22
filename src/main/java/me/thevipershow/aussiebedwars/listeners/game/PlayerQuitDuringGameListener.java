@@ -1,6 +1,7 @@
 package me.thevipershow.aussiebedwars.listeners.game;
 
 import me.thevipershow.aussiebedwars.AussieBedwars;
+import me.thevipershow.aussiebedwars.bedwars.Gamemode;
 import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.aussiebedwars.game.ActiveGame;
 import me.thevipershow.aussiebedwars.game.GameUtils;
@@ -31,6 +32,9 @@ public final class PlayerQuitDuringGameListener extends UnregisterableListener {
         }
 
         activeGame.removePlayer(p);
+        if (activeGame.getBedwarsGame().getGamemode() == Gamemode.SOLO) {
+            activeGame.getDestroyedTeams().add(activeGame.getPlayerTeam(p));
+        }
         activeGame.getPlayersOutOfGame().add(p);
         GameUtils.clearAllEffects(p);
         GameUtils.clearArmor(p);

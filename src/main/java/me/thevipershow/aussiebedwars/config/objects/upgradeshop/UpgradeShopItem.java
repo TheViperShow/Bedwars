@@ -59,4 +59,32 @@ public final class UpgradeShopItem implements ConfigurationSerializable {
         final List<String> lore = (List<String>) map.get("lore");
         return new UpgradeShopItem(level, material, itemName, amount, price, buyWith, lore);
     }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public Material getMaterial() {
+        return material;
+    }
+
+    public String getItemName() {
+        return itemName;
+    }
+
+    public int getAmount() {
+        return amount;
+    }
+
+    public int getPrice() {
+        return price;
+    }
+
+    public Material getBuyWith() {
+        return buyWith;
+    }
+
+    public List<String> getLore() {
+        return lore;
+    }
 }

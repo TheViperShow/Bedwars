@@ -1,7 +1,7 @@
 package me.thevipershow.aussiebedwars;
 
 import me.thevipershow.aussiebedwars.bedwars.spawner.SpawnerLevel;
-import me.thevipershow.aussiebedwars.commands.CommandsManager;
+import me.thevipershow.aussiebedwars.commands.AussieBedwarsMainCommand;
 import me.thevipershow.aussiebedwars.config.BedwarsGamemodeConfig;
 import me.thevipershow.aussiebedwars.config.ConfigManager;
 import me.thevipershow.aussiebedwars.config.DefaultConfiguration;
@@ -31,7 +31,8 @@ import me.thevipershow.aussiebedwars.storage.sql.Database;
 import me.thevipershow.aussiebedwars.storage.sql.MySQLDatabase;
 import me.thevipershow.aussiebedwars.worlds.WorldsManager;
 import me.tigerhix.lib.scoreboard.ScoreboardLib;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.Bukkit;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -42,7 +43,6 @@ public final class AussieBedwars extends JavaPlugin {
     public static String MYSQL_DRIVER_CLASS = null;
 
     private WorldsManager worldsManager;
-    private CommandsManager commandsManager;
     private GameManager gameManager;
     private Database database;
     private DefaultConfiguration defaultConfiguration;
@@ -124,12 +124,14 @@ public final class AussieBedwars extends JavaPlugin {
         worldsManager = WorldsManager.getInstanceSafe(configManager, this);
         worldsManager.cleanPreviousDirs();
 
-        commandsManager = CommandsManager.getInstance(this);
-        commandsManager.registerAll();
-
         database = new MySQLDatabase(this, defaultConfiguration);
         gameManager = new GameManager(this, worldsManager, soloConfig, duoConfig);
         gameManager.loadBaseAmount();
+
+        final PluginCommand pluginCommand = getServer().getPluginCommand("abedwars");
+        final AussieBedwarsMainCommand aussieBedwarsMainCommand = new AussieBedwarsMainCommand(this, gameManager);
+        pluginCommand.setExecutor(aussieBedwarsMainCommand);
+        pluginCommand.setTabCompleter(aussieBedwarsMainCommand);
 
         matchmakingVillagerListener = new MatchmakingVillagersListener(this, gameManager);
         getServer().getPluginManager().registerEvents(matchmakingVillagerListener, this);

@@ -1,14 +1,13 @@
 package me.thevipershow.aussiebedwars.game.upgrades;
 
+import java.util.Iterator;
+import java.util.LinkedList;
 import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.aussiebedwars.config.objects.upgradeshop.HealPoolUpgrade;
 import me.thevipershow.aussiebedwars.game.ActiveGame;
-import me.thevipershow.aussiebedwars.game.GameUtils;
-import net.minecraft.server.v1_8_R3.EnumParticle;
-import net.minecraft.server.v1_8_R3.PacketPlayOutWorldParticles;
-import net.minecraft.server.v1_8_R3.PlayerConnection;
 import org.bukkit.Effect;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
@@ -50,12 +49,54 @@ public final class ActiveHealPool {
                             final double newHealth = p.getHealth() + (healPoolUpgrade.getHealAmount() * 2);
                             if (newHealth <= 20.00) {
                                 p.setHealth(p.getHealth() + healPoolUpgrade.getHealAmount());
-                                final Location playerEyeLoc = p.getEyeLocation().add(0.0, 0.175, 0.0);
-                                activeGame.getAssociatedWorld().playEffect(playerEyeLoc, Effect.HEART, 0);
+                                new HealAnimation(p, activeGame.getPlugin()).start();
                             }
                         });
             }
         }, 1L, 20L * healPoolUpgrade.getHealFrequency());
+
+    }
+
+    private static class HealAnimation {
+
+        private final Player target;
+        private final World w;
+        private final Plugin plugin;
+        private final Iterator<Location> animation;
+        private final static double radius = 1.10125d;
+
+        private BukkitTask task = null;
+
+        public HealAnimation(final Player target, final Plugin plugin) {
+            this.target = target;
+            this.plugin = plugin;
+            this.w = target.getWorld();
+            final Location startingLocation = target.getLocation().add(0, 0.15, 0);
+            final LinkedList<Location> locations = new LinkedList<>();
+            double increaseY = 0.00d;
+
+            for (double d = 0d; d < 360d; d += 12.0, increaseY += 0.0625325) {
+                final Location modified = new Location(w,
+                        (startingLocation.getX() + (radius * Math.sin(d))),
+                        increaseY + startingLocation.getY(),
+                        (startingLocation.getZ() + (radius * Math.cos(d)))
+                );
+                locations.add(modified);
+            }
+
+            this.animation = locations.iterator();
+        }
+
+        public final void start() {
+            this.task = plugin.getServer().getScheduler().runTaskTimer(plugin, () -> {
+                if (!target.isOnline() || !animation.hasNext()) {
+                    task.cancel();
+                } else {
+                    final Location particleLoc = animation.next();
+                    w.playEffect(particleLoc, Effect.HEART, 0);
+                }
+            }, 1L, 1L);
+        }
 
     }
 

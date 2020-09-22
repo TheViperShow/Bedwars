@@ -24,7 +24,7 @@ public final class TNTPlaceListener extends UnregisterableListener {
         if (b.getType() == Material.TNT) {
             GameUtils.decreaseItemInHand(event.getPlayer());
             event.setCancelled(true);
-            b.getWorld().spawnEntity(b.getLocation(), EntityType.PRIMED_TNT);
+            b.getWorld().spawnEntity(b.getLocation().add(0.501, 0.055, 0.501), EntityType.PRIMED_TNT);
         }
     }
 }

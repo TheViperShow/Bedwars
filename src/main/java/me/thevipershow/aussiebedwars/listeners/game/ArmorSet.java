@@ -70,7 +70,7 @@ public final class ArmorSet {
         public ItemStack generateColoredItemStack(final BedwarsTeam teamColor, final String type) {
             final ItemStack i = new ItemStack(bindMap.get(type));
             final LeatherArmorMeta colorMeta = (LeatherArmorMeta) i.getItemMeta();
-            colorMeta.setColor(teamColor.getRgbColour());
+            colorMeta.setColor(teamColor.getRGBColor());
             colorMeta.setDisplayName("§7Team §" + teamColor.getColorCode() + "§l" + teamColor.name());
             i.setItemMeta(colorMeta);
             return i;

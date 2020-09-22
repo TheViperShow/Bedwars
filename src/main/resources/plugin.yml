@@ -5,3 +5,6 @@ prefix: Aussie-Bedwars
 authors: [ TheViperShow ]
 description: Bedwars plugin for AussieBedwars server.
 website: ${project.url}
+commands:
+  abedwars:
+    description: "Main command of Aussie Bedwars."

@@ -10,11 +10,13 @@ public class SpawnerLevel implements ConfigurationSerializable {
     private final int level;
     private final int dropIncrease;
     private final int afterSeconds;
+    private final int decreaseSpawnDelay;
 
-    public SpawnerLevel(int level, int dropIncrease, int afterSeconds) {
+    public SpawnerLevel(int level, int dropIncrease, int afterSeconds, int decreaseSpawnDelay) {
         this.level = level;
         this.dropIncrease = dropIncrease;
         this.afterSeconds = afterSeconds;
+        this.decreaseSpawnDelay = decreaseSpawnDelay;
     }
 
     @Override
@@ -23,6 +25,7 @@ public class SpawnerLevel implements ConfigurationSerializable {
         objectMap.put("number", level);
         objectMap.put("increase-drop", dropIncrease);
         objectMap.put("after-seconds", afterSeconds);
+        objectMap.put("decrease-delay", decreaseSpawnDelay);
         return objectMap;
     }
 
@@ -30,7 +33,12 @@ public class SpawnerLevel implements ConfigurationSerializable {
         int level = (int) objectMap.get("number");
         int increase = (int) objectMap.get("increase-drop");
         int seconds = (int) objectMap.get("after-seconds");
-        return new SpawnerLevel(level, increase, seconds);
+        int decreaseSpawnDelay = (int) objectMap.get("decrease-delay");
+        return new SpawnerLevel(level, increase, seconds, decreaseSpawnDelay);
+    }
+
+    public int getDecreaseSpawnDelay() {
+        return decreaseSpawnDelay;
     }
 
     public int getLevel() {

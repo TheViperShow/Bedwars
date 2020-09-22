@@ -5,7 +5,7 @@ duo:
     maximum-games: 8
     min-players: 4
     players: 16
-    deathmatch-start: 600 # in seconds
+    deathmatch-start: 1800 # in seconds
     teams:
       - "CYAN"
       - "PINK"
@@ -73,12 +73,15 @@ duo:
           - number: 1
             increase-drop: 0
             after-seconds: 1
+            decrease-delay: 0
           - number: 2
-            increase-drop: 1
-            after-seconds: 240
+            increase-drop: 0
+            after-seconds: 720
+            decrease-delay: 40
           - number: 3
-            increase-drop: 2
-            after-seconds: 420
+            increase-drop: 1
+            after-seconds: 1440
+            decrease-delay: 60
       - type: "EMERALD"
         invisible: false
         location:
@@ -91,12 +94,15 @@ duo:
           - number: 1
             increase-drop: 0
             after-seconds: 1
+            decrease-delay: 0
           - number: 2
-            increase-drop: 1
-            after-seconds: 240
+            increase-drop: 0
+            after-seconds: 720
+            decrease-delay: 40
           - number: 3
-            increase-drop: 2
-            after-seconds: 420
+            increase-drop: 1
+            after-seconds: 1440
+            decrease-delay: 60
       - type: "EMERALD"
         invisible: false
         location:
@@ -109,12 +115,15 @@ duo:
           - number: 1
             increase-drop: 0
             after-seconds: 1
+            decrease-delay: 0
           - number: 2
-            increase-drop: 1
-            after-seconds: 240
+            increase-drop: 0
+            after-seconds: 720
+            decrease-delay: 40
           - number: 3
-            increase-drop: 2
-            after-seconds: 420
+            increase-drop: 1
+            after-seconds: 1440
+            decrease-delay: 60
       - type: "EMERALD"
         invisible: false
         location:
@@ -127,12 +136,15 @@ duo:
           - number: 1
             increase-drop: 0
             after-seconds: 1
+            decrease-delay: 0
           - number: 2
-            increase-drop: 1
-            after-seconds: 240
+            increase-drop: 0
+            after-seconds: 720
+            decrease-delay: 40
           - number: 3
-            increase-drop: 2
-            after-seconds: 420
+            increase-drop: 1
+            after-seconds: 1440
+            decrease-delay: 60
       # DIAMONDS SPAWNERS
       #---------------------------------------
       - type: "DIAMOND"
@@ -147,12 +159,15 @@ duo:
           - number: 1
             increase-drop: 0
             after-seconds: 1
+            decrease-delay: 0
           - number: 2
-            increase-drop: 1
-            after-seconds: 240
+            increase-drop: 0
+            after-seconds: 360
+            decrease-delay: 40
           - number: 3
-            increase-drop: 2
-            after-seconds: 420
+            increase-drop: 1
+            after-seconds: 1080
+            decrease-delay: 60
       - type: "DIAMOND"
         invisible: false
         location:
@@ -165,12 +180,15 @@ duo:
           - number: 1
             increase-drop: 0
             after-seconds: 1
+            decrease-delay: 0
           - number: 2
-            increase-drop: 1
-            after-seconds: 240
+            increase-drop: 0
+            after-seconds: 360
+            decrease-delay: 40
           - number: 3
-            increase-drop: 2
-            after-seconds: 420
+            increase-drop: 1
+            after-seconds: 1080
+            decrease-delay: 60
       - type: "DIAMOND"
         invisible: false
         location:
@@ -183,12 +201,15 @@ duo:
           - number: 1
             increase-drop: 0
             after-seconds: 1
+            decrease-delay: 0
           - number: 2
-            increase-drop: 1
-            after-seconds: 240
+            increase-drop: 0
+            after-seconds: 360
+            decrease-delay: 40
           - number: 3
-            increase-drop: 2
-            after-seconds: 420
+            increase-drop: 1
+            after-seconds: 1080
+            decrease-delay: 60
       - type: "DIAMOND"
         invisible: false
         location:
@@ -201,12 +222,15 @@ duo:
           - number: 1
             increase-drop: 0
             after-seconds: 1
+            decrease-delay: 0
           - number: 2
-            increase-drop: 1
-            after-seconds: 240
+            increase-drop: 0
+            after-seconds: 360
+            decrease-delay: 40
           - number: 3
-            increase-drop: 2
-            after-seconds: 420
+            increase-drop: 1
+            after-seconds: 1080
+            decrease-delay: 60
             #--------------------------------------- Dark
       - type: "IRON"
         invisible: true
@@ -220,6 +244,7 @@ duo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
+            decrease-delay: 0
       - type: "GOLD"
         invisible: true
         location:
@@ -232,6 +257,7 @@ duo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
+            decrease-delay: 0
             #--------------------------------------- Red
       - type: "IRON"
         invisible: true
@@ -245,6 +271,7 @@ duo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
+            decrease-delay: 0
       - type: "GOLD"
         invisible: true
         location:
@@ -257,6 +284,7 @@ duo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
+            decrease-delay: 0
             #--------------------------------------- Blue
       - type: "IRON"
         invisible: true
@@ -270,6 +298,7 @@ duo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
+            decrease-delay: 0
       - type: "GOLD"
         invisible: true
         location:
@@ -282,6 +311,7 @@ duo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
+            decrease-delay: 0
             #--------------------------------------- Green
       - type: "IRON"
         invisible: true
@@ -295,6 +325,7 @@ duo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
+            decrease-delay: 0
       - type: "GOLD"
         invisible: true
         location:
@@ -307,6 +338,7 @@ duo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
+            decrease-delay: 0
             #--------------------------------------- Yellow
       - type: "IRON"
         invisible: true
@@ -320,6 +352,7 @@ duo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
+            decrease-delay: 0
       - type: "GOLD"
         invisible: true
         location:
@@ -332,6 +365,7 @@ duo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
+            decrease-delay: 0
             #---------------------------------------  cyan
       - type: "IRON"
         invisible: true
@@ -345,6 +379,7 @@ duo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
+            decrease-delay: 0
       - type: "GOLD"
         invisible: true
         location:
@@ -357,6 +392,7 @@ duo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
+            decrease-delay: 0
             #--------------------------------------- White
       - type: "IRON"
         invisible: true
@@ -370,6 +406,7 @@ duo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
+            decrease-delay: 0
       - type: "GOLD"
         invisible: true
         location:
@@ -382,6 +419,7 @@ duo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
+            decrease-delay: 0
             # ---------------------------------------- Pink
       - type: "IRON"
         invisible: true
@@ -395,6 +433,7 @@ duo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
+            decrease-delay: 0
       - type: "GOLD"
         invisible: true
         location:
@@ -407,6 +446,7 @@ duo:
           - number: 1
             increase-drop: 0
             after-seconds: 60
+            decrease-delay: 0
     merchants:
       # MERCHANTS SHOP SIGNS
       - name: "§7[§eAussieBedwars§7] §eShop"
@@ -672,7 +712,7 @@ duo:
           buy-with: "IRON_INGOT"
           lore:
             - "§7Wood planks."
-        - material: "GLASS"
+        - material: "STAINED_GLASS"
           item-name: "§f§lGlass"
           slot: 30
           amount: 16
@@ -879,7 +919,7 @@ duo:
               - ""
               - "§7Tier 4: +200% Resources"
       heal-pool:
-        heal-radius: 10
+        heal-radius: 25
         heal-frequency: 5
         heal-amount: 1.0
         material: "BEACON"

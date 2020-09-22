@@ -28,7 +28,10 @@ public class ExplosionListener extends UnregisterableListener {
 
         final List<Block> affectedBlocks = event.blockList();
         final List<Block> toDestroy = affectedBlocks.stream()
-                .filter(block -> activeGame.getPlayerPlacedBlocks().contains(block) && block.getType() != Material.GLASS && block.getType() != Material.ENDER_STONE)
+                .filter(block -> activeGame.getPlayerPlacedBlocks().contains(block)
+                        && block.getType() != Material.GLASS
+                        && block.getType() != Material.STAINED_GLASS
+                        && block.getType() != Material.ENDER_STONE)
                 .collect(Collectors.toList());
         if (toDestroy.size() != affectedBlocks.size()) {
             event.setCancelled(true);

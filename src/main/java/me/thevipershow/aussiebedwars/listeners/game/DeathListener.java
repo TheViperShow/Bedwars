@@ -121,7 +121,7 @@ public final class DeathListener extends UnregisterableListener {
         game.downgradePlayerTools(player);
     }
 
-    private String generateDeathMessage(final EntityDamageEvent e, final BedwarsTeam killedPlayerTeam) {
+    private String generateDeathMessage(final EntityDamageEvent e, final BedwarsTeam killedPlayerTeam, final boolean finalKill) {
 
         final StringBuilder msg = new StringBuilder("§" + killedPlayerTeam.getColorCode() + e.getEntity().getName());
         if (e instanceof EntityDamageByEntityEvent) {
@@ -161,7 +161,8 @@ public final class DeathListener extends UnregisterableListener {
                     break;
             }
         }
-        msg.append(" §e§lFINAL KILL.");
+        if (finalKill)
+            msg.append(" §e§lFINAL KILL.");
         return msg.toString();
     }
 
@@ -182,9 +183,10 @@ public final class DeathListener extends UnregisterableListener {
         final double damage = event.getDamage();
         if (playerHealth - damage <= 0.0) {
             final BedwarsTeam b = activeGame.getPlayerTeam(p);
-            if (activeGame.getDestroyedTeams().contains(b)) { // Checking if players' team's bed has been broken previously.
+
+            if (activeGame.getDestroyedTeams().contains(b) || activeGame.getAbstractDeathmatch().isRunning()) { // Checking if players' team's bed has been broken previously.
                 // here player has lost the game.
-                activeGame.getPlayersOutOfGame().add(p);
+                // or has died permanently since the deathmatch mode is ON.
                 activeGame.removePlayer(p);
                 p.setAllowFlight(true);
                 p.setFlying(true);
@@ -193,10 +195,11 @@ public final class DeathListener extends UnregisterableListener {
                 GameUtils.clearArmor(p);
                 givePlayerLobbyCompass(p);
                 if (!activeGame.getPlayersOutOfGame().contains(p)) {
-                    p.sendMessage("§cYou have been eliminated.");
-                    final String generatedDeathMsg = generateDeathMessage(event, b);
-                    activeGame.getAssociatedWorld().getPlayers().forEach(player -> player.sendMessage(generatedDeathMsg));
+                    p.sendMessage(AussieBedwars.PREFIX + "§cYou have been eliminated.");
+                    final String generatedDeathMsg = generateDeathMessage(event, b, true);
+                    activeGame.getAssociatedWorld().getPlayers().forEach(player -> player.sendMessage(AussieBedwars.PREFIX + generatedDeathMsg));
                 }
+                activeGame.getPlayersOutOfGame().add(p);
 
                 final Location pLoc = p.getLocation();
                 if (pLoc.getY() <= 1.00) {
@@ -220,6 +223,8 @@ public final class DeathListener extends UnregisterableListener {
                     pLoc.setY(70.00);
                     p.teleport(pLoc);
                 }
+                final String generatedDeathMsg = generateDeathMessage(event, b, false);
+                activeGame.getAssociatedWorld().getPlayers().forEach(player -> player.sendMessage(AussieBedwars.PREFIX + generatedDeathMsg));
             }
             p.setHealth(p.getMaxHealth());
             event.setCancelled(true);

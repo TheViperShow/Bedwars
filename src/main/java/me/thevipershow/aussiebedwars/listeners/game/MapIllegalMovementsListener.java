@@ -10,6 +10,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 
 public final class MapIllegalMovementsListener extends UnregisterableListener {
 
@@ -44,22 +46,29 @@ public final class MapIllegalMovementsListener extends UnregisterableListener {
                 minZ = tempZ;
         }
 
-        data[0] = new double[]{minX, maxX};
-        data[1] = new double[]{20, 80};
-        data[2] = new double[]{minZ, maxZ};
+        data[0] = new double[]{minX - 50, maxX + 50};
+        data[1] = new double[]{0, 120};
+        data[2] = new double[]{minZ - 50, maxZ + 50};
 
         return data;
     }
 
-    private boolean isOutOfBounds(final Block block) {
-        final Location loc = block.getLocation();
+    private boolean isOutOfBounds(final Location loc, final boolean considerY) {
         final double x = loc.getX();
         final double y = loc.getY();
         final double z = loc.getZ();
 
         return (x < bounds[0][0] || x > bounds[0][1]) ||
-                (y < bounds[1][0] || y > bounds[1][1]) ||
+                (y < bounds[1][0] || (considerY && y > bounds[1][1])) ||
                 (z < bounds[2][0] || z > bounds[2][1]);
+    }
+
+    private boolean isOutOfBounds(final Block block) {
+        return isOutOfBounds(block.getLocation(), true);
+    }
+
+    private boolean isOutOfBounds(final Player player) {
+        return isOutOfBounds(player.getLocation(), true);
     }
 
     public MapIllegalMovementsListener(final ActiveGame activeGame) {
@@ -67,12 +76,27 @@ public final class MapIllegalMovementsListener extends UnregisterableListener {
         this.bounds = genBounds(activeGame);
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
+    public void onPlayerMove(final PlayerMoveEvent event) {
+        final Player player = event.getPlayer();
+        if (!activeGame.getAssociatedWorld().equals(player.getWorld())) return;
+        if (!activeGame.isHasStarted()) return;
+        if (isOutOfBounds(player)) {
+            if (activeGame.isOutOfGame(player)) {
+                event.setCancelled(true);
+            } else {
+                final EntityDamageEvent e = new EntityDamageEvent(player, EntityDamageEvent.DamageCause.VOID, 20.00);
+                activeGame.getPlugin().getServer().getPluginManager().callEvent(e);
+            }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
     public void onBlockPlace(final BlockPlaceEvent event) {
         final Block block = event.getBlock();
         final Player player = event.getPlayer();
-        if (player.isOp()) return;
-        if (isOutOfBounds(block) && player.getWorld().equals(activeGame.getAssociatedWorld()))
+        if (player.getWorld().equals(activeGame.getAssociatedWorld()) && isOutOfBounds(block)) {
             event.setCancelled(true);
+        }
     }
 }

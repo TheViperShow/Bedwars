@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import me.thevipershow.aussiebedwars.bedwars.Gamemode;
 import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
+import me.thevipershow.aussiebedwars.bedwars.objects.spawners.SpawnerType;
 import me.thevipershow.aussiebedwars.config.objects.Merchant;
 import me.thevipershow.aussiebedwars.config.objects.TeamSpawnPosition;
 import me.thevipershow.aussiebedwars.listeners.game.ArmorSet;
@@ -301,6 +302,39 @@ public final class GameUtils {
         return null;
     }
 
+    public static String generateScoreboardMissingTimeSpawners(final ActiveSpawner activeSpawner) {
+        if (activeSpawner == null) return "";
+        final SpawnerType type = activeSpawner.getType();
+        final StringBuilder str = new StringBuilder();
+        switch (type) {
+            case DIAMOND:
+                str.append("§b§l");
+                break;
+            case EMERALD:
+                str.append("§a§l");
+                break;
+            case IRON:
+                str.append("§f§l");
+                break;
+            case GOLD:
+                str.append("§e§l");
+                break;
+            default:
+                break;
+        }
+        str.append(type.name().toUpperCase());
+        final long timeLeft = activeSpawner.getTimeUntilNextLevel();
+
+        if (timeLeft == -1L) {
+            str.append(" §r§7Spawner (§eMax Lvl.§7)");
+        } else {
+            str.append(" §r§7Lvl. §e")
+                    .append(toRoman(1 + activeSpawner.getCurrentLevel().getLevel()))
+                    .append(" §7in §e§l").append(timeLeft)
+                    .append("§r§7s");
+        }
+        return str.toString();
+    }
 
     public static String toRoman(int number) {
         return String.valueOf(new char[number]).replace('\0', 'I')

@@ -5,12 +5,14 @@ import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.aussiebedwars.game.ActiveGame;
 import me.thevipershow.aussiebedwars.listeners.UnregisterableListener;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.util.Vector;
 
 public final class EntityDamageListener extends UnregisterableListener {
 
@@ -48,6 +50,9 @@ public final class EntityDamageListener extends UnregisterableListener {
             if (damagedPlayerTeam != null && (damagedPlayerTeam == damagerPlayerTeam)) {
                 event.setCancelled(true);
             }
+        } else if (damager instanceof EnderDragon && damaged instanceof Player) {
+            final Vector dragonVelocity = damager.getVelocity();
+            damaged.setVelocity(dragonVelocity.multiply(new Vector(0.75, 2.75, 0.75)));
         }
     }
 }
