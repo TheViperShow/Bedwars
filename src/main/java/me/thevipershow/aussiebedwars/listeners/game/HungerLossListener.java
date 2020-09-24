@@ -15,7 +15,7 @@ public class HungerLossListener extends UnregisterableListener {
         this.activeGame = activeGame;
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onFoodLevelChange(final FoodLevelChangeEvent event) {
         if (!(event.getEntity() instanceof Player)) return;
         if (!event.getEntity().getWorld().equals(activeGame.getAssociatedWorld())) return;

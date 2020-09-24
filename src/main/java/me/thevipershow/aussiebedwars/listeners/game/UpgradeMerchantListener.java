@@ -20,7 +20,7 @@ public final class UpgradeMerchantListener extends UnregisterableListener {
         this.activeGame = activeGame;
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerInteractEntity(final PlayerInteractEntityEvent event) {
         final Entity entity = event.getRightClicked();
         if (!(entity instanceof Villager)) return;
@@ -39,9 +39,9 @@ public final class UpgradeMerchantListener extends UnregisterableListener {
             }
         }
 
-        if (aMerchant == null) return;
-
-        event.setCancelled(true);
-        activeGame.openUpgrade(p);
+        if (aMerchant != null) {
+            event.setCancelled(true);
+            activeGame.openUpgrade(p);
+        }
     }
 }

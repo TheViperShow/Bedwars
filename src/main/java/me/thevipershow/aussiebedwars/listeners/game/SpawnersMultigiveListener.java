@@ -21,7 +21,7 @@ public final class SpawnersMultigiveListener extends UnregisterableListener {
         this.activeGame = activeGame;
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public final void onPlayerPickupItem(final PlayerPickupItemEvent event) {
         final Player player = event.getPlayer();
         if (!player.getWorld().equals(activeGame.getAssociatedWorld())) return;

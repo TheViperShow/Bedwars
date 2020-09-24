@@ -10,7 +10,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -21,8 +20,9 @@ public final class SpectatorsInteractListener extends UnregisterableListener {
     private final ActiveGame activeGame;
 
     private <T extends Event & Cancellable> void cancel(final Player player, final T cancellableEvent) {
-        if (activeGame.getPlayersOutOfGame().contains(player))
+        if (activeGame.isOutOfGame(player)) {
             cancellableEvent.setCancelled(true);
+        }
     }
 
     public SpectatorsInteractListener(final ActiveGame activeGame) {
@@ -61,8 +61,9 @@ public final class SpectatorsInteractListener extends UnregisterableListener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-        if (event.getDamager() instanceof Player)
+        if (event.getDamager() instanceof Player) {
             cancel((Player) event.getDamager(), event);
+        }
     }
 
 }

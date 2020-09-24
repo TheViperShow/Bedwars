@@ -53,7 +53,7 @@ public final class SoloActiveGame extends ActiveGame {
             final Player p = entry.getValue().stream().findAny().get();
             final Scoreboard scoreboard = ScoreboardLib.createScoreboard(p);
             scoreboard.setHandler(super.scoreboardHandler).setUpdateInterval(20L);
-            super.activeScoreboards.add(scoreboard);
+            super.activeScoreboards.put(p, scoreboard);
             scoreboard.activate();
         }
     }

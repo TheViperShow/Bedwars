@@ -2,6 +2,8 @@ package me.thevipershow.aussiebedwars.game;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -94,7 +96,6 @@ public abstract class ActiveGame {
     protected ActiveSpawner emeraldSampleSpawner = null;
 
     protected final SwordUpgrades swordUpgrades = new SwordUpgrades();
-    protected final List<Scoreboard> activeScoreboards = new ArrayList<>();
     protected final List<BedwarsTeam> destroyedTeams = new ArrayList<>();
     protected final List<Player> playersOutOfGame = new ArrayList<>();
     protected final List<AbstractActiveMerchant> activeMerchants = new ArrayList<>();
@@ -108,6 +109,7 @@ public abstract class ActiveGame {
     protected final Map<ItemStack, ShopItem> shopItemStacks = new HashMap<>();
     protected final Map<ItemStack, UpgradeItem> upgradeItemStacks = new HashMap<>();
     protected final Map<Player, Map<UpgradeItem, Integer>> playerUpgradeLevelsMap = new HashMap<>();
+    protected final Map<Player, Scoreboard> activeScoreboards = new HashMap<>();
     protected final EnumMap<UpgradeType, Map<BedwarsTeam, Integer>> upgradesLevelsMap = new EnumMap<>(UpgradeType.class);
 
     ///////////////////////////////////////////////////
@@ -225,6 +227,7 @@ public abstract class ActiveGame {
         @Override
         public List<Entry> getEntries(final Player player) {
             final EntryBuilder builder = new EntryBuilder();
+            builder.next("§7" + LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE));
             builder.blank();
 
             if (diamondSampleSpawner != null && emeraldSampleSpawner != null) {
@@ -232,8 +235,6 @@ public abstract class ActiveGame {
                 final String emeraldText = GameUtils.generateScoreboardMissingTimeSpawners(getEmeraldSampleSpawner());
                 builder.next(diamondText);
                 builder.next(emeraldText);
-                System.out.println("D: " + diamondText.length());
-                System.out.println("E: " + emeraldText.length());
                 builder.blank();
             }
 
@@ -267,7 +268,7 @@ public abstract class ActiveGame {
         assignedTeams.clear();
         activeSpawners.forEach(ActiveSpawner::despawn);
         activeSpawners.clear();
-        activeScoreboards.forEach(Scoreboard::deactivate);
+        activeScoreboards.values().forEach(Scoreboard::deactivate);
         activeScoreboards.clear();
         destroyedTeams.clear();
         playersOutOfGame.clear();
@@ -757,7 +758,7 @@ public abstract class ActiveGame {
         return assignedTeams;
     }
 
-    public final List<Scoreboard> getActiveScoreboards() {
+    public Map<Player, Scoreboard> getActiveScoreboards() {
         return activeScoreboards;
     }
 

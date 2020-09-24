@@ -26,7 +26,7 @@ public final class EntityDamageListener extends UnregisterableListener {
         return activeGame.getCachedWaitingLocation().distanceSquared(player.getLocation()) <= 500;
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onEntityDamageByEntity(final EntityDamageByEntityEvent event) {
         final Entity damaged = event.getEntity();
         final Entity damager = event.getDamager();

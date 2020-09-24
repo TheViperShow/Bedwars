@@ -21,7 +21,7 @@ public class ExplosionListener extends UnregisterableListener {
         this.activeGame = activeGame;
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onEntityExplode(final EntityExplodeEvent event) {
         final Entity entity = event.getEntity();
         if (!(entity instanceof TNTPrimed) && !(entity instanceof Fireball)) return;

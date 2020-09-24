@@ -91,7 +91,7 @@ public final class MapIllegalMovementsListener extends UnregisterableListener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
+    @EventHandler(priority = EventPriority.LOW)
     public void onBlockPlace(final BlockPlaceEvent event) {
         final Block block = event.getBlock();
         final Player player = event.getPlayer();

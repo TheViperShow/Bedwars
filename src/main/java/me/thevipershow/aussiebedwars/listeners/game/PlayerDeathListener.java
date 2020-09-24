@@ -168,27 +168,28 @@ public final class PlayerDeathListener extends UnregisterableListener {
                     break;
             }
         }
-        if (finalKill)
+        if (finalKill) {
             msg.append(" §e§lFINAL KILL.");
+        }
         return msg.toString();
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public final void onPlayerDeath(final EntityDamageEvent event) {
-        if (!(event.getEntity() instanceof Player)) return;
+        if (!(event.getEntity() instanceof Player)) {
+            return;
+        }
         final Player p = (Player) event.getEntity();
         final World w = p.getWorld();
 
-        if (!w.equals(activeGame.getAssociatedWorld())) return;
-
-        if (activeGame.isOutOfGame(p)) {
-            event.setCancelled(true);
+        if (!w.equals(activeGame.getAssociatedWorld())) {
             return;
         }
 
         final double playerHealth = p.getHealth();
         final double damage = event.getDamage();
-        if (playerHealth - damage <= 0.0) {
+
+        if (playerHealth - damage <= 0.00) {
             final BedwarsTeam b = activeGame.getPlayerTeam(p);
 
             if (activeGame.getDestroyedTeams().contains(b) || activeGame.getAbstractDeathmatch().isRunning()) { // Checking if players' team's bed has been broken previously.
@@ -201,7 +202,7 @@ public final class PlayerDeathListener extends UnregisterableListener {
                 p.getInventory().clear();
                 GameUtils.clearArmor(p);
                 givePlayerLobbyCompass(p);
-                if (!activeGame.getPlayersOutOfGame().contains(p)) {
+                if (!activeGame.isOutOfGame(p)) {
                     p.sendMessage(AussieBedwars.PREFIX + "§cYou have been eliminated.");
                     final String generatedDeathMsg = generateDeathMessage(event, b, true);
                     activeGame.getAssociatedWorld().getPlayers().forEach(player -> player.sendMessage(AussieBedwars.PREFIX + generatedDeathMsg));
@@ -209,8 +210,8 @@ public final class PlayerDeathListener extends UnregisterableListener {
                 activeGame.getPlayersOutOfGame().add(p);
 
                 final Location pLoc = p.getLocation();
-                if (pLoc.getY() <= 1.00) {
-                    pLoc.setY(100.00);
+                if (pLoc.getY() <= 0.00) {
+                    pLoc.setY(90.00);
                     p.teleport(pLoc);
                 }
 
@@ -226,20 +227,23 @@ public final class PlayerDeathListener extends UnregisterableListener {
                 clearInvExceptArmorAndTools(p, activeGame);
                 doDeathTimer(p);
                 final Location pLoc = p.getLocation();
-                if (pLoc.getY() <= 5.00) {
-                    pLoc.setY(70.00);
+                if (pLoc.getY() <= 0.00) {
+                    pLoc.setY(90.00);
                     p.teleport(pLoc);
                 }
+
                 final String generatedDeathMsg = generateDeathMessage(event, b, false);
                 activeGame.getAssociatedWorld().getPlayers().forEach(player -> player.sendMessage(AussieBedwars.PREFIX + generatedDeathMsg));
             }
+
             p.setHealth(p.getMaxHealth());
             event.setCancelled(true);
+
             if (event instanceof EntityDamageByEntityEvent) {
                 final EntityDamageByEntityEvent edbee = (EntityDamageByEntityEvent) event;
                 final Entity damager = edbee.getDamager();
                 if (damager instanceof Player) {
-                    ((Player) damager).playSound(damager.getLocation(), Sound.SPLASH, 7.50f, 1.0f);
+                    ((Player) damager).playSound(damager.getLocation(), Sound.SPLASH, 7.99f, 1.00f);
                 }
             }
         }

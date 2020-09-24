@@ -117,7 +117,7 @@ public final class UpgradeInteractListener extends UnregisterableListener {
                         System.out.println(s.getSpawner().getSpawnPosition().toString());
                     });
 
-                    activeGame.getAssociatedUpgradeGUI().get(player).setItem(clickedSlot, ironForgeUpgrade.getLevels().get(currentLevel).getCachedFancyStack());
+                    activeGame.getAssociatedUpgradeGUI().get(player).setItem(clickedSlot, ironForgeUpgrade.getLevels().get(currentLevel + 1).getCachedFancyStack());
                     player.updateInventory();
                 }
             }
@@ -138,7 +138,7 @@ public final class UpgradeInteractListener extends UnregisterableListener {
                         }
                     });
 
-                    activeGame.getAssociatedUpgradeGUI().get(player).setItem(clickedSlot, maniacMinerUpgrade.getLevels().get(currentLevel).getCachedFancyStack());
+                    activeGame.getAssociatedUpgradeGUI().get(player).setItem(clickedSlot, maniacMinerUpgrade.getLevels().get(currentLevel + 1).getCachedFancyStack());
                     player.updateInventory();
                 }
             }
@@ -159,7 +159,7 @@ public final class UpgradeInteractListener extends UnregisterableListener {
                         }
                     });
 
-                    activeGame.getAssociatedUpgradeGUI().get(player).setItem(clickedSlot, reinforcedArmorUpgrade.getLevels().get(currentLevel).getCachedFancyStack());
+                    activeGame.getAssociatedUpgradeGUI().get(player).setItem(clickedSlot, reinforcedArmorUpgrade.getLevels().get(currentLevel + 1).getCachedFancyStack());
                     player.updateInventory();
                 }
             }
@@ -183,7 +183,7 @@ public final class UpgradeInteractListener extends UnregisterableListener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onInventoryClick(final InventoryClickEvent event) {
         final HumanEntity entity = event.getWhoClicked();
         if (!(entity instanceof Player)) return;

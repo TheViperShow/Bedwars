@@ -19,7 +19,7 @@ public final class PlayerQuitDuringGameListener extends UnregisterableListener {
         this.activeGame = activeGame;
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerQuit(final PlayerQuitEvent event) {
         final Player p = event.getPlayer();
         final World w = p.getWorld();

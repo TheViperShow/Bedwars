@@ -22,7 +22,7 @@ public final class PlayerFireballInteractListener extends UnregisterableListener
         this.activeGame = activeGame;
     }
 
-    @EventHandler(ignoreCancelled = false, priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerInteract(final PlayerInteractEvent event) {
         final Player player = event.getPlayer();
         if (!player.getWorld().equals(activeGame.getAssociatedWorld())) return;

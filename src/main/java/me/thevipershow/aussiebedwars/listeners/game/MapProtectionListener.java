@@ -35,7 +35,7 @@ public final class MapProtectionListener extends UnregisterableListener {
         return false;
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerDeath(final BlockPlaceEvent event) {
         final Block block = event.getBlock();
         if (!block.getWorld().equals(activeGame.getAssociatedWorld())) return;

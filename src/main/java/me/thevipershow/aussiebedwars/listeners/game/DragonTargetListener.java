@@ -25,7 +25,7 @@ public final class DragonTargetListener extends UnregisterableListener {
         this.activeGame = activeGame;
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onEntityTargetLivingEntity(final EntityTargetLivingEntityEvent event) {
         if (!event.getEntity().getWorld().equals(activeGame.getAssociatedWorld())) return;
         if (!(event.getEntity() instanceof EnderDragon)) return;

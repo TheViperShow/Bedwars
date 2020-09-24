@@ -307,13 +307,13 @@ public final class GameUtils {
         final SpawnerType type = activeSpawner.getType();
         final StringBuilder str = new StringBuilder();
         if (type == SpawnerType.DIAMOND) {
-            str.append("§b§l");
+            str.append("§b");
         } else if (type == SpawnerType.EMERALD) {
-            str.append("§a§l");
+            str.append("§a");
         } else if (type == SpawnerType.GOLD) {
-            str.append("§e§l");
+            str.append("§e");
         } else {
-            str.append("§f§l");
+            str.append("§f");
         }
 
         str.append(type.name());
@@ -321,9 +321,9 @@ public final class GameUtils {
         final long timeLeft = activeSpawner.getTimeUntilNextLevel();
 
         if (timeLeft == -1L) {
-            str.append(" §r§7Spawner (§eMax Lvl.§7)");
+            str.append(" §7Spawner (§eMax Lvl.§7)");
         } else {
-            str.append(" §r§7Lvl. §e")
+            str.append(" §7Lvl. §e")
                     .append(toRoman(1 + activeSpawner.getCurrentLevel().getLevel()))
                     .append(" §7in §e").append(timeLeft)
                     .append("§7s");

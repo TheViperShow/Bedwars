@@ -18,7 +18,7 @@ public final class LobbyCompassListener extends UnregisterableListener {
         this.activeGame = activeGame;
     }
 
-    @EventHandler(ignoreCancelled = false, priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onInventoryClick(final PlayerInteractEvent event) {
         final Player clicker = event.getPlayer();
 

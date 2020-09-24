@@ -88,7 +88,7 @@ public final class DuoActiveGame extends ActiveGame {
             for (final Player player : players) {
                 final Scoreboard scoreboard = ScoreboardLib.createScoreboard(player);
                 scoreboard.setHandler(super.scoreboardHandler).setUpdateInterval(20L);
-                super.activeScoreboards.add(scoreboard);
+                super.activeScoreboards.put(player, scoreboard);
                 scoreboard.activate();
             }
         }
