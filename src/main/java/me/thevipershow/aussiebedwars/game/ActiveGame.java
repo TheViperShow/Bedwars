@@ -3,7 +3,6 @@ package me.thevipershow.aussiebedwars.game;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -16,7 +15,6 @@ import java.util.stream.Collectors;
 import me.thevipershow.aussiebedwars.AussieBedwars;
 import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.aussiebedwars.bedwars.objects.spawners.SpawnerType;
-import me.thevipershow.aussiebedwars.bedwars.spawner.SpawnerLevel;
 import me.thevipershow.aussiebedwars.config.objects.BedwarsGame;
 import me.thevipershow.aussiebedwars.config.objects.Merchant;
 import me.thevipershow.aussiebedwars.config.objects.Shop;
@@ -38,7 +36,7 @@ import me.thevipershow.aussiebedwars.game.upgrades.ActiveHealPool;
 import me.thevipershow.aussiebedwars.listeners.UnregisterableListener;
 import me.thevipershow.aussiebedwars.listeners.game.ArmorSet;
 import me.thevipershow.aussiebedwars.listeners.game.BedBreakListener;
-import me.thevipershow.aussiebedwars.listeners.game.DeathListener;
+import me.thevipershow.aussiebedwars.listeners.game.PlayerDeathListener;
 import me.thevipershow.aussiebedwars.listeners.game.EntityDamageListener;
 import me.thevipershow.aussiebedwars.listeners.game.ExplosionListener;
 import me.thevipershow.aussiebedwars.listeners.game.HungerLossListener;
@@ -102,6 +100,7 @@ public abstract class ActiveGame {
     protected final List<AbstractActiveMerchant> activeMerchants = new ArrayList<>();
     protected final List<Block> playerPlacedBlocks = new ArrayList<>();
     protected final List<UnregisterableListener> unregisterableListeners = new ArrayList<>();
+    protected final List<ActiveHealPool> healPools = new ArrayList<>();
     protected final Map<Player, ArmorSet> playerSetMap = new HashMap<>();
     protected final Map<String, Integer> topKills = new HashMap<>();
     protected final Map<Player, Inventory> associatedShopGUI = new HashMap<>();
@@ -109,7 +108,6 @@ public abstract class ActiveGame {
     protected final Map<ItemStack, ShopItem> shopItemStacks = new HashMap<>();
     protected final Map<ItemStack, UpgradeItem> upgradeItemStacks = new HashMap<>();
     protected final Map<Player, Map<UpgradeItem, Integer>> playerUpgradeLevelsMap = new HashMap<>();
-    protected final List<ActiveHealPool> healPools = new ArrayList<>();
     protected final EnumMap<UpgradeType, Map<BedwarsTeam, Integer>> upgradesLevelsMap = new EnumMap<>(UpgradeType.class);
 
     ///////////////////////////////////////////////////
@@ -227,21 +225,24 @@ public abstract class ActiveGame {
         @Override
         public List<Entry> getEntries(final Player player) {
             final EntryBuilder builder = new EntryBuilder();
+            builder.blank();
 
             if (diamondSampleSpawner != null && emeraldSampleSpawner != null) {
                 final String diamondText = GameUtils.generateScoreboardMissingTimeSpawners(getDiamondSampleSpawner());
                 final String emeraldText = GameUtils.generateScoreboardMissingTimeSpawners(getEmeraldSampleSpawner());
-                builder.next(emeraldText);
                 builder.next(diamondText);
+                builder.next(emeraldText);
+                System.out.println("D: " + diamondText.length());
+                System.out.println("E: " + emeraldText.length());
                 builder.blank();
             }
 
-            for (final BedwarsTeam t : assignedTeams.keySet()) {
-                builder.next("✦ §7Team " + "§" + t.getColorCode() + "§l" + t.name() + getTeamChar(t));
+            for (final BedwarsTeam team : assignedTeams.keySet()) {
+                builder.next("✦ §7Team " + "§" + team.getColorCode() + "§l" + team.name() + getTeamChar(team));
             }
 
             builder.blank();
-            builder.next(" §emc.aussiebedwars.net");
+            builder.next(" §eaussiebedwars.com");
             return builder.build();
         }
 
@@ -308,6 +309,7 @@ public abstract class ActiveGame {
                     squaredDistanceGold = tempDistance;
                 } else if (squaredDistanceGold > tempDistance) {
                     squaredDistanceGold = tempDistance;
+                    nearestGold = activeSpawner;
                 }
             } else if (activeSpawner.getType() == SpawnerType.IRON) {
                 final double tempDistance = activeSpawner.getSpawner().getSpawnPosition().squaredDistance(getTeamSpawn(team));
@@ -316,6 +318,7 @@ public abstract class ActiveGame {
                     squaredDistanceIron = tempDistance;
                 } else if (squaredDistanceIron > tempDistance) {
                     squaredDistanceIron = tempDistance;
+                    nearestIron = activeSpawner;
                 }
             }
         }
@@ -324,7 +327,6 @@ public abstract class ActiveGame {
         s.add(nearestIron);
         s.add(nearestGold);
         return s;
-
     }
 
     public void handleError(final String text) {
@@ -360,7 +362,7 @@ public abstract class ActiveGame {
         final UnregisterableListener mapIllegalMovementsListener = new MapIllegalMovementsListener(this);
         final UnregisterableListener bedDestroyListener = new BedBreakListener(this);
         final UnregisterableListener lobbyCompassListener = new LobbyCompassListener(this);
-        final UnregisterableListener deathListener = new DeathListener(this);
+        final UnregisterableListener deathListener = new PlayerDeathListener(this);
         final UnregisterableListener quitListener = new PlayerQuitDuringGameListener(this);
         final UnregisterableListener merchantListener = new ShopMerchantListener(this);
         final UnregisterableListener entityDamageListener = new EntityDamageListener(this);

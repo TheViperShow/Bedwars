@@ -108,16 +108,16 @@ public class ActiveSpawner {
     private void drop() {
         final World w = game.associatedWorld;
         final Location dropSpawnPos = spawner.getSpawnPosition().toLocation(w);
-        final Collection<Entity> nearbyEntities = w.getNearbyEntities(dropSpawnPos, 2.501, 5.00, 2.501)
+        final int nearbyEntities = w.getNearbyEntities(dropSpawnPos, 2.501, 5.00, 2.501)
                 .stream()
                 .filter(e -> e instanceof Item)
                 .map(e -> (Item) e)
                 .filter(i -> {
                     final ItemStack s = i.getItemStack();
                     return s.getType() == spawner.getSpawnerType().getDropItem();
-                })
-                .collect(Collectors.toSet());
-        if (this.maxNearby == -1 || nearbyEntities.size() <= this.maxNearby) {
+                }).mapToInt(i -> i.getItemStack().getAmount()).sum();
+
+        if (this.maxNearby == -1 || nearbyEntities < this.maxNearby) {
             final ItemStack toDrop = new ItemStack(type.getDropItem(), spawner.getDropAmount() + currentLevel.getDropIncrease());
             w.dropItem(dropSpawnPos, toDrop).setVelocity(new Vector());
         }
@@ -169,14 +169,18 @@ public class ActiveSpawner {
                 .runTaskTimer(game.plugin, () -> {
                     final long currentTime = now();
                     if (lastDrop == -1L ||
-                            (currentTime - lastDrop) / 1000.d >=
-                                    (spawner.getDropDelay() - currentLevel.getDecreaseSpawnDelay()) * Math.pow(0.50, (this.dropSpeedRegulator / 100))) {
+                            ((double) (currentTime - lastDrop) / 1000.0) > (spawner.getDropDelay() - currentLevel.getDecreaseSpawnDelay()) * Math.pow(0.5, (this.dropSpeedRegulator / 100))) {
                         lastDrop = currentTime;
                         drop();
                     }
-                    timePassedSinceCreation++;
-                }, 1, 20L);
+                }, 1, 5L);
+
+        game.plugin.getServer()
+                .getScheduler()
+                .runTaskTimer(game.plugin, () -> timePassedSinceCreation++, 1L, 20L);
     }
+
+
 
     public boolean active() {
         return this.animationTask != null
@@ -199,7 +203,7 @@ public class ActiveSpawner {
     public long getTimeUntilNextLevel() {
         final SpawnerLevel currentLevel = this.currentLevel;
         final int nextLevel = currentLevel.getLevel();
-        if (spawner.getSpawnerLevels().size() >= nextLevel) {
+        if (spawner.getSpawnerLevels().size() > nextLevel) {
             final SpawnerLevel nextSpawnerLevel = getSpawner().getSpawnerLevels().get(nextLevel);
             final long nextSpawnerLevelAfter = nextSpawnerLevel.getAfterSeconds();
             return nextSpawnerLevelAfter - this.timePassedSinceCreation;

@@ -8,11 +8,13 @@ import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.aussiebedwars.config.objects.ShopItem;
 import me.thevipershow.aussiebedwars.config.objects.UpgradeItem;
 import me.thevipershow.aussiebedwars.config.objects.UpgradeLevel;
+import me.thevipershow.aussiebedwars.config.objects.upgradeshop.UpgradeType;
 import me.thevipershow.aussiebedwars.game.ActiveGame;
 import me.thevipershow.aussiebedwars.game.GameUtils;
 import me.thevipershow.aussiebedwars.game.Pair;
 import me.thevipershow.aussiebedwars.listeners.UnregisterableListener;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -56,12 +58,22 @@ public final class ShopInteractListener extends UnregisterableListener {
                         GameUtils.makePlayerPay(player.getInventory(), clickedShopItem.getBuyWith(), clickedShopItem.getBuyCost(), transaction.getA());
                         activeGame.upgradePlayerArmorSet(player, armorType);
                         GameUtils.paySound(player);
+
+                        final int enchantLvl = activeGame.getUpgradesLevelsMap().get(UpgradeType.REINFORCED_ARMOR).get(activeGame.getPlayerTeam(player));
+                        if (enchantLvl != 0) {
+                            GameUtils.enchantSwords(Enchantment.PROTECTION_ENVIRONMENTAL, enchantLvl, player); // Adding enchant if he has the Upgrade.
+                        }
                     } else if (clickedItem.getType().name().endsWith("SWORD")) {
                         final ItemStack prevSword = activeGame.getSwordUpgrades().getPrevious(clickedItem.getType());
                         if (prevSword == null) {
                             GameUtils.paySound(player);
                             GameUtils.makePlayerPay(player.getInventory(), clickedShopItem.getBuyWith(), clickedShopItem.getBuyCost(), transaction.getA());
-                            GameUtils.giveStackToPlayer(clickedShopItem.generateWithoutLore(), player, player.getInventory().getContents());
+                            final ItemStack toGive = clickedShopItem.generateWithoutLore();
+                            if (activeGame.getUpgradesLevelsMap().get(UpgradeType.SHARPNESS).get(activeGame.getPlayerTeam(player)) != 0) {
+                                GameUtils.applyEnchant(toGive, Enchantment.DAMAGE_ALL, 1); // Adding enchant if he has the Upgrade.
+                            }
+                            GameUtils.giveStackToPlayer(toGive, player, player.getInventory().getContents());
+
                         } else { // we should always usually enter this:
                             final ItemStack search = GameUtils.hasItemOfType(player, prevSword.getType());
                             final ItemStack dupe = GameUtils.hasItemOfType(player, clickedShopItem.getMaterial());

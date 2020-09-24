@@ -29,11 +29,11 @@ public final class AussieBedwarsMainCommand implements CommandExecutor, TabExecu
         this.gameManager = gameManager;
     }
 
-    private final void sendHelp(final CommandSender sender) {
+    public final void sendHelp(final CommandSender sender) {
 
     }
 
-    private final void unknownArg(final CommandSender sender, final String arg) {
+    public final void unknownArg(final CommandSender sender, final String arg) {
         sender.sendMessage(AussieBedwars.PREFIX + "Unknown command argument \"" + arg + "\"");
     }
 
@@ -54,6 +54,7 @@ public final class AussieBedwarsMainCommand implements CommandExecutor, TabExecu
                     new RemoveCommand(this.gameManager, this.plugin, args).run(sender);
                     break;
                 case "join":
+                    new JoinCommand(this.gameManager, this.plugin, args).run(sender);
                     break;
                 case "quit":
                     new QuitCommand(this.gameManager, this.plugin, args).run(sender);

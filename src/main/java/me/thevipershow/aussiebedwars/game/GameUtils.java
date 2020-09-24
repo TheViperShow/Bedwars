@@ -17,6 +17,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -303,26 +304,20 @@ public final class GameUtils {
     }
 
     public static String generateScoreboardMissingTimeSpawners(final ActiveSpawner activeSpawner) {
-        if (activeSpawner == null) return "";
         final SpawnerType type = activeSpawner.getType();
         final StringBuilder str = new StringBuilder();
-        switch (type) {
-            case DIAMOND:
-                str.append("§b§l");
-                break;
-            case EMERALD:
-                str.append("§a§l");
-                break;
-            case IRON:
-                str.append("§f§l");
-                break;
-            case GOLD:
-                str.append("§e§l");
-                break;
-            default:
-                break;
+        if (type == SpawnerType.DIAMOND) {
+            str.append("§b§l");
+        } else if (type == SpawnerType.EMERALD) {
+            str.append("§a§l");
+        } else if (type == SpawnerType.GOLD) {
+            str.append("§e§l");
+        } else {
+            str.append("§f§l");
         }
-        str.append(type.name().toUpperCase());
+
+        str.append(type.name());
+
         final long timeLeft = activeSpawner.getTimeUntilNextLevel();
 
         if (timeLeft == -1L) {
@@ -330,8 +325,8 @@ public final class GameUtils {
         } else {
             str.append(" §r§7Lvl. §e")
                     .append(toRoman(1 + activeSpawner.getCurrentLevel().getLevel()))
-                    .append(" §7in §e§l").append(timeLeft)
-                    .append("§r§7s");
+                    .append(" §7in §e").append(timeLeft)
+                    .append("§7s");
         }
         return str.toString();
     }
@@ -437,6 +432,42 @@ public final class GameUtils {
             default:
                 throw new IllegalArgumentException("bro what gamemode u playing?");
         }
+    }
+
+    public static ItemStack applyEnchant(final ItemStack stack, final Enchantment enchant, final int level) {
+        if (stack != null) {
+            stack.addEnchantment(enchant, level);
+        }
+        return stack;
+    }
+
+    public static void enchantSwords(final Enchantment enchant, final int level, final Player player) {
+
+        final PlayerInventory inv = player.getInventory();
+
+        final ItemStack[] contents = inv.getContents();
+        for (final ItemStack content : contents) {
+            if (content != null) {
+                if (content.getType().name().endsWith("_SWORD")) {
+                    content.addEnchantment(enchant, level);
+                }
+            }
+        }
+    }
+
+    public static void enchantArmor(final Enchantment enchant, final int level, final Player player) {
+
+        final PlayerInventory inv = player.getInventory();
+
+        final ItemStack helmet = inv.getHelmet();
+        final ItemStack chest = inv.getChestplate();
+        final ItemStack leggings = inv.getLeggings();
+        final ItemStack boots = inv.getBoots();
+
+        final ItemStack enchantedHelmet = applyEnchant(helmet, enchant, level);
+        final ItemStack enchantedChest = applyEnchant(chest, enchant, level);
+        final ItemStack enchantedLeggings = applyEnchant(leggings, enchant, level);
+        final ItemStack enchantedBoots = applyEnchant(boots, enchant, level);
     }
 
     public static boolean anyMatchMaterial(final Collection<ItemStack> stack, final Material material) {

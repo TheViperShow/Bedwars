@@ -52,7 +52,7 @@ public final class EntityDamageListener extends UnregisterableListener {
             }
         } else if (damager instanceof EnderDragon && damaged instanceof Player) {
             final Vector dragonVelocity = damager.getVelocity();
-            damaged.setVelocity(dragonVelocity.multiply(new Vector(0.75, 2.75, 0.75)));
+            damaged.setVelocity(new Vector(dragonVelocity.getX(), 4.0, dragonVelocity.getZ()));
         }
     }
 }

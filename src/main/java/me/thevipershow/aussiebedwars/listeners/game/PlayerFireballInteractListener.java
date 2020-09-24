@@ -28,14 +28,13 @@ public final class PlayerFireballInteractListener extends UnregisterableListener
         if (!player.getWorld().equals(activeGame.getAssociatedWorld())) return;
 
         final Action action = event.getAction();
-        if (action != Action.PHYSICAL) {
+        if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
             final ItemStack itemInHand = player.getInventory().getItemInHand();
             if (itemInHand == null) return;
             if (itemInHand.getType() != Material.FIREBALL) return;
             final Vector playerDirection = player.getEyeLocation().getDirection();
-            final Fireball fireball = (Fireball) activeGame.getAssociatedWorld().spawnEntity(player.getEyeLocation().add(playerDirection.multiply(1.25)), EntityType.FIREBALL);
-            fireball.setDirection(playerDirection);
-            fireball.setVelocity(playerDirection.multiply(0.125));
+            final Fireball fireball = (Fireball) activeGame.getAssociatedWorld().spawnEntity(player.getEyeLocation().add(playerDirection.multiply(1.25725125)), EntityType.FIREBALL);
+            fireball.setVelocity(playerDirection.multiply(0.10));
             fireball.setIsIncendiary(false);
             event.setCancelled(true);
             GameUtils.decreaseItemInHand(player);

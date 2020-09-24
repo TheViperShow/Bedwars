@@ -22,6 +22,7 @@ import me.thevipershow.aussiebedwars.game.Pair;
 import me.thevipershow.aussiebedwars.game.upgrades.ActiveHealPool;
 import me.thevipershow.aussiebedwars.listeners.UnregisterableListener;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -30,6 +31,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 public final class UpgradeInteractListener extends UnregisterableListener {
 
@@ -52,12 +55,12 @@ public final class UpgradeInteractListener extends UnregisterableListener {
         } else {
             GameUtils.makePlayerPay(player.getInventory(), payWith, cost, result.getA());
             GameUtils.paySound(player);
-            player.sendMessage(AussieBedwars.PREFIX + "You successfully upgraded: §e" + upgradeName );
+            player.sendMessage(AussieBedwars.PREFIX + "You successfully upgraded: §e" + upgradeName);
             return true;
         }
     }
 
-    public final void upgradeLogic(final Player player, final int clickedSlot, final ItemStack clickedItem) {
+    public final void upgradeLogic(final Player player, final int clickedSlot) {
         final BedwarsTeam pTeam = activeGame.getPlayerTeam(player);
         final PlayerInventory playerInventory = player.getInventory();
 
@@ -78,10 +81,9 @@ public final class UpgradeInteractListener extends UnregisterableListener {
             } else {
                 final ShopItem shopItem = dragonBuffUpgrade.getShopItem();
                 Pair<HashMap<Integer, Integer>, Boolean> pay = GameUtils.canAfford(playerInventory, shopItem.getBuyWith(), shopItem.getBuyCost());
-                if(pay(pay, player, shopItem.getBuyWith(), shopItem.getBuyCost(), "Dragon Buff")) {
-                    upgradesAvailable.get(dragonBuffUpgrade.getType()).put(pTeam, 1);
+                if (pay(pay, player, shopItem.getBuyWith(), shopItem.getBuyCost(), "Dragon Buff")) { // This is the Dragon Buff Logic
+                    upgradesAvailable.get(dragonBuffUpgrade.getType()).put(pTeam, 1);                           // Here they have correctly upgrade their item.
                 }
-                // Dragon Buff ^
             }
         } else if (clickedSlot == healPoolUpgrade.getItem().getSlot()) {
             final Map<BedwarsTeam, Integer> healPoolTeamLevelsMap = Objects.requireNonNull(upgradesAvailable.get(healPoolUpgrade.getType()));
@@ -91,15 +93,14 @@ public final class UpgradeInteractListener extends UnregisterableListener {
             } else {
                 final ShopItem shopItem = healPoolUpgrade.getItem();
                 Pair<HashMap<Integer, Integer>, Boolean> pay = GameUtils.canAfford(playerInventory, shopItem.getBuyWith(), shopItem.getBuyCost());
-                if(pay(pay, player, shopItem.getBuyWith(), shopItem.getBuyCost(), "Heal Pool")) {
-                    upgradesAvailable.get(healPoolUpgrade.getType()).put(pTeam, 1);
+                if (pay(pay, player, shopItem.getBuyWith(), shopItem.getBuyCost(), "Heal Pool")) { // This is the Heal Pool Logic
+                    upgradesAvailable.get(healPoolUpgrade.getType()).put(pTeam, 1);                           // Here they have correctly upgraded their item.
                     final ActiveHealPool activeHealPool = new ActiveHealPool(activeGame, pTeam, healPoolUpgrade);
                     activeGame.getHealPools().add(activeHealPool);
                     activeHealPool.start();
 
                     upgradesAvailable.get(healPoolUpgrade.getType()).put(pTeam, 1);
                 }
-                // Heal Pool ^
             }
         } else if (clickedSlot == ironForgeUpgrade.getSlot()) {
             final int currentLevel = upgradesAvailable.get(ironForgeUpgrade.getType()).get(pTeam);
@@ -108,14 +109,17 @@ public final class UpgradeInteractListener extends UnregisterableListener {
                 maxLevel(player);
             } else {
                 final UpgradeShopItem itemToBuy = ironForgeUpgrade.getLevels().get(currentLevel);
-                // TODO: Add Iron Forge logic
-                // here
                 final Pair<HashMap<Integer, Integer>, Boolean> pay = GameUtils.canAfford(playerInventory, itemToBuy.getBuyWith(), itemToBuy.getPrice());
-                if (pay(pay, player, itemToBuy.getBuyWith(), itemToBuy.getPrice(), "Iron Forge")) {
-                    upgradesAvailable.get(ironForgeUpgrade.getType()).put(pTeam, currentLevel + 1);
-                    activeGame.getTeamSpawners(pTeam).forEach(s -> s.setDropSpeedRegulator((currentLevel + 1) * 50));
+                if (pay(pay, player, itemToBuy.getBuyWith(), itemToBuy.getPrice(), "Iron Forge")) { // This is the Iron Forge Logic.
+                    upgradesAvailable.get(ironForgeUpgrade.getType()).put(pTeam, currentLevel + 1);            // Here they have correctly upgraded their item.
+                    activeGame.getTeamSpawners(pTeam).forEach(s -> {
+                        s.setDropSpeedRegulator((currentLevel + 1) * 50);
+                        System.out.println(s.getSpawner().getSpawnPosition().toString());
+                    });
+
+                    activeGame.getAssociatedUpgradeGUI().get(player).setItem(clickedSlot, ironForgeUpgrade.getLevels().get(currentLevel).getCachedFancyStack());
+                    player.updateInventory();
                 }
-                upgradesAvailable.get(ironForgeUpgrade.getType()).put(pTeam, currentLevel + 1);
             }
         } else if (clickedSlot == maniacMinerUpgrade.getSlot()) {
             final int currentLevel = upgradesAvailable.get(maniacMinerUpgrade.getType()).get(pTeam);
@@ -123,9 +127,20 @@ public final class UpgradeInteractListener extends UnregisterableListener {
             if (currentLevel == maxLevel) {
                 maxLevel(player);
             } else {
-                // TODO: Add Maniac Miner logic
-                // here
-                upgradesAvailable.get(maniacMinerUpgrade.getType()).put(pTeam, maxLevel);
+                final UpgradeShopItem itemToBuy = maniacMinerUpgrade.getLevels().get(currentLevel);
+                final Pair<HashMap<Integer, Integer>, Boolean> pay = GameUtils.canAfford(playerInventory, itemToBuy.getBuyWith(), itemToBuy.getPrice());
+                if (pay(pay, player, itemToBuy.getBuyWith(), itemToBuy.getPrice(), "Maniac Miner")) { // This is the Maniac Miner Logic
+                    upgradesAvailable.get(maniacMinerUpgrade.getType()).put(pTeam, currentLevel + 1);            //  Here they have correctly upgraded their item.
+                    activeGame.getTeamPlayers(pTeam).forEach(p -> {
+                        if (!activeGame.isOutOfGame(p) && p.isOnline()) {
+                            p.removePotionEffect(PotionEffectType.FAST_DIGGING);
+                            p.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 69420, currentLevel));
+                        }
+                    });
+
+                    activeGame.getAssociatedUpgradeGUI().get(player).setItem(clickedSlot, maniacMinerUpgrade.getLevels().get(currentLevel).getCachedFancyStack());
+                    player.updateInventory();
+                }
             }
         } else if (clickedSlot == reinforcedArmorUpgrade.getSlot()) {
             final int currentLevel = upgradesAvailable.get(reinforcedArmorUpgrade.getType()).get(pTeam);
@@ -133,18 +148,37 @@ public final class UpgradeInteractListener extends UnregisterableListener {
             if (currentLevel == maxLevel) {
                 maxLevel(player);
             } else {
-                // TODO: Add Reinforced Armor logic
-                // here
-                upgradesAvailable.get(reinforcedArmorUpgrade.getType()).put(pTeam, maxLevel);
+                final UpgradeShopItem itemToBuy = reinforcedArmorUpgrade.getLevels().get(currentLevel);
+                final Pair<HashMap<Integer, Integer>, Boolean> pay = GameUtils.canAfford(playerInventory, itemToBuy.getBuyWith(), itemToBuy.getPrice());
+                if (pay(pay, player, itemToBuy.getBuyWith(), itemToBuy.getPrice(), "Reinforced Armor")) {// This is the Reinforced Armor Logic
+                    upgradesAvailable.get(reinforcedArmorUpgrade.getType()).put(pTeam, currentLevel + 1);           //  Here they have correctly upgraded their item.
+
+                    activeGame.getTeamPlayers(pTeam).forEach(p -> {
+                        if (p.isOnline() && !activeGame.isOutOfGame(p)) {                                           // Enchanting the armor of everyone on the team
+                            GameUtils.enchantArmor(Enchantment.PROTECTION_ENVIRONMENTAL, currentLevel + 1, p); // To their level
+                        }
+                    });
+
+                    activeGame.getAssociatedUpgradeGUI().get(player).setItem(clickedSlot, reinforcedArmorUpgrade.getLevels().get(currentLevel).getCachedFancyStack());
+                    player.updateInventory();
+                }
             }
         } else if (clickedSlot == sharpnessUpgrade.getItem().getSlot()) {
             final int currentLevel = upgradesAvailable.get(sharpnessUpgrade.getType()).get(pTeam);
             if (currentLevel == 1) {
                 maxLevel(player);
             } else {
-                // TODO: Add dragon buff logic
-                // here
-                upgradesAvailable.get(sharpnessUpgrade.getType()).put(pTeam, 1);
+                final ShopItem shopItem = sharpnessUpgrade.getItem();
+                Pair<HashMap<Integer, Integer>, Boolean> pay = GameUtils.canAfford(playerInventory, shopItem.getBuyWith(), shopItem.getBuyCost());
+                if (pay(pay, player, shopItem.getBuyWith(), shopItem.getBuyCost(), "Sharpened Swords")) {  // This is the Sharpened Swords Logic
+                    upgradesAvailable.get(sharpnessUpgrade.getType()).put(pTeam, 1);                                  // Here they have correctly upgrade their item.
+
+                    activeGame.getTeamPlayers(pTeam).forEach(p -> {
+                        if (p.isOnline() && !activeGame.isOutOfGame(p)) {
+                            GameUtils.enchantSwords(Enchantment.DAMAGE_ALL, 1, p);
+                        }
+                    });
+                }
             }
         }
     }
@@ -166,7 +200,7 @@ public final class UpgradeInteractListener extends UnregisterableListener {
             final int clickedSlot = event.getSlot();
             final ItemStack clickedItem = event.getCurrentItem();
             if (clickedItem == null) return;
-            upgradeLogic(player, clickedSlot, clickedItem);
+            upgradeLogic(player, clickedSlot);
         }
     }
 }

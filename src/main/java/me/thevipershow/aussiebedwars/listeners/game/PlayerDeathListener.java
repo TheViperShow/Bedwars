@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import me.thevipershow.aussiebedwars.AussieBedwars;
 import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.aussiebedwars.config.objects.SpawnPosition;
+import me.thevipershow.aussiebedwars.config.objects.upgradeshop.UpgradeType;
 import me.thevipershow.aussiebedwars.game.ActiveGame;
 import me.thevipershow.aussiebedwars.game.GameUtils;
 import me.thevipershow.aussiebedwars.listeners.UnregisterableListener;
@@ -14,7 +15,9 @@ import net.minecraft.server.v1_8_R3.PlayerConnection;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -29,12 +32,12 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public final class DeathListener extends UnregisterableListener {
+public final class PlayerDeathListener extends UnregisterableListener {
 
     private final ActiveGame activeGame;
-    private static final ItemStack LOBBY_COMPASS = new ItemStack(Material.COMPASS, 1);
+    private static final ItemStack LOBBY_COMPASS = new ItemStack(Material.COMPASS, 0x01);
 
-    public DeathListener(final ActiveGame activeGame) {
+    public PlayerDeathListener(final ActiveGame activeGame) {
         this.activeGame = activeGame;
 
         final ItemMeta compassMeta = LOBBY_COMPASS.getItemMeta();
@@ -71,7 +74,7 @@ public final class DeathListener extends UnregisterableListener {
                 cancel();
             } else {
                 final PlayerConnection conn = GameUtils.getPlayerConnection(p);
-                final PacketPlayOutTitle emptyTitle = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.TITLE, new ChatMessage(" "), 2, 16, 2);
+                final PacketPlayOutTitle emptyTitle = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.TITLE, new ChatMessage(""), 2, 16, 2);
                 final IChatBaseComponent iChat = new ChatMessage(AussieBedwars.PREFIX + String.format("§eRespawning in §7%d §es", secondsLeft));
                 final PacketPlayOutTitle titlePacket = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.SUBTITLE, iChat, 2, 16, 2);
                 conn.sendPacket(emptyTitle);
@@ -87,10 +90,6 @@ public final class DeathListener extends UnregisterableListener {
 
     private void doDeathTimer(final Player p) {
         new RespawnRunnable(p, activeGame).runTaskTimer(activeGame.getPlugin(), 1L, 20L);
-    }
-
-    private static void setFakeSpectator(final Player p) {
-
     }
 
     private static void clearInvExceptArmorAndTools(final Player player, final ActiveGame game) {
@@ -119,6 +118,11 @@ public final class DeathListener extends UnregisterableListener {
         }
 
         game.downgradePlayerTools(player);
+
+        final int enchantLvl = game.getUpgradesLevelsMap().get(UpgradeType.SHARPNESS).get(game.getPlayerTeam(player));
+        if (enchantLvl != 0) {
+            GameUtils.enchantSwords(Enchantment.DAMAGE_ALL, enchantLvl, player); // Adding enchant if he has the Upgrade.
+        }
     }
 
     private String generateDeathMessage(final EntityDamageEvent e, final BedwarsTeam killedPlayerTeam, final boolean finalKill) {
@@ -130,7 +134,9 @@ public final class DeathListener extends UnregisterableListener {
             if (damager instanceof Player) {
                 final Player p = (Player) damager;
                 final BedwarsTeam damagerTeam = activeGame.getPlayerTeam(p);
-                msg.append(" §7was annihilated by §").append(damagerTeam.getColorCode()).append(p.getName()).append('.');
+                final DamageCause cz = ee.getCause();
+                final String killMsg = cz == DamageCause.PROJECTILE ? "pierced " : "annihilated ";
+                msg.append(String.format(" §7was %s by §", killMsg)).append(damagerTeam.getColorCode()).append(p.getName()).append('.');
             } else {
                 msg.append(" §7was killed by §f").append(GameUtils.beautifyCaps(damager.getType().name())).append('.');
             }
@@ -154,6 +160,7 @@ public final class DeathListener extends UnregisterableListener {
                     msg.append(" §7fought against gravity.");
                     break;
                 case BLOCK_EXPLOSION:
+                case ENTITY_EXPLOSION:
                     msg.append(" §7exploded into pieces.");
                     break;
                 default:
@@ -228,6 +235,13 @@ public final class DeathListener extends UnregisterableListener {
             }
             p.setHealth(p.getMaxHealth());
             event.setCancelled(true);
+            if (event instanceof EntityDamageByEntityEvent) {
+                final EntityDamageByEntityEvent edbee = (EntityDamageByEntityEvent) event;
+                final Entity damager = edbee.getDamager();
+                if (damager instanceof Player) {
+                    ((Player) damager).playSound(damager.getLocation(), Sound.SPLASH, 7.50f, 1.0f);
+                }
+            }
         }
     }
 }
