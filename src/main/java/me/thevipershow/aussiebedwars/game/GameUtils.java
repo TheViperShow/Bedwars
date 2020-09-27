@@ -25,6 +25,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 public final class GameUtils {
     public final static String NO_AI_TAG = "NoAi";
@@ -293,6 +294,12 @@ public final class GameUtils {
         return full;
     }
 
+    public static void removeAllEffects(final Player p) {
+        for (final PotionEffectType type : PotionEffectType.values()) {
+            p.removePotionEffect(type);
+        }
+    }
+
     public static AbstractActiveMerchant fromMerchant(final Merchant merchant, final ActiveGame activeGame) {
         switch (merchant.getMerchantType()) {
             case SHOP:
@@ -301,6 +308,22 @@ public final class GameUtils {
                 return new UpgradeActiveMerchant(activeGame, merchant, findMerchantTeam(merchant, activeGame));
         }
         return null;
+    }
+
+    public static String generateDeathmatch(final AbstractDeathmatch abstractDeathmatch) {
+        final long t = abstractDeathmatch.timeUntilDeathmatch();
+        if (t < 0) {
+            return "§6§lDEATHMATCH §r§7(§fStarted§7)";
+        }
+        return "§6§lDEATHMATCH §r§7in §e" + t + "§7s";
+    }
+
+    public static String generateDragons(final AbstractDeathmatch abstractDeathmatch) {
+        final long t = abstractDeathmatch.timeUntilDeathmatch();
+        if (t < 0) {
+            return "§5§lDRAGONS §r§7(§fReleased§7)";
+        }
+        return "§5§lDRAGONS §r§7in §e" + t + "§7s";
     }
 
     public static String generateScoreboardMissingTimeSpawners(final ActiveSpawner activeSpawner) {

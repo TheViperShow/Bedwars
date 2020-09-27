@@ -20,6 +20,7 @@ public abstract class AbstractDeathmatch {
     protected final DragonTargetListener dragonTargetListener;
     protected final int startAfter;
 
+    protected long startTime = -1L;
     protected boolean running = false;
     protected BukkitTask task = null;
 
@@ -62,6 +63,7 @@ public abstract class AbstractDeathmatch {
     public void start() {
         this.task = activeGame.plugin.getServer().getScheduler().runTaskLater(activeGame.plugin, () -> {
             setRunning(true);
+            this.startTime = System.currentTimeMillis();
             startDeathMatch();
             activeGame.plugin.getServer().getPluginManager().registerEvents(dragonTargetListener, activeGame.plugin);
         }, startAfter * 20L);
@@ -72,6 +74,24 @@ public abstract class AbstractDeathmatch {
         if (task != null) task.cancel();
         dragonTargetListener.getDragonPlayerMap().clear();
         dragonTargetListener.unregister();
+    }
+
+    public final long getStartTime() {
+        return startTime;
+    }
+
+    public final long timeUntilDragons() {
+        if (!isRunning()) {
+            return -1L;
+        }
+        return (((startTime / 1000L) + 600L) - (System.currentTimeMillis() / 1000L));
+    }
+
+    public final long timeUntilDeathmatch() {
+        if (activeGame.isHasStarted()) {
+            return (((activeGame.startTime / 1000L) + startAfter) - (System.currentTimeMillis() / 1000L));
+        }
+        return -1L;
     }
 
     public final boolean isRunning() {

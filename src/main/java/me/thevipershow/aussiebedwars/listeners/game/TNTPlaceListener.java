@@ -6,6 +6,7 @@ import me.thevipershow.aussiebedwars.listeners.UnregisterableListener;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockPlaceEvent;
 
@@ -24,7 +25,8 @@ public final class TNTPlaceListener extends UnregisterableListener {
         if (b.getType() == Material.TNT) {
             GameUtils.decreaseItemInHand(event.getPlayer());
             event.setCancelled(true);
-            b.getWorld().spawnEntity(b.getLocation().add(0.501, 0.0501, 0.501), EntityType.PRIMED_TNT);
+            final TNTPrimed tnt = (TNTPrimed) b.getWorld().spawnEntity(b.getLocation().add(0.501, 0.05, 0.501), EntityType.PRIMED_TNT);
+            tnt.setFuseTicks(activeGame.getBedwarsGame().getTntFuse());
         }
     }
 }

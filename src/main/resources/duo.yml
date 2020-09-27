@@ -6,6 +6,7 @@ duo:
     min-players: 4
     players: 16
     deathmatch-start: 1800 # in seconds
+    tnt-fuse: 75 # in ticks (20 = 1s)
     teams:
       - "CYAN"
       - "PINK"

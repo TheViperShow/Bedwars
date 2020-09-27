@@ -1,9 +1,13 @@
 package me.thevipershow.aussiebedwars.listeners.game;
 
+import me.thevipershow.aussiebedwars.AussieBedwars;
+import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.aussiebedwars.config.objects.SpawnPosition;
 import me.thevipershow.aussiebedwars.game.ActiveGame;
 import me.thevipershow.aussiebedwars.game.ActiveSpawner;
+import me.thevipershow.aussiebedwars.game.GameUtils;
 import me.thevipershow.aussiebedwars.listeners.UnregisterableListener;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -12,6 +16,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 public final class MapIllegalMovementsListener extends UnregisterableListener {
 
@@ -85,8 +91,8 @@ public final class MapIllegalMovementsListener extends UnregisterableListener {
             if (activeGame.isOutOfGame(player)) {
                 event.setCancelled(true);
             } else {
-                final EntityDamageEvent e = new EntityDamageEvent(player, EntityDamageEvent.DamageCause.VOID, 20.00);
-                activeGame.getPlugin().getServer().getPluginManager().callEvent(e);
+                PlayerDeathListener.deathLogic(activeGame, activeGame.getPlayerTeam(player), player,
+                        new EntityDamageEvent(player, EntityDamageEvent.DamageCause.VOID, 20.00));
             }
         }
     }

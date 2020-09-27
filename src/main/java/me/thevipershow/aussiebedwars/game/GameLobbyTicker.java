@@ -1,5 +1,6 @@
 package me.thevipershow.aussiebedwars.game;
 
+import me.thevipershow.aussiebedwars.AussieBedwars;
 import me.thevipershow.aussiebedwars.events.GameStartEvent;
 import net.minecraft.server.v1_8_R3.ChatMessage;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
@@ -26,15 +27,20 @@ public final class GameLobbyTicker extends AbstractLobbyTicker {
                     final GameStartEvent gameStartEvent = new GameStartEvent(activeGame);
                     activeGame.plugin.getServer().getPluginManager().callEvent(gameStartEvent);
                     if (gameStartEvent.isCancelled()) return;
-                    activeGame.associatedQueue.perform(p -> p.playSound(p.getLocation(), Sound.ANVIL_LAND, 5.f, 1.f));
+                    activeGame.associatedQueue.perform(p -> p.playSound(p.getLocation(), Sound.ANVIL_LAND, 5.0f, 1.0f));
                     activeGame.start();
                 } else {
                     final IChatBaseComponent iChat = new ChatMessage(generateTimeText());
                     final PacketPlayOutChat chatPacket = new PacketPlayOutChat(iChat, (byte) 0x2);
-                    activeGame.associatedQueue.perform(p -> {
-                        p.playSound(p.getLocation(), Sound.NOTE_STICKS, 10.f, 1.f);
-                        GameUtils.getPlayerConnection(p).sendPacket(chatPacket);
-                    });
+                    activeGame.associatedQueue.perform(p -> GameUtils.getPlayerConnection(p).sendPacket(chatPacket));
+
+                    if (missingTime > 0 && missingTime <= 5) {
+                        activeGame.associatedQueue.perform(p -> {
+                            p.playSound(p.getLocation(), Sound.NOTE_STICKS, 9.50f, 0.850f);
+                            p.sendMessage(AussieBedwars.PREFIX+ "§aGame starting in §e" + missingTime);
+                        });
+                    }
+
                     missingTime -= 1;
                 }
 

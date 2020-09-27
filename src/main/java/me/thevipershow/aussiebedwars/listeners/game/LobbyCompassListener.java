@@ -1,6 +1,7 @@
 package me.thevipershow.aussiebedwars.listeners.game;
 
 import me.thevipershow.aussiebedwars.game.ActiveGame;
+import me.thevipershow.aussiebedwars.game.GameUtils;
 import me.thevipershow.aussiebedwars.listeners.UnregisterableListener;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -8,7 +9,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffectType;
 
 public final class LobbyCompassListener extends UnregisterableListener {
 
@@ -30,7 +30,9 @@ public final class LobbyCompassListener extends UnregisterableListener {
             clicker.getInventory().clear();
             activeGame.getAssociatedQueue().removeFromQueue(clicker);
             clicker.teleport(activeGame.getCachedLobbySpawnLocation());
-            clicker.removePotionEffect(PotionEffectType.INVISIBILITY);
+            GameUtils.removeAllEffects(clicker);
+            clicker.setFlying(false);
+            clicker.setAllowFlight(false);
         }
     }
 }

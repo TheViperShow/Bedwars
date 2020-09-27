@@ -9,5 +9,7 @@ public final class BlindnessAndPoisonTrap extends AbstractTrap {
         super(TrapType.BLINDNESS_AND_POISON, shopItem);
     }
 
-
+    public static BlindnessAndPoisonTrap deserialize(final Map<String, Object> map) {
+        return new BlindnessAndPoisonTrap(ShopItem.deserialize(map));
+    }
 }

@@ -24,6 +24,7 @@ public abstract class BedwarsGame {
     protected final UpgradeShop upgradeShop;
     protected final int startTimer;
     protected final int deathmatchStart;
+    protected final int tntFuse;
 
     protected BedwarsGame(
             Gamemode gamemode,
@@ -38,7 +39,7 @@ public abstract class BedwarsGame {
             List<Spawner> spawners,
             List<Merchant> merchants,
             Shop shop,
-            UpgradeShop upgradeShop, int startTimer, int deathmatchStart) {
+            UpgradeShop upgradeShop, int startTimer, int deathmatchStart, int tntFuse) {
         this.gamemode = gamemode;
         this.minGames = minGames;
         this.maxGames = maxGames;
@@ -54,6 +55,7 @@ public abstract class BedwarsGame {
         this.upgradeShop = upgradeShop;
         this.startTimer = startTimer;
         this.deathmatchStart = deathmatchStart;
+        this.tntFuse = tntFuse;
     }
 
     public SpawnPosition spawnPosOfTeam(final BedwarsTeam team) {
@@ -121,5 +123,9 @@ public abstract class BedwarsGame {
 
     public UpgradeShop getUpgradeShop() {
         return upgradeShop;
+    }
+
+    public int getTntFuse() {
+        return tntFuse;
     }
 }

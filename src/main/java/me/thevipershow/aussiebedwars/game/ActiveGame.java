@@ -38,15 +38,17 @@ import me.thevipershow.aussiebedwars.game.upgrades.ActiveHealPool;
 import me.thevipershow.aussiebedwars.listeners.UnregisterableListener;
 import me.thevipershow.aussiebedwars.listeners.game.ArmorSet;
 import me.thevipershow.aussiebedwars.listeners.game.BedBreakListener;
-import me.thevipershow.aussiebedwars.listeners.game.PlayerDeathListener;
 import me.thevipershow.aussiebedwars.listeners.game.EntityDamageListener;
 import me.thevipershow.aussiebedwars.listeners.game.ExplosionListener;
 import me.thevipershow.aussiebedwars.listeners.game.HungerLossListener;
+import me.thevipershow.aussiebedwars.listeners.game.ItemDegradeListener;
 import me.thevipershow.aussiebedwars.listeners.game.LobbyCompassListener;
 import me.thevipershow.aussiebedwars.listeners.game.MapIllegalMovementsListener;
 import me.thevipershow.aussiebedwars.listeners.game.MapProtectionListener;
+import me.thevipershow.aussiebedwars.listeners.game.PlayerDeathListener;
 import me.thevipershow.aussiebedwars.listeners.game.PlayerFireballInteractListener;
 import me.thevipershow.aussiebedwars.listeners.game.PlayerQuitDuringGameListener;
+import me.thevipershow.aussiebedwars.listeners.game.PlayerSpectatePlayerListener;
 import me.thevipershow.aussiebedwars.listeners.game.ShopInteractListener;
 import me.thevipershow.aussiebedwars.listeners.game.ShopMerchantListener;
 import me.thevipershow.aussiebedwars.listeners.game.SpawnersMultigiveListener;
@@ -102,6 +104,7 @@ public abstract class ActiveGame {
     protected final List<Block> playerPlacedBlocks = new ArrayList<>();
     protected final List<UnregisterableListener> unregisterableListeners = new ArrayList<>();
     protected final List<ActiveHealPool> healPools = new ArrayList<>();
+    protected final List<BukkitTask> announcementsTasks = new ArrayList<>();
     protected final Map<Player, ArmorSet> playerSetMap = new HashMap<>();
     protected final Map<String, Integer> topKills = new HashMap<>();
     protected final Map<Player, Inventory> associatedShopGUI = new HashMap<>();
@@ -118,8 +121,10 @@ public abstract class ActiveGame {
     //                                               //
     protected boolean hasStarted = false;            //
     protected boolean winnerDeclared = false;        //
+
     protected BukkitTask timerTask = null;           //
     protected final GameLobbyTicker gameLobbyTicker; //
+    protected long startTime;                        //
     //-----------------------------------------------//
 
     public ActiveGame(String associatedWorldFilename, BedwarsGame bedwarsGame, World lobbyWorld, Plugin plugin) {
@@ -238,6 +243,11 @@ public abstract class ActiveGame {
                 builder.blank();
             }
 
+            if (abstractDeathmatch.isRunning()) {
+                builder.next(GameUtils.generateDeathmatch(abstractDeathmatch));
+                builder.next(GameUtils.generateDragons(abstractDeathmatch));
+            }
+
             for (final BedwarsTeam team : assignedTeams.keySet()) {
                 builder.next("✦ §7Team " + "§" + team.getColorCode() + "§l" + team.name() + getTeamChar(team));
             }
@@ -284,6 +294,8 @@ public abstract class ActiveGame {
         upgradesLevelsMap.clear();
         playerUpgradeLevelsMap.clear();
         upgradeItemStacks.clear();
+        announcementsTasks.forEach(BukkitTask::cancel);
+        announcementsTasks.clear();
         hasStarted = false;
         destroyMap();
     }
@@ -376,6 +388,8 @@ public abstract class ActiveGame {
         final UnregisterableListener upgradeMerchantListener = new UpgradeMerchantListener(this);
         final UnregisterableListener upgradeInteractListener = new UpgradeInteractListener(this);
         final UnregisterableListener spawnersMultigiveListener = new SpawnersMultigiveListener(this);
+        final UnregisterableListener itemDegradeListener = new ItemDegradeListener(this);
+        final UnregisterableListener playerSpectatePlayerListener = new PlayerSpectatePlayerListener(this);
 
         final PluginManager pluginManager = plugin.getServer().getPluginManager();
 
@@ -396,6 +410,8 @@ public abstract class ActiveGame {
         pluginManager.registerEvents(upgradeMerchantListener, plugin);
         pluginManager.registerEvents(upgradeInteractListener, plugin);
         pluginManager.registerEvents(spawnersMultigiveListener, plugin);
+        pluginManager.registerEvents(itemDegradeListener, plugin);
+        pluginManager.registerEvents(playerSpectatePlayerListener, plugin);
 
         unregisterableListeners.add(mapIllegalMovementsListener);
         unregisterableListeners.add(mapProtectionListener);
@@ -414,6 +430,8 @@ public abstract class ActiveGame {
         unregisterableListeners.add(upgradeMerchantListener);
         unregisterableListeners.add(upgradeInteractListener);
         unregisterableListeners.add(spawnersMultigiveListener);
+        unregisterableListeners.add(itemDegradeListener);
+        unregisterableListeners.add(playerSpectatePlayerListener);
     }
 
     public final void unregisterAllListeners() {
@@ -466,6 +484,7 @@ public abstract class ActiveGame {
             setupUpgradeLevelsMap();
             announceNoTeaming();
             abstractDeathmatch.start();
+            this.startTime = System.currentTimeMillis();
         }
     }
 
@@ -535,10 +554,18 @@ public abstract class ActiveGame {
     }
 
     public void declareWinner(final BedwarsTeam team) {
-        if (winnerDeclared) return;
-        associatedWorld.getPlayers().forEach(p -> {
+        if (winnerDeclared) {
+            return;
+        }
+        associatedQueue.perform(p -> {
             if (p.isOnline()) {
-                p.sendTitle("§7Team " + '§' + team.getColorCode() + team.name() + " §7has won the game!", "§7Returning to lobby in 15s");
+                final BedwarsTeam pTeam = getPlayerTeam(p);
+                if (pTeam == team) {
+                    p.sendTitle("§a§lYou have won this game!", "§aCongratulations.");
+                    p.playSound(p.getLocation(), Sound.FIREWORK_TWINKLE, 7.50f, 1.00f);
+                } else {
+                    p.sendTitle("§7Team " + '§' + team.getColorCode() + team.name() + " §7has won the game!", "§7Returning to lobby in 15s");
+                }
             }
         });
         this.winnerDeclared = true;
@@ -566,6 +593,37 @@ public abstract class ActiveGame {
                     this.emeraldSampleSpawner = activeSpawner;
                 }
             }
+        }
+        if (this.diamondSampleSpawner != null && this.emeraldSampleSpawner != null) {
+            diamondSampleSpawner.getSpawner()
+                    .getSpawnerLevels()
+                    .stream()
+                    .filter(lvl -> lvl.getLevel() != 1)
+                    .forEach(i -> {
+                        this.announcementsTasks.add(plugin.getServer().getScheduler()
+                                .runTaskLater(plugin, () -> {
+                                    getAssociatedWorld()
+                                            .getPlayers()
+                                            .forEach(p -> {
+                                                p.sendMessage(AussieBedwars.PREFIX + "The §b§lDIAMOND §7spawners have been upgraded to lvl. §e" + i.getLevel());
+                                            });
+                                }, i.getAfterSeconds() * 20L));
+                    });
+
+            emeraldSampleSpawner.getSpawner()
+                    .getSpawnerLevels()
+                    .stream()
+                    .filter(lvl -> lvl.getLevel() != 1)
+                    .forEach(i -> {
+                        this.announcementsTasks.add(plugin.getServer().getScheduler()
+                                .runTaskLater(plugin, () -> {
+                                    getAssociatedWorld()
+                                            .getPlayers()
+                                            .forEach(p -> {
+                                                p.sendMessage(AussieBedwars.PREFIX + "The §a§lEMERALD §7spawners have been upgraded to lvl. §e" + i.getLevel());
+                                            });
+                                }, i.getAfterSeconds() * 20L));
+                    });
         }
     }
 
@@ -622,7 +680,7 @@ public abstract class ActiveGame {
     }
 
     protected String getTeamChar(final BedwarsTeam t) {
-        if (destroyedTeams.contains(t)) {
+        if (destroyedTeams.contains(t) || abstractDeathmatch.isRunning()) {
             final List<Player> teamMembers = getTeamPlayers(t);
             if (teamMembers.stream().allMatch(this::isOutOfGame)) {
                 return " §c§l✘";
@@ -634,11 +692,22 @@ public abstract class ActiveGame {
         }
     }
 
-    public ShopActiveMerchant getTeamShopActiveMerchant(final BedwarsTeam team) {
-        for (AbstractActiveMerchant activeMerchant : activeMerchants) {
+    public ShopActiveMerchant getTeamShopActiveMerchant(final Villager clickedVillager) {
+        for (final AbstractActiveMerchant activeMerchant : activeMerchants) {
             if (activeMerchant instanceof ShopActiveMerchant) {
-                if (team == activeMerchant.team) {
+                if (activeMerchant.villager.equals(clickedVillager)) {
                     return (ShopActiveMerchant) activeMerchant;
+                }
+            }
+        }
+        return null;
+    }
+
+    public UpgradeActiveMerchant getTeamUpgradeActiveMerchant(final Villager clickedVillager) {
+        for (final AbstractActiveMerchant activeMerchant : activeMerchants) {
+            if (activeMerchant instanceof UpgradeActiveMerchant) {
+                if (clickedVillager.equals(activeMerchant.villager)) {
+                    return (UpgradeActiveMerchant) activeMerchant;
                 }
             }
         }
@@ -816,6 +885,10 @@ public abstract class ActiveGame {
 
     public final ActiveSpawner getEmeraldSampleSpawner() {
         return this.emeraldSampleSpawner;
+    }
+
+    public long getStartTime() {
+        return startTime;
     }
 
     public List<ActiveHealPool> getHealPools() {

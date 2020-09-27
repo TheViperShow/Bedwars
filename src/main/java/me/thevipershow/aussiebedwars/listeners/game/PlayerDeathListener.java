@@ -1,6 +1,7 @@
 package me.thevipershow.aussiebedwars.listeners.game;
 
 import com.google.common.collect.Lists;
+import java.util.Map;
 import me.thevipershow.aussiebedwars.AussieBedwars;
 import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.aussiebedwars.config.objects.SpawnPosition;
@@ -50,7 +51,7 @@ public final class PlayerDeathListener extends UnregisterableListener {
         LOBBY_COMPASS.setItemMeta(compassMeta);
     }
 
-    private static class RespawnRunnable extends BukkitRunnable {
+    public static class RespawnRunnable extends BukkitRunnable {
 
         private int secondsLeft = 5;
         private final Player p;
@@ -84,15 +85,15 @@ public final class PlayerDeathListener extends UnregisterableListener {
         }
     }
 
-    private void givePlayerLobbyCompass(final Player p) {
+    public static void givePlayerLobbyCompass(final Player p) {
         p.getInventory().setItemInHand(LOBBY_COMPASS);
     }
 
-    private void doDeathTimer(final Player p) {
+    public static void doDeathTimer(final Player p, final ActiveGame activeGame) {
         new RespawnRunnable(p, activeGame).runTaskTimer(activeGame.getPlugin(), 1L, 20L);
     }
 
-    private static void clearInvExceptArmorAndTools(final Player player, final ActiveGame game) {
+    public static void clearInvExceptArmorAndTools(final Player player, final ActiveGame game) {
         final PlayerInventory inv = player.getInventory();
         final ItemStack[] contents = inv.getContents();
 
@@ -100,19 +101,22 @@ public final class PlayerDeathListener extends UnregisterableListener {
             final ItemStack stack = contents[i];
             if (stack == null) {
                 continue;
+            } else if (stack.getType().name().endsWith("_SWORD")) { // Checking if player has sword
+                final Material swordType = stack.getType();
+                if (swordType != Material.WOOD_SWORD) { // Not clearing wooden swords (they're the base).
+                    final Map<Enchantment, Integer> enchants = stack.getEnchantments();
+                    final ItemStack cloned = new ItemStack(Material.WOOD_SWORD, 1);
+                    if (!enchants.isEmpty()) {              // Copying enchants
+                        cloned.addEnchantments(enchants);   // (for downgrades).
+                    }
+                    inv.setItem(i, cloned);
+                    continue;
+                }
             } else if (game.getBedwarsGame().getShop().getUpgradeItems()
                     .stream()
                     .flatMap(shop -> shop.getLevels().stream())
                     .anyMatch(lvl -> lvl.getCachedGameStack().isSimilar(stack))) {
                 continue;
-            } else if (game.getSwordUpgrades().getLevels().stream().anyMatch(stacc -> stacc.getType() == stack.getType())) {
-                final ItemStack prev = game.getSwordUpgrades().getPrevious(stack.getType());
-                if (prev != null) {
-                    GameUtils.upgradePlayerStack(player, stack, prev);
-                    continue;
-                } else if (stack.getType() == game.getSwordUpgrades().getLevels().get(0).getType()) {
-                    continue;
-                }
             }
             inv.setItem(i, null);
         }
@@ -125,7 +129,7 @@ public final class PlayerDeathListener extends UnregisterableListener {
         }
     }
 
-    private String generateDeathMessage(final EntityDamageEvent e, final BedwarsTeam killedPlayerTeam, final boolean finalKill) {
+    public static String generateDeathMessage(final EntityDamageEvent e, final BedwarsTeam killedPlayerTeam, final boolean finalKill, ActiveGame activeGame) {
 
         final StringBuilder msg = new StringBuilder("§" + killedPlayerTeam.getColorCode() + e.getEntity().getName());
         if (e instanceof EntityDamageByEntityEvent) {
@@ -174,7 +178,55 @@ public final class PlayerDeathListener extends UnregisterableListener {
         return msg.toString();
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    public static void deathLogic(ActiveGame activeGame, BedwarsTeam b, Player p, EntityDamageEvent event) {
+        if (activeGame.getDestroyedTeams().contains(b) || activeGame.getAbstractDeathmatch().isRunning()) { // Checking if players' team's bed has been broken previously.
+            // here player has lost the game.
+            // or has died permanently since the deathmatch mode is ON.
+            activeGame.removePlayer(p);
+            p.setAllowFlight(true);
+            p.setFlying(true);
+            p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 42069, 1, false), true);
+            p.getInventory().clear();
+            GameUtils.clearArmor(p);
+            givePlayerLobbyCompass(p);
+            if (!activeGame.isOutOfGame(p)) {
+                p.sendMessage(AussieBedwars.PREFIX + "§cYou have been eliminated.");
+                final String generatedDeathMsg = generateDeathMessage(event, b, true, activeGame);
+                activeGame.getAssociatedWorld().getPlayers().forEach(player -> player.sendMessage(AussieBedwars.PREFIX + generatedDeathMsg));
+            }
+            activeGame.getPlayersOutOfGame().add(p);
+
+            final Location pLoc = p.getLocation();
+            if (pLoc.getY() <= -5.00) {
+                pLoc.setY(90.00);
+                p.teleport(pLoc);
+            }
+
+            if (!activeGame.isWinnerDeclared()) {
+                final BedwarsTeam bedwarsTeam = activeGame.findWinningTeam();
+                if (bedwarsTeam != null) {
+                    activeGame.declareWinner(bedwarsTeam);
+                    activeGame.getPlugin().getServer().getScheduler().runTaskLater(activeGame.getPlugin(), activeGame::stop, 20 * 10L);
+                }
+            }
+        } else { // team is still in game
+            p.setGameMode(GameMode.SPECTATOR);
+            clearInvExceptArmorAndTools(p, activeGame);
+            doDeathTimer(p, activeGame);
+            final Location pLoc = p.getLocation();
+            if (pLoc.getY() <= -5.00) {
+                pLoc.setY(90.00);
+                p.teleport(pLoc);
+            }
+
+            final String generatedDeathMsg = generateDeathMessage(event, b, false, activeGame);
+            activeGame.getAssociatedWorld().getPlayers().forEach(player -> player.sendMessage(AussieBedwars.PREFIX + generatedDeathMsg));
+        }
+
+        p.setHealth(p.getMaxHealth());
+    }
+
+    @EventHandler()
     public final void onPlayerDeath(final EntityDamageEvent event) {
         if (!(event.getEntity() instanceof Player)) {
             return;
@@ -191,59 +243,17 @@ public final class PlayerDeathListener extends UnregisterableListener {
 
         if (playerHealth - damage <= 0.00) {
             final BedwarsTeam b = activeGame.getPlayerTeam(p);
+            p.closeInventory();
 
-            if (activeGame.getDestroyedTeams().contains(b) || activeGame.getAbstractDeathmatch().isRunning()) { // Checking if players' team's bed has been broken previously.
-                // here player has lost the game.
-                // or has died permanently since the deathmatch mode is ON.
-                activeGame.removePlayer(p);
-                p.setAllowFlight(true);
-                p.setFlying(true);
-                p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 42069, 1, false), true);
-                p.getInventory().clear();
-                GameUtils.clearArmor(p);
-                givePlayerLobbyCompass(p);
-                if (!activeGame.isOutOfGame(p)) {
-                    p.sendMessage(AussieBedwars.PREFIX + "§cYou have been eliminated.");
-                    final String generatedDeathMsg = generateDeathMessage(event, b, true);
-                    activeGame.getAssociatedWorld().getPlayers().forEach(player -> player.sendMessage(AussieBedwars.PREFIX + generatedDeathMsg));
-                }
-                activeGame.getPlayersOutOfGame().add(p);
+            deathLogic(activeGame, b, p, event);
 
-                final Location pLoc = p.getLocation();
-                if (pLoc.getY() <= 0.00) {
-                    pLoc.setY(90.00);
-                    p.teleport(pLoc);
-                }
-
-                if (!activeGame.isWinnerDeclared()) {
-                    final BedwarsTeam bedwarsTeam = activeGame.findWinningTeam();
-                    if (bedwarsTeam != null) {
-                        activeGame.declareWinner(bedwarsTeam);
-                        activeGame.getPlugin().getServer().getScheduler().runTaskLater(activeGame.getPlugin(), activeGame::stop, 20 * 10L);
-                    }
-                }
-            } else { // team is still in game
-                p.setGameMode(GameMode.SPECTATOR);
-                clearInvExceptArmorAndTools(p, activeGame);
-                doDeathTimer(p);
-                final Location pLoc = p.getLocation();
-                if (pLoc.getY() <= 0.00) {
-                    pLoc.setY(90.00);
-                    p.teleport(pLoc);
-                }
-
-                final String generatedDeathMsg = generateDeathMessage(event, b, false);
-                activeGame.getAssociatedWorld().getPlayers().forEach(player -> player.sendMessage(AussieBedwars.PREFIX + generatedDeathMsg));
-            }
-
-            p.setHealth(p.getMaxHealth());
             event.setCancelled(true);
 
             if (event instanceof EntityDamageByEntityEvent) {
                 final EntityDamageByEntityEvent edbee = (EntityDamageByEntityEvent) event;
                 final Entity damager = edbee.getDamager();
                 if (damager instanceof Player) {
-                    ((Player) damager).playSound(damager.getLocation(), Sound.SPLASH, 7.99f, 1.00f);
+                    ((Player) damager).playSound(damager.getLocation(), Sound.SPLASH, 8.35f, 1.00f);
                 }
             }
         }

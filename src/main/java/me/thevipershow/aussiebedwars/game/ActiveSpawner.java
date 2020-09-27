@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
+import me.thevipershow.aussiebedwars.AussieBedwars;
 import me.thevipershow.aussiebedwars.bedwars.Gamemode;
 import me.thevipershow.aussiebedwars.bedwars.objects.spawners.SpawnerType;
 import me.thevipershow.aussiebedwars.bedwars.spawner.SpawnerLevel;
@@ -100,7 +101,7 @@ public class ActiveSpawner {
     }
 
     private String generateStandName() {
-        return String.format("§7§lLevel§r§7: §r§7§e%s§7| Drop in: §e§l%d§7s",
+        return String.format("§f§lLevel§r§7: §r§f§e%s§7|§f Drop in: §e§l%d§fs",
                 currentLevel.getLevel(),
                 (spawner.getDropDelay() - currentLevel.getDecreaseSpawnDelay()) - ((now() - lastDrop) / 1000));
     }
@@ -108,7 +109,7 @@ public class ActiveSpawner {
     private void drop() {
         final World w = game.associatedWorld;
         final Location dropSpawnPos = spawner.getSpawnPosition().toLocation(w);
-        final int nearbyEntities = w.getNearbyEntities(dropSpawnPos, 2.501, 5.00, 2.501)
+        final int nearbyEntities = w.getNearbyEntities(dropSpawnPos, 1.501, 3.00, 1.501)
                 .stream()
                 .filter(e -> e instanceof Item)
                 .map(e -> (Item) e)
@@ -179,7 +180,6 @@ public class ActiveSpawner {
                 .getScheduler()
                 .runTaskTimer(game.plugin, () -> timePassedSinceCreation++, 1L, 20L);
     }
-
 
 
     public boolean active() {

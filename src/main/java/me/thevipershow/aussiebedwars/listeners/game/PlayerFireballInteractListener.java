@@ -3,6 +3,7 @@ package me.thevipershow.aussiebedwars.listeners.game;
 import me.thevipershow.aussiebedwars.game.ActiveGame;
 import me.thevipershow.aussiebedwars.game.GameUtils;
 import me.thevipershow.aussiebedwars.listeners.UnregisterableListener;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
@@ -28,14 +29,23 @@ public final class PlayerFireballInteractListener extends UnregisterableListener
         if (!player.getWorld().equals(activeGame.getAssociatedWorld())) return;
 
         final Action action = event.getAction();
-        if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
+        if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
             final ItemStack itemInHand = player.getInventory().getItemInHand();
-            if (itemInHand == null) return;
-            if (itemInHand.getType() != Material.FIREBALL) return;
-            final Vector playerDirection = player.getEyeLocation().getDirection();
-            final Fireball fireball = (Fireball) activeGame.getAssociatedWorld().spawnEntity(player.getEyeLocation().add(playerDirection.multiply(1.25725125)), EntityType.FIREBALL);
-            fireball.setVelocity(playerDirection.multiply(0.10));
-            fireball.setIsIncendiary(false);
+
+            if (itemInHand == null) {
+                return;
+            }
+            if (itemInHand.getType() != Material.FIREBALL) {
+                return;
+            }
+
+            final Location pEyeLoc = player.getEyeLocation();
+            final Vector playerDirection = pEyeLoc.getDirection();
+            final Location shootLocation = pEyeLoc.add(playerDirection.clone().multiply(1.05));
+
+            final Fireball fireball = (Fireball) activeGame.getAssociatedWorld().spawnEntity(shootLocation, EntityType.FIREBALL);
+            fireball.setVelocity(playerDirection.multiply(0.4725));
+            fireball.setIsIncendiary(true);
             event.setCancelled(true);
             GameUtils.decreaseItemInHand(player);
         }

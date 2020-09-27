@@ -13,8 +13,8 @@ import org.bukkit.configuration.serialization.SerializableAs;
 @SerializableAs("Solo")
 public class SoloBedwars extends BedwarsGame implements ConfigurationSerializable {
 
-    protected SoloBedwars(Gamemode gamemode, int minGames, int maxGames, int minPlayers, int players, List<BedwarsTeam> teams, SpawnPosition lobbySpawn, String mapFilename, Set<TeamSpawnPosition> mapSpawns, List<Spawner> spawners, List<Merchant> merchants, Shop shop, UpgradeShop upgradeShop, int startTimer, int deathmatchStart) {
-        super(gamemode, minGames, maxGames, minPlayers, players, teams, lobbySpawn, mapFilename, mapSpawns, spawners, merchants, shop, upgradeShop, startTimer, deathmatchStart);
+    protected SoloBedwars(Gamemode gamemode, int minGames, int maxGames, int minPlayers, int players, List<BedwarsTeam> teams, SpawnPosition lobbySpawn, String mapFilename, Set<TeamSpawnPosition> mapSpawns, List<Spawner> spawners, List<Merchant> merchants, Shop shop, UpgradeShop upgradeShop, int startTimer, int deathmatchStart, int tntFuse) {
+        super(gamemode, minGames, maxGames, minPlayers, players, teams, lobbySpawn, mapFilename, mapSpawns, spawners, merchants, shop, upgradeShop, startTimer, deathmatchStart, tntFuse);
     }
 
     @Override
@@ -30,6 +30,7 @@ public class SoloBedwars extends BedwarsGame implements ConfigurationSerializabl
         int deathmatchStart = (int) objectMap.get("deathmatch-start");
         int minPlayers = (int) objectMap.get("min-players");
         int startTimer = (int) objectMap.get("start-timer");
+        int tntFuse = (int) objectMap.get("tnt-fuse");
         List<String> teams = (List<String>) objectMap.get("teams");
         List<BedwarsTeam> actualTeams = teams.stream().map(BedwarsTeam::valueOf).collect(Collectors.toList());
         Map<String, Object> mapLobbySpawn = (Map<String, Object>) objectMap.get("map-lobby-spawn");
@@ -52,7 +53,7 @@ public class SoloBedwars extends BedwarsGame implements ConfigurationSerializabl
         Map<String, Object> shopSection = (Map<String, Object>) objectMap.get("shop");
         Shop shop = Shop.deserialize(shopSection);
         UpgradeShop upgradeShop = UpgradeShop.deserialize((Map<String, Object>) objectMap.get("upgrades"));
-        return new SoloBedwars(Gamemode.SOLO, minGames, maxGames, minPlayers, players, actualTeams, mapLobbySpawnPos, filename, mapSpawnPos, spawnerList, merchantsList, shop, upgradeShop, startTimer, deathmatchStart);
+        return new SoloBedwars(Gamemode.SOLO, minGames, maxGames, minPlayers, players, actualTeams, mapLobbySpawnPos, filename, mapSpawnPos, spawnerList, merchantsList, shop, upgradeShop, startTimer, deathmatchStart, tntFuse);
     }
 
 }

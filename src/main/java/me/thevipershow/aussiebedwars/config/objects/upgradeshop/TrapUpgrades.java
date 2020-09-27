@@ -2,7 +2,6 @@ package me.thevipershow.aussiebedwars.config.objects.upgradeshop;
 
 import java.util.List;
 import java.util.Map;
-import me.thevipershow.aussiebedwars.config.objects.ShopItem;
 import me.thevipershow.aussiebedwars.config.objects.upgradeshop.traps.AlarmTrap;
 import me.thevipershow.aussiebedwars.config.objects.upgradeshop.traps.BlindnessAndPoisonTrap;
 import me.thevipershow.aussiebedwars.config.objects.upgradeshop.traps.CounterOffensiveTrap;
@@ -37,6 +36,18 @@ public final class TrapUpgrades implements ConfigurationSerializable {
         this.material = material;
     }
 
+    public static TrapUpgrades deserialize(final Map<String, Object> map) {
+        String itemName = (String) map.get("material");
+        int slot = (int) map.get("slot");
+        Material material = Material.valueOf((String) map.get("material"));
+        List<String> lore = (List<String>) map.get("lore");
+
+        AlarmTrap alarmTrap = AlarmTrap.deserialize((Map<String, Object>) map.get("alarm"));
+        BlindnessAndPoisonTrap blindnessAndPoisonTrap = BlindnessAndPoisonTrap.deserialize((Map<String, Object>) map.get("blindness-poison"));
+        CounterOffensiveTrap counterOffensiveTrap = CounterOffensiveTrap.deserialize((Map<String, Object>) map.get("counter-offensive"));
+
+        return null; // TODO: Finish when sqce tells me
+    }
 
     public AlarmTrap getAlarmTrap() {
         return alarmTrap;

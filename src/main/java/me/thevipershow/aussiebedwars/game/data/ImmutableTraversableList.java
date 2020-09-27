@@ -11,7 +11,7 @@ public final class ImmutableTraversableList<T> {
 
     private final LinkedList<T> list;
     private MovingStatus movingStatus = FORWARDS; // always move Forwards on default.
-    private int currentIndex = 0;
+    private int currentIndex = 0x00;
 
     public T move() {
         switch (movingStatus) {

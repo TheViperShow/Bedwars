@@ -23,7 +23,12 @@ import me.thevipershow.aussiebedwars.config.objects.upgradeshop.IronForgeUpgrade
 import me.thevipershow.aussiebedwars.config.objects.upgradeshop.ManiacMinerUpgrade;
 import me.thevipershow.aussiebedwars.config.objects.upgradeshop.ReinforcedArmorUpgrade;
 import me.thevipershow.aussiebedwars.config.objects.upgradeshop.SharpnessUpgrade;
+import me.thevipershow.aussiebedwars.config.objects.upgradeshop.TrapUpgrades;
 import me.thevipershow.aussiebedwars.config.objects.upgradeshop.UpgradeShop;
+import me.thevipershow.aussiebedwars.config.objects.upgradeshop.traps.AlarmTrap;
+import me.thevipershow.aussiebedwars.config.objects.upgradeshop.traps.BlindnessAndPoisonTrap;
+import me.thevipershow.aussiebedwars.config.objects.upgradeshop.traps.CounterOffensiveTrap;
+import me.thevipershow.aussiebedwars.config.objects.upgradeshop.traps.MinerFatigueTrap;
 import me.thevipershow.aussiebedwars.game.GameManager;
 import me.thevipershow.aussiebedwars.listeners.queue.MatchmakingVillagersListener;
 import me.thevipershow.aussiebedwars.listeners.queue.QueueResizerListener;
@@ -33,6 +38,7 @@ import me.thevipershow.aussiebedwars.worlds.WorldsManager;
 import me.tigerhix.lib.scoreboard.ScoreboardLib;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -83,6 +89,11 @@ public final class AussieBedwars extends JavaPlugin {
         ConfigurationSerialization.registerClass(ShopItem.class);
         ConfigurationSerialization.registerClass(TeamSpawnPosition.class);
         ConfigurationSerialization.registerClass(DuoBedwars.class);
+        ConfigurationSerialization.registerClass(MinerFatigueTrap.class);
+        ConfigurationSerialization.registerClass(BlindnessAndPoisonTrap.class);
+        ConfigurationSerialization.registerClass(CounterOffensiveTrap.class);
+        ConfigurationSerialization.registerClass(AlarmTrap.class);
+        ConfigurationSerialization.registerClass(TrapUpgrades.class);
     }
 
 //

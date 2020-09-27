@@ -36,8 +36,9 @@ public final class EntityDamageListener extends UnregisterableListener {
             event.setCancelled(true);
         } else if (damaged instanceof Villager) {
             final Villager damagedVillager = (Villager) damaged;
-            if (activeGame.isMerchantVillager(damagedVillager))
+            if (activeGame.isMerchantVillager(damagedVillager)) {
                 event.setCancelled(true);
+            }
         } else if (damaged instanceof ArmorStand) {
             event.setCancelled(true);
         } else if (activeGame.getBedwarsGame().getGamemode() != Gamemode.SOLO
@@ -53,6 +54,8 @@ public final class EntityDamageListener extends UnregisterableListener {
         } else if (damager instanceof EnderDragon && damaged instanceof Player) {
             final Vector dragonVelocity = damager.getVelocity();
             damaged.setVelocity(new Vector(dragonVelocity.getX(), 4.0, dragonVelocity.getZ()));
+        } else if (damaged instanceof Player && activeGame.isOutOfGame((Player) damaged)) {
+            event.setCancelled(true);
         }
     }
 }
