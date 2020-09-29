@@ -190,7 +190,6 @@ public abstract class ActiveGame {
             upgradeItemStacks.put(s, item);
             inv.setItem(item.getSlot(), s);
         }
-
         return inv;
     }
 
@@ -259,13 +258,14 @@ public abstract class ActiveGame {
 
     };
 
-    public void destroyTeamBed(final BedwarsTeam team) {
+    public void destroyTeamBed(final BedwarsTeam destroyed, final Player destroyer) {
         associatedQueue.perform(p -> {
             if (p.isOnline() && p.getWorld().equals(associatedWorld)) {
-                if (getPlayerTeam(p) == team) {
+                if (getPlayerTeam(p) == destroyed) {
                     p.sendTitle("", "§c§lYour bed has been broken!");
                 } else {
-                    p.sendMessage(AussieBedwars.PREFIX + "§" + team.getColorCode() + team.name() + " §7team's bed has been broken!");
+                    final BedwarsTeam destroyerTeam = getPlayerTeam(destroyer);
+                    p.sendMessage(AussieBedwars.PREFIX + "§" + destroyed.getColorCode() + destroyed.name() + " §7team's bed has been broken by §" + destroyerTeam.getColorCode() + destroyer.getName());
                 }
                 p.playSound(p.getLocation(), Sound.ENDERDRAGON_GROWL, 9.0f, 1.0f);
             }
@@ -453,9 +453,11 @@ public abstract class ActiveGame {
     }
 
     public BedwarsTeam getPlayerTeam(final Player player) {
-        for (final Map.Entry<BedwarsTeam, List<Player>> entry : assignedTeams.entrySet())
-            if (entry.getValue().contains(player))
+        for (final Map.Entry<BedwarsTeam, List<Player>> entry : assignedTeams.entrySet()) {
+            if (entry.getValue().contains(player)) {
                 return entry.getKey();
+            }
+        }
         return null;
     }
 
@@ -473,16 +475,23 @@ public abstract class ActiveGame {
                 handleError("Something went wrong while you were being sent into game.");
                 return;
             }
+
             assignTeams();
+
+            assignedTeams.forEach((k,v) -> {
+                System.out.println(k.name());
+                v.forEach(p -> System.out.println("  ⮡ " + p.getName()));
+            });
+
             assignScoreboards();
             createSpawners();
             createMerchants();
             moveTeamsToSpawns();
             fillUpgradeMaps();
-            giveAllDefaultSet();
-            healAll();
             setupUpgradeLevelsMap();
             announceNoTeaming();
+            healAll();
+            giveAllDefaultSet();
             abstractDeathmatch.start();
             this.startTime = System.currentTimeMillis();
         }
@@ -508,11 +517,12 @@ public abstract class ActiveGame {
 
     public abstract void moveTeamsToSpawns();
 
-    public void givePlayerDefaultSet(final Player p) {
-        final ArmorSet startingSet = new ArmorSet(getPlayerTeam(p));
-        startingSet.getArmorSet().forEach((k, v) -> ArmorSet.Slots.setArmorPiece(k, p, startingSet.getArmorSet().get(k)));
-        GameUtils.giveStackToPlayer(new ItemStack(Material.WOOD_SWORD, 1), p, p.getInventory().getContents());
-        this.playerSetMap.put(p, startingSet);
+    public void givePlayerDefaultSet(final Player player) {
+
+        final ArmorSet startingSet = new ArmorSet(Objects.requireNonNull(getPlayerTeam(player)));
+        startingSet.getArmorSet().forEach((k, v) -> ArmorSet.Slots.setArmorPiece(k, player, startingSet.getArmorSet().get(k)));
+        GameUtils.giveStackToPlayer(new ItemStack(Material.WOOD_SWORD, 1), player, player.getInventory().getContents());
+        this.playerSetMap.put(player, startingSet);
     }
 
     public void giveAllDefaultSet() {

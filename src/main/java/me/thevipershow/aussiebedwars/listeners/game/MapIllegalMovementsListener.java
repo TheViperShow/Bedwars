@@ -18,6 +18,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
 
 public final class MapIllegalMovementsListener extends UnregisterableListener {
 
@@ -90,9 +91,10 @@ public final class MapIllegalMovementsListener extends UnregisterableListener {
         if (isOutOfBounds(player)) {
             if (activeGame.isOutOfGame(player)) {
                 event.setCancelled(true);
+                player.setVelocity(new Vector(0.d,0.d,0.d));
             } else {
-                PlayerDeathListener.deathLogic(activeGame, activeGame.getPlayerTeam(player), player,
-                        new EntityDamageEvent(player, EntityDamageEvent.DamageCause.VOID, 20.00));
+                //PlayerDeathListener.deathLogic(activeGame, activeGame.getPlayerTeam(player), player,
+                //        new EntityDamageEvent(player, EntityDamageEvent.DamageCause.VOID, 20.00));
             }
         }
     }

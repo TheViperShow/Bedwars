@@ -106,8 +106,12 @@ public final class ArmorSet {
     }
 
     public ArmorSet(final BedwarsTeam team) {
-        for (final Slots slots : Slots.values())
+        if (team == null) {
+            throw new UnsupportedOperationException("null constructor argument for team.");
+        }
+        for (final Slots slots : Slots.values()) {
             armorSet.put(slots, slots.generateColoredItemStack(team, "LEATHER"));
+        }
     }
 
     public Collection<ItemStack> getItems() {

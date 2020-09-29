@@ -5,7 +5,7 @@ import me.thevipershow.aussiebedwars.listeners.UnregisterableListener;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.player.PlayerItemDamageEvent;
 
 public final class ItemDegradeListener extends UnregisterableListener {
 
@@ -15,9 +15,10 @@ public final class ItemDegradeListener extends UnregisterableListener {
         this.activeGame = activeGame;
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
-    public void onPlayerItemConsume(final PlayerItemConsumeEvent event) {
+    @EventHandler(ignoreCancelled = true)
+    public void onPlayerItemConsume(final PlayerItemDamageEvent event) {
         final Player player = event.getPlayer();
+
         if (!player.getWorld().equals(activeGame.getAssociatedWorld())) {
             return;
         }

@@ -1,6 +1,7 @@
 package me.thevipershow.aussiebedwars.listeners.game;
 
 import me.thevipershow.aussiebedwars.config.objects.TeamSpawnPosition;
+import me.thevipershow.aussiebedwars.game.AbstractActiveMerchant;
 import me.thevipershow.aussiebedwars.game.ActiveGame;
 import me.thevipershow.aussiebedwars.game.ActiveSpawner;
 import me.thevipershow.aussiebedwars.listeners.UnregisterableListener;
@@ -26,12 +27,17 @@ public final class MapProtectionListener extends UnregisterableListener {
 
     private boolean isBlockInsideSpawn(final Block block) {
         for (final TeamSpawnPosition spawn : activeGame.getBedwarsGame().getMapSpawns())
-            if (spawn.squaredDistance(block.getLocation()) <= 16.00)
+            if (spawn.squaredDistance(block.getLocation()) < 16.00)
                 return true;
         return false;
     }
 
     private boolean isBlockInsideMerchant(final Block block) { //TODO: Implement
+        for (AbstractActiveMerchant activeMerchant : activeGame.getActiveMerchants()) {
+            if (activeMerchant.getMerchant().getMerchantPosition().squaredDistance(block.getLocation()) < 16.00) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -40,7 +46,7 @@ public final class MapProtectionListener extends UnregisterableListener {
         final Block block = event.getBlock();
         if (!block.getWorld().equals(activeGame.getAssociatedWorld())) return;
 
-        if (isBlockNearSpawner(block) || isBlockInsideSpawn(block)) {
+        if (isBlockNearSpawner(block) || isBlockInsideSpawn(block) || isBlockInsideMerchant(block)) {
             event.setCancelled(true);
         } else {
             activeGame.getPlayerPlacedBlocks().add(block);

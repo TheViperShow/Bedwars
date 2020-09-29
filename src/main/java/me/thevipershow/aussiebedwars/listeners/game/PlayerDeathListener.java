@@ -1,6 +1,7 @@
 package me.thevipershow.aussiebedwars.listeners.game;
 
 import com.google.common.collect.Lists;
+import java.util.Collection;
 import java.util.Map;
 import me.thevipershow.aussiebedwars.AussieBedwars;
 import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
@@ -102,16 +103,17 @@ public final class PlayerDeathListener extends UnregisterableListener {
             if (stack == null) {
                 continue;
             } else if (stack.getType().name().endsWith("_SWORD")) { // Checking if player has sword
-                final Material swordType = stack.getType();
-                if (swordType != Material.WOOD_SWORD) { // Not clearing wooden swords (they're the base).
-                    final Map<Enchantment, Integer> enchants = stack.getEnchantments();
-                    final ItemStack cloned = new ItemStack(Material.WOOD_SWORD, 1);
-                    if (!enchants.isEmpty()) {              // Copying enchants
-                        cloned.addEnchantments(enchants);   // (for downgrades).
+                if (stack.getType() != Material.WOOD_SWORD) {
+                    final Map<Enchantment, Integer> availableEnchs = stack.getEnchantments();
+                    if (availableEnchs.isEmpty()) {
+                        inv.setItem(i, new ItemStack(Material.WOOD_SWORD, 1));
+                    } else {
+                        final ItemStack es = new ItemStack(Material.WOOD_SWORD, 1);
+                        es.addEnchantments(availableEnchs);
+                        inv.setItem(i, es);
                     }
-                    inv.setItem(i, cloned);
-                    continue;
                 }
+                continue;
             } else if (game.getBedwarsGame().getShop().getUpgradeItems()
                     .stream()
                     .flatMap(shop -> shop.getLevels().stream())
@@ -243,17 +245,16 @@ public final class PlayerDeathListener extends UnregisterableListener {
 
         if (playerHealth - damage <= 0.00) {
             final BedwarsTeam b = activeGame.getPlayerTeam(p);
+
             p.closeInventory();
-
             deathLogic(activeGame, b, p, event);
-
             event.setCancelled(true);
 
             if (event instanceof EntityDamageByEntityEvent) {
                 final EntityDamageByEntityEvent edbee = (EntityDamageByEntityEvent) event;
                 final Entity damager = edbee.getDamager();
                 if (damager instanceof Player) {
-                    ((Player) damager).playSound(damager.getLocation(), Sound.SPLASH, 8.35f, 1.00f);
+                    ((Player) damager).playSound(damager.getLocation(), Sound.SPLASH, 8.50f, 0.85f);
                 }
             }
         }

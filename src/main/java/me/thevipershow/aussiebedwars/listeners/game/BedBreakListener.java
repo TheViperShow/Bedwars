@@ -68,7 +68,7 @@ public final class BedBreakListener extends UnregisterableListener {
                         if (e.isCancelled()) return;
 
                         activeGame.getDestroyedTeams().add(destroyedBedTeam);
-                        activeGame.destroyTeamBed(destroyedBedTeam);
+                        activeGame.destroyTeamBed(destroyedBedTeam, p);
                     }
 
                 } else {

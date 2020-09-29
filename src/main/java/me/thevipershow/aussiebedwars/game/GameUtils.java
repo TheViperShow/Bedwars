@@ -1,7 +1,10 @@
 package me.thevipershow.aussiebedwars.game;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import me.thevipershow.aussiebedwars.bedwars.Gamemode;
 import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
@@ -294,9 +297,27 @@ public final class GameUtils {
         return full;
     }
 
+    public static <T> List<List<T>> splitByTwo(final List<T> t) {
+        final int groups = (int) Math.ceil(t.size() / 2.0);
+        final List<List<T>> lists = new ArrayList<>(groups);
+        for (int k = 0; k < t.size(); k++) {
+            final T e = t.get(k);
+            final List<T> temp = new ArrayList<>(2);
+            temp.add(e);
+            if (k != t.size() - 1) {
+                final T e2 = t.get(++k);
+                temp.add(e2);
+            }
+            lists.add(temp);
+        }
+        return lists;
+    }
+
     public static void removeAllEffects(final Player p) {
         for (final PotionEffectType type : PotionEffectType.values()) {
-            p.removePotionEffect(type);
+            if (p.hasPotionEffect(type)) {
+                p.removePotionEffect(type);
+            }
         }
     }
 
