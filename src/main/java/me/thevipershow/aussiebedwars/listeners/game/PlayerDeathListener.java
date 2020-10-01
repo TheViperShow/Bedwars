@@ -252,6 +252,7 @@ public final class PlayerDeathListener extends UnregisterableListener {
                 final EntityDamageByEntityEvent edbee = (EntityDamageByEntityEvent) event;
                 final Entity damager = edbee.getDamager();
                 if (damager instanceof Player) {
+                    GameUtils.sendKillActionBar(activeGame, (Player) damager,  p);
                     ((Player) damager).playSound(damager.getLocation(), Sound.SPLASH, 8.50f, 0.85f);
                 }
             }

@@ -13,8 +13,11 @@ import me.thevipershow.aussiebedwars.bedwars.objects.spawners.SpawnerType;
 import me.thevipershow.aussiebedwars.config.objects.Merchant;
 import me.thevipershow.aussiebedwars.config.objects.TeamSpawnPosition;
 import me.thevipershow.aussiebedwars.listeners.game.ArmorSet;
+import net.minecraft.server.v1_8_R3.ChatMessage;
+import net.minecraft.server.v1_8_R3.IChatBaseComponent;
 import net.minecraft.server.v1_8_R3.Items;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
+import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
 import net.minecraft.server.v1_8_R3.PlayerConnection;
 import org.apache.commons.lang3.ObjectUtils;
 import org.bukkit.Material;
@@ -170,6 +173,19 @@ public final class GameUtils {
             }
         }
         return false;
+    }
+
+    public static PacketPlayOutChat killActionBar(final ActiveGame activeGame, final Player killed) {
+        final BedwarsTeam killedTeam = activeGame.getPlayerTeam(killed);
+        final IChatBaseComponent iChatBaseComponent = new ChatMessage(
+                "§e⚔ You killed player §" + killedTeam.getColorCode() + killed.getName() + "§r§e⚔"
+        );
+        return new PacketPlayOutChat(iChatBaseComponent, (byte) 0x02);
+    }
+
+    public static void sendKillActionBar(final ActiveGame activeGame, final Player killer, final Player killed) {
+        final PlayerConnection conn = getPlayerConnection(killer);
+        conn.sendPacket(killActionBar(activeGame, killed));
     }
 
     public static void giveStackToPlayer(final ItemStack itemStack, final Player player, final ItemStack[] contents) {
