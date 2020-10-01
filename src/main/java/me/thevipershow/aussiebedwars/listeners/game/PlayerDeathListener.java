@@ -144,34 +144,32 @@ public final class PlayerDeathListener extends UnregisterableListener {
                 final String killMsg = cz == DamageCause.PROJECTILE ? "pierced " : "annihilated ";
                 msg.append(String.format(" §7was %s by §", killMsg)).append(damagerTeam.getColorCode()).append(p.getName()).append('.');
             } else {
-                msg.append(" §7was killed by §f").append(GameUtils.beautifyCaps(damager.getType().name())).append('.');
-            }
-        } else {
-            final DamageCause damageCause = e.getCause();
-            switch (damageCause) {
-                case FIRE:
-                case LAVA:
-                    msg.append(" §7burned to death.");
-                    break;
-                case DROWNING:
-                    msg.append(" §7tried to swallow the ocean.");
-                    break;
-                case SUFFOCATION:
-                    msg.append(" §7suffocated to death.");
-                    break;
-                case FALL:
-                    msg.append(" §7believed the floor was soft.");
-                    break;
-                case VOID:
-                    msg.append(" §7fought against gravity.");
-                    break;
-                case BLOCK_EXPLOSION:
-                case ENTITY_EXPLOSION:
-                    msg.append(" §7exploded into pieces.");
-                    break;
-                default:
-                    msg.append(" §7has died.");
-                    break;
+                final DamageCause damageCause = e.getCause();
+                switch (damageCause) {
+                    case FIRE:
+                    case LAVA:
+                        msg.append(" §7burned to death.");
+                        break;
+                    case DROWNING:
+                        msg.append(" §7tried to swallow the ocean.");
+                        break;
+                    case SUFFOCATION:
+                        msg.append(" §7suffocated to death.");
+                        break;
+                    case FALL:
+                        msg.append(" §7believed the floor was soft.");
+                        break;
+                    case VOID:
+                        msg.append(" §7fought against gravity.");
+                        break;
+                    case BLOCK_EXPLOSION:
+                    case ENTITY_EXPLOSION:
+                        msg.append(" §7exploded into pieces.");
+                        break;
+                    default:
+                        msg.append(" §7has died.");
+                        break;
+                }
             }
         }
         if (finalKill) {

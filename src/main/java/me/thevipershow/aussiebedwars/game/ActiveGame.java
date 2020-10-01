@@ -477,12 +477,6 @@ public abstract class ActiveGame {
             }
 
             assignTeams();
-
-            assignedTeams.forEach((k,v) -> {
-                System.out.println(k.name());
-                v.forEach(p -> System.out.println("  ⮡ " + p.getName()));
-            });
-
             assignScoreboards();
             createSpawners();
             createMerchants();
@@ -508,7 +502,7 @@ public abstract class ActiveGame {
 
     }
 
-    public void healAll() {
+    public final void healAll() {
         associatedWorld.getPlayers().forEach(p -> {
             p.setHealth(p.getMaxHealth());
             p.setFoodLevel(0x14);
@@ -695,7 +689,7 @@ public abstract class ActiveGame {
             if (teamMembers.stream().allMatch(this::isOutOfGame)) {
                 return " §c§l✘";
             } else {
-                return " §f§l" + teamMembers.size();
+                return " §f§l" + teamMembers.stream().filter(p -> !isOutOfGame(p)).count();
             }
         } else {
             return " §a✓";

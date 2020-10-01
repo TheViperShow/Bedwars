@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Logger;
+import me.thevipershow.aussiebedwars.LoggerUtils;
 import me.thevipershow.aussiebedwars.config.BedwarsGamemodeConfig;
 import me.thevipershow.aussiebedwars.config.ConfigManager;
 import me.thevipershow.aussiebedwars.config.objects.BedwarsGame;
@@ -70,6 +72,7 @@ public class WorldsManager {
     }
 
     public final void load(final BedwarsGame game) {
+        final Logger log = plugin.getLogger();
         final String fileName = game.getMapFilename();
         final Integer i = createdAmountsMap.get(game);
         final int currentInt = i == null ? 1 : i + 1;
@@ -77,17 +80,17 @@ public class WorldsManager {
         final File sourceFile = new File(pluginFolder.getAbsolutePath(), game.getMapFilename());
 
         if (!sourceFile.exists()) {
-            plugin.getLogger().warning(String.format("Could not find a world folder named [%s].", sourceFile.getAbsolutePath()));
+            LoggerUtils.logColor(log, String.format("&cCould not find a world folder named &f[&e%s&f]",  sourceFile.getAbsolutePath()));
             return;
         }
 
         final File outputFile = new File(worldContainer.getAbsolutePath(), tempName);
 
         final WorldLoader worldLoader = new WorldLoader(sourceFile, outputFile);
-        plugin.getLogger().info(String.format("Attempting to copy directory of bukkit World [%s].", tempName));
+        LoggerUtils.logColor(log, String.format("&3Attempting to copy directory of Bukkit World &f[&e%s&f].", tempName));
         final boolean copyResult = worldLoader.copyToDir();
 
-        plugin.getLogger().info(String.format("Attempting to create instance of bukkit World [%s].", tempName));
+        LoggerUtils.logColor(log, String.format("&3Attempting to create instance of Bukkit World &f[&e%s&f].", tempName));
 
         final World w = WorldCreator.name(tempName)
                 .environment(World.Environment.NORMAL)
@@ -95,21 +98,21 @@ public class WorldsManager {
                 .type(WorldType.CUSTOMIZED)
                 .createWorld();
 
-        plugin.getLogger().info(String.format("Loading [%s] into active games...", tempName));
+        LoggerUtils.logColor(log, String.format("&3Loading &f[&e%s&f] &3into active games...", tempName));
 
         final ActiveGame activeGame = GamemodeUtilities.fromGamemode(tempName, game, lobbyWorld, plugin);
 
         if (w != null && copyResult) {
-            plugin.getLogger().info(String.format("Successfully created a world name [%s].", tempName));
+            LoggerUtils.logColor(log, String.format("&3Successfully created a world with name &f[&e%s&f].", tempName));
             createdAmountsMap.put(game, currentInt);
             if (activeGame == null) {
-                plugin.getLogger().severe(String.format("Could not create active game for [%s].", tempName));
+                LoggerUtils.logColor(log, String.format("&cCould not create ActiveGame for &f[&e%s&f]", tempName));
             } else {
-                plugin.getLogger().info("Added new ActiveGame [" + tempName + "].");
+                LoggerUtils.logColor(log, "&3Added new ActiveGame &f[&e" + tempName + "&f].");
                 activeGameSet.add(activeGame);
             }
         } else {
-            plugin.getLogger().warning(String.format("Something went wrong when creating world [%s].", tempName));
+            LoggerUtils.logColor(log, String.format("&cSomething went wrong when creating world &f[&e%s&f].", tempName));
         }
 
     }

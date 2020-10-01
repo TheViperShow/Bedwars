@@ -3,23 +3,23 @@ package me.thevipershow.aussiebedwars.config;
 import java.util.Map;
 import java.util.stream.Collectors;
 import me.thevipershow.aussiebedwars.LoggerUtils;
-import me.thevipershow.aussiebedwars.config.objects.DuoBedwars;
+import me.thevipershow.aussiebedwars.config.objects.QuadBedwars;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public final class DuoConfig extends BedwarsGamemodeConfig<DuoBedwars> {
+public final class QuadConfig extends BedwarsGamemodeConfig<QuadBedwars> {
 
-    public DuoConfig(final JavaPlugin plugin) {
-        super(plugin, "duo.yml");
+    public QuadConfig(final JavaPlugin plugin) {
+        super(plugin, "quad.yml");
         load();
     }
 
     @Override
     public final void load() {
         bedwarsObjects =
-                getConfig().getMapList("duo")
+                getConfig().getMapList("quad")
                         .stream()
-                        .map(map -> DuoBedwars.deserialize((Map<String, Object>) map))
+                        .map(map -> QuadBedwars.deserialize((Map<String, Object>) map))
                         .collect(Collectors.toSet());
     }
 

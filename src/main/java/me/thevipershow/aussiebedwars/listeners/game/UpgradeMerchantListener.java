@@ -22,17 +22,17 @@ public final class UpgradeMerchantListener extends UnregisterableListener {
     public void onPlayerInteractEntity(final PlayerInteractEntityEvent event) {
         final Entity entity = event.getRightClicked();
         if (!(entity instanceof Villager)) return;
-        System.out.println("1");
+
         final World w = entity.getWorld();
         if (!w.equals(activeGame.getAssociatedWorld())) return;
-        System.out.println("2");
+
         final Player p = event.getPlayer();
 
         final Villager villager = (Villager) entity;
         UpgradeActiveMerchant upgradeActiveMerchant = activeGame.getTeamUpgradeActiveMerchant(villager);
 
         if (upgradeActiveMerchant != null) {
-            System.out.println("3");
+
             event.setCancelled(true);
             activeGame.openUpgrade(p);
         }

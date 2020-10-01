@@ -6,10 +6,12 @@ import me.thevipershow.aussiebedwars.config.BedwarsGamemodeConfig;
 import me.thevipershow.aussiebedwars.config.ConfigManager;
 import me.thevipershow.aussiebedwars.config.DefaultConfiguration;
 import me.thevipershow.aussiebedwars.config.DuoConfig;
+import me.thevipershow.aussiebedwars.config.QuadConfig;
 import me.thevipershow.aussiebedwars.config.SoloConfig;
 import me.thevipershow.aussiebedwars.config.objects.DuoBedwars;
 import me.thevipershow.aussiebedwars.config.objects.Enchantment;
 import me.thevipershow.aussiebedwars.config.objects.Merchant;
+import me.thevipershow.aussiebedwars.config.objects.QuadBedwars;
 import me.thevipershow.aussiebedwars.config.objects.Shop;
 import me.thevipershow.aussiebedwars.config.objects.ShopItem;
 import me.thevipershow.aussiebedwars.config.objects.SoloBedwars;
@@ -55,6 +57,7 @@ public final class AussieBedwars extends JavaPlugin {
     // loading file configurations:
     private BedwarsGamemodeConfig<SoloBedwars> soloConfig;
     private BedwarsGamemodeConfig<DuoBedwars> duoConfig;
+    private BedwarsGamemodeConfig<QuadBedwars> quadConfig;
     private ConfigManager configManager;
 
     // Global Listeners section
@@ -94,6 +97,7 @@ public final class AussieBedwars extends JavaPlugin {
         ConfigurationSerialization.registerClass(CounterOffensiveTrap.class);
         ConfigurationSerialization.registerClass(AlarmTrap.class);
         ConfigurationSerialization.registerClass(TrapUpgrades.class);
+        ConfigurationSerialization.registerClass(QuadBedwars.class);
     }
 
 //
@@ -116,27 +120,31 @@ public final class AussieBedwars extends JavaPlugin {
 
 
     @Override
-    public void onLoad() {
+    public final void onLoad() {
         registerSerializers();
     }
 
     @Override
-    public void onEnable() { // Plugin startup logic
+    public final void onEnable() { // Plugin startup logic
         ScoreboardLib.setPluginInstance(this);
         defaultConfiguration = new DefaultConfiguration(this);
+
         soloConfig = new SoloConfig(this);
         soloConfig.saveDefaultConfig();
 
         duoConfig = new DuoConfig(this);
         duoConfig.saveDefaultConfig();
 
-        configManager = new ConfigManager(defaultConfiguration, soloConfig, duoConfig); // TODO: add extras
+        quadConfig = new QuadConfig(this);
+        quadConfig.saveDefaultConfig();
+
+        configManager = new ConfigManager(defaultConfiguration, soloConfig, duoConfig, quadConfig);
 
         worldsManager = WorldsManager.getInstanceSafe(configManager, this);
         worldsManager.cleanPreviousDirs();
 
         database = new MySQLDatabase(this, defaultConfiguration);
-        gameManager = new GameManager(this, worldsManager, soloConfig, duoConfig);
+        gameManager = new GameManager(this, worldsManager, soloConfig, duoConfig, quadConfig);
         gameManager.loadBaseAmount();
 
         final PluginCommand pluginCommand = getServer().getPluginCommand("abedwars");
@@ -151,7 +159,7 @@ public final class AussieBedwars extends JavaPlugin {
     }
 
     @Override
-    public void onDisable() {
+    public final void onDisable() {
         worldsManager.getActiveGameList().forEach(game -> getServer().unloadWorld(game.getAssociatedWorld(), false));
     }
 

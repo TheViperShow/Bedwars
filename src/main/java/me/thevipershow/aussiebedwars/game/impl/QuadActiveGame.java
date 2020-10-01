@@ -1,5 +1,7 @@
 package me.thevipershow.aussiebedwars.game.impl;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -16,9 +18,9 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-public final class DuoActiveGame extends ActiveGame {
+public final class QuadActiveGame extends ActiveGame {
 
-    public DuoActiveGame(String associatedWorldFilename, BedwarsGame bedwarsGame, World lobbyWorld, Plugin plugin) {
+    public QuadActiveGame(String associatedWorldFilename, BedwarsGame bedwarsGame, World lobbyWorld, Plugin plugin) {
         super(associatedWorldFilename, bedwarsGame, lobbyWorld, plugin);
     }
 
@@ -41,11 +43,11 @@ public final class DuoActiveGame extends ActiveGame {
         final Iterator<BedwarsTeam> teamsIterator = teams.iterator();
 
         final LinkedList<Player> queue = getAssociatedQueue().getInQueue();
-        final List<List<Player>> splitTeams = GameUtils.splitByTwo(queue);
+        final Collection<Collection<Player>> splitTeams = GameUtils.redistributeEqually(queue, 4);
 
         splitTeams.forEach(team -> {
             if (teamsIterator.hasNext()) {
-                assignedTeams.put(teamsIterator.next(), team);
+                assignedTeams.put(teamsIterator.next(), new ArrayList<>(team));
             }
         });
     }

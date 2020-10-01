@@ -3,6 +3,7 @@ package me.thevipershow.aussiebedwars.game;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import me.thevipershow.aussiebedwars.LoggerUtils;
 import me.thevipershow.aussiebedwars.bedwars.Gamemode;
 import me.thevipershow.aussiebedwars.config.BedwarsGamemodeConfig;
 import me.thevipershow.aussiebedwars.config.objects.BedwarsGame;
@@ -15,9 +16,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 public final class GameManager {
 
     @SafeVarargs
-    public GameManager(JavaPlugin plugin,
-                       WorldsManager worldsManager,
-                       BedwarsGamemodeConfig<? extends BedwarsGame>... configs) {
+    public GameManager(final JavaPlugin plugin,
+                       final WorldsManager worldsManager,
+                       final BedwarsGamemodeConfig<? extends BedwarsGame>... configs) {
         this.plugin = plugin;
         this.worldsManager = worldsManager;
         for (final BedwarsGamemodeConfig<? extends BedwarsGame> config : configs) {

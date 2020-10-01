@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import me.thevipershow.aussiebedwars.bedwars.Gamemode;
@@ -220,7 +221,6 @@ public final class GameUtils {
             given += willGive;
         }
 
-        //TODO : Maybe fix stacks overflowing (it should be fixed.)
     }
 
     /**
@@ -311,6 +311,30 @@ public final class GameUtils {
             lists.add(temp);
         }
         return lists;
+    }
+
+    public static <T> Collection<Collection<T>> redistributeEqually(final Collection<T> sample, final int groupSize) {
+
+        final int predictedGroups = (int) Math.ceil(sample.size() / (double) groupSize);
+        final Collection<Collection<T>> sampleGroups = new ArrayList<>(predictedGroups);
+
+        final Iterator<T> iterator = sample.iterator();
+
+        while (iterator.hasNext()) {
+            final Collection<T> temp = new ArrayList<>(groupSize);
+            int got = 0x00;
+            while (got < groupSize) {
+                if (iterator.hasNext()) {
+                    temp.add(iterator.next());
+                    got++;
+                } else {
+                    break;
+                }
+            }
+            sampleGroups.add(temp);
+        }
+
+        return sampleGroups;
     }
 
     public static void removeAllEffects(final Player p) {
