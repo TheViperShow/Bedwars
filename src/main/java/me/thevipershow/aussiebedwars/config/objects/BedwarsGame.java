@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 import me.thevipershow.aussiebedwars.bedwars.Gamemode;
 import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
+import me.thevipershow.aussiebedwars.config.objects.upgradeshop.TrapUpgrades;
 import me.thevipershow.aussiebedwars.config.objects.upgradeshop.UpgradeShop;
 
 public abstract class BedwarsGame {
@@ -39,7 +40,10 @@ public abstract class BedwarsGame {
             List<Spawner> spawners,
             List<Merchant> merchants,
             Shop shop,
-            UpgradeShop upgradeShop, int startTimer, int deathmatchStart, int tntFuse) {
+            UpgradeShop upgradeShop,
+            int startTimer,
+            int deathmatchStart,
+            int tntFuse) {
         this.gamemode = gamemode;
         this.minGames = minGames;
         this.maxGames = maxGames;
@@ -128,4 +132,5 @@ public abstract class BedwarsGame {
     public int getTntFuse() {
         return tntFuse;
     }
+
 }

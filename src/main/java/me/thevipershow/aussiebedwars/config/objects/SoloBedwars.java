@@ -14,7 +14,7 @@ import org.bukkit.configuration.serialization.SerializableAs;
 public class SoloBedwars extends BedwarsGame implements ConfigurationSerializable {
 
     private SoloBedwars(Gamemode gamemode, int minGames, int maxGames, int minPlayers, int players, List<BedwarsTeam> teams, SpawnPosition lobbySpawn, String mapFilename, Set<TeamSpawnPosition> mapSpawns, List<Spawner> spawners, List<Merchant> merchants, Shop shop, UpgradeShop upgradeShop, int startTimer, int deathmatchStart, int tntFuse) {
-        super(gamemode, minGames, maxGames, minPlayers, players, teams, lobbySpawn, mapFilename, mapSpawns, spawners, merchants, shop, upgradeShop, startTimer, deathmatchStart, tntFuse);
+        super(gamemode, minGames, maxGames, minPlayers, players, teams, lobbySpawn, mapFilename, mapSpawns, spawners, merchants, shop, upgradeShop, startTimer, deathmatchStart, tntFuse, trapUpgrades);
     }
 
     @Override

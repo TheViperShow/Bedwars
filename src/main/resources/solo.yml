@@ -984,3 +984,15 @@ solo:
             - "§7you will immediately get speed"
             - "§7and strength effect for a"
             - "§7short period of time."
+        miner-fatigue:
+          material: "GOLD"
+          item-name: "§eMiner-Fatigue Trap"
+          slot: 13
+          amount: 1
+          buy-with: "DIAMOND"
+          price: 1
+          lore:
+            - "§7When someone goes near your island"
+            - "§7they will receive the"
+            - "§7miner fatigue effect for a"
+            - "§7short period of time."

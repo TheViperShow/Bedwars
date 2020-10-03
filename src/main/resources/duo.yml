@@ -1,12 +1,12 @@
 duo:
   - map-filename: "bedwars-duo"
-    start-timer: 15
+    start-timer: 25
     minimum-games: 1
     maximum-games: 8
     min-players: 4
     players: 16
     deathmatch-start: 1800 # in seconds
-    tnt-fuse: 75 # in ticks (20 = 1s)
+    tnt-fuse: 75 # in ticks (20 ticks = 1s)
     teams:
       - "CYAN"
       - "PINK"
@@ -942,3 +942,57 @@ duo:
         lore:
           - "§7Your team will have 2 dragons"
           - "§7instead of 1 during death-match!"
+      traps:
+        material: "ARROW"
+        slot: 16
+        item-name: "§eSpawn Traps"
+        lore:
+          - "§7Click here to open the"
+          - "§7traps shop menu."
+        alarm:
+          material: "GOLD"
+          item-name: "§eAlarm Trap"
+          slot: 10
+          amount: 1
+          buy-with: "DIAMOND"
+          price: 1
+          lore:
+            - "§7When someone goes near your island"
+            - "§7you will immediatly receieve an alert"
+            - "§7on your screen."
+        blindness-poison:
+          material: "GOLD"
+          item-name: "§eBlindess\Potion Trap"
+          slot: 11
+          amount: 1
+          buy-with: "DIAMOND"
+          price: 2
+          lore:
+            - "§7When someone goes near your island"
+            - "§7they will immediately get poison"
+            - "§7and blindness effect for a"
+            - "§7short period of time."
+        counter-offensive:
+          material: "GOLD"
+          item-name: "§eCounter-Offensive Trap"
+          slot: 12
+          amount: 1
+          buy-with: "DIAMOND"
+          price: 1
+          lore:
+            - "§7When someone goes near your island"
+            - "§7you will immediately get speed"
+            - "§7and strength effect for a"
+            - "§7short period of time."
+        miner-fatigue:
+          material: "GOLD"
+          item-name: "§eMiner-Fatigue Trap"
+          slot: 13
+          amount: 1
+          buy-with: "DIAMOND"
+          price: 1
+          lore:
+            - "§7When someone goes near your island"
+            - "§7they will receive the"
+            - "§7miner fatigue effect for a"
+            - "§7short period of time."

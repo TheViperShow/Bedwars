@@ -37,16 +37,17 @@ public final class TrapUpgrades implements ConfigurationSerializable {
     }
 
     public static TrapUpgrades deserialize(final Map<String, Object> map) {
-        String itemName = (String) map.get("material");
-        int slot = (int) map.get("slot");
-        Material material = Material.valueOf((String) map.get("material"));
-        List<String> lore = (List<String>) map.get("lore");
+        final String itemName = (String) map.get("material");
+        final int slot = (int) map.get("slot");
+        final Material material = Material.valueOf((String) map.get("material"));
+        final List<String> lore = (List<String>) map.get("lore");
 
-        AlarmTrap alarmTrap = AlarmTrap.deserialize((Map<String, Object>) map.get("alarm"));
-        BlindnessAndPoisonTrap blindnessAndPoisonTrap = BlindnessAndPoisonTrap.deserialize((Map<String, Object>) map.get("blindness-poison"));
-        CounterOffensiveTrap counterOffensiveTrap = CounterOffensiveTrap.deserialize((Map<String, Object>) map.get("counter-offensive"));
+        final AlarmTrap alarmTrap = AlarmTrap.deserialize((Map<String, Object>) map.get("alarm"));
+        final BlindnessAndPoisonTrap blindnessAndPoisonTrap = BlindnessAndPoisonTrap.deserialize((Map<String, Object>) map.get("blindness-poison"));
+        final CounterOffensiveTrap counterOffensiveTrap = CounterOffensiveTrap.deserialize((Map<String, Object>) map.get("counter-offensive"));
+        final MinerFatigueTrap minerFatigueTrap = MinerFatigueTrap.deserialize((Map<String, Object>) map.get("miner-fatigue"));
 
-        return null; // TODO: Finish when sqce tells me
+        return new TrapUpgrades(alarmTrap, blindnessAndPoisonTrap, counterOffensiveTrap, minerFatigueTrap, itemName, lore, slot, material);
     }
 
     public AlarmTrap getAlarmTrap() {

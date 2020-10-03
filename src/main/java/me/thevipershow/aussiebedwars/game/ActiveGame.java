@@ -31,9 +31,14 @@ import me.thevipershow.aussiebedwars.config.objects.upgradeshop.IronForgeUpgrade
 import me.thevipershow.aussiebedwars.config.objects.upgradeshop.ManiacMinerUpgrade;
 import me.thevipershow.aussiebedwars.config.objects.upgradeshop.ReinforcedArmorUpgrade;
 import me.thevipershow.aussiebedwars.config.objects.upgradeshop.SharpnessUpgrade;
+import me.thevipershow.aussiebedwars.config.objects.upgradeshop.TrapUpgrades;
 import me.thevipershow.aussiebedwars.config.objects.upgradeshop.UpgradeShop;
 import me.thevipershow.aussiebedwars.config.objects.upgradeshop.UpgradeShopItem;
 import me.thevipershow.aussiebedwars.config.objects.upgradeshop.UpgradeType;
+import me.thevipershow.aussiebedwars.config.objects.upgradeshop.traps.AlarmTrap;
+import me.thevipershow.aussiebedwars.config.objects.upgradeshop.traps.BlindnessAndPoisonTrap;
+import me.thevipershow.aussiebedwars.config.objects.upgradeshop.traps.CounterOffensiveTrap;
+import me.thevipershow.aussiebedwars.config.objects.upgradeshop.traps.MinerFatigueTrap;
 import me.thevipershow.aussiebedwars.game.upgrades.ActiveHealPool;
 import me.thevipershow.aussiebedwars.listeners.UnregisterableListener;
 import me.thevipershow.aussiebedwars.listeners.game.ArmorSet;
@@ -92,6 +97,7 @@ public abstract class ActiveGame {
     protected final Set<ActiveSpawner> activeSpawners;
     protected final Inventory defaultShopInv;
     protected final Inventory defaultUpgradeInv;
+    protected final Inventory defaultTrapsInv;
     protected final AbstractDeathmatch abstractDeathmatch;
 
     protected ActiveSpawner diamondSampleSpawner = null;
@@ -147,6 +153,7 @@ public abstract class ActiveGame {
         gameLobbyTicker.startTicking();
         this.defaultShopInv = Objects.requireNonNull(setupShopGUIs(), "The default shop inventory was null.");
         this.defaultUpgradeInv = Objects.requireNonNull(setupUpgradeGUIs(), "The default upgrade inventory was null.");
+        this.defaultTrapsInv = Objects.requireNonNull(setupTrapsGUIs(), "The traps inventory was null.");
         this.abstractDeathmatch = GameUtils.deathmatchFromGamemode(bedwarsGame.getGamemode(), this);
     }
 
@@ -191,6 +198,27 @@ public abstract class ActiveGame {
             inv.setItem(item.getSlot(), s);
         }
         return inv;
+    }
+
+    public final Inventory setupTrapsGUIs() {
+        final Inventory trapsInv = Bukkit.createInventory(null, 0x1B, "§7[§eAussieBedwars§7] Traps");
+        final TrapUpgrades trapUpgrades = bedwarsGame.getUpgradeShop().getTrapUpgrades();
+        final BlindnessAndPoisonTrap blindnessAndPoisonTrap = trapUpgrades.getBlindnessAndPoisonTrap();
+        final CounterOffensiveTrap counterOffensiveTrap = trapUpgrades.getCounterOffensiveTrap();
+        final AlarmTrap alarmTrap = trapUpgrades.getAlarmTrap();
+        final MinerFatigueTrap minerFatigueTrap = trapUpgrades.getMinerFatigueTrap();
+
+        final ShopItem blindnessAndPoisonItem = blindnessAndPoisonTrap.getShopItem();
+        final ShopItem alarmTrapItem = alarmTrap.getShopItem();
+        final ShopItem minerFatigueItem = minerFatigueTrap.getShopItem();
+        final ShopItem counterOffensiveItem = counterOffensiveTrap.getShopItem();
+
+        trapsInv.setItem(blindnessAndPoisonItem.getSlot(), blindnessAndPoisonItem.generateFancyStack());
+        trapsInv.setItem(alarmTrapItem.getSlot(), alarmTrapItem.generateFancyStack());
+        trapsInv.setItem(minerFatigueItem.getSlot(), minerFatigueItem.generateFancyStack());
+        trapsInv.setItem(counterOffensiveItem.getSlot(), counterOffensiveItem.generateFancyStack());
+
+        return trapsInv;
     }
 
     public final Inventory setupUpgradeGUIs() {
@@ -891,11 +919,19 @@ public abstract class ActiveGame {
         return this.emeraldSampleSpawner;
     }
 
-    public long getStartTime() {
+    public final long getStartTime() {
         return startTime;
     }
 
-    public List<ActiveHealPool> getHealPools() {
+    public final List<ActiveHealPool> getHealPools() {
         return healPools;
+    }
+
+    public final Inventory getDefaultTrapsInv() {
+        return defaultTrapsInv;
+    }
+
+    public final List<BukkitTask> getAnnouncementsTasks() {
+        return announcementsTasks;
     }
 }

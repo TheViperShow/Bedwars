@@ -117,7 +117,7 @@ public final class UpgradeInteractListener extends UnregisterableListener {
                         System.out.println(s.getSpawner().getSpawnPosition().toString());
                     });
 
-                    activeGame.getAssociatedUpgradeGUI().get(player).setItem(clickedSlot, ironForgeUpgrade.getLevels().get(currentLevel + 1).getCachedFancyStack());
+                    activeGame.getAssociatedUpgradeGUI().get(player).setItem(clickedSlot, ironForgeUpgrade.getLevels().get(currentLevel).getCachedFancyStack());
                     player.updateInventory();
                 }
             }
@@ -138,7 +138,7 @@ public final class UpgradeInteractListener extends UnregisterableListener {
                         }
                     });
 
-                    activeGame.getAssociatedUpgradeGUI().get(player).setItem(clickedSlot, maniacMinerUpgrade.getLevels().get(currentLevel + 1).getCachedFancyStack());
+                    activeGame.getAssociatedUpgradeGUI().get(player).setItem(clickedSlot, maniacMinerUpgrade.getLevels().get(currentLevel).getCachedFancyStack());
                     player.updateInventory();
                 }
             }
@@ -159,7 +159,7 @@ public final class UpgradeInteractListener extends UnregisterableListener {
                         }
                     });
 
-                    activeGame.getAssociatedUpgradeGUI().get(player).setItem(clickedSlot, reinforcedArmorUpgrade.getLevels().get(currentLevel + 1).getCachedFancyStack());
+                    activeGame.getAssociatedUpgradeGUI().get(player).setItem(clickedSlot, reinforcedArmorUpgrade.getLevels().get(currentLevel).getCachedFancyStack());
                     player.updateInventory();
                 }
             }

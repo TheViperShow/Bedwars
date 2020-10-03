@@ -178,7 +178,7 @@ public final class GameUtils {
     public static PacketPlayOutChat killActionBar(final ActiveGame activeGame, final Player killed) {
         final BedwarsTeam killedTeam = activeGame.getPlayerTeam(killed);
         final IChatBaseComponent iChatBaseComponent = new ChatMessage(
-                "§e⚔ You killed player §" + killedTeam.getColorCode() + killed.getName() + "§r§e⚔"
+                "§e⚔ You killed player §" + killedTeam.getColorCode() + killed.getName() + " §r§e⚔"
         );
         return new PacketPlayOutChat(iChatBaseComponent, (byte) 0x02);
     }

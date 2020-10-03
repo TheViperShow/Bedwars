@@ -13,7 +13,7 @@ import org.bukkit.configuration.serialization.SerializableAs;
 @SerializableAs("Quad")
 public final class QuadBedwars extends BedwarsGame implements ConfigurationSerializable {
     private QuadBedwars(int minGames, int maxGames, int minPlayers, int players, List<BedwarsTeam> teams, SpawnPosition lobbySpawn, String mapFilename, Set<TeamSpawnPosition> mapSpawns, List<Spawner> spawners, List<Merchant> merchants, Shop shop, UpgradeShop upgradeShop, int startTimer, int deathmatchStart, int tntFuse) {
-        super(Gamemode.QUAD, minGames, maxGames, minPlayers, players, teams, lobbySpawn, mapFilename, mapSpawns, spawners, merchants, shop, upgradeShop, startTimer, deathmatchStart, tntFuse);
+        super(Gamemode.QUAD, minGames, maxGames, minPlayers, players, teams, lobbySpawn, mapFilename, mapSpawns, spawners, merchants, shop, upgradeShop, startTimer, deathmatchStart, tntFuse, trapUpgrades);
     }
 
     @Override
