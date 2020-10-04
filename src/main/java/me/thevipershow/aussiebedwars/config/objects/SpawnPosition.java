@@ -42,16 +42,28 @@ public class SpawnPosition implements ConfigurationSerializable, Cloneable {
         return (SpawnPosition) super.clone();
     }
 
-    public final double xDistance(final SpawnPosition spawnPosition) {
-        return Math.abs(x - spawnPosition.x);
+    public final double xDistance(final SpawnPosition position) {
+        return Math.abs(x - position.x);
     }
 
-    public final double yDistance(final SpawnPosition spawnPosition) {
-        return Math.abs(y - spawnPosition.y);
+    public final double yDistance(final SpawnPosition position) {
+        return Math.abs(y - position.y);
     }
 
-    public final double zDistance(final SpawnPosition spawnPosition) {
-        return Math.abs(z - spawnPosition.z);
+    public final double zDistance(final SpawnPosition position) {
+        return Math.abs(z - position.z);
+    }
+
+    public final double xDistance(final Location location) {
+        return Math.abs(x - location.getX());
+    }
+
+    public final double yDistance(final Location location) {
+        return Math.abs(y - location.getY());
+    }
+
+    public final double zDistance(final Location location) {
+        return Math.abs(z - location.getZ());
     }
 
     public final double distance(final SpawnPosition spawnPosition) {

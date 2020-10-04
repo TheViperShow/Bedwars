@@ -8,6 +8,8 @@ import me.thevipershow.aussiebedwars.config.objects.upgradeshop.traps.CounterOff
 import me.thevipershow.aussiebedwars.config.objects.upgradeshop.traps.MinerFatigueTrap;
 import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public final class TrapUpgrades implements ConfigurationSerializable {
 
@@ -25,6 +27,8 @@ public final class TrapUpgrades implements ConfigurationSerializable {
     private final int slot;
     private final Material material;
 
+    private ItemStack fancyItemStack = null;
+
     public TrapUpgrades(AlarmTrap alarmTrap, BlindnessAndPoisonTrap blindnessAndPoisonTrap, CounterOffensiveTrap counterOffensiveTrap, MinerFatigueTrap minerFatigueTrap, String itemName, List<String> lore, int slot, Material material) {
         this.alarmTrap = alarmTrap;
         this.blindnessAndPoisonTrap = blindnessAndPoisonTrap;
@@ -37,7 +41,7 @@ public final class TrapUpgrades implements ConfigurationSerializable {
     }
 
     public static TrapUpgrades deserialize(final Map<String, Object> map) {
-        final String itemName = (String) map.get("material");
+        final String itemName = (String) map.get("item-name");
         final int slot = (int) map.get("slot");
         final Material material = Material.valueOf((String) map.get("material"));
         final List<String> lore = (List<String>) map.get("lore");
@@ -80,5 +84,17 @@ public final class TrapUpgrades implements ConfigurationSerializable {
 
     public Material getMaterial() {
         return material;
+    }
+
+    public ItemStack getFancyItemStack() {
+        if (this.fancyItemStack == null) {
+            final ItemStack i = new ItemStack(this.material);
+            final ItemMeta m = i.getItemMeta();
+            m.setDisplayName(this.itemName);
+            m.setLore(this.lore);
+            i.setItemMeta(m);
+            this.fancyItemStack = i;
+        }
+        return fancyItemStack.clone();
     }
 }

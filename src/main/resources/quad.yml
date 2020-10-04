@@ -950,7 +950,7 @@ quad:
           - "§7Click here to open the"
           - "§7traps shop menu."
         alarm:
-          material: "GOLD"
+          material: "GOLD_INGOT"
           item-name: "§eAlarm Trap"
           slot: 10
           amount: 1
@@ -961,7 +961,7 @@ quad:
             - "§7you will immediatly receieve an alert"
             - "§7on your screen."
         blindness-poison:
-          material: "GOLD"
+          material: "GOLD_INGOT"
           item-name: "§eBlindess\Potion Trap"
           slot: 11
           amount: 1
@@ -973,7 +973,7 @@ quad:
             - "§7and blindness effect for a"
             - "§7short period of time."
         counter-offensive:
-          material: "GOLD"
+          material: "GOLD_INGOT"
           item-name: "§eCounter-Offensive Trap"
           slot: 12
           amount: 1
@@ -985,7 +985,7 @@ quad:
             - "§7and strength effect for a"
             - "§7short period of time."
         miner-fatigue:
-          material: "GOLD"
+          material: "GOLD_INGOT"
           item-name: "§eMiner-Fatigue Trap"
           slot: 13
           amount: 1

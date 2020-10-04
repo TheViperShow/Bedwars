@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -40,11 +41,13 @@ import me.thevipershow.aussiebedwars.config.objects.upgradeshop.traps.BlindnessA
 import me.thevipershow.aussiebedwars.config.objects.upgradeshop.traps.CounterOffensiveTrap;
 import me.thevipershow.aussiebedwars.config.objects.upgradeshop.traps.MinerFatigueTrap;
 import me.thevipershow.aussiebedwars.game.upgrades.ActiveHealPool;
+import me.thevipershow.aussiebedwars.game.upgrades.ActiveTrap;
 import me.thevipershow.aussiebedwars.listeners.UnregisterableListener;
 import me.thevipershow.aussiebedwars.listeners.game.ArmorSet;
 import me.thevipershow.aussiebedwars.listeners.game.BedBreakListener;
 import me.thevipershow.aussiebedwars.listeners.game.EntityDamageListener;
 import me.thevipershow.aussiebedwars.listeners.game.ExplosionListener;
+import me.thevipershow.aussiebedwars.listeners.game.GameTrapTriggerer;
 import me.thevipershow.aussiebedwars.listeners.game.HungerLossListener;
 import me.thevipershow.aussiebedwars.listeners.game.ItemDegradeListener;
 import me.thevipershow.aussiebedwars.listeners.game.LobbyCompassListener;
@@ -99,6 +102,7 @@ public abstract class ActiveGame {
     protected final Inventory defaultUpgradeInv;
     protected final Inventory defaultTrapsInv;
     protected final AbstractDeathmatch abstractDeathmatch;
+    protected final GameTrapTriggerer gameTrapTriggerer = new GameTrapTriggerer(this);
 
     protected ActiveSpawner diamondSampleSpawner = null;
     protected ActiveSpawner emeraldSampleSpawner = null;
@@ -106,20 +110,26 @@ public abstract class ActiveGame {
     protected final SwordUpgrades swordUpgrades = new SwordUpgrades();
     protected final List<BedwarsTeam> destroyedTeams = new ArrayList<>();
     protected final List<Player> playersOutOfGame = new ArrayList<>();
+    protected final List<Player> playersRespawning = new ArrayList<>();
     protected final List<AbstractActiveMerchant> activeMerchants = new ArrayList<>();
     protected final List<Block> playerPlacedBlocks = new ArrayList<>();
     protected final List<UnregisterableListener> unregisterableListeners = new ArrayList<>();
     protected final List<ActiveHealPool> healPools = new ArrayList<>();
     protected final List<BukkitTask> announcementsTasks = new ArrayList<>();
+    protected final List<Player> immuneTrapPlayers = new ArrayList<>();
+    protected final List<Player> hiddenPlayers = new ArrayList<>();
     protected final Map<Player, ArmorSet> playerSetMap = new HashMap<>();
     protected final Map<String, Integer> topKills = new HashMap<>();
     protected final Map<Player, Inventory> associatedShopGUI = new HashMap<>();
     protected final Map<Player, Inventory> associatedUpgradeGUI = new HashMap<>();
+    protected final Map<Player, Inventory> associatedTrapsGUI = new HashMap<>();
     protected final Map<ItemStack, ShopItem> shopItemStacks = new HashMap<>();
     protected final Map<ItemStack, UpgradeItem> upgradeItemStacks = new HashMap<>();
     protected final Map<Player, Map<UpgradeItem, Integer>> playerUpgradeLevelsMap = new HashMap<>();
     protected final Map<Player, Scoreboard> activeScoreboards = new HashMap<>();
     protected final EnumMap<UpgradeType, Map<BedwarsTeam, Integer>> upgradesLevelsMap = new EnumMap<>(UpgradeType.class);
+    protected final EnumMap<BedwarsTeam, LinkedList<ActiveTrap>> teamActiveTrapsList = new EnumMap<>(BedwarsTeam.class);
+    protected final EnumMap<BedwarsTeam, Long> lastActivatedTraps = new EnumMap<>(BedwarsTeam.class);
 
     ///////////////////////////////////////////////////
     // Internal ActiveGame fields                    //
@@ -200,8 +210,33 @@ public abstract class ActiveGame {
         return inv;
     }
 
+    public void hidePlayer(final Player player) {
+        final BedwarsTeam playerTeam = getPlayerTeam(player);
+        for (Map.Entry<BedwarsTeam, List<Player>> entry : assignedTeams.entrySet()) {
+            if (entry.getKey() != playerTeam) {
+                for (final Player p : entry.getValue()) {
+                    if (p.isOnline() && !isOutOfGame(p)) {
+                        p.hidePlayer(player);
+                    }
+                }
+            }
+        }
+        hiddenPlayers.add(player);
+    }
+
+    public void showPlayer(final Player player) {
+        for (final List<Player> players : assignedTeams.values()) {
+            for (final Player p : players) {
+                if (p.isOnline() && !isOutOfGame(p)) {
+                    p.showPlayer(player);
+                }
+            }
+        }
+        hiddenPlayers.remove(player);
+    }
+
     public final Inventory setupTrapsGUIs() {
-        final Inventory trapsInv = Bukkit.createInventory(null, 0x1B, "§7[§eAussieBedwars§7] Traps");
+        final Inventory trapsInv = Bukkit.createInventory(null, 0x24, "§7[§eAussieBedwars§7] Traps");
         final TrapUpgrades trapUpgrades = bedwarsGame.getUpgradeShop().getTrapUpgrades();
         final BlindnessAndPoisonTrap blindnessAndPoisonTrap = trapUpgrades.getBlindnessAndPoisonTrap();
         final CounterOffensiveTrap counterOffensiveTrap = trapUpgrades.getCounterOffensiveTrap();
@@ -217,6 +252,14 @@ public abstract class ActiveGame {
         trapsInv.setItem(alarmTrapItem.getSlot(), alarmTrapItem.generateFancyStack());
         trapsInv.setItem(minerFatigueItem.getSlot(), minerFatigueItem.generateFancyStack());
         trapsInv.setItem(counterOffensiveItem.getSlot(), counterOffensiveItem.generateFancyStack());
+
+        for (int i = 1; i <= 3; i++) {
+            final ItemStack glass = new ItemStack(Material.STAINED_GLASS_PANE, i);
+            final ItemMeta glassMeta = glass.getItemMeta();
+            glassMeta.setDisplayName("");
+            glass.setItemMeta(glassMeta);
+            trapsInv.setItem(29 + i, glass);
+        }
 
         return trapsInv;
     }
@@ -238,6 +281,7 @@ public abstract class ActiveGame {
         final UpgradeShopItem maniacMinerItem = maniacMinerUpgrade.getLevels().get(0);
         final UpgradeShopItem reinforcedArmorItem = reinforcedArmorUpgrade.getLevels().get(0);
         final ShopItem sharpnessItem = sharpnessUpgrade.getItem();
+        final TrapUpgrades trapUpgrades = upgradeShop.getTrapUpgrades();
 
         upgradeInv.setItem(dragonBuffItem.getSlot(), dragonBuffItem.generateFancyStack());
         upgradeInv.setItem(healPoolItem.getSlot(), healPoolItem.generateFancyStack());
@@ -245,9 +289,12 @@ public abstract class ActiveGame {
         upgradeInv.setItem(maniacMinerUpgrade.getSlot(), maniacMinerItem.getCachedFancyStack());
         upgradeInv.setItem(reinforcedArmorUpgrade.getSlot(), reinforcedArmorItem.getCachedFancyStack());
         upgradeInv.setItem(sharpnessItem.getSlot(), sharpnessItem.generateFancyStack());
+        upgradeInv.setItem(trapUpgrades.getSlot(), trapUpgrades.getFancyItemStack());
 
         return upgradeInv;
     }
+
+
 
     protected final ScoreboardHandler scoreboardHandler = new ScoreboardHandler() {
 
@@ -301,6 +348,7 @@ public abstract class ActiveGame {
     }
 
     public final void cleanAllAndFinalize() {
+        gameTrapTriggerer.stop();
         unregisterAllListeners();
         associatedQueue.cleanQueue();
         assignedTeams.clear();
@@ -324,11 +372,14 @@ public abstract class ActiveGame {
         upgradeItemStacks.clear();
         announcementsTasks.forEach(BukkitTask::cancel);
         announcementsTasks.clear();
+        lastActivatedTraps.clear();
+        associatedTrapsGUI.clear();
+        hiddenPlayers.clear();
         hasStarted = false;
         destroyMap();
     }
 
-    public SpawnPosition getTeamSpawn(final BedwarsTeam bedwarsTeam) {
+    public final SpawnPosition getTeamSpawn(final BedwarsTeam bedwarsTeam) {
         for (final TeamSpawnPosition mapSpawn : bedwarsGame.getMapSpawns()) {
             if (mapSpawn.getBedwarsTeam() == bedwarsTeam) {
                 return mapSpawn;
@@ -514,8 +565,24 @@ public abstract class ActiveGame {
             announceNoTeaming();
             healAll();
             giveAllDefaultSet();
+            fillTraps();
+            fillTrapsDelayMap();
+            gameTrapTriggerer.start();
             abstractDeathmatch.start();
             this.startTime = System.currentTimeMillis();
+        }
+    }
+
+    public final void fillTrapsDelayMap() {
+        final long time = System.currentTimeMillis();
+        for (final Map.Entry<BedwarsTeam, List<Player>> entry : assignedTeams.entrySet()) {
+            getLastActivatedTraps().put(entry.getKey(), time);
+        }
+    }
+
+    public final void fillTraps() {
+        for (final Map.Entry<BedwarsTeam, List<Player>> entry : assignedTeams.entrySet()) {
+            this.getTeamActiveTrapsList().put(entry.getKey(), new LinkedList<>());
         }
     }
 
@@ -571,7 +638,7 @@ public abstract class ActiveGame {
         return null;
     }
 
-    public Set<BedwarsTeam> teamsLeft() {
+    public final Set<BedwarsTeam> teamsLeft() {
         if (playersOutOfGame.isEmpty()) return Collections.emptySet();
         final Set<BedwarsTeam> bedwarsTeams = new HashSet<>();
         for (final Map.Entry<BedwarsTeam, List<Player>> entry : assignedTeams.entrySet()) {
@@ -766,6 +833,15 @@ public abstract class ActiveGame {
         player.openInventory(associated);
     }
 
+    public void openTraps(final Player player) {
+        Inventory associated = associatedTrapsGUI.get(player);
+        if (associated == null) {
+            associated = cloneInventory(Objects.requireNonNull(this.defaultTrapsInv, "Cloned illegal traps inventory"));
+            associatedTrapsGUI.put(player, associated);
+        }
+        player.openInventory(associated);
+    }
+
     public void openShop(final Player player) {
         Inventory associated = associatedShopGUI.get(player);
         if (associated == null) { // initializing inventory for player since it was not found.
@@ -933,5 +1009,29 @@ public abstract class ActiveGame {
 
     public final List<BukkitTask> getAnnouncementsTasks() {
         return announcementsTasks;
+    }
+
+    public final Map<Player, Inventory> getAssociatedTrapsGUI() {
+        return associatedTrapsGUI;
+    }
+
+    public final EnumMap<BedwarsTeam, LinkedList<ActiveTrap>> getTeamActiveTrapsList() {
+        return teamActiveTrapsList;
+    }
+
+    public EnumMap<BedwarsTeam, Long> getLastActivatedTraps() {
+        return lastActivatedTraps;
+    }
+
+    public List<Player> getImmuneTrapPlayers() {
+        return immuneTrapPlayers;
+    }
+
+    public List<Player> getPlayersRespawning() {
+        return playersRespawning;
+    }
+
+    public List<Player> getHiddenPlayers() {
+        return hiddenPlayers;
     }
 }

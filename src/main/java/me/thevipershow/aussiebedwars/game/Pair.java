@@ -1,18 +1,18 @@
 package me.thevipershow.aussiebedwars.game;
 
-public class Pair<A, B> {
+public final class Pair<A, B> {
     private final A a;
     private final B b;
 
-    public A getA() {
+    public final A getA() {
         return a;
     }
 
-    public B getB() {
+    public final B getB() {
         return b;
     }
 
-    public Pair(A a, B b) {
+    public Pair(final A a, final B b) {
         this.a = a;
         this.b = b;
     }

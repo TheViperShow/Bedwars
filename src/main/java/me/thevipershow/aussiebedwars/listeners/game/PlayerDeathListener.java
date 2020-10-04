@@ -91,7 +91,9 @@ public final class PlayerDeathListener extends UnregisterableListener {
     }
 
     public static void doDeathTimer(final Player p, final ActiveGame activeGame) {
+        activeGame.getPlayersRespawning().add(p);
         new RespawnRunnable(p, activeGame).runTaskTimer(activeGame.getPlugin(), 1L, 20L);
+        activeGame.getPlugin().getServer().getScheduler().runTaskLater(activeGame.getPlugin(), () -> activeGame.getPlayersRespawning().remove(p), 20L*5L);
     }
 
     public static void clearInvExceptArmorAndTools(final Player player, final ActiveGame game) {
