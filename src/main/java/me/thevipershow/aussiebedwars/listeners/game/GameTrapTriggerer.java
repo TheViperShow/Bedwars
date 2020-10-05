@@ -24,7 +24,7 @@ public final class GameTrapTriggerer {
     }
 
     public final void start() {
-        if (task == null) {
+        if (task != null) {
             return;
         }
 
@@ -45,7 +45,7 @@ public final class GameTrapTriggerer {
                                 for (final Player runner : assignedTeams.getValue()) {
                                     if (runner.isOnline() && !activeGame.isOutOfGame(runner) && !activeGame.getPlayersRespawning().contains(runner)) { // Ignoring all players that
                                                                                                 // are either out of game or left.
-                                        final SpawnPosition spawnPos = activeGame.getTeamSpawn(assignedTeams.getKey());
+                                        final SpawnPosition spawnPos = activeGame.getTeamSpawn(trapTeamOwner);
                                         final Location pLoc = runner.getLocation();
 
                                         final double xDist = spawnPos.xDistance(pLoc);
@@ -59,11 +59,11 @@ public final class GameTrapTriggerer {
                                                                                                                                             // a trap owned by this team
                                                                                                                                             // has been activated.
 
-                                        if ((System.currentTimeMillis() - lastTeamTrapActivation) / 1E+3 < 15.0) { // 15.0 seconds have not passed
+                                        if ((System.currentTimeMillis() - lastTeamTrapActivation) / 1e+3 < 15.0) { // 15.0 seconds have not passed
                                             continue teamTrapsLabel;                                              // skipping this team checks.
                                         }
 
-                                        if (xDist <= 20.0 && zDist <= 20.0 && yDist <= 6.01) { // Player has entered island's
+                                        if (xDist <= 20.0 && zDist <= 20.0 && yDist <= 5.01) { // Player has entered island's
                                                                                                // box region [±20.0, ±6.01, ±20.0]
 
                                             if (isPlayerImmune) { // We should not trigger trap
@@ -77,6 +77,11 @@ public final class GameTrapTriggerer {
                                             }
 
                                             teamActiveTraps.getValue().pollFirst().trigger(runner); // removing
+
+                                            // Updating last activation time:
+                                            activeGame.getLastActivatedTraps().compute(trapTeamOwner, (k,v) -> v = System.currentTimeMillis());
+
+                                            // Updating team GUIs:
                                             activeGame.getAssociatedTrapsGUI().values().forEach(inv -> inv.setItem(30 + teamActiveTraps.getValue().size(), new ItemStack(Material.STAINED_GLASS_PANE, 1 + teamActiveTraps.getValue().size())));
 
                                             continue teamTrapsLabel; // skipping to next team's traps

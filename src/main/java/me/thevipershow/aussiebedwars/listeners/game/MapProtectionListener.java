@@ -6,9 +6,11 @@ import me.thevipershow.aussiebedwars.game.ActiveGame;
 import me.thevipershow.aussiebedwars.game.ActiveSpawner;
 import me.thevipershow.aussiebedwars.listeners.UnregisterableListener;
 import org.bukkit.block.Block;
+import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 
 public final class MapProtectionListener extends UnregisterableListener {
 
@@ -41,8 +43,15 @@ public final class MapProtectionListener extends UnregisterableListener {
         return false;
     }
 
+    @EventHandler(ignoreCancelled = true)
+    public final void onPlayerInteractAtEntity(final PlayerInteractAtEntityEvent event) {
+        if (event.getRightClicked() != null && event.getRightClicked().getType() == EntityType.ARMOR_STAND) {
+            event.setCancelled(true);
+        }
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onPlayerDeath(final BlockPlaceEvent event) {
+    public final void onPlayerDeath(final BlockPlaceEvent event) {
         final Block block = event.getBlock();
         if (!block.getWorld().equals(activeGame.getAssociatedWorld())) return;
 
