@@ -82,7 +82,8 @@ public final class GameTrapTriggerer {
                                             activeGame.getLastActivatedTraps().compute(trapTeamOwner, (k,v) -> v = System.currentTimeMillis());
 
                                             // Updating team GUIs:
-                                            activeGame.getAssociatedTrapsGUI().values().forEach(inv -> inv.setItem(30 + teamActiveTraps.getValue().size(), new ItemStack(Material.STAINED_GLASS_PANE, 1 + teamActiveTraps.getValue().size())));
+                                            activeGame.getTeamPlayers(trapTeamOwner).forEach(p -> activeGame.getAssociatedTrapsGUI().get(p).setItem(30 + teamActiveTraps.getValue().size(), new ItemStack(Material.STAINED_GLASS_PANE, 1 + teamActiveTraps.getValue().size())));
+                                            activeGame.getTeamPlayers(trapTeamOwner).forEach(p -> activeGame.getAssociatedUpgradeGUI().get(p).setItem(30 + teamActiveTraps.getValue().size(), new ItemStack(Material.STAINED_GLASS_PANE, 1 + teamActiveTraps.getValue().size())));
 
                                             continue teamTrapsLabel; // skipping to next team's traps
 

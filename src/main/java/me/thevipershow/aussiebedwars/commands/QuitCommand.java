@@ -14,7 +14,7 @@ public final class QuitCommand extends SubCommand {
     }
 
     @Override
-    public void run(CommandSender sender) {
+    public final void run(final CommandSender sender) {
         if (!sender.hasPermission("abedwars.users.quit")) {
             missingPerm(sender);
             return;

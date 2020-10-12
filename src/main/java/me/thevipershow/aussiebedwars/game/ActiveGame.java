@@ -16,10 +16,12 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import me.thevipershow.aussiebedwars.AussieBedwars;
+import me.thevipershow.aussiebedwars.bedwars.Gamemode;
 import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.aussiebedwars.bedwars.objects.spawners.SpawnerType;
 import me.thevipershow.aussiebedwars.config.objects.BedwarsGame;
 import me.thevipershow.aussiebedwars.config.objects.Merchant;
+import me.thevipershow.aussiebedwars.config.objects.PotionItem;
 import me.thevipershow.aussiebedwars.config.objects.Shop;
 import me.thevipershow.aussiebedwars.config.objects.ShopItem;
 import me.thevipershow.aussiebedwars.config.objects.SpawnPosition;
@@ -50,6 +52,7 @@ import me.thevipershow.aussiebedwars.listeners.game.ExplosionListener;
 import me.thevipershow.aussiebedwars.listeners.game.GameTrapTriggerer;
 import me.thevipershow.aussiebedwars.listeners.game.HungerLossListener;
 import me.thevipershow.aussiebedwars.listeners.game.ItemDegradeListener;
+import me.thevipershow.aussiebedwars.listeners.game.LevelUpListener;
 import me.thevipershow.aussiebedwars.listeners.game.LobbyCompassListener;
 import me.thevipershow.aussiebedwars.listeners.game.MapIllegalMovementsListener;
 import me.thevipershow.aussiebedwars.listeners.game.MapProtectionListener;
@@ -57,6 +60,7 @@ import me.thevipershow.aussiebedwars.listeners.game.PlayerDeathListener;
 import me.thevipershow.aussiebedwars.listeners.game.PlayerFireballInteractListener;
 import me.thevipershow.aussiebedwars.listeners.game.PlayerQuitDuringGameListener;
 import me.thevipershow.aussiebedwars.listeners.game.PlayerSpectatePlayerListener;
+import me.thevipershow.aussiebedwars.listeners.game.PotionModifyListener;
 import me.thevipershow.aussiebedwars.listeners.game.ShopInteractListener;
 import me.thevipershow.aussiebedwars.listeners.game.ShopMerchantListener;
 import me.thevipershow.aussiebedwars.listeners.game.SpawnersMultigiveListener;
@@ -102,6 +106,7 @@ public abstract class ActiveGame {
     protected final Inventory defaultUpgradeInv;
     protected final Inventory defaultTrapsInv;
     protected final AbstractDeathmatch abstractDeathmatch;
+    protected final ExperienceManager experienceManager = new ExperienceManager(this);
     protected final GameTrapTriggerer gameTrapTriggerer = new GameTrapTriggerer(this);
 
     protected ActiveSpawner diamondSampleSpawner = null;
@@ -116,6 +121,7 @@ public abstract class ActiveGame {
     protected final List<UnregisterableListener> unregisterableListeners = new ArrayList<>();
     protected final List<ActiveHealPool> healPools = new ArrayList<>();
     protected final List<BukkitTask> announcementsTasks = new ArrayList<>();
+    protected final List<BukkitTask> emeraldBoostDrops = new ArrayList<>();
     protected final List<Player> immuneTrapPlayers = new ArrayList<>();
     protected final List<Player> hiddenPlayers = new ArrayList<>();
     protected final Map<Player, ArmorSet> playerSetMap = new HashMap<>();
@@ -123,8 +129,7 @@ public abstract class ActiveGame {
     protected final Map<Player, Inventory> associatedShopGUI = new HashMap<>();
     protected final Map<Player, Inventory> associatedUpgradeGUI = new HashMap<>();
     protected final Map<Player, Inventory> associatedTrapsGUI = new HashMap<>();
-    protected final Map<ItemStack, ShopItem> shopItemStacks = new HashMap<>();
-    protected final Map<ItemStack, UpgradeItem> upgradeItemStacks = new HashMap<>();
+
     protected final Map<Player, Map<UpgradeItem, Integer>> playerUpgradeLevelsMap = new HashMap<>();
     protected final Map<Player, Scoreboard> activeScoreboards = new HashMap<>();
     protected final EnumMap<UpgradeType, Map<BedwarsTeam, Integer>> upgradesLevelsMap = new EnumMap<>(UpgradeType.class);
@@ -197,14 +202,17 @@ public abstract class ActiveGame {
 
         for (final ShopItem item : shop.getItems()) {
             final ItemStack stack = item.generateFancyStack(); // <-
-            shopItemStacks.put(stack, item);
             inv.setItem(item.getSlot(), stack);
+        }
+
+        for (final PotionItem potionItem : shop.getPotionItem()) {
+            final ItemStack stack = potionItem.getCachedFancyStack();
+            inv.setItem(potionItem.getSlot(), stack);
         }
 
         for (final UpgradeItem item : shop.getUpgradeItems()) {
             final UpgradeLevel first = item.getLevels().get(0);
             final ItemStack s = first.generateFancyStack();
-            upgradeItemStacks.put(s, item);
             inv.setItem(item.getSlot(), s);
         }
         return inv;
@@ -291,9 +299,16 @@ public abstract class ActiveGame {
         upgradeInv.setItem(sharpnessItem.getSlot(), sharpnessItem.generateFancyStack());
         upgradeInv.setItem(trapUpgrades.getSlot(), trapUpgrades.getFancyItemStack());
 
+        for (int i = 1; i <= 3; i++) {
+            final ItemStack glass = new ItemStack(Material.STAINED_GLASS_PANE, i);
+            final ItemMeta glassMeta = glass.getItemMeta();
+            glassMeta.setDisplayName("");
+            glass.setItemMeta(glassMeta);
+            upgradeInv.setItem(29 + i, glass);
+        }
+
         return upgradeInv;
     }
-
 
 
     protected final ScoreboardHandler scoreboardHandler = new ScoreboardHandler() {
@@ -369,12 +384,14 @@ public abstract class ActiveGame {
         healPools.clear();
         upgradesLevelsMap.clear();
         playerUpgradeLevelsMap.clear();
-        upgradeItemStacks.clear();
         announcementsTasks.forEach(BukkitTask::cancel);
         announcementsTasks.clear();
         lastActivatedTraps.clear();
         associatedTrapsGUI.clear();
         hiddenPlayers.clear();
+        emeraldBoostDrops.forEach(BukkitTask::cancel);
+        emeraldBoostDrops.clear();
+        experienceManager.stopRewardTask();
         hasStarted = false;
         destroyMap();
     }
@@ -469,6 +486,8 @@ public abstract class ActiveGame {
         final UnregisterableListener spawnersMultigiveListener = new SpawnersMultigiveListener(this);
         final UnregisterableListener itemDegradeListener = new ItemDegradeListener(this);
         final UnregisterableListener playerSpectatePlayerListener = new PlayerSpectatePlayerListener(this);
+        final UnregisterableListener potionModifyListener = new PotionModifyListener(this);
+        final UnregisterableListener levelUpListener = new LevelUpListener(this);
 
         final PluginManager pluginManager = plugin.getServer().getPluginManager();
 
@@ -491,6 +510,8 @@ public abstract class ActiveGame {
         pluginManager.registerEvents(spawnersMultigiveListener, plugin);
         pluginManager.registerEvents(itemDegradeListener, plugin);
         pluginManager.registerEvents(playerSpectatePlayerListener, plugin);
+        pluginManager.registerEvents(potionModifyListener, plugin);
+        pluginManager.registerEvents(levelUpListener, plugin);
 
         unregisterableListeners.add(mapIllegalMovementsListener);
         unregisterableListeners.add(mapProtectionListener);
@@ -511,6 +532,8 @@ public abstract class ActiveGame {
         unregisterableListeners.add(spawnersMultigiveListener);
         unregisterableListeners.add(itemDegradeListener);
         unregisterableListeners.add(playerSpectatePlayerListener);
+        unregisterableListeners.add(potionModifyListener);
+        unregisterableListeners.add(levelUpListener);
     }
 
     public final void unregisterAllListeners() {
@@ -569,6 +592,7 @@ public abstract class ActiveGame {
             fillTrapsDelayMap();
             gameTrapTriggerer.start();
             abstractDeathmatch.start();
+            experienceManager.startRewardTask();
             this.startTime = System.currentTimeMillis();
         }
     }
@@ -662,6 +686,7 @@ public abstract class ActiveGame {
                 if (pTeam == team) {
                     p.sendTitle("§a§lYou have won this game!", "§aCongratulations.");
                     p.playSound(p.getLocation(), Sound.FIREWORK_TWINKLE, 7.50f, 1.00f);
+                    ExperienceManager.rewardPlayer(bedwarsGame.getGamemode() == Gamemode.QUAD ? 50 : 100, p, this);
                 } else {
                     p.sendTitle("§7Team " + '§' + team.getColorCode() + team.name() + " §7has won the game!", "§7Returning to lobby in 15s");
                 }
@@ -855,14 +880,6 @@ public abstract class ActiveGame {
         return defaultShopInv;
     }
 
-    public final Map<ItemStack, ShopItem> getShopItemStacks() {
-        return shopItemStacks;
-    }
-
-    public final Map<ItemStack, UpgradeItem> getUpgradeItemStacks() {
-        return upgradeItemStacks;
-    }
-
     public final List<UnregisterableListener> getUnregisterableListeners() {
         return unregisterableListeners;
     }
@@ -1033,5 +1050,13 @@ public abstract class ActiveGame {
 
     public List<Player> getHiddenPlayers() {
         return hiddenPlayers;
+    }
+
+    public GameTrapTriggerer getGameTrapTriggerer() {
+        return gameTrapTriggerer;
+    }
+
+    public List<BukkitTask> getEmeraldBoostDrops() {
+        return emeraldBoostDrops;
     }
 }

@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import me.thevipershow.aussiebedwars.AussieBedwars;
+import me.thevipershow.aussiebedwars.game.ExperienceManager;
 import me.thevipershow.aussiebedwars.game.GameManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -21,7 +22,8 @@ public final class AussieBedwarsMainCommand implements CommandExecutor, TabExecu
             "set",
             "remove",
             "join",
-            "quit"
+            "quit",
+            "exp"
     ));
 
     public AussieBedwarsMainCommand(Plugin plugin, GameManager gameManager) {
@@ -58,6 +60,9 @@ public final class AussieBedwarsMainCommand implements CommandExecutor, TabExecu
                     break;
                 case "quit":
                     new QuitCommand(this.gameManager, this.plugin, args).run(sender);
+                    break;
+                case "exp":
+                    new ExpCommand(this.gameManager, this.plugin, args).run(sender);
                     break;
                 default:
                     unknownArg(sender, firstArg);

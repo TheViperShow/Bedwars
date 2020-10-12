@@ -56,6 +56,8 @@ public final class EntityDamageListener extends UnregisterableListener {
             damaged.setVelocity(new Vector(dragonVelocity.getX(), 4.0, dragonVelocity.getZ()));
         } else if (damaged instanceof Player && activeGame.isOutOfGame((Player) damaged)) {
             event.setCancelled(true);
+        } else if (damaged instanceof Player && activeGame.getHiddenPlayers().contains(damaged)) {
+            activeGame.showPlayer((Player) damaged);
         }
     }
 }

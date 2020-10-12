@@ -4,12 +4,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import me.thevipershow.aussiebedwars.AussieBedwars;
 import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.aussiebedwars.config.objects.ShopItem;
+import me.thevipershow.aussiebedwars.config.objects.SpawnPosition;
 import me.thevipershow.aussiebedwars.config.objects.upgradeshop.DragonBuffUpgrade;
 import me.thevipershow.aussiebedwars.config.objects.upgradeshop.HealPoolUpgrade;
 import me.thevipershow.aussiebedwars.config.objects.upgradeshop.IronForgeUpgrade;
@@ -34,6 +34,7 @@ import me.thevipershow.aussiebedwars.game.upgrades.BlindnessPoisonActiveTrap;
 import me.thevipershow.aussiebedwars.game.upgrades.CounterOffensiveActiveTrap;
 import me.thevipershow.aussiebedwars.game.upgrades.MinerFatigueActiveTrap;
 import me.thevipershow.aussiebedwars.listeners.UnregisterableListener;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
@@ -47,6 +48,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
 
 public final class UpgradeInteractListener extends UnregisterableListener {
 
@@ -142,10 +144,28 @@ public final class UpgradeInteractListener extends UnregisterableListener {
                 final Pair<HashMap<Integer, Integer>, Boolean> pay = GameUtils.canAfford(playerInventory, itemToBuy.getBuyWith(), itemToBuy.getPrice());
                 if (payUpgrade(pay, player, itemToBuy.getBuyWith(), itemToBuy.getPrice(), "Iron Forge")) { // This is the Iron Forge Logic.
                     upgradesAvailable.get(ironForgeUpgrade.getType()).put(pTeam, currentLevel + 1);            // Here they have correctly upgraded their item.
-                    activeGame.getTeamSpawners(pTeam).forEach(s -> {
-                        s.setDropSpeedRegulator((currentLevel + 1) * 50);
-                        System.out.println(s.getSpawner().getSpawnPosition().toString());
-                    });
+
+                    if (currentLevel + 1 == 3) {
+
+                        activeGame.getTeamSpawners(pTeam).stream().findAny().ifPresent(s -> {
+                            final SpawnPosition spawn = s.getSpawner().getSpawnPosition();
+                            final Location spawnLoc = spawn.add(0.00, 0.05, 0.00).toLocation(activeGame.getAssociatedWorld());
+                            activeGame.getEmeraldBoostDrops().add(
+                                    activeGame.getPlugin().getServer().getScheduler().runTaskTimer(activeGame.getPlugin(),
+                                            () -> {
+                                                activeGame.getAssociatedWorld().dropItem(spawnLoc, new ItemStack(Material.EMERALD, 1)).setVelocity(new Vector(0,0,0));
+                                            }, 20L, 20L * 180L)
+                            );
+                        });
+
+                    } else {
+
+                        activeGame.getTeamSpawners(pTeam).forEach(s -> {
+                            s.setDropSpeedRegulator((currentLevel + 1) * 50);
+                            System.out.println(s.getSpawner().getSpawnPosition().toString());
+                        });
+
+                    }
 
                     activeGame.getAssociatedUpgradeGUI().get(player).setItem(clickedSlot, ironForgeUpgrade.getLevels().get(currentLevel).getCachedFancyStack());
                     player.updateInventory();
@@ -220,6 +240,7 @@ public final class UpgradeInteractListener extends UnregisterableListener {
             e.printStackTrace();
         }
         activeGame.getAssociatedTrapsGUI().get(player).setItem(slot, item.generateFancyStack());
+        activeGame.getAssociatedUpgradeGUI().get(player).setItem(slot, item.generateFancyStack());
     }
 
     private void trapLogic(final Player player, final int clickedSlot) {
@@ -296,7 +317,9 @@ public final class UpgradeInteractListener extends UnregisterableListener {
             return;
         }
 
-        if (ui.equals(event.getView().getTopInventory())) {
+        final Inventory topInventory = event.getView().getTopInventory();
+
+        if (ui != null && ui.equals(topInventory)) {
             event.setCancelled(true);
             final int clickedSlot = event.getSlot();
             final ItemStack clickedItem = event.getCurrentItem();
@@ -304,7 +327,7 @@ public final class UpgradeInteractListener extends UnregisterableListener {
                 return;
             }
             upgradeLogic(player, clickedSlot);
-        } else if (traps.equals(event.getView().getTopInventory())) {
+        } else if (traps != null && traps.equals(topInventory)) {
             event.setCancelled(true);
             final ItemStack clickedItem = event.getCurrentItem();
             if (clickedItem == null) {

@@ -36,6 +36,7 @@ public class ShopItem implements ConfigurationSerializable {
         stack.setItemMeta(meta);
         this.cachedFancyStack = stack;
         return cachedFancyStack.clone();
+
     }
 
     public ShopItem(String material, int amount, String buyWith, int buyCost, int slot, String itemName, List<String> lore) {

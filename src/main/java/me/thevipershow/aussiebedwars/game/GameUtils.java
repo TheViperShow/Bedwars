@@ -205,9 +205,11 @@ public final class GameUtils {
 
         for (int i = 0; i < contents.length; i++) {
             final ItemStack stack = contents[i];
-            if (stack == null) continue;
+            if (stack == null) {
+                continue;
+            }
             final int stackAmount = stack.getAmount();
-            if (stack.getType() == itemStack.getType() && stack.getAmount() != 64) {
+            if (stack.getType() == itemStack.getType() && stack.getDurability() == itemStack.getDurability() && stack.getAmount() != 64) {
                 matchingTypeSlots.put(i, stackAmount);
             }
         }

@@ -1,12 +1,12 @@
 package me.thevipershow.aussiebedwars.config.objects;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
+import org.bukkit.potion.PotionEffect;
 
 @SerializableAs("Shop")
 public class Shop implements ConfigurationSerializable {
@@ -17,15 +17,16 @@ public class Shop implements ConfigurationSerializable {
     private final int glassColor;
     private final List<Integer> glassSlots;
     private final List<UpgradeItem> upgradeItems;
+    private final List<PotionItem> potionItem;
 
-    public Shop(String name, int slots, List<ShopItem> items, int glassColor, List<Integer> glassSlots, List<UpgradeItem> upgradeItems) {
+    public Shop(String name, int slots, List<ShopItem> items, int glassColor, List<Integer> glassSlots, List<UpgradeItem> upgradeItems, List<PotionItem> potionItem) {
         this.name = name;
         this.slots = slots;
         this.items = items;
         this.glassColor = glassColor;
         this.glassSlots = glassSlots;
         this.upgradeItems = upgradeItems;
-
+        this.potionItem = potionItem;
     }
 
     @Override
@@ -44,7 +45,8 @@ public class Shop implements ConfigurationSerializable {
         final List<Integer> glassSlots = (List<Integer>) glass.get("slots");
         final List<Map<String, Object>> upgradableItems = (List<Map<String, Object>>) objectMap.get("upgradable-items");
         final List<UpgradeItem> upgradeItems = upgradableItems.stream().map(UpgradeItem::deserialize).collect(Collectors.toList());
-        return new Shop(title, slots, itemsShop, glassColor, glassSlots, upgradeItems);
+        final List<PotionItem> potionItems = ((List<Map<String, Object>>) objectMap.get("potions")).stream().map(PotionItem::deserialize).collect(Collectors.toList());
+        return new Shop(title, slots, itemsShop, glassColor, glassSlots, upgradeItems, potionItems);
     }
 
     public String getName() {
@@ -71,4 +73,7 @@ public class Shop implements ConfigurationSerializable {
         return upgradeItems;
     }
 
+    public List<PotionItem> getPotionItem() {
+        return potionItem;
+    }
 }

@@ -1,6 +1,6 @@
 quad:
   - map-filename: "bedwars-quad"
-    start-timer: 25
+    start-timer: 30
     minimum-games: 1
     maximum-games: 8
     min-players: 8
@@ -774,8 +774,42 @@ quad:
           lore:
             - "§7Buying this will give you an §b§lDIAMOND §r§7sword."
             - "§7It will lose one tier upon death."
+      potions:
+        - item-name: "§f§lInvisibility Potion"
+          slot: 42
+          amount: 1
+          price: 2
+          buy-with: "DIAMOND"
+          lore:
+            - "§7This potion will make you"
+            - "§7invisible to all enemies."
+          type: "INVISIBILITY"
+          length: 30
+          level: 1
+        - item-name: "§f§lSpeed Potion"
+          slot: 41
+          amount: 1
+          price: 2
+          buy-with: "DIAMOND"
+          lore:
+            - "§7This potion will make you"
+            - "§7move very fast."
+          type: "SPEED"
+          length: 45
+          level: 2
+        - item-name: "§f§lJump Potion"
+          slot: 40
+          amount: 1
+          price: 2
+          buy-with: "DIAMOND"
+          lore:
+            - "§7This potion will make you"
+            - "§7jump insanely high."
+          type: "JUMP"
+          length: 45
+          level: 5
     upgrades:
-      slots: 45
+      slots: 36
       sharpness:
         material: "IRON_SWORD"
         item-name: "§eSharpened Swords"

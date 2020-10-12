@@ -100,6 +100,10 @@ public final class GameManager {
         return loading;
     }
 
+    public JavaPlugin getPlugin() {
+        return plugin;
+    }
+
     public final WorldsManager getWorldsManager() {
         return worldsManager;
     }

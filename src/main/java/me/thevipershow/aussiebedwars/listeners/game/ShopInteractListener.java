@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import me.thevipershow.aussiebedwars.AussieBedwars;
 import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
+import me.thevipershow.aussiebedwars.config.objects.PotionItem;
 import me.thevipershow.aussiebedwars.config.objects.ShopItem;
 import me.thevipershow.aussiebedwars.config.objects.UpgradeItem;
 import me.thevipershow.aussiebedwars.config.objects.UpgradeLevel;
@@ -36,20 +37,35 @@ public final class ShopInteractListener extends UnregisterableListener {
     }
 
     private ShopItem clickedShopItem(final int clickedSlot) {
-        for (final ShopItem shopItem : activeGame.getBedwarsGame().getShop().getItems())
-            if (shopItem.getSlot() == clickedSlot) return shopItem;
+        for (final ShopItem shopItem : activeGame.getBedwarsGame().getShop().getItems()) {
+            if (shopItem.getSlot() == clickedSlot) {
+                return shopItem;
+            }
+        }
         return null;
     }
 
     private UpgradeItem clickedUpgradeItem(final int clickedSlot) {
-        for (final UpgradeItem upgradeItem : activeGame.getBedwarsGame().getShop().getUpgradeItems())
-            if (upgradeItem.getSlot() == clickedSlot) return upgradeItem;
+        for (final UpgradeItem upgradeItem : activeGame.getBedwarsGame().getShop().getUpgradeItems()) {
+            if (upgradeItem.getSlot() == clickedSlot) {
+                return upgradeItem;
+            }
+        }
+        return null;
+    }
+
+    private PotionItem getClickedPotion(final int clickedSlot) {
+        for (final PotionItem potionItem : activeGame.getBedwarsGame().getShop().getPotionItem()) {
+            if (potionItem.getSlot() == clickedSlot) {
+                return potionItem;
+            }
+        }
         return null;
     }
 
     private void performBuy(final Player player, final ItemStack clickedItem, final int clickedSlot) {
         if (!clickedAir(clickedItem)) {
-            final ShopItem clickedShopItem = clickedShopItem(clickedSlot);
+            final ShopItem clickedShopItem = this.clickedShopItem(clickedSlot);
             if (clickedShopItem != null) { // clicked a ShopItem
                 final Pair<HashMap<Integer, Integer>, Boolean> transaction = GameUtils.canAfford(player.getInventory(), clickedShopItem.getBuyWith(), clickedShopItem.getBuyCost());
                 if (transaction.getB()) { // Give player to item
@@ -108,43 +124,63 @@ public final class ShopInteractListener extends UnregisterableListener {
                     player.sendMessage(AussieBedwars.PREFIX + "§7You did not have enough " + GameUtils.beautifyCaps(clickedShopItem.getBuyWith().name()));
                 }
                 return;
-            }
+            } else if (clickedItem.getType() == Material.POTION) {
 
-            final UpgradeItem clickedUpgradeItem = clickedUpgradeItem(clickedSlot);
-            if (clickedUpgradeItem == null) return; // No upgrade lvls could be found
-            final List<UpgradeLevel> loadedLvls = clickedUpgradeItem.getLevels();
+                final PotionItem clickedPotion = this.getClickedPotion(clickedSlot);
+                if (clickedPotion != null) {
+                    final Pair<HashMap<Integer, Integer>, Boolean> transaction = GameUtils.canAfford(player.getInventory(), clickedPotion.getBuyWith(), clickedPotion.getPrice());
 
-            final Map<UpgradeItem, Integer> playerLevels = activeGame.getPlayerUpgradeLevelsMap().get(player);
-            if (playerLevels == null) return;
-            final Integer currentLevel = playerLevels.get(clickedUpgradeItem);
-            if (currentLevel == null) return;
-            if (loadedLvls.size() <= currentLevel + 1) {
-                GameUtils.buyFailSound(player);
-                player.sendMessage(AussieBedwars.PREFIX + "§7You already have the highest upgrade available.");
-            } else {
-                final UpgradeLevel boughtLevel = clickedUpgradeItem.getLevels().get(currentLevel + 1);
-                final Pair<HashMap<Integer, Integer>, Boolean> transaction = GameUtils.canAfford(player.getInventory(), boughtLevel.getBuyWith(), boughtLevel.getPrice());
-
-                if (!transaction.getB()) {
-                    GameUtils.buyFailSound(player);
-                    player.sendMessage(AussieBedwars.PREFIX + "§7You did not have enough " + GameUtils.beautifyCaps(boughtLevel.getBuyWith().name()));
-                } else {
-                    GameUtils.makePlayerPay(player.getInventory(), boughtLevel.getBuyWith(), boughtLevel.getPrice(), transaction.getA());
-                    final Inventory inv = activeGame.getAssociatedShopGUI().get(player);
-                    final ItemStack currentBoughtItem = boughtLevel.getCachedGameStack();
-                    if (loadedLvls.size() > currentLevel + 2) {
-                        final UpgradeLevel toSetInGui = loadedLvls.get(currentLevel + 2);
-                        inv.setItem(clickedSlot, toSetInGui.getCachedFancyStack());
-                    }
-                    if (currentLevel == -1) {
-                        GameUtils.giveStackToPlayer(currentBoughtItem, player, player.getInventory().getContents());
+                    if (transaction.getB()) {
+                        GameUtils.makePlayerPay(player.getInventory(), clickedPotion.getBuyWith(), clickedPotion.getPrice(), transaction.getA());
+                        GameUtils.paySound(player);
+                        GameUtils.giveStackToPlayer(clickedPotion.getGameStack(), player, player.getInventory().getContents());
                     } else {
-                        GameUtils.upgradePlayerStack(player, loadedLvls.get(currentLevel).getCachedGameStack(), currentBoughtItem);
+                        GameUtils.buyFailSound(player);
+                        player.sendMessage(AussieBedwars.PREFIX + "§7You did not have enough " + GameUtils.beautifyCaps(clickedPotion.getBuyWith().name()));
                     }
-                    player.updateInventory();
-                    playerLevels.computeIfPresent(clickedUpgradeItem, (k, v) -> v = v + 1);
-                    GameUtils.upgradeSound(player);
-                    player.sendMessage(AussieBedwars.PREFIX + "§7You successfully upgraded this item to §eLvl. " + (currentLevel + 2));
+
+                }
+
+            } else {
+
+                final UpgradeItem clickedUpgradeItem = this.clickedUpgradeItem(clickedSlot);
+                if (clickedUpgradeItem == null) {
+                    return;
+                } // No upgrade lvls could be found
+                final List<UpgradeLevel> loadedLvls = clickedUpgradeItem.getLevels();
+
+                final Map<UpgradeItem, Integer> playerLevels = activeGame.getPlayerUpgradeLevelsMap().get(player);
+                if (playerLevels == null) return;
+                final Integer currentLevel = playerLevels.get(clickedUpgradeItem);
+                if (currentLevel == null) return;
+                if (loadedLvls.size() <= currentLevel + 1) {
+                    GameUtils.buyFailSound(player);
+                    player.sendMessage(AussieBedwars.PREFIX + "§7You already have the highest upgrade available.");
+                } else {
+                    final UpgradeLevel boughtLevel = clickedUpgradeItem.getLevels().get(currentLevel + 1);
+                    final Pair<HashMap<Integer, Integer>, Boolean> transaction = GameUtils.canAfford(player.getInventory(), boughtLevel.getBuyWith(), boughtLevel.getPrice());
+
+                    if (!transaction.getB()) {
+                        GameUtils.buyFailSound(player);
+                        player.sendMessage(AussieBedwars.PREFIX + "§7You did not have enough " + GameUtils.beautifyCaps(boughtLevel.getBuyWith().name()));
+                    } else {
+                        GameUtils.makePlayerPay(player.getInventory(), boughtLevel.getBuyWith(), boughtLevel.getPrice(), transaction.getA());
+                        final Inventory inv = activeGame.getAssociatedShopGUI().get(player);
+                        final ItemStack currentBoughtItem = boughtLevel.getCachedGameStack();
+                        if (loadedLvls.size() > currentLevel + 2) {
+                            final UpgradeLevel toSetInGui = loadedLvls.get(currentLevel + 2);
+                            inv.setItem(clickedSlot, toSetInGui.getCachedFancyStack());
+                        }
+                        if (currentLevel == -1) {
+                            GameUtils.giveStackToPlayer(currentBoughtItem, player, player.getInventory().getContents());
+                        } else {
+                            GameUtils.upgradePlayerStack(player, loadedLvls.get(currentLevel).getCachedGameStack(), currentBoughtItem);
+                        }
+                        player.updateInventory();
+                        playerLevels.computeIfPresent(clickedUpgradeItem, (k, v) -> v = v + 1);
+                        GameUtils.upgradeSound(player);
+                        player.sendMessage(AussieBedwars.PREFIX + "§7You successfully upgraded this item to §eLvl. " + (currentLevel + 2));
+                    }
                 }
             }
         }

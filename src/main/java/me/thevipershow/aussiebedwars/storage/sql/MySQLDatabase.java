@@ -7,8 +7,10 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Optional;
 import me.thevipershow.aussiebedwars.AussieBedwars;
+import me.thevipershow.aussiebedwars.LoggerUtils;
 import me.thevipershow.aussiebedwars.config.DefaultConfiguration;
 import me.thevipershow.aussiebedwars.storage.sql.queue.QueueVillagerTableCreator;
+import me.thevipershow.aussiebedwars.storage.sql.queue.RanksTableCreator;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class MySQLDatabase extends Database {
@@ -18,21 +20,21 @@ public final class MySQLDatabase extends Database {
 
     public MySQLDatabase(JavaPlugin plugin,
                          DefaultConfiguration defaultConfiguration) {
-        super(plugin, QueueVillagerTableCreator.class);
+        super(plugin, QueueVillagerTableCreator.class, RanksTableCreator.class);
         this.defaultConfiguration = defaultConfiguration;
         HikariDataSource dataSrc = new HikariDataSource();
         final String address = defaultConfiguration.getAddress();
         final int port = defaultConfiguration.getPort();
         final String dbName = defaultConfiguration.getDatabaseName();
-
         final String jdbcUrl = "jdbc:mysql://" + address + ":" + port + "/" + dbName;
+
         dataSrc.setJdbcUrl(jdbcUrl);
         dataSrc.setUsername(defaultConfiguration.getDatabaseUsername());
         dataSrc.setPassword(defaultConfiguration.getPassword());
         dataSrc.setDriverClassName(AussieBedwars.MYSQL_DRIVER_CLASS);
         dataSrc.setConnectionTimeout(3500);
         dataSource = dataSrc;
-        plugin.getLogger().info("Attempting MySQL Connection at " + jdbcUrl);
+        LoggerUtils.logColor(plugin.getLogger(), "&eAttempting MySQL Connection to address ->&a" + jdbcUrl);
         createTables();
     }
 
@@ -47,7 +49,7 @@ public final class MySQLDatabase extends Database {
     }
 
     @Override
-    public void createTables() {
+    public final void createTables() {
         for (final Class<? extends TableCreator> tableCreator : tableCreators) {
             try {
                 final Constructor<? extends TableCreator> constructor = tableCreator.getConstructor(Connection.class);

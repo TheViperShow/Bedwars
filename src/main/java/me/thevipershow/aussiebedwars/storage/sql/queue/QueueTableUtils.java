@@ -74,7 +74,9 @@ public final class QueueTableUtils {
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
                     if (resultSet.next()) {
                         String g = resultSet.getString("gamemode");
-                        if (g == null) return Optional.empty();
+                        if (g == null) {
+                            return Optional.empty();
+                        }
                         return Optional.of(Gamemode.valueOf(g));
                     }
                 }

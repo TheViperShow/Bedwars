@@ -4,6 +4,7 @@ import me.thevipershow.aussiebedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.aussiebedwars.config.objects.upgradeshop.traps.TrapType;
 import me.thevipershow.aussiebedwars.game.ActiveGame;
 import me.thevipershow.aussiebedwars.game.GameUtils;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 public abstract class ActiveTrap {
@@ -25,6 +26,7 @@ public abstract class ActiveTrap {
         for (final Player player : activeGame.getTeamPlayers(owner)) {
             if (player.isOnline() && !activeGame.isOutOfGame(player)) {
                 player.sendTitle("", "§eYour §a§l" + GameUtils.beautifyCaps(trapType.name()) + " §r§etrap has been activated!");
+                player.playSound(player.getLocation(), Sound.CLICK, 9.0f, 0.85f);
             }
         }
     }

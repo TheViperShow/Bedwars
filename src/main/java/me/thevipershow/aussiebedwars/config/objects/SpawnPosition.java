@@ -86,6 +86,10 @@ public class SpawnPosition implements ConfigurationSerializable, Cloneable {
                 + Math.pow((z - location.getZ()), 2.0);
     }
 
+    public final SpawnPosition add(final double x, final double y, final double z) {
+        return new SpawnPosition(this.x + x, this.y + y, this.z + z);
+    }
+
     public double getX() {
         return x;
     }
