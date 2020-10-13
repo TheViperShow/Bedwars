@@ -1,5 +1,6 @@
 package me.thevipershow.aussiebedwars.commands;
 
+import java.text.NumberFormat;
 import java.util.concurrent.CompletableFuture;
 import me.thevipershow.aussiebedwars.AussieBedwars;
 import me.thevipershow.aussiebedwars.game.ExperienceManager;
@@ -35,19 +36,21 @@ public final class ExpCommand extends SubCommand {
                 }
 
             } else {
+                final int playerLevel = ExperienceManager.findLevelFromExp(e);
+                final int playerLevelMinExp = ExperienceManager.requiredExpMap.get(playerLevel);
+                final int playerNextLevelMinExp = ExperienceManager.requiredExpMap.get(playerLevel + 1);
 
-                final int lvl = ExperienceManager.findLevelFromExp(e);
-
-                final int nextLevelExp = ExperienceManager.requiredExpMap.get(lvl + 1);
+                final int expForNextLevel = playerNextLevelMinExp - playerLevelMinExp;
+                final int currentLevelExp = e - playerLevelMinExp;
 
                 if (self) {
-                    p.sendMessage(AussieBedwars.PREFIX + "\n    §7Your current experience: §6§l" + e + "§8/§6§l" + nextLevelExp);
-                    p.sendMessage("    §7Your current bedwars level: §6§l" + lvl);
-                    p.sendMessage("    §7You need §6§l" + (nextLevelExp - e) + " EXP §7to reach §3§lLevel " + (lvl + 1));
+                    p.sendMessage(AussieBedwars.PREFIX + "\n    §7Your current experience: §6§l" + e);
+                    p.sendMessage("    §7Your current bedwars level: §6§l" + playerLevel);
+                    p.sendMessage("    §7You own §6§l" + currentLevelExp + "§8\\§6§l" + expForNextLevel + " EXP §r§7required to reach §3§lLevel " + (playerLevel + 1));
                 } else {
-                    p.sendMessage(AussieBedwars.PREFIX + "\n    §7" + targetName + "'s current experience: §6§l" + e + "§8/§6§l" + nextLevelExp);
-                    p.sendMessage("    §7" + targetName + "'s current bedwars level: §6§l" + lvl);
-                    p.sendMessage("    §7He needs §6§l" + (nextLevelExp - e) + " EXP §7to reach §3§lLevel " + (lvl + 1));
+                    p.sendMessage(AussieBedwars.PREFIX + String.format("\n    §7%s's current experience: §6§l", targetName) + e);
+                    p.sendMessage(String.format("    §7%s's current bedwars level: §6§l", targetName) + playerLevel);
+                    p.sendMessage(String.format("    §7%s owns §6§l", targetName) + currentLevelExp + "§8\\§6§l" + expForNextLevel + " EXP §r§7required to reach §3§lLevel " + (playerLevel + 1));
                 }
             }
         });
@@ -69,11 +72,25 @@ public final class ExpCommand extends SubCommand {
         } else {
             if (args.length == 3) {
                 if (args[1].equalsIgnoreCase("view")) {
-                    if (!sender.hasPermission("abedwars.admin.exp")) {
+                    if (!sender.hasPermission("abedwars.admin.exp.view")) {
                         missingPerm(sender);
                     } else {
 
                         lookupOther(sender, args[2], plugin);
+                    }
+                }
+            } else if (args.length == 4) {
+                if (!sender.hasPermission("abedwars.admin.exp.give")) {
+                    missingPerm(sender);
+                } else {
+                    if (args[1].equalsIgnoreCase("add")) {
+                        try {
+                            final int i = Integer.parseInt(args[3]);
+                            RankTableUtils.rewardPlayerExp(args[2], i, plugin);
+                            sender.sendMessage(AussieBedwars.PREFIX + "§7If that player was present in the database, his exp increased by §6§l" + i);
+                        } catch (final NumberFormatException e) {
+                            sender.sendMessage(AussieBedwars.PREFIX + "§7The last argument is not a number.");
+                        }
                     }
                 }
             } else {

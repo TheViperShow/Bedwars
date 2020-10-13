@@ -14,22 +14,43 @@ import org.bukkit.scheduler.BukkitScheduler;
 
 public final class RankTableUtils {
 
-    public static void rewardPlayerExp(final Player player, final int exp) {
+    public static void rewardPlayerExp(final String name, final int exp, final Plugin plugin) {
+
+        final Optional<Connection> connectionOptional = MySQLDatabase.getConnection();
+        connectionOptional.ifPresent(conn -> {
+            plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+                try (final Connection c = conn;
+                     final PreparedStatement ps = c.prepareStatement("UPDATE " + RanksTableCreator.TABLE +
+                             " SET exp = exp + ? WHERE username = ?;")) {
+                    ps.setInt(1, exp);
+                    ps.setString(2, name);
+                    ps.executeUpdate();
+                } catch (final SQLException e) {
+                    e.printStackTrace();
+                }
+            });
+        });
+    }
+
+    public static void rewardPlayerExp(final Player player, final int exp, final Plugin plugin) {
         final Optional<Connection> conn = MySQLDatabase.getConnection();
         conn.ifPresent(connection -> {
-            try (final Connection c = connection;
-                 final PreparedStatement ps = c.prepareStatement("INSERT INTO " + RanksTableCreator.TABLE +
-                         " (uuid, username, exp) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE username = ?, exp = exp + ?;")) {
 
-                ps.setString(1, player.getUniqueId().toString());
-                ps.setString(2, player.getName());
-                ps.setInt(3, exp);
-                ps.setString(4, player.getName());
-                ps.setInt(5, exp);
-                ps.executeUpdate();
-            } catch (final SQLException e) {
-                e.printStackTrace();
-            }
+            plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+                try (final Connection c = connection;
+                     final PreparedStatement ps = c.prepareStatement("INSERT INTO " + RanksTableCreator.TABLE +
+                             " (uuid, username, exp) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE username = ?, exp = exp + ?;")) {
+
+                    ps.setString(1, player.getUniqueId().toString());
+                    ps.setString(2, player.getName());
+                    ps.setInt(3, exp);
+                    ps.setString(4, player.getName());
+                    ps.setInt(5, exp);
+                    ps.executeUpdate();
+                } catch (final SQLException e) {
+                    e.printStackTrace();
+                }
+            });
 
         });
     }

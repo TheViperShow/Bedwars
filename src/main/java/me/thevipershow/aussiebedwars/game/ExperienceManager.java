@@ -20,15 +20,15 @@ public final class ExperienceManager {
 
         for (int j = 0; j <= 10; j++) {
             if (j == 0) {
-                requiredExpMap.put(1, 500);
-                requiredExpMap.put(2, 1500);
-                requiredExpMap.put(3, 3500);
-                requiredExpMap.put(4, 8000);
+                requiredExpMap.put(1, FIRST_LVL);
+                requiredExpMap.put(2, SECOND_LVL);
+                requiredExpMap.put(3, THIRD_LVL);
+                requiredExpMap.put(4, FOURTH_LVL);
             } else {
-                requiredExpMap.put((100 * j) + 1, requiredExpMap.get(100 * j) + 500);
-                requiredExpMap.put((100 * j) + 2, requiredExpMap.get(100 * j) + 1500);
-                requiredExpMap.put((100 * j) + 3, requiredExpMap.get(100 * j) + 3500);
-                requiredExpMap.put((100 * j) + 4, requiredExpMap.get(100 * j) + 8000);
+                requiredExpMap.put((100 * j) + 1, requiredExpMap.get(100 * j) + FIRST_LVL);
+                requiredExpMap.put((100 * j) + 2, requiredExpMap.get(100 * j) + SECOND_LVL);
+                requiredExpMap.put((100 * j) + 3, requiredExpMap.get(100 * j) + THIRD_LVL);
+                requiredExpMap.put((100 * j) + 4, requiredExpMap.get(100 * j) + FOURTH_LVL);
             }
             for (int i = 5; i <= 100; i++) {
                 requiredExpMap.put(i + (j * 100), 5000 + requiredExpMap.get((i + (j * 100)) - 1));
@@ -40,9 +40,9 @@ public final class ExperienceManager {
     public final static long PLAY_REWARD_DELAY = 60L * 20L;
     public final static int PLAY_REWARD_EXP = 25;
     public final static int FIRST_LVL = 500,
-            SECOND_LVL = 1000,
+            SECOND_LVL = 1500,
             THIRD_LVL = 3500,
-            FOURTH_LVL = 8000;
+            FOURTH_LVL = 7000;
 
     private BukkitTask playtimeExperienceTask = null;
 
@@ -81,7 +81,7 @@ public final class ExperienceManager {
 
     public static void rewardPlayer(final int experience, final Player p, final ActiveGame activeGame) {
         if (p.isOnline() && !activeGame.isOutOfGame(p)) {
-            RankTableUtils.rewardPlayerExp(p, experience); // rewarding him exp
+            RankTableUtils.rewardPlayerExp(p, experience, activeGame.getPlugin()); // rewarding him exp
             RankTableUtils.getPlayerExp(p.getUniqueId(), activeGame.getPlugin()).thenAccept(pExp -> {
                 if (pExp != 0) {
                     final Optional<Integer> hasLevelledUp = hasLevelledUp(pExp, experience);
