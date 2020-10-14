@@ -106,8 +106,9 @@ public abstract class ActiveGame {
     protected final Inventory defaultUpgradeInv;
     protected final Inventory defaultTrapsInv;
     protected final AbstractDeathmatch abstractDeathmatch;
-    protected final ExperienceManager experienceManager = new ExperienceManager(this);
-    protected final GameTrapTriggerer gameTrapTriggerer = new GameTrapTriggerer(this);
+    protected final ExperienceManager experienceManager;
+    protected final QuestManager questManager;
+    protected final GameTrapTriggerer gameTrapTriggerer;
 
     protected ActiveSpawner diamondSampleSpawner = null;
     protected ActiveSpawner emeraldSampleSpawner = null;
@@ -170,6 +171,9 @@ public abstract class ActiveGame {
         this.defaultUpgradeInv = Objects.requireNonNull(setupUpgradeGUIs(), "The default upgrade inventory was null.");
         this.defaultTrapsInv = Objects.requireNonNull(setupTrapsGUIs(), "The traps inventory was null.");
         this.abstractDeathmatch = GameUtils.deathmatchFromGamemode(bedwarsGame.getGamemode(), this);
+        this.experienceManager = new ExperienceManager(this);
+        this.questManager = new QuestManager(this.experienceManager);
+        this.gameTrapTriggerer = new GameTrapTriggerer(this);
     }
 
     protected final void setupUpgradeLevelsMap() {
@@ -349,6 +353,8 @@ public abstract class ActiveGame {
     };
 
     public void destroyTeamBed(final BedwarsTeam destroyed, final Player destroyer) {
+        questManager.breakBedReward(destroyer);
+
         associatedQueue.perform(p -> {
             if (p.isOnline() && p.getWorld().equals(associatedWorld)) {
                 if (getPlayerTeam(p) == destroyed) {
@@ -687,9 +693,11 @@ public abstract class ActiveGame {
                     p.sendTitle("§a§lYou have won this game!", "§aCongratulations.");
                     p.playSound(p.getLocation(), Sound.FIREWORK_TWINKLE, 7.50f, 1.00f);
                     ExperienceManager.rewardPlayer(bedwarsGame.getGamemode() == Gamemode.QUAD ? 50 : 100, p, this);
+                    questManager.winDailyFirstGame(p);
                 } else {
                     p.sendTitle("§7Team " + '§' + team.getColorCode() + team.name() + " §7has won the game!", "§7Returning to lobby in 15s");
                 }
+                questManager.gamePlayedReward(p);
             }
         });
         this.winnerDeclared = true;
@@ -1036,27 +1044,35 @@ public abstract class ActiveGame {
         return teamActiveTrapsList;
     }
 
-    public EnumMap<BedwarsTeam, Long> getLastActivatedTraps() {
+    public final EnumMap<BedwarsTeam, Long> getLastActivatedTraps() {
         return lastActivatedTraps;
     }
 
-    public List<Player> getImmuneTrapPlayers() {
+    public final List<Player> getImmuneTrapPlayers() {
         return immuneTrapPlayers;
     }
 
-    public List<Player> getPlayersRespawning() {
+    public final List<Player> getPlayersRespawning() {
         return playersRespawning;
     }
 
-    public List<Player> getHiddenPlayers() {
+    public final List<Player> getHiddenPlayers() {
         return hiddenPlayers;
     }
 
-    public GameTrapTriggerer getGameTrapTriggerer() {
+    public final GameTrapTriggerer getGameTrapTriggerer() {
         return gameTrapTriggerer;
     }
 
-    public List<BukkitTask> getEmeraldBoostDrops() {
+    public final QuestManager getQuestManager() {
+        return questManager;
+    }
+
+    public final ExperienceManager getExperienceManager() {
+        return experienceManager;
+    }
+
+    public final List<BukkitTask> getEmeraldBoostDrops() {
         return emeraldBoostDrops;
     }
 }

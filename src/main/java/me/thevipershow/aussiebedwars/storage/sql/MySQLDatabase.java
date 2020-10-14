@@ -9,6 +9,7 @@ import java.util.Optional;
 import me.thevipershow.aussiebedwars.AussieBedwars;
 import me.thevipershow.aussiebedwars.LoggerUtils;
 import me.thevipershow.aussiebedwars.config.DefaultConfiguration;
+import me.thevipershow.aussiebedwars.storage.sql.queue.DailyQuestsTableCreator;
 import me.thevipershow.aussiebedwars.storage.sql.queue.WeeklyQuestsTableCreator;
 import me.thevipershow.aussiebedwars.storage.sql.queue.QueueVillagerTableCreator;
 import me.thevipershow.aussiebedwars.storage.sql.queue.RanksTableCreator;
@@ -21,7 +22,11 @@ public final class MySQLDatabase extends Database {
 
     public MySQLDatabase(final JavaPlugin plugin, final DefaultConfiguration defaultConfiguration) {
 
-        super(plugin, QueueVillagerTableCreator.class, RanksTableCreator.class, WeeklyQuestsTableCreator.class);
+        super(plugin,
+                QueueVillagerTableCreator.class,
+                RanksTableCreator.class,
+                WeeklyQuestsTableCreator.class,
+                DailyQuestsTableCreator.class);
 
         this.defaultConfiguration = defaultConfiguration;
         HikariDataSource dataSrc = new HikariDataSource();

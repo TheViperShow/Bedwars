@@ -72,7 +72,7 @@ public final class RankTableUtils {
                     try (final ResultSet rs = ps.executeQuery()) {
                         if (rs.next()) {
                             final int v = rs.getInt("exp");
-                            value.complete(v);
+                            scheduler.runTask(plugin, () -> value.complete(v));
                         }
                     }
                 } catch (final SQLException e) {
@@ -104,7 +104,7 @@ public final class RankTableUtils {
                     try (final ResultSet rs = ps.executeQuery()) {
                         if (rs.next()) {
                             final int v = rs.getInt("exp");
-                            value.complete(v);
+                            scheduler.runTask(plugin, () -> value.complete(v));
                         }
                     }
                 } catch (final SQLException e) {

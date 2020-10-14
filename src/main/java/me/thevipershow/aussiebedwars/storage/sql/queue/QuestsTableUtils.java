@@ -2,8 +2,12 @@ package me.thevipershow.aussiebedwars.storage.sql.queue;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import me.thevipershow.aussiebedwars.game.Pair;
 import me.thevipershow.aussiebedwars.storage.sql.MySQLDatabase;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -58,15 +62,46 @@ public final class QuestsTableUtils {
         }));
     }
 
+    public static CompletableFuture<Boolean> getDailyFirstWin(final Plugin plugin, final Player player) {
+
+        final CompletableFuture<Boolean> future = new CompletableFuture<>();
+        final Optional<Connection> connectionOptional = MySQLDatabase.getConnection();
+
+        if (connectionOptional.isPresent()) {
+            plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+
+                try (final Connection conn = connectionOptional.get();
+                     final PreparedStatement ps = conn.prepareStatement("SELECT (win_first) FROM " + DailyQuestsTableCreator.TABLE + " WHERE uuid = ?;")) {
+
+                    ps.setString(1, player.getUniqueId().toString());
+                    try (final ResultSet rs = ps.executeQuery()) {
+                        boolean firstWin;
+                        if (rs.next()) {
+                            firstWin = rs.getBoolean("win_first");
+                            plugin.getServer().getScheduler().runTask(plugin, () -> future.complete(firstWin));
+                        } else {
+                            plugin.getServer().getScheduler().runTask(plugin, () -> future.complete(null));
+                        }
+                    }
+                } catch (final SQLException e) {
+                    e.printStackTrace();
+                }
+            });
+        } else {
+            future.completeExceptionally(new SQLException("Could not get connection."));
+        }
+        return future;
+    }
+
     public static void setDailyFirstWin(final Plugin plugin, final Player player) {
         final Optional<Connection> connectionOptional = MySQLDatabase.getConnection();
         connectionOptional.ifPresent(conn -> plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
             try (final Connection c = conn;
-                final PreparedStatement ps = c.prepareStatement("INSERT INTO " + DailyQuestsTableCreator.TABLE + " (uuid, username, win_first, games_played) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE username = ?, win_first = ?;")) {
-                 ps.setString(0x01, player.getUniqueId().toString());
-                 ps.setString(0x02, player.getName());
-                 ps.setBoolean(0x03, true);
-                 ps.setInt(0x04, 0x00);
+                 final PreparedStatement ps = c.prepareStatement("INSERT INTO " + DailyQuestsTableCreator.TABLE + " (uuid, username, win_first, games_played) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE username = ?, win_first = ?;")) {
+                ps.setString(0x01, player.getUniqueId().toString());
+                ps.setString(0x02, player.getName());
+                ps.setBoolean(0x03, true);
+                ps.setInt(0x04, 0x00);
                 ps.setString(0x05, player.getName());
                 ps.setBoolean(0x06, true);
                 ps.executeUpdate();
@@ -74,6 +109,37 @@ public final class QuestsTableUtils {
                 e.printStackTrace();
             }
         }));
+    }
+
+    public static CompletableFuture<Integer> getDailyGamesPlayed(final Plugin plugin, final Player player) {
+
+        final CompletableFuture<Integer> future = new CompletableFuture<>();
+        final Optional<Connection> connectionOptional = MySQLDatabase.getConnection();
+
+        if (connectionOptional.isPresent()) {
+            plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+
+                try (final Connection conn = connectionOptional.get();
+                     final PreparedStatement ps = conn.prepareStatement("SELECT (games_played) FROM " + DailyQuestsTableCreator.TABLE + " WHERE uuid = ?;")) {
+
+                    ps.setString(1, player.getUniqueId().toString());
+                    try (final ResultSet rs = ps.executeQuery()) {
+                        int firstWin;
+                        if (rs.next()) {
+                            firstWin = rs.getInt("games_played");
+                            plugin.getServer().getScheduler().runTask(plugin, () -> future.complete(firstWin));
+                        } else {
+                            plugin.getServer().getScheduler().runTask(plugin, () -> future.complete(null));
+                        }
+                    }
+                } catch (final SQLException e) {
+                    e.printStackTrace();
+                }
+            });
+        } else {
+            future.completeExceptionally(new SQLException("Could not get connection."));
+        }
+        return future;
     }
 
     public static void increaseGamesPlayed(final Plugin plugin, final Player player) {
@@ -92,5 +158,74 @@ public final class QuestsTableUtils {
                 e.printStackTrace();
             }
         }));
+    }
+
+    public static CompletableFuture<Integer> getBedsBroken(final UUID uuid, final Plugin plugin) {
+
+        final CompletableFuture<Integer> future = new CompletableFuture<>();
+        final Optional<Connection> connectionOptional = MySQLDatabase.getConnection();
+
+        if (connectionOptional.isPresent()) {
+            plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+
+                try (final Connection conn = connectionOptional.get();
+                     final PreparedStatement ps = conn.prepareStatement("SELECT (beds_broken) FROM " + WeeklyQuestsTableCreator.TABLE + " WHERE uuid = ?;")) {
+
+                    ps.setString(1, uuid.toString());
+                    try (final ResultSet rs = ps.executeQuery()) {
+                        int return_ = -1;
+                        if (rs.next()) {
+                            return_ = rs.getInt("beds_broken");
+                        }
+                        final int finalReturn_ = return_;
+                        plugin.getServer().getScheduler().runTask(plugin, () -> future.complete(finalReturn_));
+                    }
+                } catch (final SQLException e) {
+                    e.printStackTrace();
+                }
+            });
+        } else {
+            future.completeExceptionally(new SQLException("Could not get connection."));
+        }
+        return future;
+
+    }
+
+    /**
+     * Get weekly data (wins\games).
+     *
+     * @param uuid   uuid of target
+     * @param plugin a plugin instance.
+     * @return null if row absent, 2 values otherwise.
+     */
+    public static CompletableFuture<Pair<Integer, Integer>> getWeeklyData(final UUID uuid, final Plugin plugin) {
+
+        final CompletableFuture<Pair<Integer, Integer>> future = new CompletableFuture<>();
+        final Optional<Connection> connectionOptional = MySQLDatabase.getConnection();
+
+        if (connectionOptional.isPresent()) {
+            plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+
+                try (final Connection conn = connectionOptional.get();
+                     final PreparedStatement ps = conn.prepareStatement("SELECT (win_first, games_played) FROM " + DailyQuestsTableCreator.TABLE + " WHERE uuid = ?;")) {
+
+                    ps.setString(1, uuid.toString());
+                    try (final ResultSet rs = ps.executeQuery()) {
+
+                        if (rs.next()) {
+                            final Pair<Integer, Integer> values = new Pair<>(rs.getInt("win_first"), rs.getInt("games_played"));
+                            plugin.getServer().getScheduler().runTask(plugin, () -> future.complete(values));
+                        } else {
+                            plugin.getServer().getScheduler().runTask(plugin, () -> future.complete(null));
+                        }
+                    }
+                } catch (final SQLException e) {
+                    e.printStackTrace();
+                }
+            });
+        } else {
+            future.completeExceptionally(new SQLException("Could not get connection."));
+        }
+        return future;
     }
 }

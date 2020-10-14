@@ -113,4 +113,11 @@ public final class ExperienceManager {
         this.playtimeExperienceTask.cancel();
     }
 
+    public ActiveGame getActiveGame() {
+        return activeGame;
+    }
+
+    public BukkitTask getPlaytimeExperienceTask() {
+        return playtimeExperienceTask;
+    }
 }

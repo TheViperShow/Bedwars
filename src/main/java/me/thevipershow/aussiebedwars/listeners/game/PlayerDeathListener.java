@@ -208,10 +208,11 @@ public final class PlayerDeathListener extends UnregisterableListener {
         return msg.toString();
     }
 
-    public static void deathLogic(ActiveGame activeGame, BedwarsTeam b, Player p, EntityDamageEvent event) {
+    public static void deathLogic(final ActiveGame activeGame, final BedwarsTeam b, final Player p, final EntityDamageEvent event) {
         if (activeGame.getDestroyedTeams().contains(b) || activeGame.getAbstractDeathmatch().isRunning()) { // Checking if players' team's bed has been broken previously.
             // here player has lost the game.
             // or has died permanently since the deathmatch mode is ON.
+
             activeGame.removePlayer(p);
             p.setAllowFlight(true);
             p.setFlying(true);
@@ -286,6 +287,8 @@ public final class PlayerDeathListener extends UnregisterableListener {
                     ((Player) damager).playSound(damager.getLocation(), Sound.SPLASH, 8.50f, 0.65f);
                 }
             }
+
+
         } else if (event.getCause() == DamageCause.FALL) {
             p.setNoDamageTicks(10);    // Making him invincible for 0.5s.
         }
