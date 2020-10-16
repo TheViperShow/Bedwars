@@ -5,13 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>me.thevipershow</groupId>
-    <artifactId>AussieBedwars</artifactId>
+    <artifactId>Bedwars</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>AussieBedwars</name>
+    <name>Bedwars</name>
 
-    <description>Bedwars plugin for AussieBedwars server.</description>
+    <description>Bedwars plugin for Bedwars server.</description>
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -1,10 +1,10 @@
-name: AussieBedwars
+name: Bedwars
 version: ${project.version}
-main: me.thevipershow.aussiebedwars.AussieBedwars
-prefix: Aussie-Bedwars
+main: me.thevipershow.bedwars.Bedwars
+prefix: Bedwars
 authors: [ TheViperShow ]
-description: Bedwars plugin for AussieBedwars server.
+description: Bedwars plugin for CloudCombat server.
 website: ${project.url}
 commands:
-  abedwars:
-    description: "Main command of Aussie Bedwars."
+  bedwars:
+    description: "Main command of Bedwars."
