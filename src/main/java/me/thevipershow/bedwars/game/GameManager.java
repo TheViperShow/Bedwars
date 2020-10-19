@@ -53,7 +53,7 @@ public final class GameManager {
         loading = false;
     }
 
-    public Optional<ActiveGame> findOptimalGame(final Gamemode gamemode) {
+    public final Optional<ActiveGame> findOptimalGame(final Gamemode gamemode) {
         Integer diff = null;
         ActiveGame bestGame = null;
 
@@ -74,7 +74,7 @@ public final class GameManager {
         return bestGame == null ? Optional.empty() : Optional.of(bestGame);
     }
 
-    public boolean addToQueue(final Player player, final ActiveGame activeGame) {
+    public final boolean addToQueue(final Player player, final ActiveGame activeGame) {
         final AbstractQueue<Player> queue = activeGame.getAssociatedQueue();
         final ConnectToQueueEvent event = new ConnectToQueueEvent(activeGame);
         plugin.getServer().getPluginManager().callEvent(event);
@@ -95,11 +95,11 @@ public final class GameManager {
         });
     }
 
-    public boolean isLoading() {
+    public final boolean isLoading() {
         return loading;
     }
 
-    public JavaPlugin getPlugin() {
+    public final JavaPlugin getPlugin() {
         return plugin;
     }
 

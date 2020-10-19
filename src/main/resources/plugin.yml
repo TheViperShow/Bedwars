@@ -5,6 +5,7 @@ prefix: Bedwars
 authors: [ TheViperShow ]
 description: Bedwars plugin for CloudCombat server.
 website: ${project.url}
+softdepend: [PlaceholderAPI]
 commands:
   bedwars:
     description: "Main command of Bedwars."

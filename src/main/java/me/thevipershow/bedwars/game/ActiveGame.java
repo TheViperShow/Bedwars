@@ -712,6 +712,9 @@ public abstract class ActiveGame {
                 questManager.gamePlayedReward(p);
             }
         });
+
+        killTracker.announceTopThreeScores();
+
         this.winnerDeclared = true;
     }
 

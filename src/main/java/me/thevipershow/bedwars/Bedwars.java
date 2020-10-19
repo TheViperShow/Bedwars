@@ -34,11 +34,13 @@ import me.thevipershow.bedwars.config.objects.upgradeshop.traps.MinerFatigueTrap
 import me.thevipershow.bedwars.game.GameManager;
 import me.thevipershow.bedwars.listeners.queue.MatchmakingVillagersListener;
 import me.thevipershow.bedwars.listeners.queue.QueueResizerListener;
+import me.thevipershow.bedwars.placeholders.BedwarsExpansion;
 import me.thevipershow.bedwars.storage.sql.DataCleaner;
 import me.thevipershow.bedwars.storage.sql.Database;
 import me.thevipershow.bedwars.storage.sql.MySQLDatabase;
 import me.thevipershow.bedwars.worlds.WorldsManager;
 import me.tigerhix.lib.scoreboard.ScoreboardLib;
+import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.event.Listener;
@@ -142,6 +144,13 @@ public final class Bedwars extends JavaPlugin {
 
         dataCleaner = new DataCleaner(this);
         dataCleaner.startTasks();
+
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            final BedwarsExpansion bedwarsExpansion = new BedwarsExpansion(gameManager);
+            if (bedwarsExpansion.register()) {
+                LoggerUtils.logColor(getLogger(), "&eSuccessfully added expansion to &aPlaceHolderAPI");
+            }
+        }
     }
 
     @Override

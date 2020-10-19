@@ -15,9 +15,11 @@ public final class ExperienceManager {
     private final ActiveGame activeGame;
     public static final Map<Integer, Integer> requiredExpMap = new LinkedHashMap<>();
 
-    public ExperienceManager(final ActiveGame activeGame) {
-        this.activeGame = activeGame;
+    public final static long PLAY_REWARD_DELAY = 60L * 20L;
+    public final static int PLAY_REWARD_EXP = 25;
+    public final static int FIRST_LVL = 500, SECOND_LVL = 1500, THIRD_LVL = 3500, FOURTH_LVL = 7000;
 
+    static {
         for (int j = 0; j <= 10; j++) {
             if (j == 0) {
                 requiredExpMap.put(1, FIRST_LVL);
@@ -34,15 +36,12 @@ public final class ExperienceManager {
                 requiredExpMap.put(i + (j * 100), 5000 + requiredExpMap.get((i + (j * 100)) - 1));
             }
         }
-
     }
 
-    public final static long PLAY_REWARD_DELAY = 60L * 20L;
-    public final static int PLAY_REWARD_EXP = 25;
-    public final static int FIRST_LVL = 500,
-            SECOND_LVL = 1500,
-            THIRD_LVL = 3500,
-            FOURTH_LVL = 7000;
+    public ExperienceManager(final ActiveGame activeGame) {
+        this.activeGame = activeGame;
+
+    }
 
     private BukkitTask playtimeExperienceTask = null;
 
