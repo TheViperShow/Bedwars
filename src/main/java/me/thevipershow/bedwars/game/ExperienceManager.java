@@ -13,6 +13,7 @@ import org.bukkit.scheduler.BukkitTask;
 public final class ExperienceManager {
 
     private final ActiveGame activeGame;
+
     public static final Map<Integer, Integer> requiredExpMap = new LinkedHashMap<>();
 
     public final static long PLAY_REWARD_DELAY = 60L * 20L;

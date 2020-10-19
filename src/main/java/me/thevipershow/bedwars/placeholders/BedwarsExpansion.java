@@ -7,11 +7,13 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import me.thevipershow.bedwars.LoggerUtils;
+import me.thevipershow.bedwars.bedwars.Gamemode;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.ExperienceManager;
 import me.thevipershow.bedwars.game.GameManager;
 import me.thevipershow.bedwars.game.Pair;
+import me.thevipershow.bedwars.storage.sql.tables.GlobalStatsTableUtils;
 import me.thevipershow.bedwars.storage.sql.tables.RankTableUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -25,28 +27,58 @@ public final class BedwarsExpansion extends PlaceholderExpansion {
 
     private final static String AUTHOR = "TheViperShow", IDENTIFIER = "bedwars";
     private final String version;
-    private BukkitTask cacheExpTask = null;
+    private BukkitTask cacheExpTask = null, cacheWinsTask = null, cacheKillsTask = null;
 
     private final HashMap<UUID, Pair<Long, Character>> cachedTeamColors = new HashMap<>();
     private final HashMap<UUID, Integer> cachedExp = new HashMap<>();
+    private final HashMap<UUID, GlobalStatsTableUtils.Wins> cachedWins = new HashMap<>();
+    private final HashMap<UUID, GlobalStatsTableUtils.Kills> cachedKills = new HashMap<>();
 
     public BedwarsExpansion(final GameManager gameManager) {
         this.gameManager = gameManager;
         this.version = gameManager.getPlugin().getDescription().getVersion();
 
         startCacheExpTask();
+        startCacheWinsTask();
+        startCacheKillsTask();
     }
 
     private void startCacheExpTask() {
         if (this.cacheExpTask == null) {
             LoggerUtils.logColor(gameManager.getPlugin().getLogger(), "&eCaching player EXP into local data. . .");
-            this.cacheExpTask = gameManager.getPlugin().getServer().getScheduler().runTaskTimer(gameManager.getPlugin(), () -> RankTableUtils.cacheIntoMap(this.cachedExp, gameManager.getPlugin()), 1L, 20L * 45L);
+            this.cacheExpTask = gameManager.getPlugin().getServer().getScheduler().runTaskTimer(gameManager.getPlugin(), () -> RankTableUtils.cacheIntoMap(this.cachedExp, gameManager.getPlugin()), 1L, 20L * 30L);
+        }
+    }
+
+    private void startCacheWinsTask() {
+        if (this.cacheWinsTask == null) {
+            LoggerUtils.logColor(gameManager.getPlugin().getLogger(), "&eCaching player win into local data. . .");
+            this.cacheWinsTask = gameManager.getPlugin().getServer().getScheduler().runTaskTimer(gameManager.getPlugin(), () -> GlobalStatsTableUtils.cacheWinsIntoMap(this.cachedWins, gameManager.getPlugin()), 1L, 20L * 60L);
+        }
+    }
+
+    private void startCacheKillsTask() {
+        if (this.cacheKillsTask == null) {
+            LoggerUtils.logColor(gameManager.getPlugin().getLogger(), "&eCaching player kills into local data. . .");
+            this.cacheKillsTask = gameManager.getPlugin().getServer().getScheduler().runTaskTimer(gameManager.getPlugin(), () -> GlobalStatsTableUtils.cacheKillsIntoMap(this.cachedKills, gameManager.getPlugin()), 1L, 20L * 60L);
         }
     }
 
     public final void stopCacheExpTask() {
         if (this.cacheExpTask != null) {
             this.cacheExpTask.cancel();
+        }
+    }
+
+    public final void stopCacheWinsTask() {
+        if (this.cacheWinsTask != null) {
+            this.cacheWinsTask.cancel();
+        }
+    }
+
+    public final void stopCacheKillsTask() {
+        if (this.cacheKillsTask != null) {
+            this.cacheKillsTask.cancel();
         }
     }
 
@@ -142,6 +174,26 @@ public final class BedwarsExpansion extends PlaceholderExpansion {
         }
     }
 
+    private String getKills(final Gamemode gamemode, final Player player) {
+        final int i = this.cachedKills.get(player.getUniqueId()).getKills(gamemode);
+        return Integer.toString(i);
+    }
+
+    private String getWins(final Gamemode gamemode, final Player player) {
+        final int i = this.cachedWins.get(player.getUniqueId()).getWin(gamemode);
+        return Integer.toString(i);
+    }
+
+    private String getTotalWins(final Player player) {
+        final GlobalStatsTableUtils.Wins wins = this.cachedWins.get(player.getUniqueId());
+        return Integer.toString(wins.getSoloWins() + wins.getDuoWins() + wins.getQuadWins());
+    }
+
+    private String getTotalKills(final Player player) {
+        final GlobalStatsTableUtils.Kills kills = this.cachedKills.get(player.getUniqueId());
+        return Integer.toString(kills.getSoloKills() + kills.getDuoKills() + kills.getQuadKills());
+    }
+
     @Override
     public final String onPlaceholderRequest(final Player player, final @NotNull String identifier) {
 
@@ -160,6 +212,22 @@ public final class BedwarsExpansion extends PlaceholderExpansion {
                 return getPlayerCurrentLevelExpRel(player);
             case "team_colour":
                 return getPlayerTeam(player);
+            case "solo_kills":
+                return getKills(Gamemode.SOLO, player);
+            case "duo_kills":
+                return getKills(Gamemode.DUO, player);
+            case "quad_kills":
+                return getKills(Gamemode.QUAD, player);
+            case "total_kills":
+                return getTotalKills(player);
+            case "solo_wins":
+                return getWins(Gamemode.SOLO, player);
+            case "duo_wins":
+                return getWins(Gamemode.DUO, player);
+            case "quad_wins":
+                return getWins(Gamemode.QUAD, player);
+            case "total_wins":
+                return getTotalWins(player);
         }
 
         return null;

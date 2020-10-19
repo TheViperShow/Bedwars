@@ -62,31 +62,29 @@ public final class RankTableUtils {
         final BukkitScheduler scheduler = plugin.getServer().getScheduler();
         final Optional<Connection> optionalConnection = MySQLDatabase.getConnection();
 
-        if (optionalConnection.isPresent()) {
-            scheduler.runTaskAsynchronously(plugin, () -> {
-                try (final Connection conn = optionalConnection.get();
-                     final PreparedStatement ps = conn.prepareStatement(
-                             "SELECT * FROM " + RanksTableCreator.TABLE + ";"
-                     );
-                     final ResultSet rs = ps.executeQuery()) {
+        optionalConnection.ifPresent(connection -> scheduler.runTaskAsynchronously(plugin, () -> {
+            try (final Connection conn = connection;
+                 final PreparedStatement ps = conn.prepareStatement(
+                         "SELECT * FROM " + RanksTableCreator.TABLE + ";"
+                 );
+                 final ResultSet rs = ps.executeQuery()) {
 
-                    final HashMap<UUID, Integer> v = new HashMap<>();
-                    while (rs.next()) {
-                        final UUID uuid = UUID.fromString(rs.getString("uuid"));
-                        final int exp = rs.getInt("exp");
-                        v.put(uuid, exp);
-                    }
-
-                    scheduler.runTask(plugin, () -> {
-                        map.clear();
-                        map.putAll(v);
-                    });
-
-                } catch (final SQLException e) {
-                    e.printStackTrace();
+                final HashMap<UUID, Integer> v = new HashMap<>();
+                while (rs.next()) {
+                    final UUID uuid = UUID.fromString(rs.getString("uuid"));
+                    final int exp = rs.getInt("exp");
+                    v.put(uuid, exp);
                 }
-            });
-        }
+
+                scheduler.runTask(plugin, () -> {
+                    map.clear();
+                    map.putAll(v);
+                });
+
+            } catch (final SQLException e) {
+                e.printStackTrace();
+            }
+        }));
     }
 
     public static CompletableFuture<Integer> getPlayerExp(final UUID uuid, final Plugin plugin) {

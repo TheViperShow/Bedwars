@@ -71,6 +71,7 @@ import me.thevipershow.bedwars.listeners.game.SpectatorsInteractListener;
 import me.thevipershow.bedwars.listeners.game.TNTPlaceListener;
 import me.thevipershow.bedwars.listeners.game.UpgradeInteractListener;
 import me.thevipershow.bedwars.listeners.game.UpgradeMerchantListener;
+import me.thevipershow.bedwars.storage.sql.tables.GlobalStatsTableUtils;
 import me.thevipershow.bedwars.worlds.WorldsManager;
 import me.tigerhix.lib.scoreboard.common.EntryBuilder;
 import me.tigerhix.lib.scoreboard.type.Entry;
@@ -706,6 +707,7 @@ public abstract class ActiveGame {
                     p.playSound(p.getLocation(), Sound.FIREWORK_TWINKLE, 7.50f, 1.00f);
                     ExperienceManager.rewardPlayer(bedwarsGame.getGamemode() == Gamemode.QUAD ? 50 : 100, p, this);
                     questManager.winDailyFirstGame(p);
+                    GlobalStatsTableUtils.increaseWin(bedwarsGame.getGamemode(), plugin, p.getUniqueId());
                 } else {
                     p.sendTitle("§7Team " + '§' + team.getColorCode() + team.name() + " §7has won the game!", "§7Returning to lobby in 15s");
                 }

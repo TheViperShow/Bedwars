@@ -9,6 +9,7 @@ import me.thevipershow.bedwars.config.objects.upgradeshop.UpgradeType;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.GameUtils;
 import me.thevipershow.bedwars.listeners.UnregisterableListener;
+import me.thevipershow.bedwars.storage.sql.tables.GlobalStatsTableUtils;
 import net.minecraft.server.v1_8_R3.ChatMessage;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
 import net.minecraft.server.v1_8_R3.PacketPlayOutTitle;
@@ -295,7 +296,7 @@ public final class PlayerDeathListener extends UnregisterableListener {
                 final EntityDamageByEntityEvent edbee = (EntityDamageByEntityEvent) event;
                 final Entity damager = edbee.getDamager();
                 if (damager instanceof Player) {
-
+                    GlobalStatsTableUtils.increaseKills(activeGame.getBedwarsGame().getGamemode(), activeGame.getPlugin(), damager.getUniqueId());
                     GameUtils.sendKillActionBar(activeGame, (Player) damager,  p);
                     ((Player) damager).playSound(damager.getLocation(), Sound.SPLASH, 8.50f, 0.65f);
                 }

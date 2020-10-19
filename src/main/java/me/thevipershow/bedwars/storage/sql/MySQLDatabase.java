@@ -11,6 +11,7 @@ import me.thevipershow.bedwars.LoggerUtils;
 import me.thevipershow.bedwars.config.DefaultConfiguration;
 import me.thevipershow.bedwars.storage.sql.tables.DailyQuestsTableCreator;
 import me.thevipershow.bedwars.storage.sql.tables.DataResetTableCreator;
+import me.thevipershow.bedwars.storage.sql.tables.GlobalStatsTableCreator;
 import me.thevipershow.bedwars.storage.sql.tables.WeeklyQuestsTableCreator;
 import me.thevipershow.bedwars.storage.sql.tables.QueueVillagerTableCreator;
 import me.thevipershow.bedwars.storage.sql.tables.RanksTableCreator;
@@ -28,10 +29,11 @@ public final class MySQLDatabase extends Database {
                 RanksTableCreator.class,
                 WeeklyQuestsTableCreator.class,
                 DailyQuestsTableCreator.class,
-                DataResetTableCreator.class);
+                DataResetTableCreator.class,
+                GlobalStatsTableCreator.class);
 
         this.defaultConfiguration = defaultConfiguration;
-        HikariDataSource dataSrc = new HikariDataSource();
+        final HikariDataSource dataSrc = new HikariDataSource();
         final String address = defaultConfiguration.getAddress();
         final int port = defaultConfiguration.getPort();
         final String dbName = defaultConfiguration.getDatabaseName();
@@ -66,7 +68,7 @@ public final class MySQLDatabase extends Database {
                 if (connection.isPresent()) {
                     constructor.newInstance(connection.get()).createTable();
                 }
-            } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
+            } catch (final NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
                 e.printStackTrace();
             }
         }
