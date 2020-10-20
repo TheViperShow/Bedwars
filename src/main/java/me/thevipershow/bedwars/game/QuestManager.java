@@ -16,27 +16,27 @@ public final class QuestManager {
     }
 
     private void dailyFirstGameMessage(final Player player) {
-        player.sendMessage("-------------------------------");
+        player.sendMessage("-----------------------------------");
         player.sendMessage("            §a★ §6DAILY QUEST COMPLETED! §a★");
         player.sendMessage("         §eYou have won your first game of the day§8!");
-        player.sendMessage("         §e       +§6§l250 EXP");
-        player.sendMessage("-------------------------------");
+        player.sendMessage("         §e          +§6§l250 EXP");
+        player.sendMessage("-----------------------------------");
     }
 
     private void dailyGamesPlayedMessage(final Player player) {
-        player.sendMessage("-------------------------------");
+        player.sendMessage("-----------------------------------");
         player.sendMessage("            §a★ §6DAILY QUEST COMPLETED! §a★");
         player.sendMessage("         §eYou have played two daily games§8!");
-        player.sendMessage("         §e       +§6§l250 EXP");
-        player.sendMessage("-------------------------------");
+        player.sendMessage("         §e          +§6§l250 EXP");
+        player.sendMessage("-----------------------------------");
     }
 
     private void brokenBedsMessage(final Player player) {
-        player.sendMessage("-------------------------------");
+        player.sendMessage("-----------------------------------");
         player.sendMessage("            §a★ §6DAILY QUEST COMPLETED! §a★");
         player.sendMessage("         §eYou have destroyed 25 beds§8!");
-        player.sendMessage("         §e       +§6§l5000 EXP");
-        player.sendMessage("-------------------------------");
+        player.sendMessage("         §e          +§6§l5000 EXP");
+        player.sendMessage("----------------------------------");
     }
 
     public final void winDailyFirstGame(final Player player) {

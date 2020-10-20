@@ -8,83 +8,93 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import me.thevipershow.bedwars.bedwars.Gamemode;
+import me.thevipershow.bedwars.storage.sql.MySQLDatabase;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Villager;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
 public final class QueueTableUtils {
 
-    public static void addVillager(final Connection connection, final Villager villager, final Gamemode gamemode) {
-        try (Connection conn = connection;
-             PreparedStatement preparedStatement = conn.prepareStatement(
-                     "INSERT INTO " + QueueVillagerTableCreator.TABLE +
-                             " (uuid, gamemode) VALUES (?, ?) ON DUPLICATE KEY UPDATE gamemode = ?;")) {
-            preparedStatement.setString(1, villager.getUniqueId().toString());
-            preparedStatement.setString(2, gamemode.name());
-            preparedStatement.setString(3, gamemode.name());
-            preparedStatement.executeUpdate();
-        } catch (final SQLException e) {
-            e.printStackTrace();
-        }
-    }
+    public static void addVillager(final Villager villager, final Gamemode gamemode, final Plugin plugin) {
+        final UUID uuid = villager.getUniqueId();
 
-    public static CompletableFuture<Boolean> removeVillager(final Connection connection, final Villager villager) {
-        return CompletableFuture.supplyAsync(() -> {
-            try (Connection conn = connection;
-                 PreparedStatement preparedStatement = conn.prepareStatement(
-                         "DELETE FROM " + QueueVillagerTableCreator.TABLE + " WHERE uuid=?;")
-            ) {
-                preparedStatement.setString(1, villager.getUniqueId().toString());
-                return preparedStatement.executeUpdate() > 0;
-            } catch (final SQLException e) {
-                e.printStackTrace();
-                return false;
-            }
+        final Optional<Connection> connectionOptional = MySQLDatabase.getConnection();
+        connectionOptional.ifPresent(c -> {
+            plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+                try (final Connection conn = c;
+                     PreparedStatement preparedStatement = conn.prepareStatement(
+                             "INSERT INTO " + QueueVillagerTableCreator.TABLE +
+                                     " (uuid, gamemode) VALUES (?, ?) ON DUPLICATE KEY UPDATE gamemode = ?;")) {
+                    preparedStatement.setString(1, uuid.toString());
+                    preparedStatement.setString(2, gamemode.name());
+                    preparedStatement.setString(3, gamemode.name());
+                    preparedStatement.executeUpdate();
+                } catch (final SQLException e) {
+                    e.printStackTrace();
+                }
+            });
         });
     }
 
-    public static CompletableFuture<Boolean> removeVillager(final Connection connection, final Villager villager, final Plugin plugin) {
+    public static CompletableFuture<Boolean> removeVillager(final Villager villager, final Plugin plugin) {
+        final CompletableFuture<Boolean> completableFuture = new CompletableFuture<>();
+        final BukkitScheduler bukkitScheduler = plugin.getServer().getScheduler();
+        final Optional<Connection> optionalConnection = MySQLDatabase.getConnection();
 
-        final CompletableFuture<Boolean> hasRemoved = new CompletableFuture<>();
+        if (optionalConnection.isPresent()) {
+            bukkitScheduler.runTaskAsynchronously(plugin, () -> {
+
+                try (final Connection conn = optionalConnection.get();
+                     final PreparedStatement ps = conn.prepareStatement("DELETE FROM " + QueueVillagerTableCreator.TABLE + " WHERE uuid=?;")) {
+                    ps.setString(1, villager.getUniqueId().toString());
+                    final int result = ps.executeUpdate();
+                    bukkitScheduler.runTask(plugin, () -> completableFuture.complete(result > 0));
+                } catch (final SQLException e) {
+                    e.printStackTrace();
+                    completableFuture.completeExceptionally(e);
+                }
+
+            });
+        } else {
+            completableFuture.completeExceptionally(new SQLException("Could not get a connection."));
+        }
+
+        return completableFuture;
+    }
+
+    public static CompletableFuture<Optional<Gamemode>> getVillagerGamemode(final UUID villagerUUID, final Plugin plugin) {
+        final CompletableFuture<Optional<Gamemode>> completableFuture = new CompletableFuture<>();
+        final Optional<Connection> connectionOptional = MySQLDatabase.getConnection();
         final BukkitScheduler scheduler = plugin.getServer().getScheduler();
 
-        scheduler.runTaskAsynchronously(plugin, () -> {
-            try (Connection conn = connection;
-                 PreparedStatement preparedStatement = conn.prepareStatement(
-                         "DELETE FROM " + QueueVillagerTableCreator.TABLE + " WHERE uuid=?;")
-            ) {
-                preparedStatement.setString(1, villager.getUniqueId().toString());
-                final boolean success = preparedStatement.executeUpdate() > 0;
-                scheduler.runTask(plugin, () -> hasRemoved.complete(success));
-            } catch (final SQLException e) {
-                e.printStackTrace();
-                hasRemoved.completeExceptionally(e);
-            }
-        });
+        if (connectionOptional.isPresent()) {
+            scheduler.runTaskAsynchronously(plugin, () -> {
 
-        return hasRemoved;
-    }
-
-    public static CompletableFuture<Optional<Gamemode>> getVillagerGamemode(final UUID villagerUUID, final Connection connection) {
-        return CompletableFuture.supplyAsync(() -> {
-            try (Connection conn = connection;
-                 PreparedStatement preparedStatement = conn.prepareStatement(
-                         "SELECT (gamemode) FROM " + QueueVillagerTableCreator.TABLE + " WHERE uuid = ?;")) {
-                preparedStatement.setString(1, villagerUUID.toString());
-                try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                    if (resultSet.next()) {
-                        String g = resultSet.getString("gamemode");
-                        if (g == null) {
-                            return Optional.empty();
+                try (Connection conn = connectionOptional.get();
+                     PreparedStatement preparedStatement = conn.prepareStatement(
+                             "SELECT (gamemode) FROM " + QueueVillagerTableCreator.TABLE + " WHERE uuid = ?;")) {
+                    preparedStatement.setString(1, villagerUUID.toString());
+                    try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                        if (resultSet.next()) {
+                            final String g = resultSet.getString("gamemode");
+                            if (g == null) {
+                                scheduler.runTask(plugin, () -> completableFuture.complete(Optional.empty()));
+                            } else {
+                                scheduler.runTask(plugin, () -> completableFuture.complete(Optional.of(Gamemode.valueOf(g))));
+                            }
                         }
-                        return Optional.of(Gamemode.valueOf(g));
                     }
+                } catch (final SQLException e) {
+                    e.printStackTrace();
+                    completableFuture.completeExceptionally(e);
                 }
-            } catch (final SQLException e) {
-                e.printStackTrace();
-            }
-            return Optional.empty();
-        });
+            });
+        } else {
+            completableFuture.completeExceptionally(new SQLException("Could not find a connection."));
+        }
+
+        return completableFuture;
     }
 
 

@@ -58,7 +58,7 @@ public class MatchmakingVillagersListener implements Listener {
 
         if (!conn.isPresent()) return;
 
-        final CompletableFuture<Optional<Gamemode>> future = QueueTableUtils.getVillagerGamemode(uuid, conn.get());
+        final CompletableFuture<Optional<Gamemode>> future = QueueTableUtils.getVillagerGamemode(uuid, plugin);
 
         future.thenAccept((g) -> plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
             if (!g.isPresent()) return;

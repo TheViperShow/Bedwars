@@ -17,8 +17,7 @@ public class VillageQueueRemover extends AbstractTargetInteractor<Player, Villag
     public void perform() {
         final Optional<Villager> villager = lookupResult.getLookupResult();
         if (villager.isPresent()) {
-            MySQLDatabase.getConnection().ifPresent(connection -> {
-                QueueTableUtils.removeVillager(connection, villager.get())
+                QueueTableUtils.removeVillager(villager.get(), Bedwars.plugin)
                         .thenAccept(bool -> {
                            if (bool != null && bool) {
                                interested.sendMessage(Bedwars.PREFIX + "§eYou successfully removed that villager from database.");
@@ -26,7 +25,7 @@ public class VillageQueueRemover extends AbstractTargetInteractor<Player, Villag
                                interested.sendMessage(Bedwars.PREFIX + "§eThat villager was not associated with a database.");
                            }
                         });
-            });
+
         } else {
             interested.sendMessage(Bedwars.PREFIX + "§eYou were not looking at a villager.");
         }

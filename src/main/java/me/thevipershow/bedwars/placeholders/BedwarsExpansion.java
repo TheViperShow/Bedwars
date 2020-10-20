@@ -105,11 +105,9 @@ public final class BedwarsExpansion extends PlaceholderExpansion {
     }
 
     private String getPlayerTeam(final Player player) {
-        if (cachedTeamColors.containsKey(player.getUniqueId())) {
+        if (cachedTeamColors.containsKey(player.getUniqueId()) && System.currentTimeMillis() - cachedTeamColors.get(player.getUniqueId()).getA() <= 10_000) {
             final Pair<Long, Character> character = cachedTeamColors.get(player.getUniqueId());
-            if (System.currentTimeMillis() - character.getA() <= 15_000) {
-                return character.getB().toString();
-            }
+                return "&" + character.getB().toString();
         } else if (player.isOnline()) {
             final Player p = player.getPlayer();
             for (final ActiveGame activeGame : gameManager.getWorldsManager().getActiveGameList()) {
@@ -122,7 +120,7 @@ public final class BedwarsExpansion extends PlaceholderExpansion {
                         if (player1.getUniqueId().equals(player.getUniqueId())) {
                             final Character pChar = entry.getKey().getColorCode();
                             cachedTeamColors.put(player.getUniqueId(), new Pair<>(System.currentTimeMillis(), pChar));
-                            return pChar.toString();
+                            return "&" + pChar.toString();
                         }
                     }
                 }
@@ -147,6 +145,9 @@ public final class BedwarsExpansion extends PlaceholderExpansion {
 
     private String getPlayerCurrentExpRel(final Player player) {
         final Integer i = this.cachedExp.get(player.getUniqueId());
+        if (i == null) {
+            return "0";
+        }
         final int playerLevel = ExperienceManager.findLevelFromExp(i);
         final int playerLevelMinExp = ExperienceManager.requiredExpMap.get(playerLevel);
         final int playerNextLevelMinExp = ExperienceManager.requiredExpMap.get(playerLevel + 1);
@@ -159,6 +160,9 @@ public final class BedwarsExpansion extends PlaceholderExpansion {
 
     private String getPlayerCurrentLevelExpRel(final Player player) {
         final Integer i = this.cachedExp.get(player.getUniqueId());
+        if (i == null) {
+            return Integer.toString(ExperienceManager.FIRST_LVL);
+        }
         final int playerLevel = ExperienceManager.findLevelFromExp(i);
         final int playerLevelMinExp = ExperienceManager.requiredExpMap.get(playerLevel);
         final int playerNextLevelMinExp = ExperienceManager.requiredExpMap.get(playerLevel + 1);

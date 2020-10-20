@@ -77,6 +77,7 @@ public final class DataResetTableUtils {
                     }
                 } catch (final SQLException e) {
                     e.printStackTrace();
+                    longCompletableFuture.completeExceptionally(e);
                 }
             });
 
@@ -108,6 +109,7 @@ public final class DataResetTableUtils {
                     }
                 } catch (final SQLException e) {
                     e.printStackTrace();
+                    longCompletableFuture.completeExceptionally(e);
                 }
             });
 

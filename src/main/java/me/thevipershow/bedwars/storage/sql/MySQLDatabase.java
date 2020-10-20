@@ -43,7 +43,7 @@ public final class MySQLDatabase extends Database {
         dataSrc.setUsername(defaultConfiguration.getDatabaseUsername());
         dataSrc.setPassword(defaultConfiguration.getPassword());
         dataSrc.setDriverClassName(Bedwars.MYSQL_DRIVER_CLASS);
-        dataSrc.setConnectionTimeout(3500);
+        dataSrc.setConnectionTimeout(500);
         dataSource = dataSrc;
         LoggerUtils.logColor(plugin.getLogger(), "&eAttempting MySQL Connection to address ->&a" + jdbcUrl);
         createTables();

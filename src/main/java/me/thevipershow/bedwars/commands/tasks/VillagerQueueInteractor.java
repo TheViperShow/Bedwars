@@ -11,7 +11,7 @@ public class VillagerQueueInteractor extends AbstractTargetInteractor<Player, Vi
 
     private final Gamemode gamemode;
 
-    public VillagerQueueInteractor(Player interested, Gamemode gamemode) {
+    public VillagerQueueInteractor(final Player interested, final Gamemode gamemode) {
         super(interested, new PlayerVillagerLookupResult(interested));
         this.gamemode = gamemode;
     }
@@ -19,7 +19,7 @@ public class VillagerQueueInteractor extends AbstractTargetInteractor<Player, Vi
     @Override
     public void perform() {
         if (lookupResult.getLookupResult().isPresent()) {
-            MySQLDatabase.getConnection().ifPresent(c -> QueueTableUtils.addVillager(c, lookupResult.getLookupResult().get(), gamemode));
+            QueueTableUtils.addVillager(lookupResult.getLookupResult().get(), gamemode, Bedwars.plugin);
             interested.sendMessage(Bedwars.PREFIX + String.format("§eYou successfully setup a %s bedwars queue villager", gamemode.name().toLowerCase()));
         } else {
             interested.sendMessage(Bedwars.PREFIX + "§eYou were not looking at villagers.");
