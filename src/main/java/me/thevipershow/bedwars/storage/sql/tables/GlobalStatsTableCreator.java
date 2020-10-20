@@ -14,7 +14,10 @@ public final class GlobalStatsTableCreator extends TableCreator {
                         " quad_wins INT NOT NULL," +
                         " solo_kills INT NOT NULL," +
                         " duo_kills INT NOT NULL," +
-                        " quad_kills INT NOT NULL",
+                        " quad_kills INT NOT NULL," +
+                        " solo_fkills INT NOT NULL," +
+                        " duo_fkills INT NOT NULL," +
+                        " quad_fkills INT NOT NULL",
                 connection);
     }
 }

@@ -86,7 +86,7 @@ public final class GlobalStatsTableUtils {
         }
     }
 
-    public static void cacheKillsIntoMap(final Map<UUID, Kills> map, final Plugin plugin) {
+    public static void cacheKillsIntoMap(final Map<UUID, Kills> map, final Plugin plugin, final boolean finalKill) {
 
         final BukkitScheduler scheduler = plugin.getServer().getScheduler();
         final Optional<Connection> optionalConnection = MySQLDatabase.getConnection();
@@ -99,8 +99,13 @@ public final class GlobalStatsTableUtils {
                 final HashMap<UUID, Kills> wMap = new HashMap<>();
                 while (rs.next()) {
                     final UUID uuid = UUID.fromString(rs.getString("uuid"));
-                    final Kills wins = new Kills(rs.getInt("solo_kills"), rs.getInt("duo_kills"), rs.getInt("quad_kills"));
-                    wMap.put(uuid, wins);
+                    if (finalKill) {
+                        final Kills killz = new Kills(rs.getInt("solo_kills"), rs.getInt("duo_kills"), rs.getInt("quad_kills"));
+                        wMap.put(uuid, killz);
+                    } else {
+                        final Kills finalKillz = new Kills(rs.getInt("solo_fkills"), rs.getInt("duo_fkills"), rs.getInt("quad_fkills"));
+                        wMap.put(uuid, finalKillz);
+                    }
                 }
 
                 scheduler.runTask(plugin, () -> {
@@ -120,8 +125,8 @@ public final class GlobalStatsTableUtils {
 
         optionalConnection.ifPresent(connection -> scheduler.runTaskAsynchronously(plugin, () -> {
             try (final Connection conn = connection;
-                final PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + GlobalStatsTableCreator.TABLE + ";");
-                final ResultSet rs = ps.executeQuery()) {
+                 final PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + GlobalStatsTableCreator.TABLE + ";");
+                 final ResultSet rs = ps.executeQuery()) {
 
                 final HashMap<UUID, Wins> wMap = new HashMap<>();
                 while (rs.next()) {
@@ -140,7 +145,7 @@ public final class GlobalStatsTableUtils {
         }));
     }
 
-    public static void increaseKills(final Gamemode gamemode, final Plugin plugin, final UUID uuid) {
+    public static void increaseKills(final Gamemode gamemode, final Plugin plugin, final UUID uuid, final boolean finalKill) {
         final Optional<Connection> conn = MySQLDatabase.getConnection();
 
         conn.ifPresent(connection -> {
@@ -149,15 +154,15 @@ public final class GlobalStatsTableUtils {
             switch (gamemode) {
                 case SOLO:
                     replace = 5;
-                    update = "solo_kills";
+                    update = !finalKill ? "solo_kills" : "solo_fkills";
                     break;
                 case DUO:
                     replace = 6;
-                    update = "duo_kills";
+                    update = !finalKill ? "duo_kills" : "duo_fkills";
                     break;
                 case QUAD:
                     replace = 7;
-                    update = "quad_kills";
+                    update = !finalKill ? "quad_kills" : "quad_fkills";
                     break;
                 default:
                     break;
@@ -168,15 +173,15 @@ public final class GlobalStatsTableUtils {
             plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
                 try (final Connection con = connection;
                      final PreparedStatement ps = con.prepareStatement(
-                             "INSERT INTO " + GlobalStatsTableCreator.TABLE + " (uuid, solo_wins, duo_wins, quad_wins, solo_kills, duo_kills, quad_kills) VALUES (?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE " + finalUpdate + " = " + finalUpdate + " ?;")) {
+                             "INSERT INTO " + GlobalStatsTableCreator.TABLE + " (uuid, solo_wins, duo_wins, quad_wins, solo_kills, duo_kills, quad_kills, solo_fkills, duo_fkills, quad_fkills) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE " + finalUpdate + " = " + finalUpdate + " + ?;")) {
 
                     ps.setString(1, uuid.toString());
-                    for (int i = 2; i <= 7; i++) {
+                    for (int i = 2; i <= 10; i++) {
                         ps.setInt(i, finalReplace == i ? 1 : 0);
                     }
-                    ps.setInt(8, 1);
+                    ps.setInt(11, 1);
                     ps.executeUpdate();
-                } catch (final SQLException e ) {
+                } catch (final SQLException e) {
                     e.printStackTrace();
                 }
             });
@@ -210,16 +215,16 @@ public final class GlobalStatsTableUtils {
             final int finalReplace = replace;
             plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
                 try (final Connection con = connection;
-                    final PreparedStatement ps = con.prepareStatement(
-                            "INSERT INTO " + GlobalStatsTableCreator.TABLE + " (uuid, solo_wins, duo_wins, quad_wins, solo_kills, duo_kills, quad_kills) VALUES (?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE " + finalUpdate + " = " + finalUpdate + " ?;")) {
+                     final PreparedStatement ps = con.prepareStatement(
+                             "INSERT INTO " + GlobalStatsTableCreator.TABLE + " (uuid, solo_wins, duo_wins, quad_wins, solo_kills, duo_kills, quad_kills, solo_fkills, duo_fkills, quad_fkills) VALUES (?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE " + finalUpdate + " = " + finalUpdate + " + ?;")) {
 
                     ps.setString(1, uuid.toString());
-                    for (int i = 2; i <= 7; i++) {
+                    for (int i = 2; i <= 10; i++) {
                         ps.setInt(i, finalReplace == i ? 1 : 0);
                     }
-                    ps.setInt(8, 1);
+                    ps.setInt(11, 1);
                     ps.executeUpdate();
-                } catch (final SQLException e ) {
+                } catch (final SQLException e) {
                     e.printStackTrace();
                 }
             });

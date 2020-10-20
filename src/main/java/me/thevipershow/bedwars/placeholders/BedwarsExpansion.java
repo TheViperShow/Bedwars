@@ -33,6 +33,7 @@ public final class BedwarsExpansion extends PlaceholderExpansion {
     private final HashMap<UUID, Integer> cachedExp = new HashMap<>();
     private final HashMap<UUID, GlobalStatsTableUtils.Wins> cachedWins = new HashMap<>();
     private final HashMap<UUID, GlobalStatsTableUtils.Kills> cachedKills = new HashMap<>();
+    private final HashMap<UUID, GlobalStatsTableUtils.Kills> cachedFinalKills = new HashMap<>();
 
     public BedwarsExpansion(final GameManager gameManager) {
         this.gameManager = gameManager;
@@ -60,7 +61,10 @@ public final class BedwarsExpansion extends PlaceholderExpansion {
     private void startCacheKillsTask() {
         if (this.cacheKillsTask == null) {
             LoggerUtils.logColor(gameManager.getPlugin().getLogger(), "&eCaching player kills into local data. . .");
-            this.cacheKillsTask = gameManager.getPlugin().getServer().getScheduler().runTaskTimer(gameManager.getPlugin(), () -> GlobalStatsTableUtils.cacheKillsIntoMap(this.cachedKills, gameManager.getPlugin()), 1L, 20L * 60L);
+            this.cacheKillsTask = gameManager.getPlugin().getServer().getScheduler().runTaskTimer(gameManager.getPlugin(), () -> {
+                GlobalStatsTableUtils.cacheKillsIntoMap(this.cachedKills, gameManager.getPlugin(),false);
+                GlobalStatsTableUtils.cacheKillsIntoMap(this.cachedFinalKills, gameManager.getPlugin(), true);
+            }, 1L, 20L * 60L);
         }
     }
 
@@ -174,23 +178,35 @@ public final class BedwarsExpansion extends PlaceholderExpansion {
         }
     }
 
-    private String getKills(final Gamemode gamemode, final Player player) {
-        final int i = this.cachedKills.get(player.getUniqueId()).getKills(gamemode);
-        return Integer.toString(i);
+    private String getKills(final Gamemode gamemode, final Player player, final boolean finalKill) {
+        final Integer i = !finalKill ? this.cachedKills.get(player.getUniqueId()).getKills(gamemode) : this.cachedFinalKills.get(player.getUniqueId()).getKills(gamemode);
+        if (i == null) {
+            return "0";
+        }
+        return i.toString();
     }
 
     private String getWins(final Gamemode gamemode, final Player player) {
+        if (!cachedWins.containsKey(player.getUniqueId())) {
+            return "0";
+        }
         final int i = this.cachedWins.get(player.getUniqueId()).getWin(gamemode);
         return Integer.toString(i);
     }
 
     private String getTotalWins(final Player player) {
         final GlobalStatsTableUtils.Wins wins = this.cachedWins.get(player.getUniqueId());
+        if (wins == null) {
+            return "0";
+        }
         return Integer.toString(wins.getSoloWins() + wins.getDuoWins() + wins.getQuadWins());
     }
 
-    private String getTotalKills(final Player player) {
-        final GlobalStatsTableUtils.Kills kills = this.cachedKills.get(player.getUniqueId());
+    private String getTotalKills(final Player player, final boolean finalKills) {
+        final GlobalStatsTableUtils.Kills kills = finalKills ? this.cachedFinalKills.get(player.getUniqueId()) : this.cachedKills.get(player.getUniqueId());
+        if (kills == null) {
+            return "0";
+        }
         return Integer.toString(kills.getSoloKills() + kills.getDuoKills() + kills.getQuadKills());
     }
 
@@ -213,13 +229,21 @@ public final class BedwarsExpansion extends PlaceholderExpansion {
             case "team_colour":
                 return getPlayerTeam(player);
             case "solo_kills":
-                return getKills(Gamemode.SOLO, player);
+                return getKills(Gamemode.SOLO, player, true);
             case "duo_kills":
-                return getKills(Gamemode.DUO, player);
+                return getKills(Gamemode.DUO, player, true);
             case "quad_kills":
-                return getKills(Gamemode.QUAD, player);
+                return getKills(Gamemode.QUAD, player, true);
             case "total_kills":
-                return getTotalKills(player);
+                return getTotalKills(player, true);
+            case "solo_fkills":
+                return getKills(Gamemode.SOLO, player, false);
+            case "duo_fkills":
+                return getKills(Gamemode.DUO, player, false);
+            case "quad_fkills":
+                return getKills(Gamemode.QUAD, player, false);
+            case "total_fkills":
+                return getTotalKills(player, false);
             case "solo_wins":
                 return getWins(Gamemode.SOLO, player);
             case "duo_wins":

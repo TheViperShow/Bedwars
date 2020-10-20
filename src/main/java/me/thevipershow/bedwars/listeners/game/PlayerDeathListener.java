@@ -207,10 +207,14 @@ public final class PlayerDeathListener extends UnregisterableListener {
         return msg.toString();
     }
 
-    public static void deathLogic(final ActiveGame activeGame, final BedwarsTeam b, final Player p, final EntityDamageEvent event) {
+    public static boolean deathLogic(final ActiveGame activeGame, final BedwarsTeam b, final Player p, final EntityDamageEvent event) {
+        boolean isFinal = false;
+
         if (activeGame.getDestroyedTeams().contains(b) || activeGame.getAbstractDeathmatch().isRunning()) { // Checking if players' team's bed has been broken previously.
             // here player has lost the game.
             // or has died permanently since the deathmatch mode is ON.
+
+            isFinal = true;
 
             activeGame.removePlayer(p);
             p.setAllowFlight(true);
@@ -268,6 +272,7 @@ public final class PlayerDeathListener extends UnregisterableListener {
         }
 
         p.setHealth(p.getMaxHealth());
+        return isFinal;
     }
 
     @EventHandler()
@@ -289,22 +294,21 @@ public final class PlayerDeathListener extends UnregisterableListener {
             final BedwarsTeam b = activeGame.getPlayerTeam(p);
 
             p.closeInventory();
-            deathLogic(activeGame, b, p, event);
+            final boolean isFinal = deathLogic(activeGame, b, p, event);
             event.setCancelled(true);
 
             if (event instanceof EntityDamageByEntityEvent) {
                 final EntityDamageByEntityEvent edbee = (EntityDamageByEntityEvent) event;
                 final Entity damager = edbee.getDamager();
                 if (damager instanceof Player) {
-                    GlobalStatsTableUtils.increaseKills(activeGame.getBedwarsGame().getGamemode(), activeGame.getPlugin(), damager.getUniqueId());
+                    GlobalStatsTableUtils.increaseKills(activeGame.getBedwarsGame().getGamemode(), activeGame.getPlugin(), damager.getUniqueId(), isFinal);
                     GameUtils.sendKillActionBar(activeGame, (Player) damager,  p);
                     ((Player) damager).playSound(damager.getLocation(), Sound.SPLASH, 8.50f, 0.65f);
                 }
             }
 
-
         } else if (event.getCause() == DamageCause.FALL) {
-            p.setNoDamageTicks(10);    // Making him invincible for 0.5s.
+            p.setNoDamageTicks(0x10);    // Making him invincible for 0.5s.
         }
     }
 }

@@ -66,7 +66,7 @@ public final class DataCleaner {
     public final void stopTasks() {
         for (final BukkitTask task : this.cleanTask) {
             if (task != null) {
-                LoggerUtils.logColor(plugin.getLogger(), "&bRemoving clean task: &e" + task.getTaskId());
+                LoggerUtils.logColor(plugin.getLogger(), "&eRemoving clean task: &e" + task.getTaskId());
                 task.cancel();
             }
         }
