@@ -52,7 +52,7 @@ public final class PotionModifyListener extends UnregisterableListener {
         this.activeGame = activeGame;
     }
 
-    @EventHandler
+    @EventHandler()
     public void onPlayerInteract(final PlayerInteractEvent event) {
 
         final Player p = event.getPlayer();
@@ -84,8 +84,11 @@ public final class PotionModifyListener extends UnregisterableListener {
 
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onCustomDrink(final CustomDrinkEvent event) {
+        if (!activeGame.isHasStarted()) {
+            return;
+        }
         final Player player = event.getPlayer();
 
         for (PotionItem potionItem : activeGame.getBedwarsGame().getShop().getPotionItem()) {

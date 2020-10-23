@@ -18,8 +18,12 @@ public final class PlayerSpectatePlayerListener extends UnregisterableListener {
         this.activeGame = activeGame;
     }
 
-    @EventHandler(priority = EventPriority.LOW)
+    @EventHandler(ignoreCancelled = true,priority = EventPriority.HIGHEST)
     public void onPlayerInteractEntity(final PlayerInteractEntityEvent event) {
+        if (!activeGame.isHasStarted()) {
+            return;
+        }
+
         final Player player = event.getPlayer();
         if (!player.getWorld().equals(activeGame.getAssociatedWorld())) {
             return;

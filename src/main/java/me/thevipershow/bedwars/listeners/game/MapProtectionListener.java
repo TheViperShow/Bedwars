@@ -50,9 +50,14 @@ public final class MapProtectionListener extends UnregisterableListener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public final void onPlayerDeath(final BlockPlaceEvent event) {
         final Block block = event.getBlock();
+
+        if (!activeGame.isHasStarted()) {
+            return;
+        }
+
         if (!block.getWorld().equals(activeGame.getAssociatedWorld())) return;
 
         if (isBlockNearSpawner(block) || isBlockInsideSpawn(block) || isBlockInsideMerchant(block)) {

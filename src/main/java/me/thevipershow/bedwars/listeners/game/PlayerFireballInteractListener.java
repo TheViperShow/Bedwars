@@ -25,10 +25,16 @@ public final class PlayerFireballInteractListener extends UnregisterableListener
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerInteract(final PlayerInteractEvent event) {
+
+        if (!activeGame.isHasStarted()) {
+            return;
+        }
+
         final Player player = event.getPlayer();
         if (!player.getWorld().equals(activeGame.getAssociatedWorld())) return;
 
         final Action action = event.getAction();
+
         if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
             final ItemStack itemInHand = player.getInventory().getItemInHand();
 
@@ -41,11 +47,12 @@ public final class PlayerFireballInteractListener extends UnregisterableListener
 
             final Location pEyeLoc = player.getEyeLocation();
             final Vector playerDirection = pEyeLoc.getDirection();
-            final Location shootLocation = pEyeLoc.add(playerDirection.clone().multiply(1.050));
+            final Location shootLocation = pEyeLoc.add(playerDirection.clone().multiply(1.10));
 
             final Fireball fireball = (Fireball) activeGame.getAssociatedWorld().spawnEntity(shootLocation, EntityType.FIREBALL);
             fireball.setVelocity(shootLocation.getDirection());
             fireball.setIsIncendiary(true);
+            fireball.setYield(2.50f);
             event.setCancelled(true);
             GameUtils.decreaseItemInHand(player);
         }

@@ -18,10 +18,15 @@ public final class ItemDegradeListener extends UnregisterableListener {
     public void onPlayerItemConsume(final PlayerItemDamageEvent event) {
         final Player player = event.getPlayer();
 
-        if (!player.getWorld().equals(activeGame.getAssociatedWorld())) {
+        if (!activeGame.isHasStarted()) {
             return;
         }
 
-        event.setCancelled(true);
+        if (player.getWorld().equals(activeGame.getAssociatedWorld())) {
+            event.setDamage(0);
+            event.setCancelled(true);
+        }
     }
+
+
 }

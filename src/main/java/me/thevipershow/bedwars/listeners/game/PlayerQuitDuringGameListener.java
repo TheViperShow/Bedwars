@@ -19,11 +19,18 @@ public final class PlayerQuitDuringGameListener extends UnregisterableListener {
         this.activeGame = activeGame;
     }
 
-    @EventHandler(priority = EventPriority.NORMAL)
+    @EventHandler(ignoreCancelled = true)
     public void onPlayerQuit(final PlayerQuitEvent event) {
+
+        if (!activeGame.isHasStarted()) {
+            return;
+        }
+
         final Player p = event.getPlayer();
         final World w = p.getWorld();
-        if (!w.equals(activeGame.getAssociatedWorld())) return;
+        if (!w.equals(activeGame.getAssociatedWorld())) {
+            return;
+        }
 
         activeGame.getAssociatedWorld().getPlayers().forEach(P -> P.sendMessage(Bedwars.PREFIX + "§7" + p.getName() + " §ehas left this game."));
         if (!activeGame.isHasStarted()) {
@@ -37,8 +44,7 @@ public final class PlayerQuitDuringGameListener extends UnregisterableListener {
                 || activeGame.getTeamPlayers(pTeam)
                 .stream()
                 .filter(P -> P.isOnline() && !activeGame.isOutOfGame(P))
-                .count() == 1L
-        ) {
+                .count() == 1L) {
             activeGame.getDestroyedTeams().add(pTeam);
         }
 

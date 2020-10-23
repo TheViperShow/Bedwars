@@ -21,10 +21,10 @@ public final class LevelUpListener extends UnregisterableListener {
 
     private void sendLevelUpMsg(final BedwarsLevelUpEvent e) {
         final Player player = e.getPlayer();
-        player.sendMessage("--------------------------------");
+        player.sendMessage("§7--------------------------------");
         player.sendMessage("            §a♫ §6LEVEL UP! §a♫");
         player.sendMessage("         §eYou are now §3Level " + e.getNewLevel() + "§8!");
-        player.sendMessage("--------------------------------");
+        player.sendMessage("§7--------------------------------");
     }
 
     private void levelUpEffects(final Player player) {
@@ -37,7 +37,6 @@ public final class LevelUpListener extends UnregisterableListener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
     public void onBedwarsLevelUp(final BedwarsLevelUpEvent event) {
-
         sendLevelUpMsg(event);
         levelUpEffects(event.getPlayer());
     }

@@ -64,6 +64,7 @@ public class ActiveSpawner {
             start += LOOP_INCREASE;
             lastYaw += YAW_INCREASE;
         }
+
         return new ImmutableTraversableList<>(animationValues);
     }
 

@@ -20,7 +20,7 @@ public final class SpectatorsInteractListener extends UnregisterableListener {
     private final ActiveGame activeGame;
 
     private <T extends Event & Cancellable> void cancel(final Player player, final T cancellableEvent) {
-        if (activeGame.isOutOfGame(player)) {
+        if (activeGame.isOutOfGame(player) && activeGame.isHasStarted()) {
             cancellableEvent.setCancelled(true);
         }
     }

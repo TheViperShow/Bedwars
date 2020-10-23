@@ -186,8 +186,11 @@ public final class ShopInteractListener extends UnregisterableListener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onInventoryClick(final InventoryClickEvent event) {
+        if (!activeGame.isHasStarted()) {
+            return;
+        }
         final HumanEntity entity = event.getWhoClicked();
         if (!(entity instanceof Player)) {
             return;

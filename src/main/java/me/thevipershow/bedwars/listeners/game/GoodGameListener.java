@@ -24,6 +24,10 @@ public final class GoodGameListener extends UnregisterableListener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
     public void onAsyncPlayerChat(final AsyncPlayerChatEvent event) {
 
+        if (!activeGame.isHasStarted()) {
+            return;
+        }
+
         final Player p = event.getPlayer();
         if (!rewarded.contains(p) && p.getWorld().equals(activeGame.getAssociatedWorld())) {
 

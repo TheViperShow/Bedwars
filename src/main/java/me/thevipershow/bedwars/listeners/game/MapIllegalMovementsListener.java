@@ -79,8 +79,15 @@ public final class MapIllegalMovementsListener extends UnregisterableListener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
     public void onPlayerMove(final PlayerMoveEvent event) {
         final Player player = event.getPlayer();
-        if (!activeGame.getAssociatedWorld().equals(player.getWorld())) return;
-        if (!activeGame.isHasStarted()) return;
+        if (!activeGame.isHasStarted()) {
+            return;
+        }
+        if (!activeGame.getAssociatedWorld().equals(player.getWorld())) {
+            return;
+        }
+        if (!activeGame.isHasStarted()) {
+            return;
+        }
         if (isOutOfBounds(player)) {
             if (activeGame.isOutOfGame(player)) {
                 event.setCancelled(true);

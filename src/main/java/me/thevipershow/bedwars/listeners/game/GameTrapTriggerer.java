@@ -30,7 +30,6 @@ public final class GameTrapTriggerer {
 
         task = activeGame.getPlugin().getServer().getScheduler()
                 .runTaskTimer(activeGame.getPlugin(), () -> {
-
                     teamTrapsLabel:
                     for (final Map.Entry<BedwarsTeam, LinkedList<ActiveTrap>> teamActiveTraps : activeGame.getTeamActiveTrapsList().entrySet()) {
                         final LinkedList<ActiveTrap> traps = teamActiveTraps.getValue();  // Getting all active traps lists
@@ -97,7 +96,7 @@ public final class GameTrapTriggerer {
                             }
                         }
                     }
-                }, 1L, 20L);
+                }, 20L, 20L);
     }
 
     public final void stop() {

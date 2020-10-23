@@ -43,11 +43,18 @@ public final class BedBreakListener extends UnregisterableListener {
         return nearestTeam;
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    @EventHandler(ignoreCancelled = true)
     public void onBlockBreak(final BlockBreakEvent event) {
         final Player p = event.getPlayer();
         final Block b = event.getBlock();
-        if (!b.getWorld().equals(activeGame.getAssociatedWorld())) return;
+
+        if (!activeGame.isHasStarted()) {
+            return;
+        }
+
+        if (!b.getWorld().equals(activeGame.getAssociatedWorld())) {
+            return;
+        }
 
         if (activeGame.getPlayerPlacedBlocks().contains(b)) {
             activeGame.getPlayerPlacedBlocks().remove(b);

@@ -11,6 +11,7 @@ import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.bedwars.objects.spawners.SpawnerType;
 import me.thevipershow.bedwars.config.objects.Merchant;
 import me.thevipershow.bedwars.config.objects.TeamSpawnPosition;
+import me.thevipershow.bedwars.config.objects.upgradeshop.UpgradeType;
 import me.thevipershow.bedwars.listeners.game.ArmorSet;
 import net.minecraft.server.v1_8_R3.ChatMessage;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
@@ -182,6 +183,43 @@ public final class GameUtils {
     public static void sendKillActionBar(final ActiveGame activeGame, final Player killer, final Player killed) {
         final PlayerConnection conn = getPlayerConnection(killer);
         conn.sendPacket(killActionBar(activeGame, killed));
+    }
+
+    public static void clearInvExceptArmorAndTools(final Player player, final ActiveGame game) {
+        final PlayerInventory inv = player.getInventory();
+        final ItemStack[] contents = inv.getContents();
+
+        for (int i = 0; i < contents.length; i++) {
+            final ItemStack stack = contents[i];
+            if (stack == null) {
+                continue;
+            } else if (stack.getType().name().endsWith("_SWORD")) { // Checking if player has sword
+                if (stack.getType() != Material.WOOD_SWORD) {
+                    final Map<Enchantment, Integer> availableEnchs = stack.getEnchantments();
+                    if (availableEnchs.isEmpty()) {
+                        inv.setItem(i, new ItemStack(Material.WOOD_SWORD, 1));
+                    } else {
+                        final ItemStack es = new ItemStack(Material.WOOD_SWORD, 1);
+                        es.addEnchantments(availableEnchs);
+                        inv.setItem(i, es);
+                    }
+                }
+                continue;
+            } else if (game.getBedwarsGame().getShop().getUpgradeItems()
+                    .stream()
+                    .flatMap(shop -> shop.getLevels().stream())
+                    .anyMatch(lvl -> lvl.getCachedGameStack().isSimilar(stack))) {
+                continue;
+            }
+            inv.setItem(i, null);
+        }
+
+        game.downgradePlayerTools(player);
+
+        final int enchantLvl = game.getUpgradesLevelsMap().get(UpgradeType.SHARPNESS).get(game.getPlayerTeam(player));
+        if (enchantLvl != 0) {
+            GameUtils.enchantSwords(Enchantment.DAMAGE_ALL, enchantLvl, player); // Adding enchant if he has the Upgrade.
+        }
     }
 
     public static void giveStackToPlayer(final ItemStack itemStack, final Player player, final ItemStack[] contents) {

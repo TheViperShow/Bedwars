@@ -3,6 +3,7 @@ package me.thevipershow.bedwars.game;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import me.thevipershow.bedwars.events.BedwarsLevelUpEvent;
@@ -81,21 +82,29 @@ public final class ExperienceManager {
 
     public static void rewardPlayer(final int experience, final Player p, final ActiveGame activeGame) {
         if (p.isOnline() && !activeGame.isOutOfGame(p)) {
-            RankTableUtils.rewardPlayerExp(p, experience, activeGame.getPlugin()); // rewarding him exp
-            RankTableUtils.getPlayerExp(p.getUniqueId(), activeGame.getPlugin()).thenAccept(pExp -> {
-                if (pExp != 0) {
-                    final Optional<Integer> hasLevelledUp = hasLevelledUp(pExp, experience);
-                    hasLevelledUp.ifPresent(newLevel -> {
-                        final BedwarsLevelUpEvent e = new BedwarsLevelUpEvent(p, (newLevel - 1), newLevel, activeGame);
-                        activeGame.getPlugin().getServer().getPluginManager().callEvent(e);
+            RankTableUtils.getPlayerExp(p.getUniqueId(), activeGame.getPlugin())
+                    .thenAccept(pExp -> {
+                        if (pExp + experience != 0) {
+                            final Optional<Integer> hasLevelledUp = hasLevelledUp(pExp + experience, experience);
+                            hasLevelledUp.ifPresent(newLevel -> {
+                                final BedwarsLevelUpEvent e = new BedwarsLevelUpEvent(p, (newLevel - 1), newLevel, activeGame);
+                                activeGame.getPlugin().getServer().getPluginManager().callEvent(e);
+                            });
+                        }
                     });
-                }
-            });
+
+            RankTableUtils.rewardPlayerExp(p, experience, activeGame.getPlugin()); // rewarding him exp
         }
     }
 
     private void rewardAllPlayingPlayers(final int experience) {
-        activeGame.getAssignedTeams().values().stream().flatMap(Collection::stream).forEach(p -> rewardPlayer(experience, p, this.activeGame));
+        for (final List<Player> value : activeGame.getAssignedTeams().values()) {
+            for (final Player player : value) {
+                if (player.isOnline()) {
+                    rewardPlayer(experience, player, this.activeGame);
+                }
+            }
+        }
     }
 
     public final void startRewardTask() {

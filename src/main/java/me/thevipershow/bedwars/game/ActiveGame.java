@@ -47,30 +47,7 @@ import me.thevipershow.bedwars.config.objects.upgradeshop.traps.MinerFatigueTrap
 import me.thevipershow.bedwars.game.upgrades.ActiveHealPool;
 import me.thevipershow.bedwars.game.upgrades.ActiveTrap;
 import me.thevipershow.bedwars.listeners.UnregisterableListener;
-import me.thevipershow.bedwars.listeners.game.ArmorSet;
-import me.thevipershow.bedwars.listeners.game.BedBreakListener;
-import me.thevipershow.bedwars.listeners.game.EntityDamageListener;
-import me.thevipershow.bedwars.listeners.game.ExplosionListener;
-import me.thevipershow.bedwars.listeners.game.GameTrapTriggerer;
-import me.thevipershow.bedwars.listeners.game.GoodGameListener;
-import me.thevipershow.bedwars.listeners.game.HungerLossListener;
-import me.thevipershow.bedwars.listeners.game.ItemDegradeListener;
-import me.thevipershow.bedwars.listeners.game.LevelUpListener;
-import me.thevipershow.bedwars.listeners.game.LobbyCompassListener;
-import me.thevipershow.bedwars.listeners.game.MapIllegalMovementsListener;
-import me.thevipershow.bedwars.listeners.game.MapProtectionListener;
-import me.thevipershow.bedwars.listeners.game.PlayerDeathListener;
-import me.thevipershow.bedwars.listeners.game.PlayerFireballInteractListener;
-import me.thevipershow.bedwars.listeners.game.PlayerQuitDuringGameListener;
-import me.thevipershow.bedwars.listeners.game.PlayerSpectatePlayerListener;
-import me.thevipershow.bedwars.listeners.game.PotionModifyListener;
-import me.thevipershow.bedwars.listeners.game.ShopInteractListener;
-import me.thevipershow.bedwars.listeners.game.ShopMerchantListener;
-import me.thevipershow.bedwars.listeners.game.SpawnersMultigiveListener;
-import me.thevipershow.bedwars.listeners.game.SpectatorsInteractListener;
-import me.thevipershow.bedwars.listeners.game.TNTPlaceListener;
-import me.thevipershow.bedwars.listeners.game.UpgradeInteractListener;
-import me.thevipershow.bedwars.listeners.game.UpgradeMerchantListener;
+import me.thevipershow.bedwars.listeners.game.*;
 import me.thevipershow.bedwars.storage.sql.tables.GlobalStatsTableUtils;
 import me.thevipershow.bedwars.worlds.WorldsManager;
 import me.tigerhix.lib.scoreboard.common.EntryBuilder;
@@ -137,6 +114,8 @@ public abstract class ActiveGame {
     protected final Map<UUID, Inventory> associatedUpgradeGUI = new HashMap<>();
     protected final Map<UUID, Inventory> associatedTrapsGUI = new HashMap<>();
 
+    protected final Map<UUID, UUID> placedTntMap = new HashMap<>();
+
     protected final Map<Player, Map<UpgradeItem, Integer>> playerUpgradeLevelsMap = new HashMap<>();
     protected final Map<Player, Scoreboard> activeScoreboards = new HashMap<>();
     protected final EnumMap<UpgradeType, Map<BedwarsTeam, Integer>> upgradesLevelsMap = new EnumMap<>(UpgradeType.class);
@@ -149,7 +128,6 @@ public abstract class ActiveGame {
     //                                               //
     protected boolean hasStarted = false;            //
     protected boolean winnerDeclared = false;        //
-
     protected BukkitTask timerTask = null;           //
     protected final GameLobbyTicker gameLobbyTicker; //
     protected long startTime;                        //
@@ -484,7 +462,7 @@ public abstract class ActiveGame {
         final UnregisterableListener mapIllegalMovementsListener = new MapIllegalMovementsListener(this);
         final UnregisterableListener bedDestroyListener = new BedBreakListener(this);
         final UnregisterableListener lobbyCompassListener = new LobbyCompassListener(this);
-        final UnregisterableListener deathListener = new PlayerDeathListener(this);
+        final UnregisterableListener deathListener = new PlayerDeathListener2(this);
         final UnregisterableListener quitListener = new PlayerQuitDuringGameListener(this);
         final UnregisterableListener merchantListener = new ShopMerchantListener(this);
         final UnregisterableListener entityDamageListener = new EntityDamageListener(this);
@@ -1083,7 +1061,11 @@ public abstract class ActiveGame {
         return emeraldBoostDrops;
     }
 
-    public KillTracker getKillTracker() {
+    public final Map<UUID, UUID> getPlacedTntMap() {
+        return placedTntMap;
+    }
+
+    public final KillTracker getKillTracker() {
         return killTracker;
     }
 }

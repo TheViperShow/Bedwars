@@ -20,13 +20,20 @@ public final class TNTPlaceListener extends UnregisterableListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockPlace(final BlockPlaceEvent event) {
-        if (!event.getBlock().getWorld().equals(activeGame.getAssociatedWorld())) return;
+        if (!activeGame.isHasStarted()) {
+            return;
+        }
+
+        if (!event.getBlock().getWorld().equals(activeGame.getAssociatedWorld())) {
+            return;
+        }
         final Block b = event.getBlock();
         if (b.getType() == Material.TNT) {
             GameUtils.decreaseItemInHand(event.getPlayer());
             event.setCancelled(true);
             final TNTPrimed tnt = (TNTPrimed) b.getWorld().spawnEntity(b.getLocation().add(0.501, 0.05, 0.501), EntityType.PRIMED_TNT);
             tnt.setFuseTicks(activeGame.getBedwarsGame().getTntFuse());
+            activeGame.getPlacedTntMap().put(tnt.getUniqueId(), event.getPlayer().getUniqueId());
         }
     }
 }

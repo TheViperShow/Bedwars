@@ -294,8 +294,11 @@ public final class UpgradeInteractListener extends UnregisterableListener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(ignoreCancelled = true,priority = EventPriority.HIGHEST)
     public void onInventoryClick(final InventoryClickEvent event) {
+        if (!activeGame.isHasStarted()) {
+            return;
+        }
         final HumanEntity entity = event.getWhoClicked();
         if (!(entity instanceof Player)) {
             return;
