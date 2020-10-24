@@ -4,11 +4,16 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import me.thevipershow.bedwars.game.ExperienceManager;
+import me.thevipershow.bedwars.game.Pair;
 import me.thevipershow.bedwars.storage.sql.MySQLDatabase;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -57,7 +62,7 @@ public final class RankTableUtils {
         });
     }
 
-    public static void cacheIntoMap(final Map<UUID, Integer> map, final Plugin plugin) {
+    public static void cacheIntoMap(final LinkedHashMap<UUID, Integer> map, LinkedList<Pair<UUID, Integer>> top, final Plugin plugin) {
 
         final BukkitScheduler scheduler = plugin.getServer().getScheduler();
         final Optional<Connection> optionalConnection = MySQLDatabase.getConnection();
@@ -69,7 +74,7 @@ public final class RankTableUtils {
                  );
                  final ResultSet rs = ps.executeQuery()) {
 
-                final HashMap<UUID, Integer> v = new HashMap<>();
+                final Map<UUID, Integer> v = new HashMap<>();
                 while (rs.next()) {
                     final UUID uuid = UUID.fromString(rs.getString("uuid"));
                     final int exp = rs.getInt("exp");
@@ -79,6 +84,11 @@ public final class RankTableUtils {
                 scheduler.runTask(plugin, () -> {
                     map.clear();
                     map.putAll(v);
+
+                    top.clear();
+                    v.entrySet().stream()
+                            .sorted(Map.Entry.comparingByValue(Comparator.naturalOrder()))
+                            .forEachOrdered(entry -> top.addLast(new Pair<>(entry.getKey(), ExperienceManager.findLevelFromExp(entry.getValue()))));
                 });
 
             } catch (final SQLException e) {

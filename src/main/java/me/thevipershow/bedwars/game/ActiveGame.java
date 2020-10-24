@@ -624,7 +624,7 @@ public abstract class ActiveGame {
     public void givePlayerDefaultSet(final Player player) {
 
         final ArmorSet startingSet = new ArmorSet(Objects.requireNonNull(getPlayerTeam(player)));
-        startingSet.getArmorSet().forEach((k, v) -> ArmorSet.Slots.setArmorPiece(k, player, startingSet.getArmorSet().get(k)));
+        startingSet.getArmorSet().forEach((k, v) -> Slots.setArmorPiece(k, player, startingSet.getArmorSet().get(k)));
         GameUtils.giveStackToPlayer(new ItemStack(Material.WOOD_SWORD, 1), player, player.getInventory().getContents());
         this.playerSetMap.put(player, startingSet);
     }
@@ -745,7 +745,7 @@ public abstract class ActiveGame {
     public void upgradePlayerArmorSet(final Player player, final String type) {
         final ArmorSet pSet = playerSetMap.get(player);
         pSet.upgradeAll(type);
-        pSet.getArmorSet().forEach((k, v) -> ArmorSet.Slots.setArmorPiece(k, player, pSet.getArmorSet().get(k)));
+        pSet.getArmorSet().forEach((k, v) -> Slots.setArmorPiece(k, player, pSet.getArmorSet().get(k)));
     }
 
     public void downgradePlayerTools(final Player player) {

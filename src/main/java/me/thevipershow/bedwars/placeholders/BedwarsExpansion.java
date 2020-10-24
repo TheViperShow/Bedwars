@@ -1,10 +1,13 @@
 package me.thevipershow.bedwars.placeholders;
 
+import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import me.thevipershow.bedwars.LoggerUtils;
 import me.thevipershow.bedwars.bedwars.Gamemode;
@@ -16,7 +19,6 @@ import me.thevipershow.bedwars.game.Pair;
 import me.thevipershow.bedwars.storage.sql.tables.GlobalStatsTableUtils;
 import me.thevipershow.bedwars.storage.sql.tables.RankTableUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
@@ -30,10 +32,15 @@ public final class BedwarsExpansion extends PlaceholderExpansion {
     private BukkitTask cacheExpTask = null, cacheWinsTask = null, cacheKillsTask = null;
 
     private final HashMap<UUID, Pair<Long, Character>> cachedTeamColors = new HashMap<>();
-    private final HashMap<UUID, Integer> cachedExp = new HashMap<>();
-    private final HashMap<UUID, GlobalStatsTableUtils.Wins> cachedWins = new HashMap<>();
-    private final HashMap<UUID, GlobalStatsTableUtils.Kills> cachedKills = new HashMap<>();
-    private final HashMap<UUID, GlobalStatsTableUtils.Kills> cachedFinalKills = new HashMap<>();
+    private final LinkedHashMap<UUID, Integer> cachedExp = new LinkedHashMap<>();
+    private final LinkedHashMap<UUID, GlobalStatsTableUtils.Wins> cachedWins = new LinkedHashMap<>();
+    private final LinkedHashMap<UUID, GlobalStatsTableUtils.Kills> cachedKills = new LinkedHashMap<>();
+    private final LinkedHashMap<UUID, GlobalStatsTableUtils.Kills> cachedFinalKills = new LinkedHashMap<>();
+
+    private final EnumMap<Gamemode, LinkedList<Pair<UUID, Integer>>> topWins = new EnumMap<>(Gamemode.class);
+    private final EnumMap<Gamemode, LinkedList<Pair<UUID, Integer>>> topKills = new EnumMap<>(Gamemode.class);
+    private final EnumMap<Gamemode, LinkedList<Pair<UUID, Integer>>> topFinalKills = new EnumMap<>(Gamemode.class);
+    private final LinkedList<Pair<UUID, Integer>> topExp = new LinkedList<>();
 
     public BedwarsExpansion(final GameManager gameManager) {
         this.gameManager = gameManager;
@@ -47,14 +54,14 @@ public final class BedwarsExpansion extends PlaceholderExpansion {
     private void startCacheExpTask() {
         if (this.cacheExpTask == null) {
             LoggerUtils.logColor(gameManager.getPlugin().getLogger(), "&eCaching player EXP into local data. . .");
-            this.cacheExpTask = gameManager.getPlugin().getServer().getScheduler().runTaskTimer(gameManager.getPlugin(), () -> RankTableUtils.cacheIntoMap(this.cachedExp, gameManager.getPlugin()), 1L, 20L * 30L);
+            this.cacheExpTask = gameManager.getPlugin().getServer().getScheduler().runTaskTimer(gameManager.getPlugin(), () ->  RankTableUtils.cacheIntoMap(cachedExp, topExp, gameManager.getPlugin()), 1L, 20L * 30L);
         }
     }
 
     private void startCacheWinsTask() {
         if (this.cacheWinsTask == null) {
             LoggerUtils.logColor(gameManager.getPlugin().getLogger(), "&eCaching player win into local data. . .");
-            this.cacheWinsTask = gameManager.getPlugin().getServer().getScheduler().runTaskTimer(gameManager.getPlugin(), () -> GlobalStatsTableUtils.cacheWinsIntoMap(this.cachedWins, gameManager.getPlugin()), 1L, 20L * 60L);
+            this.cacheWinsTask = gameManager.getPlugin().getServer().getScheduler().runTaskTimer(gameManager.getPlugin(), () -> GlobalStatsTableUtils.cacheWinsIntoMap(cachedWins, topWins, gameManager.getPlugin()), 1L, 20L * 60L);
         }
     }
 
@@ -62,8 +69,8 @@ public final class BedwarsExpansion extends PlaceholderExpansion {
         if (this.cacheKillsTask == null) {
             LoggerUtils.logColor(gameManager.getPlugin().getLogger(), "&eCaching player kills into local data. . .");
             this.cacheKillsTask = gameManager.getPlugin().getServer().getScheduler().runTaskTimer(gameManager.getPlugin(), () -> {
-                GlobalStatsTableUtils.cacheKillsIntoMap(this.cachedKills, gameManager.getPlugin(),false);
-                GlobalStatsTableUtils.cacheKillsIntoMap(this.cachedFinalKills, gameManager.getPlugin(), true);
+                GlobalStatsTableUtils.cacheKillsIntoMap(cachedKills, topKills, topFinalKills, gameManager.getPlugin(),false);
+                GlobalStatsTableUtils.cacheKillsIntoMap(cachedFinalKills, topKills, topFinalKills, gameManager.getPlugin(), true);
             }, 1L, 20L * 60L);
         }
     }
@@ -214,6 +221,12 @@ public final class BedwarsExpansion extends PlaceholderExpansion {
         return Integer.toString(kills.getSoloKills() + kills.getDuoKills() + kills.getQuadKills());
     }
 
+    private final static Pattern topKillPattern = Pattern.compile("top_(solo|duo|quad)_kill_[0-9]");
+    private final static Pattern topFinalKillPattern = Pattern.compile("top_(solo|duo|quad)_fkill_[0-9]");
+    private final static Pattern topWinsPattern = Pattern.compile("top_(solo|duo|quad)_wins_[0-9]");
+    private final static Pattern topLevelPattern = Pattern.compile("top_level_[0-9]");
+    private final static Pattern underscorePattern = Pattern.compile("_");
+
     @Override
     public final String onPlaceholderRequest(final Player player, final @NotNull String identifier) {
 
@@ -256,6 +269,52 @@ public final class BedwarsExpansion extends PlaceholderExpansion {
                 return getWins(Gamemode.QUAD, player);
             case "total_wins":
                 return getTotalWins(player);
+        }
+
+        if (topKillPattern.matcher(identifier).matches()) {
+            final String[] split = underscorePattern.split(identifier);
+            final int i = Integer.parseInt(split[3]);
+            if (topKills.size() <= i) {
+                final Pair<UUID, Integer> got = topKills.get(Gamemode.valueOf(split[1].toUpperCase())).get(i - 1);
+                if (got == null || got.getB() == 0) {
+                    return "";
+                } else {
+                    return Bukkit.getOfflinePlayer(got.getA()).getName() + " " + got.getB();
+                }
+            }
+        } else if (topFinalKillPattern.matcher(identifier).matches()) {
+            final String[] split = underscorePattern.split(identifier);
+            final int i = Integer.parseInt(split[3]);
+            if (topFinalKills.size() <= i) {
+                final Pair<UUID, Integer> got = topFinalKills.get(Gamemode.valueOf(split[1].toUpperCase())).get(i - 1);
+                if (got == null || got.getB() == 0) {
+                    return "";
+                } else {
+                    return Bukkit.getOfflinePlayer(got.getA()).getName() + " " + got.getB();
+                }
+            }
+        } else if (topWinsPattern.matcher(identifier).matches()) {
+            final String[] split = underscorePattern.split(identifier);
+            final int i = Integer.parseInt(split[3]);
+            if (topWins.size() <= i) {
+                final Pair<UUID, Integer> got = topWins.get(Gamemode.valueOf(split[1].toUpperCase())).get(i - 1);
+                if (got == null || got.getB() == 0) {
+                    return "";
+                } else {
+                    return Bukkit.getOfflinePlayer(got.getA()).getName() + " " + got.getB();
+                }
+            }
+        } else if (topLevelPattern.matcher(identifier).matches()) {
+            final String[] split = underscorePattern.split(identifier);
+            final int i = Integer.parseInt(split[2]);
+            if (this.topExp.size() <= i) {
+                final Pair<UUID, Integer> got = topExp.get(i - 1);
+                if (got == null || got.getB() == 0) {
+                    return "";
+                } else {
+                    return Bukkit.getOfflinePlayer(got.getA()).getName() + " " + got.getB();
+                }
+            }
         }
 
         return null;

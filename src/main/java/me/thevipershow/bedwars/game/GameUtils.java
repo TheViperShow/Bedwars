@@ -12,7 +12,7 @@ import me.thevipershow.bedwars.bedwars.objects.spawners.SpawnerType;
 import me.thevipershow.bedwars.config.objects.Merchant;
 import me.thevipershow.bedwars.config.objects.TeamSpawnPosition;
 import me.thevipershow.bedwars.config.objects.upgradeshop.UpgradeType;
-import me.thevipershow.bedwars.listeners.game.ArmorSet;
+import me.thevipershow.bedwars.listeners.game.Slots;
 import net.minecraft.server.v1_8_R3.ChatMessage;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
@@ -164,7 +164,7 @@ public final class GameUtils {
         if (material.isBlock() || material.isSolid()) {
             return false;
         }
-        for (ArmorSet.Slots value : ArmorSet.Slots.values()) {
+        for (Slots value : Slots.values()) {
             for (Material m : value.getBindMap().values()) {
                 if (m == material) return true;
             }

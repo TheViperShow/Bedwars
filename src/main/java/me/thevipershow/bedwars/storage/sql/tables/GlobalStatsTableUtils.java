@@ -4,12 +4,22 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import me.thevipershow.bedwars.bedwars.Gamemode;
+import static me.thevipershow.bedwars.bedwars.Gamemode.DUO;
+import static me.thevipershow.bedwars.bedwars.Gamemode.QUAD;
+import static me.thevipershow.bedwars.bedwars.Gamemode.SOLO;
+import me.thevipershow.bedwars.game.Pair;
 import me.thevipershow.bedwars.storage.sql.MySQLDatabase;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -23,6 +33,10 @@ public final class GlobalStatsTableUtils {
             this.soloKills = soloKills;
             this.duoKills = duoKills;
             this.quadKills = quadKills;
+        }
+
+        public final int getSum() {
+            return getSoloKills() + getDuoKills() + getQuadKills();
         }
 
         public final int getKills(final Gamemode gamemode) {
@@ -60,6 +74,10 @@ public final class GlobalStatsTableUtils {
             this.quadWins = quadWins;
         }
 
+        public final int getSum() {
+            return getSoloWins() + getDuoWins() + getQuadWins();
+        }
+
         public int getWin(final Gamemode gamemode) {
             switch (gamemode) {
                 case SOLO:
@@ -86,7 +104,7 @@ public final class GlobalStatsTableUtils {
         }
     }
 
-    public static void cacheKillsIntoMap(final Map<UUID, Kills> map, final Plugin plugin, final boolean finalKill) {
+    public static void cacheKillsIntoMap(final LinkedHashMap<UUID, Kills> map, Map<Gamemode, LinkedList<Pair<UUID, Integer>>> top, Map<Gamemode, LinkedList<Pair<UUID, Integer>>> topFinal, final Plugin plugin, final boolean finalKill) {
 
         final BukkitScheduler scheduler = plugin.getServer().getScheduler();
         final Optional<Connection> optionalConnection = MySQLDatabase.getConnection();
@@ -96,7 +114,7 @@ public final class GlobalStatsTableUtils {
                  final PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + GlobalStatsTableCreator.TABLE + ";");
                  final ResultSet rs = ps.executeQuery()) {
 
-                final HashMap<UUID, Kills> wMap = new HashMap<>();
+                final Map<UUID, Kills> wMap = new HashMap<>();
                 while (rs.next()) {
                     final UUID uuid = UUID.fromString(rs.getString("uuid"));
                     if (finalKill) {
@@ -111,6 +129,32 @@ public final class GlobalStatsTableUtils {
                 scheduler.runTask(plugin, () -> {
                     map.clear();
                     map.putAll(wMap);
+
+                    final LinkedList<Pair<UUID, Integer>> topSolo = new LinkedList<>(), topDuo = new LinkedList<>(), topQuad = new LinkedList<>();
+
+                    top.clear();
+                    topFinal.clear();
+
+                    wMap.entrySet().stream()
+                            .sorted(Map.Entry.comparingByValue((a, b) -> Math.max(a.getSoloKills(), b.getSoloKills())))
+                            .forEachOrdered(o -> topSolo.offerLast(new Pair<>(o.getKey(), o.getValue().getSoloKills())));
+                    wMap.entrySet().stream()
+                            .sorted(Map.Entry.comparingByValue((a, b) -> Math.max(a.getDuoKills(), b.getDuoKills())))
+                            .forEachOrdered(o -> topDuo.offerLast(new Pair<>(o.getKey(), o.getValue().getDuoKills())));
+                    wMap.entrySet().stream()
+                            .sorted(Map.Entry.comparingByValue((a, b) -> Math.max(a.getQuadKills(), b.getQuadKills())))
+                            .forEachOrdered(o -> topQuad.offerLast(new Pair<>(o.getKey(), o.getValue().getQuadKills())));
+
+                    if (!finalKill) {
+                        top.put(SOLO, topSolo);
+                        top.put(Gamemode.DUO, topDuo);
+                        top.put(Gamemode.QUAD, topQuad);
+                    } else {
+                        topFinal.put(SOLO, topSolo);
+                        topFinal.put(Gamemode.DUO, topDuo);
+                        topFinal.put(Gamemode.QUAD, topQuad);
+                    }
+
                 });
             } catch (final SQLException e) {
                 e.printStackTrace();
@@ -118,7 +162,7 @@ public final class GlobalStatsTableUtils {
         }));
     }
 
-    public static void cacheWinsIntoMap(final Map<UUID, Wins> map, final Plugin plugin) {
+    public static void cacheWinsIntoMap(final LinkedHashMap<UUID, Wins> map, Map<Gamemode, LinkedList<Pair<UUID, Integer>>> top, final Plugin plugin) {
 
         final BukkitScheduler scheduler = plugin.getServer().getScheduler();
         final Optional<Connection> optionalConnection = MySQLDatabase.getConnection();
@@ -128,7 +172,7 @@ public final class GlobalStatsTableUtils {
                  final PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + GlobalStatsTableCreator.TABLE + ";");
                  final ResultSet rs = ps.executeQuery()) {
 
-                final HashMap<UUID, Wins> wMap = new HashMap<>();
+                final Map<UUID, Wins> wMap = new HashMap<>();
                 while (rs.next()) {
                     final UUID uuid = UUID.fromString(rs.getString("uuid"));
                     final Wins wins = new Wins(rs.getInt("solo_wins"), rs.getInt("duo_wins"), rs.getInt("quad_wins"));
@@ -138,7 +182,25 @@ public final class GlobalStatsTableUtils {
                 scheduler.runTask(plugin, () -> {
                     map.clear();
                     map.putAll(wMap);
+
+                    top.clear();
+
+                    final LinkedList<Pair<UUID, Integer>> soloWin = new LinkedList<>(), duoWin = new LinkedList<>(), quadWin = new LinkedList<>();
+                    wMap.entrySet().stream()
+                            .sorted(Map.Entry.comparingByValue((a, b) -> Math.max(a.getSoloWins(), b.getSoloWins())))
+                            .forEachOrdered(o -> soloWin.offerLast(new Pair<>(o.getKey(), o.getValue().getSoloWins())));
+                    wMap.entrySet().stream()
+                            .sorted(Map.Entry.comparingByValue((a, b) -> Math.max(a.getDuoWins(), b.getDuoWins())))
+                            .forEachOrdered(o -> duoWin.offerLast(new Pair<>(o.getKey(), o.getValue().getDuoWins())));
+                    wMap.entrySet().stream()
+                            .sorted(Map.Entry.comparingByValue((a, b) -> Math.max(a.getQuadWins(), b.getQuadWins())))
+                            .forEachOrdered(o -> quadWin.offerLast(new Pair<>(o.getKey(), o.getValue().getQuadWins())));
+
+                    top.put(SOLO, soloWin);
+                    top.put(DUO, duoWin);
+                    top.put(QUAD, quadWin);
                 });
+
             } catch (final SQLException e) {
                 e.printStackTrace();
             }
