@@ -40,8 +40,6 @@ public final class UpgradeMerchantListener extends UnregisterableListener {
         final UpgradeActiveMerchant upgradeActiveMerchant = activeGame.getTeamUpgradeActiveMerchant(villager);
 
         if (upgradeActiveMerchant != null) {
-            System.out.println("1");
-
             event.setCancelled(true);
             activeGame.openUpgrade(p);
         }

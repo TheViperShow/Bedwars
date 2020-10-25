@@ -12,6 +12,7 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
+import static me.thevipershow.bedwars.AllStrings.*;
 
 public final class PotionItem implements ConfigurationSerializable {
 
@@ -37,19 +38,19 @@ public final class PotionItem implements ConfigurationSerializable {
 
     @Override
     public Map<String, Object> serialize() {
-        throw new UnsupportedOperationException("no");
+        throw new UnsupportedOperationException();
     }
 
     public static PotionItem deserialize(final Map<String, Object> map) {
-        final String name = (String) map.get("item-name");
-        final int slot = (int) map.get("slot");
-        final int amount = (int) map.get("amount");
-        final int price = (int) map.get("price");
-        final Material buyWith = Material.valueOf((String) map.get("buy-with"));
-        final List<String> lore = (List<String>) map.get("lore");
-        final PotionEffectType type = PotionEffectType.getByName((String) map.get("type"));
-        final int length = (int) map.get("length");
-        final int level = (int) map.get("level");
+        final String name = (String) map.get(ITEM_NAME.get());
+        final int slot = (int) map.get(SLOT.get());
+        final int amount = (int) map.get(AMOUNT.get());
+        final int price = (int) map.get(PRICE.get());
+        final Material buyWith = Material.valueOf((String) map.get(BUY_WITH.get()));
+        final List<String> lore = (List<String>) map.get(LORE.get());
+        final PotionEffectType type = PotionEffectType.getByName((String) map.get(TYPE.get()));
+        final int length = (int) map.get(LENGTH.get());
+        final int level = (int) map.get(LEVEL.get());
         return new PotionItem(name, slot, amount, price, length, level, type, buyWith, lore);
     }
 

@@ -8,7 +8,7 @@ public abstract class AbstractTrap implements ConfigurationSerializable {
 
     @Override
     public Map<String, Object> serialize() {
-        throw new UnsupportedOperationException("no");
+        throw new UnsupportedOperationException();
     }
 
     private final TrapType trapType;

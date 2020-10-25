@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.game.AbstractActiveMerchant;
 import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
@@ -57,17 +58,17 @@ public final class UpgradeLevel implements ConfigurationSerializable {
 
     @Override
     public Map<String, Object> serialize() {
-        throw new UnsupportedOperationException("no");
+        throw new UnsupportedOperationException();
     }
 
     public static UpgradeLevel deserialize(final Map<String, Object> map) {
-        final int level = (int) map.get("level");
-        final Material levelMaterial = Material.valueOf((String) map.get("material"));
-        final String itemName = (String) map.get("item-name");
-        final Material buyWith = Material.valueOf((String) map.get("buy-with"));
-        final int price = (int) map.get("price");
-        final List<String> lore = (List<String>) map.get("lore");
-        final List<Map<String, Object>> enchMap = (List<Map<String, Object>>) map.get("enchantments");
+        final int level = (int) map.get(AllStrings.LEVEL.get());
+        final Material levelMaterial = Material.valueOf((String) map.get(AllStrings.MATERIAL.get()));
+        final String itemName = (String) map.get(AllStrings.ITEM_NAME.get());
+        final Material buyWith = Material.valueOf((String) map.get(AllStrings.BUY_WITH.get()));
+        final int price = (int) map.get(AllStrings.PRICE.get());
+        final List<String> lore = (List<String>) map.get(AllStrings.LORE.get());
+        final List<Map<String, Object>> enchMap = (List<Map<String, Object>>) map.get(AllStrings.ENCHANTS.get());
         final List<Enchantment> enchants = enchMap.stream().map(Enchantment::deserialize).collect(Collectors.toList());
         return new UpgradeLevel(level, levelMaterial, itemName, price, buyWith, lore, enchants);
     }
@@ -115,20 +116,5 @@ public final class UpgradeLevel implements ConfigurationSerializable {
 
     public final ItemStack getCachedGameStack() {
         return cachedGameStack;
-    }
-
-    @Override
-    public String toString() {
-        return "UpgradeLevel{" +
-                "level=" + level +
-                ", levelMaterial=" + levelMaterial +
-                ", itemName='" + itemName + '\'' +
-                ", price=" + price +
-                ", buyWith=" + buyWith +
-                ", lore=" + lore +
-                ", enchants=" + enchants +
-                ", cachedFancyStack=" + cachedFancyStack +
-                ", cachedGameStack=" + cachedGameStack +
-                '}';
     }
 }

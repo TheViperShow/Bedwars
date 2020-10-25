@@ -30,16 +30,13 @@ public final class ArmorSet {
     private final EnumMap<Slots, ItemStack> armorSet = new EnumMap<>(Slots.class);
 
     public final void upgradeAll(final String type) {
-        //for (final Slots slots : Slots.values()) {
-        //    armorSet.put(slots, slots.generateItemStack(type));
-        //}
         armorSet.put(Slots.LEGGINGS, Slots.LEGGINGS.generateItemStack(type));
         armorSet.put(Slots.BOOTS, Slots.BOOTS.generateItemStack(type));
     }
 
     public ArmorSet(final BedwarsTeam team) {
         if (team == null) {
-            throw new UnsupportedOperationException("null constructor argument for team.");
+            throw new UnsupportedOperationException();
         }
         for (final Slots slots : Slots.values()) {
             final ItemStack toSet = slots.generateColoredItemStack(team, "LEATHER");

@@ -1,5 +1,6 @@
 package me.thevipershow.bedwars.listeners.game;
 
+import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
 import me.thevipershow.bedwars.bedwars.Gamemode;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
@@ -32,9 +33,9 @@ public final class PlayerQuitDuringGameListener extends UnregisterableListener {
             return;
         }
 
-        activeGame.getAssociatedWorld().getPlayers().forEach(P -> P.sendMessage(Bedwars.PREFIX + "§7" + p.getName() + " §ehas left this game."));
+        activeGame.getAssociatedWorld().getPlayers().forEach(P -> P.sendMessage(Bedwars.PREFIX + "§7" + p.getName() + AllStrings.HAS_LEFT_GAME.get()));
         if (!activeGame.isHasStarted()) {
-            activeGame.getAssociatedWorld().getPlayers().forEach(P -> P.sendMessage(Bedwars.PREFIX + String.format(" §eStatus §7§l[§a%d§7/§a%d§7§l]",
+            activeGame.getAssociatedWorld().getPlayers().forEach(P -> P.sendMessage(Bedwars.PREFIX + String.format(AllStrings.QUEUE_STATUS.get(),
                     activeGame.getAssociatedQueue().queueSize() - 1, activeGame.getAssociatedQueue().getMaximumSize())));
         }
 

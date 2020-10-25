@@ -1,6 +1,7 @@
 package me.thevipershow.bedwars.commands;
 
 import java.util.Optional;
+import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.GameManager;
@@ -15,7 +16,7 @@ public final class QuitCommand extends SubCommand {
 
     @Override
     public final void run(final CommandSender sender) {
-        if (!sender.hasPermission("abedwars.users.quit")) {
+        if (!sender.hasPermission(AllStrings.PERMISSION_USER_QUIT.get())) {
             missingPerm(sender);
             return;
         }
@@ -34,11 +35,11 @@ public final class QuitCommand extends SubCommand {
                 .findFirst();
 
         if (!activeGame.isPresent()) {
-            sender.sendMessage(Bedwars.PREFIX + "You are not in any queue.");
+            sender.sendMessage(Bedwars.PREFIX + AllStrings.NOT_IN_QUEUE.get());
         } else {
             activeGame.get().removePlayer((Player) sender);
             activeGame.get().moveToLobby((Player) sender);
-            sender.sendMessage(Bedwars.PREFIX + "You left the queue.");
+            sender.sendMessage(Bedwars.PREFIX + AllStrings.LEFT_QUEUE.get());
         }
     }
 }

@@ -2,6 +2,7 @@ package me.thevipershow.bedwars.config.objects;
 
 import java.util.HashMap;
 import java.util.Map;
+import me.thevipershow.bedwars.AllStrings;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
@@ -23,17 +24,17 @@ public class SpawnPosition implements ConfigurationSerializable, Cloneable {
     @Override
     public Map<String, Object> serialize() {
         final Map<String, Object> positionMap = new HashMap<>();
-        positionMap.put("x", x);
-        positionMap.put("y", y);
-        positionMap.put("z", z);
+        positionMap.put(AllStrings.X.get(), x);
+        positionMap.put(AllStrings.Y.get(), y);
+        positionMap.put(AllStrings.Z.get(), z);
         return positionMap;
     }
 
     public static SpawnPosition deserialize(final Map<String, Object> objectMap) {
         double x, y, z;
-        x = (double) objectMap.get("x");
-        y = (double) objectMap.get("y");
-        z = (double) objectMap.get("z");
+        x = (double) objectMap.get(AllStrings.X.get());
+        y = (double) objectMap.get(AllStrings.Y.get());
+        z = (double) objectMap.get(AllStrings.Z.get());
         return new SpawnPosition(x, y, z);
     }
 
@@ -104,14 +105,5 @@ public class SpawnPosition implements ConfigurationSerializable, Cloneable {
 
     public final Location toLocation(final World world) {
         return new Location(world, this.x, this.y, this.z);
-    }
-
-    @Override
-    public String toString() {
-        return "SpawnPosition{" +
-                "x=" + x +
-                ", y=" + y +
-                ", z=" + z +
-                '}';
     }
 }

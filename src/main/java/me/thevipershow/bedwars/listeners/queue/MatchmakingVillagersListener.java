@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
 import me.thevipershow.bedwars.bedwars.Gamemode;
 import me.thevipershow.bedwars.game.ActiveGame;
@@ -72,7 +73,7 @@ public class MatchmakingVillagersListener implements Listener {
                     return;
                 }
 
-                player.sendMessage(Bedwars.PREFIX + "§eWe could not find a game, try clicking again.");
+                player.sendMessage(Bedwars.PREFIX + AllStrings.WE_COULD_NOT_FIND_GAME.get());
                 return;
             }
 

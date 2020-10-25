@@ -1,5 +1,6 @@
 package me.thevipershow.bedwars.commands.tasks;
 
+import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
 import me.thevipershow.bedwars.bedwars.Gamemode;
 import me.thevipershow.bedwars.storage.sql.MySQLDatabase;
@@ -20,9 +21,9 @@ public class VillagerQueueInteractor extends AbstractTargetInteractor<Player, Vi
     public void perform() {
         if (lookupResult.getLookupResult().isPresent()) {
             QueueTableUtils.addVillager(lookupResult.getLookupResult().get(), gamemode, Bedwars.plugin);
-            interested.sendMessage(Bedwars.PREFIX + String.format("§eYou successfully setup a %s bedwars queue villager", gamemode.name().toLowerCase()));
+            interested.sendMessage(Bedwars.PREFIX + String.format(AllStrings.SETUP_QUEUE_VILLAGER.get(), gamemode.name().toLowerCase()));
         } else {
-            interested.sendMessage(Bedwars.PREFIX + "§eYou were not looking at villagers.");
+            interested.sendMessage(Bedwars.PREFIX + AllStrings.NOT_LOOKING_AT_VILLAGER.get());
         }
     }
 

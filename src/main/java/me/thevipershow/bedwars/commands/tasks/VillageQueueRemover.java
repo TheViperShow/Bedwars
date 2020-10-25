@@ -1,6 +1,7 @@
 package me.thevipershow.bedwars.commands.tasks;
 
 import java.util.Optional;
+import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
 import me.thevipershow.bedwars.storage.sql.MySQLDatabase;
 import me.thevipershow.bedwars.storage.sql.tables.QueueTableUtils;
@@ -20,14 +21,14 @@ public class VillageQueueRemover extends AbstractTargetInteractor<Player, Villag
                 QueueTableUtils.removeVillager(villager.get(), Bedwars.plugin)
                         .thenAccept(bool -> {
                            if (bool != null && bool) {
-                               interested.sendMessage(Bedwars.PREFIX + "§eYou successfully removed that villager from database.");
+                               interested.sendMessage(Bedwars.PREFIX + AllStrings.REMOVED_VILLAGER_FROM_DATABASE.get());
                            } else {
-                               interested.sendMessage(Bedwars.PREFIX + "§eThat villager was not associated with a database.");
+                               interested.sendMessage(Bedwars.PREFIX + AllStrings.VILLAGER_NOT_PRESENT_IN_DATABASE.get());
                            }
                         });
 
         } else {
-            interested.sendMessage(Bedwars.PREFIX + "§eYou were not looking at a villager.");
+            interested.sendMessage(Bedwars.PREFIX + AllStrings.NOT_LOOKING_AT_VILLAGER);
         }
     }
 }

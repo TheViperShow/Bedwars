@@ -1,5 +1,6 @@
 package me.thevipershow.bedwars.game;
 
+import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import org.bukkit.Sound;
@@ -13,8 +14,7 @@ public final class SoloDeathmatch extends AbstractDeathmatch {
     @Override
     public void spawnEnderdragons() {
         activeGame.getAssociatedQueue().perform(p -> {
-            p.sendMessage(Bedwars.PREFIX + "§6§lSUDDEN DEATH §r§6mode has started!");
-            p.sendMessage(Bedwars.PREFIX + "§6The Ender Dragons have been released!");
+            p.sendMessage(Bedwars.PREFIX + AllStrings.DRAGONS_RELEASED.get());
             p.playSound(p.getLocation(), Sound.ENDERDRAGON_GROWL, 8.5f, 1.0f);
         });
         activeGame.getAssociatedQueue().perform(p -> {

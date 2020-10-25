@@ -3,6 +3,7 @@ package me.thevipershow.bedwars.game;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.config.objects.Merchant;
 import me.thevipershow.bedwars.config.objects.ShopItem;
@@ -29,8 +30,8 @@ public abstract class AbstractActiveMerchant {
 
     public static List<String> priceDescriptorSection(final int price, final Material buyWith) {
         return Collections.unmodifiableList(Arrays.asList("",
-                "§7- Price§f: §e§l" + price,
-                "§7- Buy with§f: §e§l" + GameUtils.beautifyCaps(buyWith.name())
+                AllStrings.GENERATE_PRICE_LORE.get() + price,
+                AllStrings.GENERATE_BUY_LORE.get() + GameUtils.beautifyCaps(buyWith.name())
         ));
     }
 

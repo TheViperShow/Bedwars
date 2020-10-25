@@ -3,6 +3,7 @@ package me.thevipershow.bedwars.config.objects.upgradeshop;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.game.AbstractActiveMerchant;
 import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
@@ -12,7 +13,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 public final class UpgradeShopItem implements ConfigurationSerializable {
     @Override
     public Map<String, Object> serialize() {
-        throw new UnsupportedOperationException("no");
+        throw new UnsupportedOperationException();
     }
 
     private final int level;
@@ -50,13 +51,13 @@ public final class UpgradeShopItem implements ConfigurationSerializable {
     }
 
     public static UpgradeShopItem deserialize(final Map<String, Object> map) {
-        final int level = (int) map.get("level");
-        final Material material = Material.valueOf((String) map.get("material"));
-        final String itemName = (String) map.get("item-name");
-        final int amount = (int) map.get("amount");
-        final int price = (int) map.get("price");
-        final Material buyWith = Material.valueOf((String) map.get("buy-with"));
-        final List<String> lore = (List<String>) map.get("lore");
+        final int level = (int) map.get(AllStrings.LEVEL.get());
+        final Material material = Material.valueOf((String) map.get(AllStrings.MATERIAL.get()));
+        final String itemName = (String) map.get(AllStrings.ITEM_NAME.get());
+        final int amount = (int) map.get(AllStrings.AMOUNT.get());
+        final int price = (int) map.get(AllStrings.PRICE.get());
+        final Material buyWith = Material.valueOf((String) map.get(AllStrings.BUY_WITH.get()));
+        final List<String> lore = (List<String>) map.get(AllStrings.LORE.get());
         return new UpgradeShopItem(level, material, itemName, amount, price, buyWith, lore);
     }
 

@@ -3,6 +3,7 @@ package me.thevipershow.bedwars.listeners.game;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.ExperienceManager;
 import me.thevipershow.bedwars.listeners.UnregisterableListener;
@@ -33,7 +34,7 @@ public final class GoodGameListener extends UnregisterableListener {
 
             final String[] words = spaces.split(event.getMessage());
             for (final String word : words) {
-                if (word.equalsIgnoreCase("gg")) {
+                if (word.equalsIgnoreCase(AllStrings.GG.get())) {
                     ExperienceManager.rewardPlayer(10, p, activeGame);
                     rewarded.add(p);
                     break;

@@ -8,7 +8,7 @@ public final class DragonBuffUpgrade implements ConfigurationSerializable, Upgra
 
     @Override
     public Map<String, Object> serialize() {
-        throw new UnsupportedOperationException("no");
+        throw new UnsupportedOperationException();
     }
 
     private final ShopItem shopItem;

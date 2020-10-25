@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
 import me.thevipershow.bedwars.game.GameManager;
 import org.bukkit.command.Command;
@@ -18,11 +19,11 @@ public final class BedwarsMainCommand implements CommandExecutor, TabExecutor {
     private final GameManager gameManager;
 
     private final List<String> immutableBaseArgs = Collections.unmodifiableList(Arrays.asList(
-            "set",
-            "remove",
-            "join",
-            "quit",
-            "exp"
+            AllStrings.SET.get(),
+            AllStrings.REMOVE.get(),
+            AllStrings.JOIN.get(),
+            AllStrings.QUIT.get(),
+            AllStrings.EXP.get()
     ));
 
     public BedwarsMainCommand(Plugin plugin, GameManager gameManager) {
@@ -35,7 +36,7 @@ public final class BedwarsMainCommand implements CommandExecutor, TabExecutor {
     }
 
     public final void unknownArg(final CommandSender sender, final String arg) {
-        sender.sendMessage(Bedwars.PREFIX + "Unknown command argument \"" + arg + "\"");
+        sender.sendMessage(Bedwars.PREFIX + AllStrings.UNKNOWN_ARG.get() + arg + "\"");
     }
 
     @Override
@@ -47,25 +48,23 @@ public final class BedwarsMainCommand implements CommandExecutor, TabExecutor {
             sendHelp(player);
         } else {
             final String firstArg = args[0].toLowerCase(Locale.ROOT);
-            switch (firstArg) {
-                case "set":
-                    new SetCommand(this.gameManager, this.plugin, args).run(sender);
-                    break;
-                case "remove":
-                    new RemoveCommand(this.gameManager, this.plugin, args).run(sender);
-                    break;
-                case "join":
-                    new JoinCommand(this.gameManager, this.plugin, args).run(sender);
-                    break;
-                case "quit":
-                    new QuitCommand(this.gameManager, this.plugin, args).run(sender);
-                    break;
-                case "exp":
-                    new ExpCommand(this.gameManager, this.plugin, args).run(sender);
-                    break;
-                default:
-                    unknownArg(sender, firstArg);
-                    break;
+            if (AllStrings.SET.get().equals(firstArg)) {
+                new SetCommand(this.gameManager, this.plugin, args).run(sender);
+
+            } else if (AllStrings.REMOVE.get().equals(firstArg)) {
+                new RemoveCommand(this.gameManager, this.plugin, args).run(sender);
+
+            } else if (AllStrings.JOIN.get().equals(firstArg)) {
+                new JoinCommand(this.gameManager, this.plugin, args).run(sender);
+
+            } else if (AllStrings.QUIT.get().equals(firstArg)) {
+                new QuitCommand(this.gameManager, this.plugin, args).run(sender);
+
+            } else if (AllStrings.EXP.get().equals(firstArg)) {
+                new ExpCommand(this.gameManager, this.plugin, args).run(sender);
+
+            } else {
+                unknownArg(sender, firstArg);
             }
         }
 
@@ -76,21 +75,6 @@ public final class BedwarsMainCommand implements CommandExecutor, TabExecutor {
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 1) {
             return this.immutableBaseArgs;
-        }
-
-        if (args.length == 2) {
-            switch (args[0].toLowerCase(Locale.ROOT)) {
-                case "set":
-                    break;
-                case "remove":
-                    break;
-                case "join":
-                    break;
-                case "quit":
-                    break;
-                default:
-                    break;
-            }
         }
 
         return null;

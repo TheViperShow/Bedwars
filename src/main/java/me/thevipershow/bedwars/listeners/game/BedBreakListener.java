@@ -1,5 +1,6 @@
 package me.thevipershow.bedwars.listeners.game;
 
+import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.config.objects.TeamSpawnPosition;
@@ -66,7 +67,7 @@ public final class BedBreakListener extends UnregisterableListener {
                     final BedwarsTeam playerTeam = activeGame.getPlayerTeam(p);
                     final BedwarsTeam destroyedBedTeam = teamOfBed(b);
                     if (playerTeam == destroyedBedTeam) {
-                        p.sendMessage(Bedwars.PREFIX + "§eYou cannot destroy your own bed.");
+                        p.sendMessage(Bedwars.PREFIX + AllStrings.CANNOT_BREAK_OWN_BED.get());
                         event.setCancelled(true);
                     } else if (activeGame.getAssignedTeams().containsKey(destroyedBedTeam)) {
                         final TeamBedDestroyEvent e = new TeamBedDestroyEvent(activeGame, destroyedBedTeam);
@@ -80,8 +81,8 @@ public final class BedBreakListener extends UnregisterableListener {
 
                 } else {
                     event.setCancelled(true);
-                    p.sendMessage(Bedwars.PREFIX + "§6Beds cannot be broken during §6§lDEATHMATCH");
-                    p.sendMessage(Bedwars.PREFIX + "§6You must kill all of your enemies to win!");
+                    p.sendMessage(Bedwars.PREFIX + AllStrings.DEATHMATCH_BEDS_CANNOT_BE_BROKEN.get());
+                    p.sendMessage(Bedwars.PREFIX + AllStrings.DEATHMATCH_BEDS_CANNOT_BE_BROKEN_2.get());
                 }
 
             } else {

@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
 import org.bukkit.entity.Player;
 
@@ -48,7 +49,7 @@ public final class KillTracker {
 
         activeGame.getAssociatedWorld().getPlayers().forEach(p -> {
             if (!this.killsMap.isEmpty()) {
-                p.sendMessage(Bedwars.PREFIX + " §7Top 3 kill scores:");
+                p.sendMessage(Bedwars.PREFIX + AllStrings.TOP_3_KILL.get());
                 final Iterator<Map.Entry<UUID, Integer>> killIterator = s.iterator();
                 while (count.getAndIncrement() < 3) {
                     if (killIterator.hasNext()) {
@@ -62,7 +63,7 @@ public final class KillTracker {
 
             if (!this.finalKillsMap.isEmpty()) {
                 count.set(0x00);
-                p.sendMessage(Bedwars.PREFIX + " §7Top 3 final kill scores:");
+                p.sendMessage(Bedwars.PREFIX + AllStrings.TOP_3_FINAL_KILL.get());
                 final Iterator<Map.Entry<UUID, Integer>> finalKillsIterator = s_.iterator();
                 while (count.getAndIncrement() < 3) {
                     if (finalKillsIterator.hasNext()) {

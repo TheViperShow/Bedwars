@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.UUID;
+import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.game.ActiveGame;
@@ -28,6 +29,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
+import static me.thevipershow.bedwars.AllStrings.*;
 
 public final class PlayerDeathListener2 extends UnregisterableListener {
 
@@ -38,11 +40,11 @@ public final class PlayerDeathListener2 extends UnregisterableListener {
         this.activeGame = activeGame;
         this.random = new Random();
         final ItemMeta compassMeta = LOBBY_COMPASS.getItemMeta();
-        compassMeta.setDisplayName(Bedwars.PREFIX + "§c§lReturn to lobby");
+        compassMeta.setDisplayName(Bedwars.PREFIX + RETURN_LOBBY.get());
         compassMeta.setLore(Lists.newArrayList(
-                "§7- You can use this compass to return to the server's lobby",
-                "§7  You can simply click on it and you will be automatically teleported.",
-                "§7  Remember that you can't join this game once you've left."
+                COMPASS_LORE_1.get(),
+                COMPASS_LORE_2.get(),
+                COMPASS_LORE_3.get()
         ));
         LOBBY_COMPASS.setItemMeta(compassMeta);
     }
@@ -54,23 +56,23 @@ public final class PlayerDeathListener2 extends UnregisterableListener {
     public final String generateNormalDeathMessage(final Player dead, final Player killer, final DamageCause damageCause) {
         if (!isFinalDeath(dead)) {
             if (damageCause == DamageCause.ENTITY_ATTACK) {
-                return String.format("§%c%s §7was slashed by §%c%s.", activeGame.getPlayerTeam(dead).getColorCode(), dead.getName(), activeGame.getPlayerTeam(killer).getColorCode(), killer.getName());
+                return String.format(KILL_1.get(), activeGame.getPlayerTeam(dead).getColorCode(), dead.getName(), activeGame.getPlayerTeam(killer).getColorCode(), killer.getName());
             } else if (damageCause == DamageCause.BLOCK_EXPLOSION || damageCause == DamageCause.ENTITY_EXPLOSION) {
-                return String.format("§%c%s's §7TNT killed §%c%s.", activeGame.getPlayerTeam(killer).getColorCode(), killer.getName(), activeGame.getPlayerTeam(dead).getColorCode(), dead.getName());
+                return String.format(KILL_2.get(), activeGame.getPlayerTeam(killer).getColorCode(), killer.getName(), activeGame.getPlayerTeam(dead).getColorCode(), dead.getName());
             } else if (damageCause == DamageCause.PROJECTILE) {
-                return String.format("§%c%s's §7arrow perforated §%c%s.", activeGame.getPlayerTeam(killer).getColorCode(), killer.getName(), activeGame.getPlayerTeam(dead).getColorCode(), dead.getName());
+                return String.format(KILL_3.get(), activeGame.getPlayerTeam(killer).getColorCode(), killer.getName(), activeGame.getPlayerTeam(dead).getColorCode(), dead.getName());
             } else {
-                return String.format("§%c%s §7was killed by §%c%s.", activeGame.getPlayerTeam(dead).getColorCode(), dead.getName(), activeGame.getPlayerTeam(killer).getColorCode(), killer.getName());
+                return String.format(KILL_4.get(), activeGame.getPlayerTeam(dead).getColorCode(), dead.getName(), activeGame.getPlayerTeam(killer).getColorCode(), killer.getName());
             }
         } else {
             if (damageCause == DamageCause.ENTITY_ATTACK) {
-                return String.format("§%c%s §7was slashed by §%c%s. §c§lFINAL KILL!", activeGame.getPlayerTeam(dead).getColorCode(), dead.getName(), activeGame.getPlayerTeam(killer).getColorCode(), killer.getName());
+                return String.format(FINAL_KILL_1.get(), activeGame.getPlayerTeam(dead).getColorCode(), dead.getName(), activeGame.getPlayerTeam(killer).getColorCode(), killer.getName());
             } else if (damageCause == DamageCause.BLOCK_EXPLOSION || damageCause == DamageCause.ENTITY_EXPLOSION) {
-                return String.format("§%c%s's §7TNT killed §%c%s. §c§lFINAL KILL!", activeGame.getPlayerTeam(killer).getColorCode(), killer.getName(), activeGame.getPlayerTeam(dead).getColorCode(), dead.getName());
+                return String.format(FINAL_KILL_2.get(), activeGame.getPlayerTeam(killer).getColorCode(), killer.getName(), activeGame.getPlayerTeam(dead).getColorCode(), dead.getName());
             } else if (damageCause == DamageCause.PROJECTILE) {
-                return String.format("§%c%s's §7arrow perforated §%c%s. §c§lFINAL KILL!", activeGame.getPlayerTeam(killer).getColorCode(), killer.getName(), activeGame.getPlayerTeam(dead).getColorCode(), dead.getName());
+                return String.format(FINAL_KILL_3.get(), activeGame.getPlayerTeam(killer).getColorCode(), killer.getName(), activeGame.getPlayerTeam(dead).getColorCode(), dead.getName());
             } else {
-                return String.format("§%c%s §7was killed by §%c%s. §c§lFINAL KILL!", activeGame.getPlayerTeam(dead).getColorCode(), dead.getName(), activeGame.getPlayerTeam(killer).getColorCode(), killer.getName());
+                return String.format(FINAL_KILL_4.get(), activeGame.getPlayerTeam(dead).getColorCode(), dead.getName(), activeGame.getPlayerTeam(killer).getColorCode(), killer.getName());
             }
         }
     }
@@ -120,7 +122,7 @@ public final class PlayerDeathListener2 extends UnregisterableListener {
         GameUtils.clearArmor(dead);
         givePlayerLobbyCompass(dead);
         if (!activeGame.isOutOfGame(dead)) {
-            dead.sendMessage(Bedwars.PREFIX + "§cYou have been eliminated.");
+            dead.sendMessage(Bedwars.PREFIX + YOU_HAVE_BEEN_ELIMINATED.get());
             final String deathMsg = generateNormalDeathMessage(dead, killer, damageCause);
             activeGame.getAssociatedWorld().getPlayers().forEach(p -> p.sendMessage(Bedwars.PREFIX + deathMsg));
         }
@@ -146,7 +148,7 @@ public final class PlayerDeathListener2 extends UnregisterableListener {
         GameUtils.clearArmor(dead);
         givePlayerLobbyCompass(dead);
         if (!activeGame.isOutOfGame(dead)) {
-            dead.sendMessage(Bedwars.PREFIX + "§cYou have been eliminated.");
+            dead.sendMessage(Bedwars.PREFIX + YOU_HAVE_BEEN_ELIMINATED.get());
             final String deathMsg = funnyDeathMsg(damageCause, dead);
             activeGame.getAssociatedWorld().getPlayers().forEach(p -> p.sendMessage(Bedwars.PREFIX + deathMsg));
         }
@@ -167,44 +169,44 @@ public final class PlayerDeathListener2 extends UnregisterableListener {
         final StringBuilder builder = new StringBuilder("§" + activeGame.getPlayerTeam(dead).getColorCode() + dead.getName() + " §7");
         switch (damageCause) {
             case FALL:
-                builder.append("believed the ground was soft.");
+                builder.append(KILL_5.get());
                 break;
             case FIRE: {
-                final int r = random.nextInt(3);
+                final int r = random.nextInt(0x03);
                 if (r == 0) {
-                    builder.append("entered Dante's inferno.");
+                    builder.append(KILL_6.get());
                 } else if (r == 1) {
-                    builder.append("got perfectly grilled.");
+                    builder.append(KILL_7.get());
                 } else {
-                    builder.append("proved to be flammable.");
+                    builder.append(KILL_8.get());
                 }
             }
             break;
             case VOID:
-                builder.append("disappeared into the void.");
+                builder.append(KILL_9.get());
                 break;
             case DROWNING:
-                builder.append("forgot he wasn't a fish.");
+                builder.append(KILL_10.get());
                 break;
             case ENTITY_EXPLOSION:
-                builder.append("exploded into pieces");
+                builder.append(KILL_11.get());
                 break;
             case SUFFOCATION:
-                builder.append("forgot how to breathe.");
+                builder.append(KILL_12.get());
                 break;
             case PROJECTILE:
-                builder.append("got hit by a projectile.");
+                builder.append(KILL_13.get());
                 break;
             case CUSTOM:
-                builder.append("CUSTOM DAMAGE???");
+                builder.append(KILL_14.get());
                 break;
             default:
-                builder.append("died in a mysterious way.");
+                builder.append(KILL_15.get());
                 break;
         }
 
         if (isFinalDeath(dead)) {
-            builder.append("§c§l FINAL KILL!");
+            builder.append(FINAL_KILL_EXT.get());
         }
 
         return builder.toString();

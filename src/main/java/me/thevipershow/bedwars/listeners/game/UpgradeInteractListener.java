@@ -1,11 +1,13 @@
 package me.thevipershow.bedwars.listeners.game;
 
+import com.sun.org.apache.bcel.internal.generic.ALOAD;
 import java.lang.reflect.InvocationTargetException;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Objects;
+import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.config.objects.ShopItem;
@@ -60,31 +62,31 @@ public final class UpgradeInteractListener extends UnregisterableListener {
 
     private static void maxLevel(final Player player) {
         GameUtils.buyFailSound(player);
-        player.sendMessage(Bedwars.PREFIX + "You already have bought maximum level");
+        player.sendMessage(Bedwars.PREFIX + AllStrings.ALREADY_BOUGHT_MAX_LVL.get());
     }
 
     private static boolean payUpgrade(final Pair<HashMap<Integer, Integer>, Boolean> result, final Player player, final Material payWith, final int cost, final String upgradeName) {
         if (!result.getB()) {
-            player.sendMessage(Bedwars.PREFIX + "You cannot afford this upgrade.");
+            player.sendMessage(Bedwars.PREFIX + AllStrings.CANNOT_AFFORD_UPGRADE.get());
             GameUtils.buyFailSound(player);
             return false;
         } else {
             GameUtils.makePlayerPay(player.getInventory(), payWith, cost, result.getA());
             GameUtils.paySound(player);
-            player.sendMessage(Bedwars.PREFIX + "You successfully upgraded: §e" + upgradeName);
+            player.sendMessage(Bedwars.PREFIX + AllStrings.SUCCESSFULLY_UPGRADED.get() + upgradeName);
             return true;
         }
     }
 
     private static boolean payTraps(final Pair<HashMap<Integer, Integer>, Boolean> result, final Player player, final ShopItem buying, final String boughtName) {
         if (!result.getB()) {
-            player.sendMessage(Bedwars.PREFIX + "You cannot afford this trap!");
+            player.sendMessage(Bedwars.PREFIX + AllStrings.CANNOT_AFFORD_TRAP.get());
             GameUtils.buyFailSound(player);
             return false;
         } else {
             GameUtils.makePlayerPay(player.getInventory(), buying.getBuyWith(), buying.getBuyCost(), result.getA());
             GameUtils.paySound(player);
-            player.sendMessage(Bedwars.PREFIX + "You successfully enabled trap: §e" + boughtName);
+            player.sendMessage(Bedwars.PREFIX + AllStrings.SUCCESSFULLY_ENABLED_TRAP.get() + boughtName);
             return true;
         }
     }
@@ -113,7 +115,7 @@ public final class UpgradeInteractListener extends UnregisterableListener {
             } else {
                 final ShopItem shopItem = dragonBuffUpgrade.getShopItem();
                 Pair<HashMap<Integer, Integer>, Boolean> pay = GameUtils.canAfford(playerInventory, shopItem.getBuyWith(), shopItem.getBuyCost());
-                if (payUpgrade(pay, player, shopItem.getBuyWith(), shopItem.getBuyCost(), "Dragon Buff")) { // This is the Dragon Buff Logic
+                if (payUpgrade(pay, player, shopItem.getBuyWith(), shopItem.getBuyCost(), AllStrings.DRAGON_BUFF_DISPLAY.get())) { // This is the Dragon Buff Logic
                     upgradesAvailable.get(dragonBuffUpgrade.getType()).put(pTeam, 1);                           // Here they have correctly upgrade their item.
                 }
             }
@@ -125,7 +127,7 @@ public final class UpgradeInteractListener extends UnregisterableListener {
             } else {
                 final ShopItem shopItem = healPoolUpgrade.getItem();
                 Pair<HashMap<Integer, Integer>, Boolean> pay = GameUtils.canAfford(playerInventory, shopItem.getBuyWith(), shopItem.getBuyCost());
-                if (payUpgrade(pay, player, shopItem.getBuyWith(), shopItem.getBuyCost(), "Heal Pool")) { // This is the Heal Pool Logic
+                if (payUpgrade(pay, player, shopItem.getBuyWith(), shopItem.getBuyCost(), AllStrings.HEAL_POOL_DISPLAY.get())) { // This is the Heal Pool Logic
                     upgradesAvailable.get(healPoolUpgrade.getType()).put(pTeam, 1);                           // Here they have correctly upgraded their item.
                     final ActiveHealPool activeHealPool = new ActiveHealPool(activeGame, pTeam, healPoolUpgrade);
                     activeGame.getHealPools().add(activeHealPool);
@@ -142,7 +144,7 @@ public final class UpgradeInteractListener extends UnregisterableListener {
             } else {
                 final UpgradeShopItem itemToBuy = ironForgeUpgrade.getLevels().get(currentLevel);
                 final Pair<HashMap<Integer, Integer>, Boolean> pay = GameUtils.canAfford(playerInventory, itemToBuy.getBuyWith(), itemToBuy.getPrice());
-                if (payUpgrade(pay, player, itemToBuy.getBuyWith(), itemToBuy.getPrice(), "Iron Forge")) { // This is the Iron Forge Logic.
+                if (payUpgrade(pay, player, itemToBuy.getBuyWith(), itemToBuy.getPrice(), AllStrings.IRON_FORGE_DISPLAY.get())) { // This is the Iron Forge Logic.
                     upgradesAvailable.get(ironForgeUpgrade.getType()).put(pTeam, currentLevel + 1);            // Here they have correctly upgraded their item.
 
                     if (currentLevel + 1 == 3) {
@@ -178,7 +180,7 @@ public final class UpgradeInteractListener extends UnregisterableListener {
             } else {
                 final UpgradeShopItem itemToBuy = maniacMinerUpgrade.getLevels().get(currentLevel);
                 final Pair<HashMap<Integer, Integer>, Boolean> pay = GameUtils.canAfford(playerInventory, itemToBuy.getBuyWith(), itemToBuy.getPrice());
-                if (payUpgrade(pay, player, itemToBuy.getBuyWith(), itemToBuy.getPrice(), "Maniac Miner")) { // This is the Maniac Miner Logic
+                if (payUpgrade(pay, player, itemToBuy.getBuyWith(), itemToBuy.getPrice(), AllStrings.MANIAC_MINER_DISPLAY.get())) { // This is the Maniac Miner Logic
                     upgradesAvailable.get(maniacMinerUpgrade.getType()).put(pTeam, currentLevel + 1);            //  Here they have correctly upgraded their item.
                     activeGame.getTeamPlayers(pTeam).forEach(p -> {
                         if (!activeGame.isOutOfGame(p) && p.isOnline()) {
@@ -199,7 +201,7 @@ public final class UpgradeInteractListener extends UnregisterableListener {
             } else {
                 final UpgradeShopItem itemToBuy = reinforcedArmorUpgrade.getLevels().get(currentLevel);
                 final Pair<HashMap<Integer, Integer>, Boolean> pay = GameUtils.canAfford(playerInventory, itemToBuy.getBuyWith(), itemToBuy.getPrice());
-                if (payUpgrade(pay, player, itemToBuy.getBuyWith(), itemToBuy.getPrice(), "Reinforced Armor")) {// This is the Reinforced Armor Logic
+                if (payUpgrade(pay, player, itemToBuy.getBuyWith(), itemToBuy.getPrice(), AllStrings.REINFORCED_ARMOR_DISPLAY.get())) {// This is the Reinforced Armor Logic
                     upgradesAvailable.get(reinforcedArmorUpgrade.getType()).put(pTeam, currentLevel + 1);           //  Here they have correctly upgraded their item.
 
                     activeGame.getTeamPlayers(pTeam).forEach(p -> {
@@ -219,7 +221,7 @@ public final class UpgradeInteractListener extends UnregisterableListener {
             } else {
                 final ShopItem shopItem = sharpnessUpgrade.getItem();
                 Pair<HashMap<Integer, Integer>, Boolean> pay = GameUtils.canAfford(playerInventory, shopItem.getBuyWith(), shopItem.getBuyCost());
-                if (payUpgrade(pay, player, shopItem.getBuyWith(), shopItem.getBuyCost(), "Sharpened Swords")) {  // This is the Sharpened Swords Logic
+                if (payUpgrade(pay, player, shopItem.getBuyWith(), shopItem.getBuyCost(), AllStrings.SHARPENED_SWORDS_DISPLAY.get())) {  // This is the Sharpened Swords Logic
                     upgradesAvailable.get(sharpnessUpgrade.getType()).put(pTeam, 1);                                    // Here they have correctly upgrade their item.
 
                     activeGame.getTeamPlayers(pTeam).forEach(p -> {
@@ -261,33 +263,33 @@ public final class UpgradeInteractListener extends UnregisterableListener {
         final int slotToSet = 30 + activeTeamTraps.size();
 
         if (activeTeamTraps.size() >= 0x03) {
-            player.sendMessage(Bedwars.PREFIX + "You have reached maximum traps limit.");
+            player.sendMessage(Bedwars.PREFIX + AllStrings.MAX_TRAPS_LIMIT.get());
             player.playSound(player.getLocation(), Sound.ARROW_HIT, 7.5f, 0.85f);
         } else if (alarmShopItem.getSlot() == clickedSlot) {
 
             final Pair<HashMap<Integer, Integer>, Boolean> payment = GameUtils.canAfford(player.getInventory(), alarmShopItem.getBuyWith(), alarmShopItem.getBuyCost());
-            if (payTraps(payment, player, alarmShopItem, "Alarm Trap")) {
+            if (payTraps(payment, player, alarmShopItem, AllStrings.ALARM_TRAP_DISPLAY.get())) {
                 addTrap(player, AlarmActiveTrap.class, playerTeam, slotToSet, alarmShopItem);
             }
 
         } else if (blindnessAndPoisonShopItem.getSlot() == clickedSlot) {
 
             final Pair<HashMap<Integer, Integer>, Boolean> payment = GameUtils.canAfford(player.getInventory(), blindnessAndPoisonShopItem.getBuyWith(), blindnessAndPoisonShopItem.getBuyCost());
-            if (payTraps(payment, player, blindnessAndPoisonShopItem, "Blindness-Poison Trap")) {
+            if (payTraps(payment, player, blindnessAndPoisonShopItem, AllStrings.BP_TRAP_DISPLAY.get())) {
                 addTrap(player, BlindnessPoisonActiveTrap.class, playerTeam, slotToSet, blindnessAndPoisonShopItem);
             }
 
         } else if (counterOffensiveShopItem.getSlot() == clickedSlot) {
 
             final Pair<HashMap<Integer, Integer>, Boolean> payment = GameUtils.canAfford(player.getInventory(), counterOffensiveShopItem.getBuyWith(), counterOffensiveShopItem.getBuyCost());
-            if (payTraps(payment, player, counterOffensiveShopItem, "Counter-Offensive Trap")) {
+            if (payTraps(payment, player, counterOffensiveShopItem, AllStrings.CO_TRAP_DISPLAY.get())) {
                 addTrap(player, CounterOffensiveActiveTrap.class, playerTeam, slotToSet, counterOffensiveShopItem);
             }
 
         } else if (minerFatigueShopItem.getSlot() == clickedSlot) {
 
             final Pair<HashMap<Integer, Integer>, Boolean> payment = GameUtils.canAfford(player.getInventory(), minerFatigueShopItem.getBuyWith(), minerFatigueShopItem.getBuyCost());
-            if (payTraps(payment, player, minerFatigueShopItem, "Miner-Fatigue Trap")) {
+            if (payTraps(payment, player, minerFatigueShopItem, AllStrings.MF_TRAP_DISPLAY.get())) {
                 addTrap(player, MinerFatigueActiveTrap.class, playerTeam, slotToSet, minerFatigueShopItem);
             }
 

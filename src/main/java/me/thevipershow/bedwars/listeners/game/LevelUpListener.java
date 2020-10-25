@@ -1,6 +1,7 @@
 package me.thevipershow.bedwars.listeners.game;
 
 import java.util.Random;
+import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.events.BedwarsLevelUpEvent;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.listeners.UnregisterableListener;
@@ -21,10 +22,7 @@ public final class LevelUpListener extends UnregisterableListener {
 
     private void sendLevelUpMsg(final BedwarsLevelUpEvent e) {
         final Player player = e.getPlayer();
-        player.sendMessage("§7--------------------------------");
-        player.sendMessage("            §a♫ §6LEVEL UP! §a♫");
-        player.sendMessage("         §eYou are now §3Level " + e.getNewLevel() + "§8!");
-        player.sendMessage("§7--------------------------------");
+        player.sendMessage(String.format(AllStrings.LEVEL_UP.get(), e.getNewLevel()));
     }
 
     private void levelUpEffects(final Player player) {

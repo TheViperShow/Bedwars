@@ -3,6 +3,7 @@ package me.thevipershow.bedwars.config.objects.upgradeshop;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import me.thevipershow.bedwars.AllStrings;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
 public final class ReinforcedArmorUpgrade implements ConfigurationSerializable, Upgrade {
@@ -21,9 +22,9 @@ public final class ReinforcedArmorUpgrade implements ConfigurationSerializable, 
     }
 
     public static ReinforcedArmorUpgrade deserialize(final Map<String, Object> map) {
-        final int slot = (int) map.get("slot");
+        final int slot = (int) map.get(AllStrings.SLOT.get());
         return new ReinforcedArmorUpgrade(
-                ((List<Map<String, Object>>) map.get("levels"))
+                ((List<Map<String, Object>>) map.get(AllStrings.LEVELS.get()))
                         .stream().map(UpgradeShopItem::deserialize)
                         .collect(Collectors.toList()),
                 slot);

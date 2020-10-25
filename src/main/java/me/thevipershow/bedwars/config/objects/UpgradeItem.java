@@ -3,6 +3,7 @@ package me.thevipershow.bedwars.config.objects;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import me.thevipershow.bedwars.AllStrings;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
 public final class UpgradeItem implements ConfigurationSerializable {
@@ -19,13 +20,13 @@ public final class UpgradeItem implements ConfigurationSerializable {
 
     @Override
     public Map<String, Object> serialize() {
-        throw new UnsupportedOperationException("no");
+        throw new UnsupportedOperationException();
     }
 
     public static UpgradeItem deserialize(final Map<String, Object> map) {
-        final int slot = (int) map.get("slot");
-        final int amount = (int) map.get("amount");
-        final List<Map<String, Object>> levels = (List<Map<String, Object>>) map.get("levels");
+        final int slot = (int) map.get(AllStrings.SLOT.get());
+        final int amount = (int) map.get(AllStrings.AMOUNT.get());
+        final List<Map<String, Object>> levels = (List<Map<String, Object>>) map.get(AllStrings.LEVELS.get());
         final List<UpgradeLevel> levels_ = levels.stream().map(lvl -> UpgradeLevel.deserialize(lvl)).collect(Collectors.toList());
         return new UpgradeItem(slot, amount, levels_);
     }

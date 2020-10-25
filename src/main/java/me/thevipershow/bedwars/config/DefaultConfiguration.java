@@ -1,5 +1,6 @@
 package me.thevipershow.bedwars.config;
 
+import me.thevipershow.bedwars.AllStrings;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -25,12 +26,12 @@ public class DefaultConfiguration {
 
     private void setValues() {
         plugin.reloadConfig();
-        this.databaseUsername = config.getString("settings.database.username");
-        this.password = config.getString("settings.database.password");
-        this.address = config.getString("settings.database.address");
-        this.port = config.getInt("settings.database.port");
-        this.databaseName = config.getString("settings.database.db-name");
-        this.lobbyName = config.getString("settings.lobby.world-name");
+        this.databaseUsername = config.getString(AllStrings.DB_USER.get());
+        this.password = config.getString(AllStrings.DB_PASSWORD.get());
+        this.address = config.getString(AllStrings.DB_ADDRESS.get());
+        this.port = config.getInt(AllStrings.DB_PORT.get());
+        this.databaseName = config.getString(AllStrings.DB_NAME.get());
+        this.lobbyName = config.getString(AllStrings.LOBBY_NAME.get());
     }
 
     public JavaPlugin getPlugin() {

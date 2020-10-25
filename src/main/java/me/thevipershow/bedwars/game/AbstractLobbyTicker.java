@@ -1,5 +1,6 @@
 package me.thevipershow.bedwars.game;
 
+import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -10,7 +11,7 @@ public abstract class AbstractLobbyTicker {
     protected long missingTime;
 
     protected final String generateTimeText() {
-        final StringBuilder strB = new StringBuilder("§eStarting in §7§l[§r");
+        final StringBuilder strB = new StringBuilder(AllStrings.STARTING_IN.get());
 
         byte start = 0x00;
         final long toColor = 0x14 * (activeGame.bedwarsGame.getStartTimer() - missingTime) / activeGame.bedwarsGame.getStartTimer();
@@ -19,11 +20,11 @@ public abstract class AbstractLobbyTicker {
             strB.append('§').append(start > toColor ? 'c' : 'a').append('|');
             start++;
         }
-        return strB.append("§7§l] §6").append(missingTime).append(" §eseconds").toString();
+        return strB.append(AllStrings.STARTING_END.get()).append(missingTime).append(AllStrings.SECONDS.get()).toString();
     }
 
     protected final String generateMissingPlayerText() {
-        return Bedwars.PREFIX + "§7Missing §e" + (activeGame.bedwarsGame.getMinPlayers() - activeGame.associatedQueue.queueSize()) + " §7more players to play";
+        return Bedwars.PREFIX + AllStrings.MISSING.get() + (activeGame.bedwarsGame.getMinPlayers() - activeGame.associatedQueue.queueSize()) + " §7more players to play";
     }
 
     public abstract void startTicking();

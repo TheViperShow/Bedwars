@@ -1,6 +1,7 @@
 package me.thevipershow.bedwars.game;
 
 import java.util.concurrent.CompletableFuture;
+import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.storage.sql.tables.QuestsTableUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -16,27 +17,15 @@ public final class QuestManager {
     }
 
     private void dailyFirstGameMessage(final Player player) {
-        player.sendMessage("-----------------------------------");
-        player.sendMessage("            §a★ §6DAILY QUEST COMPLETED! §a★");
-        player.sendMessage("         §eYou have won your first game of the day§8!");
-        player.sendMessage("         §e          +§6§l250 EXP");
-        player.sendMessage("-----------------------------------");
+        player.sendMessage(AllStrings.DAILY_FIRST_GAME_MESSAGE.get());
     }
 
     private void dailyGamesPlayedMessage(final Player player) {
-        player.sendMessage("-----------------------------------");
-        player.sendMessage("            §a★ §6DAILY QUEST COMPLETED! §a★");
-        player.sendMessage("         §eYou have played two daily games§8!");
-        player.sendMessage("         §e          +§6§l250 EXP");
-        player.sendMessage("-----------------------------------");
+        player.sendMessage(AllStrings.DAILY_GAMES_PLAYER_MESSAGE.get());
     }
 
     private void brokenBedsMessage(final Player player) {
-        player.sendMessage("-----------------------------------");
-        player.sendMessage("            §a★ §6DAILY QUEST COMPLETED! §a★");
-        player.sendMessage("         §eYou have destroyed 25 beds§8!");
-        player.sendMessage("         §e          +§6§l5000 EXP");
-        player.sendMessage("----------------------------------");
+        player.sendMessage(AllStrings.WEEKLY_BROKEN_BEDS_MESSAGE.get());
     }
 
     public final void winDailyFirstGame(final Player player) {

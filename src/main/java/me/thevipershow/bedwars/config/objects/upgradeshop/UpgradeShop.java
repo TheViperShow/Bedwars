@@ -2,6 +2,8 @@ package me.thevipershow.bedwars.config.objects.upgradeshop;
 
 import java.util.Map;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import static me.thevipershow.bedwars.AllStrings.*;
+import sun.security.provider.SHA;
 
 public final class UpgradeShop implements ConfigurationSerializable {
 
@@ -30,18 +32,18 @@ public final class UpgradeShop implements ConfigurationSerializable {
 
     @Override
     public Map<String, Object> serialize() {
-        throw new UnsupportedOperationException("no");
+        throw new UnsupportedOperationException();
     }
 
     public static UpgradeShop deserialize(final Map<String, Object> map) {
-        final int slots = (int) map.get("slots");
-        final SharpnessUpgrade sharpnessUpgrade = SharpnessUpgrade.deserialize((Map<String, Object>) map.get("sharpness"));
-        final ReinforcedArmorUpgrade reinforcedArmorUpgrade = ReinforcedArmorUpgrade.deserialize((Map<String, Object>) map.get("reinforced-armor"));
-        final ManiacMinerUpgrade maniacMinerUpgrade = ManiacMinerUpgrade.deserialize((Map<String, Object>) map.get("maniac-miner"));
-        final IronForgeUpgrade ironForgeUpgrade = IronForgeUpgrade.deserialize((Map<String, Object>) map.get("iron-forge"));
-        final HealPoolUpgrade healPoolUpgrade = HealPoolUpgrade.deserialize((Map<String, Object>) map.get("heal-pool"));
-        final DragonBuffUpgrade dragonBuffUpgrade = DragonBuffUpgrade.deserialize((Map<String, Object>) map.get("dragon-buff"));
-        final TrapUpgrades trapUpgrades = TrapUpgrades.deserialize((Map<String, Object>) map.get("traps"));
+        final int slots = (int) map.get(SLOTS.get());
+        final SharpnessUpgrade sharpnessUpgrade = SharpnessUpgrade.deserialize((Map<String, Object>) map.get(SHARPNESS.get()));
+        final ReinforcedArmorUpgrade reinforcedArmorUpgrade = ReinforcedArmorUpgrade.deserialize((Map<String, Object>) map.get(REINFORCED_ARMOR.get()));
+        final ManiacMinerUpgrade maniacMinerUpgrade = ManiacMinerUpgrade.deserialize((Map<String, Object>) map.get(MANIAC_MINER.get()));
+        final IronForgeUpgrade ironForgeUpgrade = IronForgeUpgrade.deserialize((Map<String, Object>) map.get(IRON_FORGE.get()));
+        final HealPoolUpgrade healPoolUpgrade = HealPoolUpgrade.deserialize((Map<String, Object>) map.get(HEAL_POOL.get()));
+        final DragonBuffUpgrade dragonBuffUpgrade = DragonBuffUpgrade.deserialize((Map<String, Object>) map.get(DRAGON_BUFF.get()));
+        final TrapUpgrades trapUpgrades = TrapUpgrades.deserialize((Map<String, Object>) map.get(TRAPS.get()));
         return new UpgradeShop(sharpnessUpgrade, reinforcedArmorUpgrade, maniacMinerUpgrade, ironForgeUpgrade, healPoolUpgrade, dragonBuffUpgrade, trapUpgrades, slots);
     }
 

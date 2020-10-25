@@ -1,14 +1,16 @@
 package me.thevipershow.bedwars.config.objects.upgradeshop;
 
 import java.util.Map;
+import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.config.objects.ShopItem;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
-public final class HealPoolUpgrade implements ConfigurationSerializable , Upgrade {
+public final class
+HealPoolUpgrade implements ConfigurationSerializable , Upgrade {
 
     @Override
     public Map<String, Object> serialize() {
-        throw new UnsupportedOperationException("no");
+        throw new UnsupportedOperationException();
     }
 
     private final ShopItem item;
@@ -24,9 +26,9 @@ public final class HealPoolUpgrade implements ConfigurationSerializable , Upgrad
     }
 
     public static HealPoolUpgrade deserialize(final Map<String, Object> map) {
-        final int healRadius = (int) map.get("heal-radius");
-        final int healFrequency = (int) map.get("heal-frequency");
-        final double healAmount = (double) map.get("heal-amount");
+        final int healRadius = (int) map.get(AllStrings.HEAL_RADIUS.get());
+        final int healFrequency = (int) map.get(AllStrings.HEAL_FREQUENCY.get());
+        final double healAmount = (double) map.get(AllStrings.HEAL_AMOUNT.get());
         return new HealPoolUpgrade(ShopItem.deserialize(map), healRadius, healFrequency, healAmount);
     }
 

@@ -51,7 +51,7 @@ public final class Bedwars extends JavaPlugin {
 
     public static Plugin plugin = null;
 
-    public static String PREFIX = "§7[§eCloudCombat§7]: ";
+    public static String PREFIX = AllStrings.PREFIX.get();
     public static String MYSQL_DRIVER_CLASS = null;
 
     private WorldsManager worldsManager;
@@ -73,7 +73,7 @@ public final class Bedwars extends JavaPlugin {
 
     static {
         try {
-            MYSQL_DRIVER_CLASS = Class.forName("com.mysql.jdbc.Driver").getCanonicalName();
+            MYSQL_DRIVER_CLASS = Class.forName(AllStrings.DRIVER_PATH.get()).getCanonicalName();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -136,7 +136,7 @@ public final class Bedwars extends JavaPlugin {
         gameManager = new GameManager(this, worldsManager, soloConfig, duoConfig, quadConfig);
         gameManager.loadBaseAmount();
 
-        final PluginCommand pluginCommand = getServer().getPluginCommand("bedwars");
+        final PluginCommand pluginCommand = getServer().getPluginCommand(AllStrings.MAIN_COMMAND.get());
         final BedwarsMainCommand aussieBedwarsMainCommand = new BedwarsMainCommand(this, gameManager);
         pluginCommand.setExecutor(aussieBedwarsMainCommand);
         pluginCommand.setTabCompleter(aussieBedwarsMainCommand);
@@ -149,10 +149,10 @@ public final class Bedwars extends JavaPlugin {
         dataCleaner = new DataCleaner(this);
         dataCleaner.startTasks();
 
-        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+        if (Bukkit.getPluginManager().getPlugin(AllStrings.PAPI_PLUGIN.get()) != null) {
             final BedwarsExpansion bedwarsExpansion = new BedwarsExpansion(gameManager);
             if (bedwarsExpansion.register()) {
-                LoggerUtils.logColor(getLogger(), "&eSuccessfully added expansion to &aPlaceHolderAPI");
+                LoggerUtils.logColor(getLogger(), AllStrings.SUCCESSFULLY_ADDED_PAPI_EXPANSION.get());
             }
         }
     }

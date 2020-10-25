@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -16,6 +17,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
 import me.thevipershow.bedwars.bedwars.Gamemode;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
@@ -150,9 +152,9 @@ public abstract class ActiveGame {
                 .collect(Collectors.toSet());
         registerMapListeners();
         gameLobbyTicker.startTicking();
-        this.defaultShopInv = Objects.requireNonNull(setupShopGUIs(), "The default shop inventory was null.");
-        this.defaultUpgradeInv = Objects.requireNonNull(setupUpgradeGUIs(), "The default upgrade inventory was null.");
-        this.defaultTrapsInv = Objects.requireNonNull(setupTrapsGUIs(), "The traps inventory was null.");
+        this.defaultShopInv = Objects.requireNonNull(setupShopGUIs());
+        this.defaultUpgradeInv = Objects.requireNonNull(setupUpgradeGUIs());
+        this.defaultTrapsInv = Objects.requireNonNull(setupTrapsGUIs());
         this.abstractDeathmatch = GameUtils.deathmatchFromGamemode(bedwarsGame.getGamemode(), this);
         this.experienceManager = new ExperienceManager(this);
         this.questManager = new QuestManager(this.experienceManager);
@@ -172,12 +174,12 @@ public abstract class ActiveGame {
     }
 
     protected final void announceNoTeaming() {
-        associatedQueue.perform(p -> p.sendMessage(Bedwars.PREFIX + "§c§lRemember that TEAMING between different teams is strictly PROHIBITED!"));
+        associatedQueue.perform(p -> p.sendMessage(Bedwars.PREFIX + AllStrings.TEAMING_PROHIBITED.get()));
     }
 
     protected final Inventory setupShopGUIs() {
         final Shop shop = bedwarsGame.getShop();
-        final Inventory inv = Bukkit.createInventory(null, shop.getSlots(), "§7[§eBedwars§7] §eShop");
+        final Inventory inv = Bukkit.createInventory(null, shop.getSlots(), AllStrings.BEDWARS_SHOP_TITLE.get());
 
         for (final int glassSlot : shop.getGlassSlots()) {
             final ItemStack glass = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) shop.getGlassColor());
@@ -232,7 +234,7 @@ public abstract class ActiveGame {
     }
 
     public final Inventory setupTrapsGUIs() {
-        final Inventory trapsInv = Bukkit.createInventory(null, 0x24, "§7[§eBedwars§7] Traps");
+        final Inventory trapsInv = Bukkit.createInventory(null, 0x24, AllStrings.BEDWARS_TRAPS_TITLE.get());
         final TrapUpgrades trapUpgrades = bedwarsGame.getUpgradeShop().getTrapUpgrades();
         final BlindnessAndPoisonTrap blindnessAndPoisonTrap = trapUpgrades.getBlindnessAndPoisonTrap();
         final CounterOffensiveTrap counterOffensiveTrap = trapUpgrades.getCounterOffensiveTrap();
@@ -261,7 +263,7 @@ public abstract class ActiveGame {
     }
 
     public final Inventory setupUpgradeGUIs() {
-        final Inventory upgradeInv = Bukkit.createInventory(null, bedwarsGame.getUpgradeShop().getSlots(), "§7[§eBedwars§7] §eUpgrades");
+        final Inventory upgradeInv = Bukkit.createInventory(null, bedwarsGame.getUpgradeShop().getSlots(), AllStrings.BEDWARS_UPGRADE_TITLE.get());
         final UpgradeShop upgradeShop = bedwarsGame.getUpgradeShop();
 
         final DragonBuffUpgrade dragonBuffUpgrade = upgradeShop.getDragonBuffUpgrade();
@@ -326,11 +328,11 @@ public abstract class ActiveGame {
             }
 
             for (final BedwarsTeam team : assignedTeams.keySet()) {
-                builder.next("✦ §7Team " + "§" + team.getColorCode() + "§l" + team.name() + getTeamChar(team));
+                builder.next(AllStrings.TEAM_SCOREBOARD.get() + team.getColorCode() + "§l" + team.name() + getTeamChar(team));
             }
 
             builder.blank();
-            builder.next(" §ecloudcombat.com");
+            builder.next(" §e" + AllStrings.SERVER_BRAND.get());
             return builder.build();
         }
 
@@ -343,10 +345,10 @@ public abstract class ActiveGame {
         associatedQueue.perform(p -> {
             if (p.isOnline() && p.getWorld().equals(associatedWorld)) {
                 if (getPlayerTeam(p) == destroyed) {
-                    p.sendTitle("", "§c§lYour bed has been broken!");
+                    p.sendTitle("", AllStrings.YOUR_BED_BROKEN.get());
                 } else {
                     final BedwarsTeam destroyerTeam = getPlayerTeam(destroyer);
-                    p.sendMessage(Bedwars.PREFIX + "§" + destroyed.getColorCode() + destroyed.name() + " §7team's bed has been broken by §" + destroyerTeam.getColorCode() + destroyer.getName());
+                    p.sendMessage(Bedwars.PREFIX + "§" + destroyed.getColorCode() + destroyed.name() + AllStrings.BED_BROKEN_BY.get() + destroyerTeam.getColorCode() + destroyer.getName());
                 }
                 p.playSound(p.getLocation(), Sound.ENDERDRAGON_GROWL, 9.0f, 1.0f);
             }
@@ -452,8 +454,8 @@ public abstract class ActiveGame {
 
     public void connectedToQueue(final Player player) {
         associatedQueue.perform(p -> {
-            p.sendMessage(Bedwars.PREFIX + player.getName() + " §ehas joined §7§l" + getAssociatedWorld().getName() + " §r§equeue");
-            p.sendMessage(Bedwars.PREFIX + String.format("§eStatus §7[§a%d§8/§a%d§7]", getAssociatedQueue().queueSize() + 1, getBedwarsGame().getPlayers()));
+            p.sendMessage(Bedwars.PREFIX + player.getName() + AllStrings.JOINED_QUEUE.get() + getAssociatedWorld().getName() + " §r§equeue");
+            p.sendMessage(Bedwars.PREFIX + String.format(AllStrings.QUEUE_STATUS.get(), getAssociatedQueue().queueSize() + 1, getBedwarsGame().getPlayers()));
         });
     }
 
@@ -542,7 +544,7 @@ public abstract class ActiveGame {
                 player.setGameMode(GameMode.ADVENTURE);
             }
         } else
-            player.sendMessage(Bedwars.PREFIX + "Something went wrong when teleporting you to waiting room.");
+            player.sendMessage(Bedwars.PREFIX + AllStrings.TELEPORT_ERROR.get());
     }
 
     public BedwarsTeam getPlayerTeam(final Player player) {
@@ -565,11 +567,12 @@ public abstract class ActiveGame {
         setHasStarted(true);
         if (associatedQueue.queueSize() >= bedwarsGame.getMinPlayers()) {
             if (associatedWorld == null) {
-                handleError("Something went wrong while you were being sent into game.");
+                handleError(AllStrings.TELEPORT_ERROR.get());
                 return;
             }
 
             assignTeams();
+            cleanAll();
             assignScoreboards();
             createSpawners();
             createMerchants();
@@ -586,6 +589,14 @@ public abstract class ActiveGame {
             experienceManager.startRewardTask();
             this.startTime = System.currentTimeMillis();
         }
+    }
+
+    public void cleanAll() {
+        assignedTeams.values().stream().flatMap(Collection::stream).forEach(p -> {
+            if (p.isOnline()) {
+                p.getInventory().clear();
+            }
+        });
     }
 
     public final void fillTrapsDelayMap() {
@@ -681,13 +692,13 @@ public abstract class ActiveGame {
             if (p.isOnline()) {
                 final BedwarsTeam pTeam = getPlayerTeam(p);
                 if (pTeam == team) {
-                    p.sendTitle("§a§lYou have won this game!", "§aCongratulations.");
+                    p.sendTitle(AllStrings.YOU_WON_GAME.get(), AllStrings.CONGRATULATIONS.get());
                     p.playSound(p.getLocation(), Sound.FIREWORK_TWINKLE, 7.50f, 1.00f);
                     ExperienceManager.rewardPlayer(bedwarsGame.getGamemode() == Gamemode.QUAD ? 50 : 100, p, this);
                     questManager.winDailyFirstGame(p);
                     GlobalStatsTableUtils.increaseWin(bedwarsGame.getGamemode(), plugin, p.getUniqueId());
                 } else {
-                    p.sendTitle("§7Team " + '§' + team.getColorCode() + team.name() + " §7has won the game!", "§7Returning to lobby in 15s");
+                    p.sendTitle(AllStrings.TEAM_WON.get()+ team.getColorCode() + team.name() + AllStrings.HAS_WON_THE_GAME.get(), AllStrings.RETURNING_LOBBY.get());
                 }
                 questManager.gamePlayedReward(p);
             }
@@ -729,7 +740,7 @@ public abstract class ActiveGame {
                     .forEach(i -> this.announcementsTasks.add(plugin.getServer().getScheduler()
                             .runTaskLater(plugin, () -> getAssociatedWorld()
                                     .getPlayers()
-                                    .forEach(p -> p.sendMessage(Bedwars.PREFIX + "The §b§lDIAMOND §7spawners have been upgraded to lvl. §e" + i.getLevel())), i.getAfterSeconds() * 20L)));
+                                    .forEach(p -> p.sendMessage(Bedwars.PREFIX + AllStrings.DIAMOND_UPGRADE.get() + i.getLevel())), i.getAfterSeconds() * 20L)));
 
             emeraldSampleSpawner.getSpawner()
                     .getSpawnerLevels()
@@ -738,7 +749,7 @@ public abstract class ActiveGame {
                     .forEach(i -> this.announcementsTasks.add(plugin.getServer().getScheduler()
                             .runTaskLater(plugin, () -> getAssociatedWorld()
                                     .getPlayers()
-                                    .forEach(p -> p.sendMessage(Bedwars.PREFIX + "The §a§lEMERALD §7spawners have been upgraded to lvl. §e" + i.getLevel())), i.getAfterSeconds() * 20L)));
+                                    .forEach(p -> p.sendMessage(Bedwars.PREFIX + AllStrings.EMERALD_UPGRADE.get() + i.getLevel())), i.getAfterSeconds() * 20L)));
         }
     }
 
@@ -778,7 +789,7 @@ public abstract class ActiveGame {
             WorldsManager.getInstanceUnsafe().getActiveGameList().remove(this);
             FileUtils.deleteDirectory(wDir);
         } catch (IOException e) {
-            plugin.getLogger().severe("Something went wrong while destroying map of " + associatedWorldFilename);
+            plugin.getLogger().severe(AllStrings.DESTROY_MAP_ERROR.get() + associatedWorldFilename);
             e.printStackTrace();
         }
     }
@@ -798,12 +809,12 @@ public abstract class ActiveGame {
         if (destroyedTeams.contains(t) || abstractDeathmatch.isRunning()) {
             final List<Player> teamMembers = getTeamPlayers(t);
             if (teamMembers.stream().allMatch(this::isOutOfGame)) {
-                return " §c§l✘";
+                return AllStrings.GRAPHIC_CROSS.get();
             } else {
                 return " §f§l" + teamMembers.stream().filter(p -> !isOutOfGame(p)).count();
             }
         } else {
-            return " §a✓";
+            return AllStrings.GRAPHIC_TICK.get();
         }
     }
 
@@ -844,8 +855,7 @@ public abstract class ActiveGame {
 
     public void openUpgrade(final Player player) {
         if (!this.associatedUpgradeGUI.containsKey(player.getUniqueId())) {
-            System.out.println("2");
-            final Inventory associated = cloneInventory(Objects.requireNonNull(this.defaultUpgradeInv, "Illegal null upgrade inv has been created."));
+            final Inventory associated = cloneInventory(Objects.requireNonNull(this.defaultUpgradeInv));
             associatedUpgradeGUI.put(player.getUniqueId(), associated);
         }
         player.openInventory(this.associatedUpgradeGUI.get(player.getUniqueId()));
@@ -853,7 +863,7 @@ public abstract class ActiveGame {
 
     public void openTraps(final Player player) {
         if (!this.associatedTrapsGUI.containsKey(player.getUniqueId())) {
-            final Inventory associated = cloneInventory(Objects.requireNonNull(this.defaultTrapsInv, "Cloned illegal traps inventory"));
+            final Inventory associated = cloneInventory(Objects.requireNonNull(this.defaultTrapsInv));
             associatedTrapsGUI.put(player.getUniqueId(), associated);
         }
         player.openInventory(this.associatedTrapsGUI.get(player.getUniqueId()));
@@ -862,7 +872,7 @@ public abstract class ActiveGame {
     public void openShop(final Player player) {
 
         if (!this.associatedShopGUI.containsKey(player.getUniqueId())) { // initializing inventory for player since it was not found.
-            final Inventory associated = cloneInventory(Objects.requireNonNull(this.defaultShopInv, "Illegal null inventory has been created."));
+            final Inventory associated = cloneInventory(Objects.requireNonNull(this.defaultShopInv));
             this.associatedShopGUI.put(player.getUniqueId(), associated);
         }
 

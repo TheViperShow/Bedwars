@@ -6,6 +6,7 @@ import me.thevipershow.bedwars.bedwars.objects.shops.MerchantType;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.entity.EntityType;
+import static me.thevipershow.bedwars.AllStrings.*;
 
 @SerializableAs("Merchant")
 public class Merchant implements ConfigurationSerializable {
@@ -43,20 +44,14 @@ public class Merchant implements ConfigurationSerializable {
 
     @Override
     public Map<String, Object> serialize() {
-        final Map<String, Object> map = new HashMap<>();
-        map.put("name", merchantName);
-        map.put("type", merchantType.name());
-        map.put("location.x", merchantPosition.getX());
-        map.put("location.y", merchantPosition.getY());
-        map.put("location.z", merchantPosition.getZ());
-        return map;
+        throw new UnsupportedOperationException();
     }
 
     public static Merchant deserialize(Map<String, Object> objectMap) {
-        String name = (String) objectMap.get("name");
-        String type = (String) objectMap.get("type");
+        String name = (String) objectMap.get(NAME.get());
+        String type = (String) objectMap.get(TYPE.get());
         MerchantType merchantType = MerchantType.valueOf(type);
-        SpawnPosition spawnPosition = SpawnPosition.deserialize((Map<String, Object>) objectMap.get("location"));
+        SpawnPosition spawnPosition = SpawnPosition.deserialize((Map<String, Object>) objectMap.get(LOCATION.get()));
         return new Merchant(EntityType.VILLAGER, name, spawnPosition, merchantType);
     }
 }

@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
+import me.thevipershow.bedwars.AllStrings;
 import org.apache.commons.lang.Validate;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -64,7 +65,7 @@ public abstract class CustomConfigHandler {
         try {
             getConfig().save(customConfigFile);
         } catch (IOException ex) {
-            plugin.getLogger().log(Level.SEVERE, "Could not save config to " + customConfigFile, ex);
+            plugin.getLogger().log(Level.SEVERE, AllStrings.COULD_NOT_SAVE_CONFIG.get() + customConfigFile, ex);
         }
     }
 
@@ -78,7 +79,7 @@ public abstract class CustomConfigHandler {
     }
 
     public YamlConfiguration loadConfiguration(File file) {
-        Validate.notNull(file, "File cannot be null");
+        Validate.notNull(file, AllStrings.FILE_NULL.get());
 
         YamlConfiguration config = new YamlConfiguration();
 
@@ -87,7 +88,7 @@ public abstract class CustomConfigHandler {
         } catch (FileNotFoundException e) {
             // empty
         } catch (IOException | InvalidConfigurationException e) {
-            plugin.getLogger().log(Level.SEVERE, "Cannot load " + file, e);
+            plugin.getLogger().log(Level.SEVERE, AllStrings.CANNOT_LOAD.get() + file, e);
         }
         return config;
     }

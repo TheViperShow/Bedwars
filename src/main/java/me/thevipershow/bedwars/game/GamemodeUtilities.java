@@ -23,7 +23,7 @@ public final class GamemodeUtilities {
                 gameToReturn = new QuadActiveGame(associatedWorldName, game, lobbyWorld, plugin);
                 break;
             default:
-                throw new UnsupportedOperationException("Invalid gamemode.");
+                throw new UnsupportedOperationException();
         }
 
         return gameToReturn;

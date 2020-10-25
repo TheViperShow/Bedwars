@@ -1,6 +1,7 @@
 package me.thevipershow.bedwars.commands;
 
 import java.util.concurrent.CompletableFuture;
+import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
 import me.thevipershow.bedwars.game.ExperienceManager;
 import me.thevipershow.bedwars.game.GameManager;
@@ -29,9 +30,9 @@ public final class ExpCommand extends SubCommand {
             if (e <= 0) {
 
                 if (self) {
-                    p.sendMessage(Bedwars.PREFIX + "§7You still don't have any experience points.");
+                    p.sendMessage(Bedwars.PREFIX + AllStrings.NO_EXPERIENCE_POINTS.get());
                 } else {
-                    p.sendMessage(Bedwars.PREFIX + "§7He still doesn't have any experience points.");
+                    p.sendMessage(Bedwars.PREFIX + AllStrings.NO_EXPERIENCE_POINTS_HE.get());
                 }
 
             } else {
@@ -43,13 +44,13 @@ public final class ExpCommand extends SubCommand {
                 final int currentLevelExp = e - playerLevelMinExp;
 
                 if (self) {
-                    p.sendMessage(Bedwars.PREFIX + "\n    §7Your current experience: §6§l" + e);
-                    p.sendMessage("    §7Your current bedwars level: §6§l" + playerLevel);
-                    p.sendMessage("    §7You own §6§l" + currentLevelExp + "§8\\§6§l" + expForNextLevel + " EXP §r§7required to reach §3§lLevel " + (playerLevel + 1));
+                    p.sendMessage(Bedwars.PREFIX + AllStrings.YOUR_CURRENT_EXP.get() + e);
+                    p.sendMessage(AllStrings.YOUR_CURRENT_LEVEL.get() + playerLevel);
+                    p.sendMessage(String.format(AllStrings.YOU_OWN.get(), currentLevelExp, expForNextLevel, playerLevel + 1));
                 } else {
-                    p.sendMessage(Bedwars.PREFIX + String.format("\n    §7%s's current experience: §6§l", targetName) + e);
-                    p.sendMessage(String.format("    §7%s's current bedwars level: §6§l", targetName) + playerLevel);
-                    p.sendMessage(String.format("    §7%s owns §6§l", targetName) + currentLevelExp + "§8\\§6§l" + expForNextLevel + " EXP §r§7required to reach §3§lLevel " + (playerLevel + 1));
+                    p.sendMessage(Bedwars.PREFIX + String.format(AllStrings.HIS_CURRENT_EXP.get(), targetName) + e);
+                    p.sendMessage(String.format(AllStrings.HIS_CURRENT_LEVEL.get(), targetName) + playerLevel);
+                    p.sendMessage(String.format(AllStrings.HE_OWNS.get(), targetName, currentLevelExp, expForNextLevel, playerLevel+1));
                 }
             }
         });
@@ -58,7 +59,7 @@ public final class ExpCommand extends SubCommand {
     @Override
     public final void run(final CommandSender sender) {
         if (args.length == 1) {
-            if (!sender.hasPermission("abedwars.users.exp")) {
+            if (!sender.hasPermission(AllStrings.PERMISSION_USER_EXP.get())) {
                 missingPerm(sender);
             } else {
                 if (!(sender instanceof Player)) {
@@ -70,8 +71,8 @@ public final class ExpCommand extends SubCommand {
             }
         } else {
             if (args.length == 3) {
-                if (args[1].equalsIgnoreCase("view")) {
-                    if (!sender.hasPermission("abedwars.admin.exp.view")) {
+                if (args[1].equalsIgnoreCase(AllStrings.VIEW.get())) {
+                    if (!sender.hasPermission(AllStrings.PERMISSION_ADMIN_EXP_VIEW.get())) {
                         missingPerm(sender);
                     } else {
 
@@ -79,16 +80,16 @@ public final class ExpCommand extends SubCommand {
                     }
                 }
             } else if (args.length == 4) {
-                if (!sender.hasPermission("abedwars.admin.exp.give")) {
+                if (!sender.hasPermission(AllStrings.PERMISSION_ADMIN_EXP_GIVE.get())) {
                     missingPerm(sender);
                 } else {
-                    if (args[1].equalsIgnoreCase("add")) {
+                    if (args[1].equalsIgnoreCase(AllStrings.ADD.get())) {
                         try {
                             final int i = Integer.parseInt(args[3]);
                             RankTableUtils.rewardPlayerExp(args[2], i, plugin);
-                            sender.sendMessage(Bedwars.PREFIX + "§7If that player was present in the database, his exp increased by §6§l" + i);
+                            sender.sendMessage(Bedwars.PREFIX + AllStrings.EXP_ADDED_MSG.get() + i);
                         } catch (final NumberFormatException e) {
-                            sender.sendMessage(Bedwars.PREFIX + "§7The last argument is not a number.");
+                            sender.sendMessage(Bedwars.PREFIX + AllStrings.LAST_ARG_NOT_NUMBER.get());
                         }
                     }
                 }

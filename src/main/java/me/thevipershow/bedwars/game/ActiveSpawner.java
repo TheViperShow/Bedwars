@@ -3,6 +3,7 @@ package me.thevipershow.bedwars.game;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.bedwars.Gamemode;
 import me.thevipershow.bedwars.bedwars.objects.spawners.SpawnerType;
 import me.thevipershow.bedwars.bedwars.spawner.SpawnerLevel;
@@ -97,7 +98,7 @@ public class ActiveSpawner {
     }
 
     private String generateStandName() {
-        return String.format("§f§lLevel§r§7: §r§f§e%s§7|§f Drop in: §e§l%d§fs",
+        return String.format(AllStrings.SPAWNER_NAME.get(),
                 currentLevel.getLevel(),
                 (spawner.getDropDelay() - currentLevel.getDecreaseSpawnDelay()) - ((now() - lastDrop) / 1000));
     }

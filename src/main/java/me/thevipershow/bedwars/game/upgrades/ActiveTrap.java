@@ -1,5 +1,6 @@
 package me.thevipershow.bedwars.game.upgrades;
 
+import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.config.objects.upgradeshop.traps.TrapType;
 import me.thevipershow.bedwars.game.ActiveGame;
@@ -26,7 +27,7 @@ public abstract class ActiveTrap {
     public void alertTrapOwners() {
         for (final Player player : activeGame.getTeamPlayers(owner)) {
             if (player.isOnline() && !activeGame.isOutOfGame(player)) {
-                player.sendTitle("", "§eYour §a§l" + GameUtils.beautifyCaps(trapType.name()) + " §r§etrap has been activated!");
+                player.sendTitle("", AllStrings.YOUR.get() + GameUtils.beautifyCaps(trapType.name()) + AllStrings.TRAP_ACTIVATED.get());
                 player.playSound(player.getLocation(), Sound.CLICK, 9.0f, 0.85f);
             }
         }

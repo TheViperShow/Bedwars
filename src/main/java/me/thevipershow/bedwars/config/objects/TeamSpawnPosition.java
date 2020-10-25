@@ -1,6 +1,7 @@
 package me.thevipershow.bedwars.config.objects;
 
 import java.util.Map;
+import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
@@ -26,12 +27,12 @@ public class TeamSpawnPosition extends SpawnPosition implements ConfigurationSer
 
     @Override
     public Map<String, Object> serialize() {
-        throw new UnsupportedOperationException("I don't want to write this.");
+        throw new UnsupportedOperationException();
     }
 
     public static TeamSpawnPosition deserialize(final Map<String, Object> map) {
         final SpawnPosition spawnPosition = SpawnPosition.deserialize(map);
-        final BedwarsTeam team = BedwarsTeam.valueOf(((String) map.get("team")).toUpperCase());
+        final BedwarsTeam team = BedwarsTeam.valueOf(((String) map.get(AllStrings.TEAM.get())).toUpperCase());
         return new TeamSpawnPosition(spawnPosition, team);
     }
 

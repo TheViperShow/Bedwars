@@ -1,5 +1,6 @@
 package me.thevipershow.bedwars.commands;
 
+import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.commands.tasks.VillageQueueRemover;
 import me.thevipershow.bedwars.game.GameManager;
 import org.bukkit.command.CommandSender;
@@ -13,7 +14,7 @@ public final class RemoveCommand extends SubCommand {
 
     @Override
     public void run(CommandSender sender) {
-        if (!sender.hasPermission("abedwars.admin.remove")) {
+        if (!sender.hasPermission(AllStrings.PERMISSION_ADMIN_REMOVE.get())) {
             missingPerm(sender);
             return;
         }

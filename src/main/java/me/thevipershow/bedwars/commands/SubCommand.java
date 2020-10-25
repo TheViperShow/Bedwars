@@ -1,5 +1,6 @@
 package me.thevipershow.bedwars.commands;
 
+import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
 import me.thevipershow.bedwars.game.GameManager;
 import org.bukkit.command.CommandSender;
@@ -8,15 +9,15 @@ import org.bukkit.plugin.Plugin;
 public abstract class SubCommand {
 
     protected static void illegalExecutor(final CommandSender sender) {
-        sender.sendMessage(Bedwars.PREFIX + "You cannot execute this command from here.");
+        sender.sendMessage(Bedwars.PREFIX + AllStrings.SUBCOMMAND_ILLEGAL_EXECUTOR.get());
     }
 
     protected static void missingPerm(final CommandSender sender) {
-        sender.sendMessage(Bedwars.PREFIX + "You do not have enough permissions.");
+        sender.sendMessage(Bedwars.PREFIX + AllStrings.SUBCOMMAND_MISSING_PERM.get());
     }
 
     protected final void wrongArgsNumber(final CommandSender sender) {
-        sender.sendMessage(Bedwars.PREFIX + "Wrong number of args: " + this.args.length);
+        sender.sendMessage(Bedwars.PREFIX + AllStrings.SUBCOMMAND_WRONG_ARGS.get() + this.args.length);
     }
 
     protected final GameManager gameManager;

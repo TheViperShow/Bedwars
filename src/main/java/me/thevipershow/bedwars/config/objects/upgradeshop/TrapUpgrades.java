@@ -2,6 +2,7 @@ package me.thevipershow.bedwars.config.objects.upgradeshop;
 
 import java.util.List;
 import java.util.Map;
+import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.config.objects.upgradeshop.traps.AlarmTrap;
 import me.thevipershow.bedwars.config.objects.upgradeshop.traps.BlindnessAndPoisonTrap;
 import me.thevipershow.bedwars.config.objects.upgradeshop.traps.CounterOffensiveTrap;
@@ -41,15 +42,15 @@ public final class TrapUpgrades implements ConfigurationSerializable {
     }
 
     public static TrapUpgrades deserialize(final Map<String, Object> map) {
-        final String itemName = (String) map.get("item-name");
-        final int slot = (int) map.get("slot");
-        final Material material = Material.valueOf((String) map.get("material"));
-        final List<String> lore = (List<String>) map.get("lore");
+        final String itemName = (String) map.get(AllStrings.ITEM_NAME.get());
+        final int slot = (int) map.get(AllStrings.SLOT.get());
+        final Material material = Material.valueOf((String) map.get(AllStrings.MATERIAL.get()));
+        final List<String> lore = (List<String>) map.get(AllStrings.LORE.get());
 
-        final AlarmTrap alarmTrap = AlarmTrap.deserialize((Map<String, Object>) map.get("alarm"));
-        final BlindnessAndPoisonTrap blindnessAndPoisonTrap = BlindnessAndPoisonTrap.deserialize((Map<String, Object>) map.get("blindness-poison"));
-        final CounterOffensiveTrap counterOffensiveTrap = CounterOffensiveTrap.deserialize((Map<String, Object>) map.get("counter-offensive"));
-        final MinerFatigueTrap minerFatigueTrap = MinerFatigueTrap.deserialize((Map<String, Object>) map.get("miner-fatigue"));
+        final AlarmTrap alarmTrap = AlarmTrap.deserialize((Map<String, Object>) map.get(AllStrings.ALARM.get()));
+        final BlindnessAndPoisonTrap blindnessAndPoisonTrap = BlindnessAndPoisonTrap.deserialize((Map<String, Object>) map.get(AllStrings.BLINDNESS_POISON.get()));
+        final CounterOffensiveTrap counterOffensiveTrap = CounterOffensiveTrap.deserialize((Map<String, Object>) map.get(AllStrings.COUNTER_OFFENSIVE.get()));
+        final MinerFatigueTrap minerFatigueTrap = MinerFatigueTrap.deserialize((Map<String, Object>) map.get(AllStrings.MINER_FATIGUE.get()));
 
         return new TrapUpgrades(alarmTrap, blindnessAndPoisonTrap, counterOffensiveTrap, minerFatigueTrap, itemName, lore, slot, material);
     }

@@ -1,6 +1,7 @@
 package me.thevipershow.bedwars.commands;
 
 import java.util.Optional;
+import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
 import me.thevipershow.bedwars.bedwars.Gamemode;
 import me.thevipershow.bedwars.game.ActiveGame;
@@ -25,18 +26,18 @@ public final class JoinCommand extends SubCommand {
                 final ActiveGame found = opt.get();
                 super.gameManager.addToQueue(player, found);
             } else {
-                player.sendMessage(Bedwars.PREFIX + String.format("No game could be found for %s gamemode.", gamemode.name()));
+                player.sendMessage(Bedwars.PREFIX + String.format(AllStrings.NO_GAME_FOUND_FOR_GAMEMODE.get(), gamemode.name()));
                 super.gameManager.loadRandom(gamemode);
             }
 
         } else {
-            player.sendMessage(Bedwars.PREFIX + "You have already joined a game!");
+            player.sendMessage(Bedwars.PREFIX + AllStrings.GAME_ALREADY_JOINED.get());
         }
     }
 
     @Override
     public void run(CommandSender sender) {
-        if (!sender.hasPermission("abedwars.users.join")) {
+        if (!sender.hasPermission(AllStrings.PERMISSION_USER_JOIN.get())) {
             missingPerm(sender);
             return;
         }
@@ -56,6 +57,6 @@ public final class JoinCommand extends SubCommand {
             }
         }
 
-        sender.sendMessage(Bedwars.PREFIX + "Unknown gamemode \"" + args[1] + "\"");
+        sender.sendMessage(Bedwars.PREFIX + AllStrings.INVALID_GAMEMODE.get() + args[1] + "\"");
     }
 }

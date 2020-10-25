@@ -1,6 +1,7 @@
 package me.thevipershow.bedwars.commands;
 
 import java.util.Locale;
+import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
 import me.thevipershow.bedwars.bedwars.Gamemode;
 import me.thevipershow.bedwars.commands.tasks.VillagerQueueInteractor;
@@ -17,7 +18,7 @@ public final class SetCommand extends SubCommand {
 
     @Override
     public void run(CommandSender sender) {
-        if (!sender.hasPermission("abedwars.admin.use")) {
+        if (!sender.hasPermission(AllStrings.PERMISSION_ADMIN_USE.get())) {
             missingPerm(sender);
             return;
         }
@@ -36,6 +37,6 @@ public final class SetCommand extends SubCommand {
                 return;
             }
         }
-        sender.sendMessage(Bedwars.PREFIX + "Invalid gamemode \"" + secondArg + "\"");
+        sender.sendMessage(Bedwars.PREFIX + AllStrings.INVALID_GAMEMODE.get() + secondArg + "\"");
     }
 }

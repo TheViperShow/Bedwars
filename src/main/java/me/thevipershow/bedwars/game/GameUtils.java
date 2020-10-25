@@ -35,7 +35,7 @@ public final class GameUtils {
     public final static String NO_AI_TAG = "NoAi";
 
     private GameUtils() {
-        throw new UnsupportedOperationException("Instantiation of Utility class " + getClass().getName());
+        throw new UnsupportedOperationException();
     }
 
     public static String capitalize(String str) {
@@ -550,7 +550,7 @@ public final class GameUtils {
             case QUAD:
                 return new TeamDeathmatch(activeGame);
             default:
-                throw new IllegalArgumentException("bro what gamemode u playing?");
+                throw new IllegalArgumentException();
         }
     }
 

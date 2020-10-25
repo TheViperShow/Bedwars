@@ -10,6 +10,7 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import static me.thevipershow.bedwars.AllStrings.*;
 
 @SerializableAs("Item")
 public class ShopItem implements ConfigurationSerializable {
@@ -52,24 +53,24 @@ public class ShopItem implements ConfigurationSerializable {
     @Override
     public final Map<String, Object> serialize() {
         final Map<String, Object> map = new HashMap<>();
-        map.put("material", material.name());
-        map.put("amount", amount);
-        map.put("buy-with", buyWith.name());
-        map.put("price", buyCost);
-        map.put("slot", slot);
-        map.put("item-name", itemName);
-        map.put("lore", lore);
+        map.put(MATERIAL.get(), material.name());
+        map.put(AMOUNT.get(), amount);
+        map.put(BUY_WITH.get(), buyWith.name());
+        map.put(PRICE.get(), buyCost);
+        map.put(SLOT.get(), slot);
+        map.put(ITEM_NAME.get(), itemName);
+        map.put(LORE.get(), lore);
         return map;
     }
 
     public static ShopItem deserialize(Map<String, Object> objectMap) {
-        String m = (String) objectMap.get("material");
-        int a = (int) objectMap.get("amount");
-        String b = (String) objectMap.get("buy-with");
-        int c = (int) objectMap.get("price");
-        int s = (int) objectMap.get("slot");
-        String itemName = (String) objectMap.get("item-name");
-        final List<String> lore = (List<String>) objectMap.get("lore");
+        String m = (String) objectMap.get(MATERIAL.get());
+        int a = (int) objectMap.get(AMOUNT.get());
+        String b = (String) objectMap.get(BUY_WITH.get());
+        int c = (int) objectMap.get(PRICE.get());
+        int s = (int) objectMap.get(SLOT.get());
+        String itemName = (String) objectMap.get(ITEM_NAME.get());
+        final List<String> lore = (List<String>) objectMap.get(LORE.get());
         return new ShopItem(m, a, b, c, s, itemName, lore);
     }
 
@@ -101,22 +102,6 @@ public class ShopItem implements ConfigurationSerializable {
         if (cachedGameStack != null) return cachedGameStack;
         this.cachedGameStack = new ItemStack(material, amount);
         return cachedGameStack;
-        // return new ItemStack(this.getMaterial(), this.amount);
-    }
-
-    @Override
-    public String toString() {
-        return "ShopItem{" +
-                "material=" + material +
-                ", amount=" + amount +
-                ", buyWith=" + buyWith +
-                ", buyCost=" + buyCost +
-                ", slot=" + slot +
-                ", itemName='" + itemName + '\'' +
-                ", lore=" + lore +
-                ", cachedFancyStack=" + cachedFancyStack +
-                ", cachedGameStack=" + cachedGameStack +
-                '}';
     }
 
     public List<String> getLore() {

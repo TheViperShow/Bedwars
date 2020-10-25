@@ -3,6 +3,7 @@ package me.thevipershow.bedwars.listeners.game;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.config.objects.PotionItem;
@@ -80,7 +81,7 @@ public final class ShopInteractListener extends UnregisterableListener {
                         if (enchantLvl != 0) {
                             GameUtils.enchantSwords(Enchantment.PROTECTION_ENVIRONMENTAL, enchantLvl, player); // Adding enchant if he has the Upgrade.
                         }
-                    } else if (clickedItem.getType().name().endsWith("SWORD")) {
+                    } else if (clickedItem.getType().name().endsWith(AllStrings.SWORD.get())) {
                         final ItemStack prevSword = activeGame.getSwordUpgrades().getPrevious(clickedItem.getType());
                         if (prevSword == null) {
                             GameUtils.paySound(player);
@@ -97,7 +98,7 @@ public final class ShopInteractListener extends UnregisterableListener {
                             final ItemStack toGive = clickedShopItem.generateWithoutLore();
                             if (dupe != null) {
                                 GameUtils.buyFailSound(player);
-                                player.sendMessage(Bedwars.PREFIX + "§7You have already picked this sword level.");
+                                player.sendMessage(Bedwars.PREFIX + AllStrings.ALREADY_SWORD_LEVEL.get());
                                 return;
                             } else if (search == null) {
                                 GameUtils.giveStackToPlayer(toGive, player, player.getInventory().getContents());
@@ -122,7 +123,7 @@ public final class ShopInteractListener extends UnregisterableListener {
                     }
                 } else {
                     GameUtils.buyFailSound(player);
-                    player.sendMessage(Bedwars.PREFIX + "§7You did not have enough " + GameUtils.beautifyCaps(clickedShopItem.getBuyWith().name()));
+                    player.sendMessage(Bedwars.PREFIX + AllStrings.YOU_DID_NOT_HAVE_ENOUGH.get() + GameUtils.beautifyCaps(clickedShopItem.getBuyWith().name()));
                 }
             } else if (clickedItem.getType() == Material.POTION) {
 
@@ -136,7 +137,7 @@ public final class ShopInteractListener extends UnregisterableListener {
                         GameUtils.giveStackToPlayer(clickedPotion.getGameStack(), player, player.getInventory().getContents());
                     } else {
                         GameUtils.buyFailSound(player);
-                        player.sendMessage(Bedwars.PREFIX + "§7You did not have enough " + GameUtils.beautifyCaps(clickedPotion.getBuyWith().name()));
+                        player.sendMessage(Bedwars.PREFIX + AllStrings.YOU_DID_NOT_HAVE_ENOUGH.get() + GameUtils.beautifyCaps(clickedPotion.getBuyWith().name()));
                     }
 
                 }
@@ -155,14 +156,14 @@ public final class ShopInteractListener extends UnregisterableListener {
                 if (currentLevel == null) return;
                 if (loadedLvls.size() <= currentLevel + 1) {
                     GameUtils.buyFailSound(player);
-                    player.sendMessage(Bedwars.PREFIX + "§7You already have the highest upgrade available.");
+                    player.sendMessage(Bedwars.PREFIX + AllStrings.YOU_ALREADY_HAVE_HIGHEST_UPGRADE_AVAILABLE.get());
                 } else {
                     final UpgradeLevel boughtLevel = clickedUpgradeItem.getLevels().get(currentLevel + 1);
                     final Pair<HashMap<Integer, Integer>, Boolean> transaction = GameUtils.canAfford(player.getInventory(), boughtLevel.getBuyWith(), boughtLevel.getPrice());
 
                     if (!transaction.getB()) {
                         GameUtils.buyFailSound(player);
-                        player.sendMessage(Bedwars.PREFIX + "§7You did not have enough " + GameUtils.beautifyCaps(boughtLevel.getBuyWith().name()));
+                        player.sendMessage(Bedwars.PREFIX + AllStrings.YOU_DID_NOT_HAVE_ENOUGH.get() + GameUtils.beautifyCaps(boughtLevel.getBuyWith().name()));
                     } else {
                         GameUtils.makePlayerPay(player.getInventory(), boughtLevel.getBuyWith(), boughtLevel.getPrice(), transaction.getA());
                         final Inventory inv = activeGame.getAssociatedShopGUI().get(player.getUniqueId());
@@ -179,7 +180,7 @@ public final class ShopInteractListener extends UnregisterableListener {
                         player.updateInventory();
                         playerLevels.computeIfPresent(clickedUpgradeItem, (k, v) -> v = v + 1);
                         GameUtils.upgradeSound(player);
-                        player.sendMessage(Bedwars.PREFIX + "§7You successfully upgraded this item to §eLvl. " + (currentLevel + 2));
+                        player.sendMessage(Bedwars.PREFIX + AllStrings.SUCCESSFULLY_UPGRADED_TO_LVL.get() + (currentLevel + 2));
                     }
                 }
             }

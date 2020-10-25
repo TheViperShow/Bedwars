@@ -1,5 +1,6 @@
 package me.thevipershow.bedwars.game;
 
+import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
 import me.thevipershow.bedwars.events.GameStartEvent;
 import net.minecraft.server.v1_8_R3.ChatMessage;
@@ -37,7 +38,7 @@ public final class GameLobbyTicker extends AbstractLobbyTicker {
                     if (missingTime > 0 && missingTime <= 5) {
                         activeGame.associatedQueue.perform(p -> {
                             p.playSound(p.getLocation(), Sound.NOTE_STICKS, 9.50f, 0.850f);
-                            p.sendMessage(Bedwars.PREFIX+ "§aGame starting in §e" + missingTime);
+                            p.sendMessage(Bedwars.PREFIX+ AllStrings.GAME_STARTING.get() + missingTime);
                         });
                     }
 
