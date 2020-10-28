@@ -1,6 +1,5 @@
 package me.thevipershow.bedwars.listeners.game;
 
-import com.sun.org.apache.bcel.internal.generic.ALOAD;
 import java.lang.reflect.InvocationTargetException;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -240,8 +239,8 @@ public final class UpgradeInteractListener extends UnregisterableListener {
         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
-        activeGame.getAssociatedTrapsGUI().get(player.getUniqueId()).setItem(slot, item.generateFancyStack());
-        activeGame.getAssociatedUpgradeGUI().get(player.getUniqueId()).setItem(slot, item.generateFancyStack());
+        activeGame.getAssociatedTrapsGUI().get(player.getUniqueId()).setItem(slot, item.getCachedFancyStack());
+        activeGame.getAssociatedUpgradeGUI().get(player.getUniqueId()).setItem(slot, item.getCachedFancyStack());
     }
 
     private void trapLogic(final Player player, final int clickedSlot) {

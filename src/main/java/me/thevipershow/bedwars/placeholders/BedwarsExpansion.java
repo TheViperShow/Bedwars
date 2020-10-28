@@ -54,14 +54,14 @@ public final class BedwarsExpansion extends PlaceholderExpansion {
     private void startCacheExpTask() {
         if (this.cacheExpTask == null) {
             LoggerUtils.logColor(gameManager.getPlugin().getLogger(), "&eCaching player EXP into local data. . .");
-            this.cacheExpTask = gameManager.getPlugin().getServer().getScheduler().runTaskTimer(gameManager.getPlugin(), () ->  RankTableUtils.cacheIntoMap(cachedExp, topExp, gameManager.getPlugin()), 1L, 20L * 30L);
+            this.cacheExpTask = gameManager.getPlugin().getServer().getScheduler().runTaskTimer(gameManager.getPlugin(), () ->  RankTableUtils.cacheIntoMap(cachedExp, topExp, gameManager.getPlugin()), 1L, 20L * 20L);
         }
     }
 
     private void startCacheWinsTask() {
         if (this.cacheWinsTask == null) {
             LoggerUtils.logColor(gameManager.getPlugin().getLogger(), "&eCaching player win into local data. . .");
-            this.cacheWinsTask = gameManager.getPlugin().getServer().getScheduler().runTaskTimer(gameManager.getPlugin(), () -> GlobalStatsTableUtils.cacheWinsIntoMap(cachedWins, topWins, gameManager.getPlugin()), 1L, 20L * 60L);
+            this.cacheWinsTask = gameManager.getPlugin().getServer().getScheduler().runTaskTimer(gameManager.getPlugin(), () -> GlobalStatsTableUtils.cacheWinsIntoMap(cachedWins, topWins, gameManager.getPlugin()), 1L, 20L * 20L);
         }
     }
 
@@ -71,7 +71,7 @@ public final class BedwarsExpansion extends PlaceholderExpansion {
             this.cacheKillsTask = gameManager.getPlugin().getServer().getScheduler().runTaskTimer(gameManager.getPlugin(), () -> {
                 GlobalStatsTableUtils.cacheKillsIntoMap(cachedKills, topKills, topFinalKills, gameManager.getPlugin(),false);
                 GlobalStatsTableUtils.cacheKillsIntoMap(cachedFinalKills, topKills, topFinalKills, gameManager.getPlugin(), true);
-            }, 1L, 20L * 60L);
+            }, 1L, 20L * 20L);
         }
     }
 

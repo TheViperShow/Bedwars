@@ -65,6 +65,8 @@ public class Shop implements ConfigurationSerializable {
         return glassColor;
     }
 
+    public static final short GREEN_GLASS_DAMAGE = 5;
+
     public List<Integer> getGlassSlots() {
         return glassSlots;
     }

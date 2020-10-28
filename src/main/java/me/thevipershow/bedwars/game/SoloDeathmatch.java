@@ -15,7 +15,7 @@ public final class SoloDeathmatch extends AbstractDeathmatch {
     public void spawnEnderdragons() {
         activeGame.getAssociatedQueue().perform(p -> {
             p.sendMessage(Bedwars.PREFIX + AllStrings.DRAGONS_RELEASED.get());
-            p.playSound(p.getLocation(), Sound.ENDERDRAGON_GROWL, 8.5f, 1.0f);
+            p.playSound(p.getLocation(), Sound.ENDERDRAGON_GROWL, 8.4565f, 1.0f);
         });
         activeGame.getAssociatedQueue().perform(p -> {
             if (!activeGame.getPlayersOutOfGame().contains(p)) {

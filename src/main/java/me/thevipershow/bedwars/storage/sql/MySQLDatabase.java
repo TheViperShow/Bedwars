@@ -6,6 +6,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Optional;
+import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
 import me.thevipershow.bedwars.LoggerUtils;
 import me.thevipershow.bedwars.config.DefaultConfiguration;
@@ -37,7 +38,8 @@ public final class MySQLDatabase extends Database {
         final String address = defaultConfiguration.getAddress();
         final int port = defaultConfiguration.getPort();
         final String dbName = defaultConfiguration.getDatabaseName();
-        final String jdbcUrl = "jdbc:mysql://" + address + ":" + port + "/" + dbName;
+        //final String jdbcUrl = "jdbc:mysql://" + address + ":" + port + "/" + dbName;
+        final String jdbcUrl = String.format(AllStrings.JDBC_MYSQL_URL.get(), address, port, dbName);
 
         dataSrc.setJdbcUrl(jdbcUrl);
         dataSrc.setUsername(defaultConfiguration.getDatabaseUsername());
@@ -45,7 +47,7 @@ public final class MySQLDatabase extends Database {
         dataSrc.setDriverClassName(Bedwars.MYSQL_DRIVER_CLASS);
         dataSrc.setConnectionTimeout(500);
         dataSource = dataSrc;
-        LoggerUtils.logColor(plugin.getLogger(), "&eAttempting MySQL Connection to address ->&a" + jdbcUrl);
+        LoggerUtils.logColor(plugin.getLogger(), AllStrings.ATTEMPTING_CONNECTION.get() + jdbcUrl);
         createTables();
     }
 

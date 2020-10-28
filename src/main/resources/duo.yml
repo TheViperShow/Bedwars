@@ -550,7 +550,7 @@ duo:
     # SHOPS SECTION
     shop:
       title: "{TEAM} Shop"
-      slots: 45
+      slots: 54
       glass:
         color: 7
         slots:
@@ -565,6 +565,7 @@ duo:
           - 17
       upgradable-items:
         - slot: 39 # pickaxe upgrades ->
+          shop-category: "TOOLS"
           amount: 1
           levels:
             - level: 1
@@ -611,6 +612,7 @@ duo:
                 - level: 3
                   type: "DIG_SPEED"
         - slot: 38 # axe upgrades ->
+          shop-category: "TOOLS"
           amount: 1
           levels:
             - level: 1
@@ -658,6 +660,7 @@ duo:
                   type: "DAMAGE_ALL"
       items:
         - material: "WOOL"
+          shop-category: "BLOCKS"
           item-name: "§eWool Block"
           slot: 20
           amount: 16
@@ -668,6 +671,7 @@ duo:
             - "§7you can use it to build bridges and"
             - "§7reach your enemies base!"
         - material: "ENDER_PEARL"
+          shop-category: "UTILITY"
           item-name: "§2Ender Pearl"
           slot: 21
           amount: 2
@@ -678,6 +682,7 @@ duo:
             - "§7you can throw it you will get teleported"
             - "§7in the same place it landed."
         - material: "FIREBALL"
+          shop-category: "UTILITY"
           item-name: "§cExplosive Charge"
           slot: 22
           amount: 1
@@ -688,6 +693,7 @@ duo:
             - "§7you can click while holding it and"
             - "§7a fireball which can kill your enemies will be shot!"
         - material: "GOLDEN_APPLE"
+          shop-category: "UTILITY"
           item-name: "§eGolden Apple"
           slot: 23
           amount: 1
@@ -696,6 +702,7 @@ duo:
           lore:
             - "§7A gold apple."
         - material: "TNT"
+          shop-category: "UTILITY"
           item-name: "§cDynamite"
           slot: 24
           amount: 1
@@ -706,6 +713,7 @@ duo:
             - "§7it will lit as soon as you place it"
             - "§7so watch out for the explosion!"
         - material: "WOOD"
+          shop-category: "BLOCKS"
           item-name: "§eWooden Planks"
           slot: 29
           amount: 16
@@ -714,6 +722,7 @@ duo:
           lore:
             - "§7Wood planks."
         - material: "STAINED_GLASS"
+          shop-category: "BLOCKS"
           item-name: "§f§lGlass"
           slot: 30
           amount: 16
@@ -722,6 +731,7 @@ duo:
           lore:
             - "§7Glass blocks."
         - material: "OBSIDIAN"
+          shop-category: "BLOCKS"
           item-name: "§5§lObsidian Block"
           slot: 31
           amount: 4
@@ -730,6 +740,7 @@ duo:
           lore:
             - "§7Obsidian blocks."
         - material: "DIAMOND_CHESTPLATE"
+          shop-category: "ARMOR"
           item-name: "§b§lPermanent Diamond Armor"
           slot: 32
           amount: 1
@@ -739,6 +750,7 @@ duo:
             - "§7Buying this will give you a complete §b§lDIAMOND §r§7armor set"
             - "§7It will be permanent upon death."
         - material: "IRON_CHESTPLATE"
+          shop-category: "ARMOR"
           item-name: "§7§lPermanent Iron Armor"
           slot: 33
           amount: 1
@@ -748,6 +760,7 @@ duo:
             - "§7Buying this will give you a complete §f§lIRON §r§7armor set"
             - "§7It will be permanent upon death."
         - material: "STONE_SWORD"
+          shop-category: "MELEE"
           item-name: "§7§lStone Sword"
           slot: 25
           amount: 1
@@ -757,6 +770,7 @@ duo:
             - "§7Buying this will give you an §7§lStone §r§7sword."
             - "§7It will lose one tier upon death."
         - material: "IRON_SWORD"
+          shop-category: "MELEE"
           item-name: "§f§lIron Sword"
           slot: 34
           amount: 1
@@ -766,6 +780,7 @@ duo:
             - "§7Buying this will give you an §f§lIRON §r§7sword."
             - "§7It will lose one tier upon death."
         - material: "DIAMOND_SWORD"
+          shop-category: "MELEE"
           item-name: "§b§lDiamond Sword"
           slot: 43
           amount: 1

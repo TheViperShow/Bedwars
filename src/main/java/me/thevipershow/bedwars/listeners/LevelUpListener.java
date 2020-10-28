@@ -1,4 +1,4 @@
-package me.thevipershow.bedwars.listeners.game;
+package me.thevipershow.bedwars.listeners;
 
 import java.util.Random;
 import me.thevipershow.bedwars.AllStrings;
@@ -13,12 +13,7 @@ import org.bukkit.event.EventPriority;
 
 public final class LevelUpListener extends UnregisterableListener {
 
-    private final ActiveGame activeGame;
     private final Random rand = new Random(System.currentTimeMillis());
-
-    public LevelUpListener(final ActiveGame activeGame) {
-        this.activeGame = activeGame;
-    }
 
     private void sendLevelUpMsg(final BedwarsLevelUpEvent e) {
         final Player player = e.getPlayer();

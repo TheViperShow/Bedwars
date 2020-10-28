@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import me.thevipershow.bedwars.game.AbstractActiveMerchant;
+import me.thevipershow.bedwars.game.shop.ShopCategory;
 import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemFlag;
@@ -21,6 +22,7 @@ public final class PotionItem implements ConfigurationSerializable {
     private final PotionEffectType type;
     private final Material buyWith;
     private final List<String> lore;
+    private final ShopCategory shopCategory = ShopCategory.POTIONS;
 
     private ItemStack cachedFancyStack = null, gameStack = null;
 
@@ -121,6 +123,10 @@ public final class PotionItem implements ConfigurationSerializable {
 
     public Material getBuyWith() {
         return buyWith;
+    }
+
+    public ShopCategory getShopCategory() {
+        return shopCategory;
     }
 
     public List<String> getLore() {

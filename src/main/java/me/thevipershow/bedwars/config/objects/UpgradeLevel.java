@@ -81,7 +81,6 @@ public final class UpgradeLevel implements ConfigurationSerializable {
         return cachedGameStack.clone();
     }
 
-
     public int getLevel() {
         return level;
     }
@@ -111,10 +110,10 @@ public final class UpgradeLevel implements ConfigurationSerializable {
     }
 
     public final ItemStack getCachedFancyStack() {
-        return cachedFancyStack;
+        return generateFancyStack();
     }
 
     public final ItemStack getCachedGameStack() {
-        return cachedGameStack;
+        return generateGameStack();
     }
 }

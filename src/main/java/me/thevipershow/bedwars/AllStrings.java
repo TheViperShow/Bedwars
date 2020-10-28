@@ -106,6 +106,16 @@ public enum AllStrings {
     POTIONS("potions"),
     LENGTH("length"),
     NAME("name"),
+    SHOP_CATEGORY("shop-category"),
+
+    BLOCKS_CATEGORY("§bBlocks"),
+    MELEE_CATEGORY("§bMelee"),
+    ARMOR_CATEGORY("§bArmor"),
+    TOOLS_CATEGORY("§bTools"),
+    RANGED_CATEGORY("§bRanged"),
+    POTIONS_CATEGORY("§bPotions"),
+    UTILITY_CATEGORY("§bUtility"),
+    QUICK_BUY("§bQuick Buy"),
 
     SHARPNESS("sharpness"),
     REINFORCED_ARMOR("reinforced-armor"),
@@ -125,23 +135,23 @@ public enum AllStrings {
 
     DRAGONS_RELEASED("§6The Ender Dragons have been released!"),
 
-    DAILY_FIRST_GAME_MESSAGE("-----------------------------------\n" +
+    DAILY_FIRST_GAME_MESSAGE("§7-----------------------------------\n" +
             "            §a★ §6DAILY QUEST COMPLETED! §a★\n" +
             "         §eYou have won your first game of the day§8!\n" +
             "         §e          +§6§l250 EXP\n" +
-            "-----------------------------------"),
+            "§7-----------------------------------"),
 
-    DAILY_GAMES_PLAYER_MESSAGE("-----------------------------------\n" +
+    DAILY_GAMES_PLAYER_MESSAGE("§7-----------------------------------\n" +
             "            §a★ §6DAILY QUEST COMPLETED! §a★\n" +
             "         §eYou have played two daily games§8!\n" +
             "         §e          +§6§l250 EXP\n" +
-            "-----------------------------------"),
+            "§7-----------------------------------"),
 
-    WEEKLY_BROKEN_BEDS_MESSAGE("-----------------------------------\n" +
+    WEEKLY_BROKEN_BEDS_MESSAGE("§7-----------------------------------\n" +
             "            §a★ §6WEEKLY QUEST COMPLETED! §a★\n" +
             "         §eYou have broken 25 beds§8!\n" +
             "         §e          +§6§l5000 EXP\n" +
-            "-----------------------------------"),
+            "§7-----------------------------------"),
 
     TOP_3_KILL(" §7Top 3 kill scores:"),
     TOP_3_FINAL_KILL(" §7Top 3 final kill scores:"),
@@ -258,7 +268,27 @@ public enum AllStrings {
     DRIVER_PATH("com.mysql.jdbc.Driver"),
     SUCCESSFULLY_ADDED_PAPI_EXPANSION("&eSuccessfully added expansion to &aPlaceHolderAPI"),
     PAPI_PLUGIN("PlaceholderAPI"),
-    MAIN_COMMAND("bedwars");
+    MAIN_COMMAND("bedwars"),
+
+    // MySQL Section below:
+    CREATE_TABLE_STATEMENT("CREATE TABLE IF NOT EXISTS %s (%s);"),
+    ATTEMPTING_CONNECTION("&eAttempting MySQL Connection to address ->&a"),
+    JDBC_MYSQL_URL("jdbc:mysql://%s:%s/%s"),
+    REMOVE_CLEAN_TASK("&eRemoving clean task: &e"),
+
+
+    // World loading section below:
+    COULD_NOT_FIND_WORLD_FOLDER("&cCould not find a world folder named &f[&e%s&f]"),
+    ATTEMPT_COPY("&3Attempting to copy directory of Bukkit World &f[&e%s&f]."),
+    ATTEMPT_CREATE("&3Attempting to create instance of Bukkit World &f[&e%s&f]."),
+    LOADING_ACTIVE_GAME("&3Loading &f[&e%s&f] &3into active games..."),
+    SUCCESSFULLY_CREATED_ACTIVE_GAME("&3Successfully created a world with name &f[&e%s&f]."),
+    ERROR_CREATE_ACTIVE_GAME("&cCould not create ActiveGame for &f[&e%s&f]"),
+    ADDED_NEW_ACTIVE_GAME("&3Added new ActiveGame &f[&e"),
+    SOMETHING_WENT_WRONG_DURING_CREATION("&cSomething went wrong when creating world &f[&e%s&f]."),
+
+    ANNOUNCE_DEATHMATCH("§6§lDEATHMATCH §r§6Mode has started§7...\n        §6Kill all of your enemies to win!"),
+    ;
 
     private final String s;
 

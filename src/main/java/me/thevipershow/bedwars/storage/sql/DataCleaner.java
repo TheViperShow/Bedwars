@@ -5,6 +5,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
+import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.LoggerUtils;
 import me.thevipershow.bedwars.storage.sql.tables.DataResetTableUtils;
 import me.thevipershow.bedwars.storage.sql.tables.QuestsTableUtils;
@@ -66,7 +67,7 @@ public final class DataCleaner {
     public final void stopTasks() {
         for (final BukkitTask task : this.cleanTask) {
             if (task != null) {
-                LoggerUtils.logColor(plugin.getLogger(), "&eRemoving clean task: &e" + task.getTaskId());
+                LoggerUtils.logColor(plugin.getLogger(), AllStrings.REMOVE_CLEAN_TASK.get() + task.getTaskId());
                 task.cancel();
             }
         }

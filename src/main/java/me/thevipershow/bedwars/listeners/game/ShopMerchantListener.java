@@ -2,6 +2,7 @@ package me.thevipershow.bedwars.listeners.game;
 
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.ShopActiveMerchant;
+import me.thevipershow.bedwars.game.shop.ShopCategory;
 import me.thevipershow.bedwars.listeners.UnregisterableListener;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -38,7 +39,7 @@ public final class ShopMerchantListener extends UnregisterableListener {
         final ShopActiveMerchant shopActiveMerchant = activeGame.getTeamShopActiveMerchant(villager);
 
         if (shopActiveMerchant != null) {
-            activeGame.openShop(p);
+            p.openInventory(activeGame.getPlayerShop().get(p.getUniqueId()).get(ShopCategory.QUICK_BUY));
             event.setCancelled(true);
         }
     }

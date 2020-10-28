@@ -469,7 +469,7 @@ public final class GameUtils {
 
 
     public static void buyFailSound(final Player player) {
-        player.playSound(player.getLocation(), Sound.ANVIL_BREAK, 5.0f, 1.0f);
+        player.playSound(player.getLocation(), Sound.DOOR_CLOSE, 5.0f, 0.768f);
     }
 
     public static void paySound(final Player player) {

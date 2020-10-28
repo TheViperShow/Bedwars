@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import me.thevipershow.bedwars.game.AbstractActiveMerchant;
+import me.thevipershow.bedwars.game.shop.ShopCategory;
 import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
@@ -22,11 +23,12 @@ public class ShopItem implements ConfigurationSerializable {
     private final int slot;
     private final String itemName;
     private final List<String> lore;
+    private ShopCategory shopCategory = null;
 
     private ItemStack cachedFancyStack = null;
     private ItemStack cachedGameStack = null;
 
-    public ItemStack generateFancyStack() {
+    public ItemStack getCachedFancyStack() {
         if (cachedFancyStack != null) return cachedFancyStack.clone();
         final ItemStack stack = new ItemStack(material, amount);
         final ItemMeta meta = stack.getItemMeta();
@@ -40,7 +42,7 @@ public class ShopItem implements ConfigurationSerializable {
 
     }
 
-    public ShopItem(String material, int amount, String buyWith, int buyCost, int slot, String itemName, List<String> lore) {
+    public ShopItem(final String material, final int amount, final String buyWith, final int buyCost, final int slot, final String itemName, final List<String> lore, final ShopCategory shopCategory) {
         this.material = Material.valueOf(material);
         this.amount = amount;
         this.buyWith = Material.valueOf(buyWith);
@@ -48,6 +50,18 @@ public class ShopItem implements ConfigurationSerializable {
         this.slot = slot;
         this.itemName = itemName;
         this.lore = lore;
+        this.shopCategory = shopCategory;
+    }
+
+    public ShopItem(final String material, final int amount, final String buyWith, final int buyCost, final int slot, final String itemName, final List<String> lore) {
+        this.material = Material.valueOf(material);
+        this.amount = amount;
+        this.buyWith = Material.valueOf(buyWith);
+        this.buyCost = buyCost;
+        this.slot = slot;
+        this.itemName = itemName;
+        this.lore = lore;
+        this.shopCategory = shopCategory;
     }
 
     @Override
@@ -60,51 +74,65 @@ public class ShopItem implements ConfigurationSerializable {
         map.put(SLOT.get(), slot);
         map.put(ITEM_NAME.get(), itemName);
         map.put(LORE.get(), lore);
+        map.put(SHOP_CATEGORY.get(), shopCategory.name());
         return map;
     }
 
-    public static ShopItem deserialize(Map<String, Object> objectMap) {
-        String m = (String) objectMap.get(MATERIAL.get());
-        int a = (int) objectMap.get(AMOUNT.get());
-        String b = (String) objectMap.get(BUY_WITH.get());
-        int c = (int) objectMap.get(PRICE.get());
-        int s = (int) objectMap.get(SLOT.get());
-        String itemName = (String) objectMap.get(ITEM_NAME.get());
+    public static ShopItem deserialize(final Map<String, Object> objectMap) {
+        final String m = (String) objectMap.get(MATERIAL.get());
+        final int a = (int) objectMap.get(AMOUNT.get());
+        final String b = (String) objectMap.get(BUY_WITH.get());
+        final int c = (int) objectMap.get(PRICE.get());
+        final int s = (int) objectMap.get(SLOT.get());
+        final String itemName = (String) objectMap.get(ITEM_NAME.get());
         final List<String> lore = (List<String>) objectMap.get(LORE.get());
+        System.out.println(itemName);
+
+        final String shopCategoryString = (String) objectMap.get(SHOP_CATEGORY.get());
+        if (shopCategoryString != null) {
+            return new ShopItem(m, a, b, c, s, itemName, lore, ShopCategory.valueOf(shopCategoryString));
+        }
+        //final ShopCategory shopCategory = ShopCategory.valueOf(((String) objectMap.get(SHOP_CATEGORY.get())));
         return new ShopItem(m, a, b, c, s, itemName, lore);
     }
 
-    public Material getMaterial() {
+    public final Material getMaterial() {
         return material;
     }
 
-    public int getAmount() {
+    public final int getAmount() {
         return amount;
     }
 
-    public Material getBuyWith() {
+    public final Material getBuyWith() {
         return buyWith;
     }
 
-    public int getBuyCost() {
+    public final int getBuyCost() {
         return buyCost;
     }
 
-    public int getSlot() {
+    public final int getSlot() {
         return slot;
     }
 
-    public String getItemName() {
+    public final String getItemName() {
         return itemName;
     }
 
-    public ItemStack generateWithoutLore() {
-        if (cachedGameStack != null) return cachedGameStack;
-        this.cachedGameStack = new ItemStack(material, amount);
-        return cachedGameStack;
+    public final List<String> getLore() {
+        return lore;
     }
 
-    public List<String> getLore() {
-        return lore;
+    public final ShopCategory getShopCategory() {
+        return shopCategory;
+    }
+
+    public final ItemStack getCachedGameStack() {
+        if (cachedGameStack != null) {
+            return cachedGameStack;
+        }
+        this.cachedGameStack = new ItemStack(material, amount);
+        return cachedGameStack.clone();
     }
 }

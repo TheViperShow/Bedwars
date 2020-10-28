@@ -104,7 +104,7 @@ public final class GlobalStatsTableUtils {
         }
     }
 
-    public static void cacheKillsIntoMap(final LinkedHashMap<UUID, Kills> map, Map<Gamemode, LinkedList<Pair<UUID, Integer>>> top, Map<Gamemode, LinkedList<Pair<UUID, Integer>>> topFinal, final Plugin plugin, final boolean finalKill) {
+    public static void cacheKillsIntoMap(final LinkedHashMap<UUID, Kills> map, final Map<Gamemode, LinkedList<Pair<UUID, Integer>>> top, final Map<Gamemode, LinkedList<Pair<UUID, Integer>>> topFinal, final Plugin plugin, final boolean finalKill) {
 
         final BukkitScheduler scheduler = plugin.getServer().getScheduler();
         final Optional<Connection> optionalConnection = MySQLDatabase.getConnection();

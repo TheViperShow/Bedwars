@@ -3,6 +3,7 @@ package me.thevipershow.bedwars.storage.sql;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import me.thevipershow.bedwars.AllStrings;
 
 public abstract class TableCreator {
     private final String tableName;
@@ -26,7 +27,7 @@ public abstract class TableCreator {
     public void createTable() {
         try (Connection connection = this.connection;
              PreparedStatement preparedStatement = connection.prepareStatement(
-                     String.format("CREATE TABLE IF NOT EXISTS %s (%s);", tableName, dataTypes))) {
+                     String.format(AllStrings.CREATE_TABLE_STATEMENT.get(), tableName, dataTypes))) {
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

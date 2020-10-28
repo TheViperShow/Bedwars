@@ -32,6 +32,7 @@ import me.thevipershow.bedwars.config.objects.upgradeshop.traps.BlindnessAndPois
 import me.thevipershow.bedwars.config.objects.upgradeshop.traps.CounterOffensiveTrap;
 import me.thevipershow.bedwars.config.objects.upgradeshop.traps.MinerFatigueTrap;
 import me.thevipershow.bedwars.game.GameManager;
+import me.thevipershow.bedwars.listeners.LevelUpListener;
 import me.thevipershow.bedwars.listeners.queue.MatchmakingVillagersListener;
 import me.thevipershow.bedwars.listeners.queue.QueueResizerListener;
 import me.thevipershow.bedwars.placeholders.BedwarsExpansion;
@@ -54,24 +55,25 @@ public final class Bedwars extends JavaPlugin {
     public static String PREFIX = AllStrings.PREFIX.get();
     public static String MYSQL_DRIVER_CLASS = null;
 
-    private WorldsManager worldsManager;
-    private GameManager gameManager;
-    private Database database;
-    private DefaultConfiguration defaultConfiguration;
+    private WorldsManager worldsManager = null;
+    private GameManager gameManager = null;
+    private Database database = null;
+    private DefaultConfiguration defaultConfiguration = null;
     // loading file configurations:
-    private BedwarsGamemodeConfig<SoloBedwars> soloConfig;
-    private BedwarsGamemodeConfig<DuoBedwars> duoConfig;
-    private BedwarsGamemodeConfig<QuadBedwars> quadConfig;
-    private ConfigManager configManager;
+    private BedwarsGamemodeConfig<SoloBedwars> soloConfig = null;
+    private BedwarsGamemodeConfig<DuoBedwars> duoConfig = null;
+    private BedwarsGamemodeConfig<QuadBedwars> quadConfig = null;
+    private ConfigManager configManager = null;
 
     // Global Listeners section
-    private Listener matchmakingVillagerListener;
-    private Listener queueResizerListener;
+    private Listener matchmakingVillagerListener = null;
+    private Listener queueResizerListener = null;
+    private Listener levelUpListener = null;
 
     // Cleaners
-    private DataCleaner dataCleaner;
+    private DataCleaner dataCleaner = null;
 
-    static {
+    static {   // Loading MYSQL Drivers for the plugin
         try {
             MYSQL_DRIVER_CLASS = Class.forName(AllStrings.DRIVER_PATH.get()).getCanonicalName();
         } catch (ClassNotFoundException e) {
@@ -115,11 +117,11 @@ public final class Bedwars extends JavaPlugin {
     @Override
     public final void onEnable() { // Plugin startup logic
         plugin = this;
-        ScoreboardLib.setPluginInstance(this);
-        defaultConfiguration = new DefaultConfiguration(this);
+        ScoreboardLib.setPluginInstance(this);                       // Setting the plugin instance for the ScoreboardLib
+        defaultConfiguration = new DefaultConfiguration(this); // Instantiating new DefaultConfiguration
 
-        soloConfig = new SoloConfig(this);
-        soloConfig.saveDefaultConfig();
+        soloConfig = new SoloConfig(this); // Instantiating all configs:
+        soloConfig.saveDefaultConfig(); //saving them
 
         duoConfig = new DuoConfig(this);
         duoConfig.saveDefaultConfig();
@@ -141,15 +143,21 @@ public final class Bedwars extends JavaPlugin {
         pluginCommand.setExecutor(aussieBedwarsMainCommand);
         pluginCommand.setTabCompleter(aussieBedwarsMainCommand);
 
-        matchmakingVillagerListener = new MatchmakingVillagersListener(this, gameManager);
-        getServer().getPluginManager().registerEvents(matchmakingVillagerListener, this);
+        matchmakingVillagerListener = new MatchmakingVillagersListener(this, gameManager); // Insantiating listeners
         queueResizerListener = new QueueResizerListener(gameManager);
+        levelUpListener = new LevelUpListener();
+        getServer().getPluginManager().registerEvents(matchmakingVillagerListener, this); // Registering global listeners
         getServer().getPluginManager().registerEvents(queueResizerListener, this);
+        getServer().getPluginManager().registerEvents(levelUpListener, this);
 
         dataCleaner = new DataCleaner(this);
         dataCleaner.startTasks();
 
-        if (Bukkit.getPluginManager().getPlugin(AllStrings.PAPI_PLUGIN.get()) != null) {
+        registerExpansions();
+    }
+
+    private void registerExpansions() {
+        if (getServer().getPluginManager().getPlugin(AllStrings.PAPI_PLUGIN.get()) != null) {
             final BedwarsExpansion bedwarsExpansion = new BedwarsExpansion(gameManager);
             if (bedwarsExpansion.register()) {
                 LoggerUtils.logColor(getLogger(), AllStrings.SUCCESSFULLY_ADDED_PAPI_EXPANSION.get());

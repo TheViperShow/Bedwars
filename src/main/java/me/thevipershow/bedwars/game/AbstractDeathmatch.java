@@ -2,6 +2,7 @@ package me.thevipershow.bedwars.game;
 
 import java.util.Map;
 import java.util.Objects;
+import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.config.objects.SpawnPosition;
@@ -51,8 +52,7 @@ public abstract class AbstractDeathmatch {
 
     public void announceDeathmatch() {
         activeGame.getAssociatedQueue().perform(p -> {
-            p.sendMessage(Bedwars.PREFIX + "§6§lDEATHMATCH §r§6Mode has started§7...");
-            p.sendMessage(Bedwars.PREFIX + "§6Kill all of your enemies to win!");
+            p.sendMessage(Bedwars.PREFIX + AllStrings.ANNOUNCE_DEATHMATCH.get());
         });
     }
 

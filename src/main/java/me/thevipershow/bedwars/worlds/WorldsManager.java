@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
+import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.LoggerUtils;
 import me.thevipershow.bedwars.config.BedwarsGamemodeConfig;
 import me.thevipershow.bedwars.config.ConfigManager;
@@ -80,17 +81,17 @@ public class WorldsManager {
         final File sourceFile = new File(pluginFolder.getAbsolutePath(), game.getMapFilename());
 
         if (!sourceFile.exists()) {
-            LoggerUtils.logColor(log, String.format("&cCould not find a world folder named &f[&e%s&f]",  sourceFile.getAbsolutePath()));
+            LoggerUtils.logColor(log, String.format(AllStrings.COULD_NOT_FIND_WORLD_FOLDER.get(),  sourceFile.getAbsolutePath()));
             return;
         }
 
         final File outputFile = new File(worldContainer.getAbsolutePath(), tempName);
 
         final WorldLoader worldLoader = new WorldLoader(sourceFile, outputFile);
-        LoggerUtils.logColor(log, String.format("&3Attempting to copy directory of Bukkit World &f[&e%s&f].", tempName));
+        LoggerUtils.logColor(log, String.format(AllStrings.ATTEMPT_COPY.get(), tempName));
         final boolean copyResult = worldLoader.copyToDir();
 
-        LoggerUtils.logColor(log, String.format("&3Attempting to create instance of Bukkit World &f[&e%s&f].", tempName));
+        LoggerUtils.logColor(log, String.format(AllStrings.ATTEMPT_CREATE.get(), tempName));
 
         final World w = WorldCreator.name(tempName)
                 .environment(World.Environment.NORMAL)
@@ -98,21 +99,21 @@ public class WorldsManager {
                 .type(WorldType.CUSTOMIZED)
                 .createWorld();
 
-        LoggerUtils.logColor(log, String.format("&3Loading &f[&e%s&f] &3into active games...", tempName));
+        LoggerUtils.logColor(log, String.format(AllStrings.LOADING_ACTIVE_GAME.get(), tempName));
 
         final ActiveGame activeGame = GamemodeUtilities.fromGamemode(tempName, game, lobbyWorld, plugin);
 
         if (w != null && copyResult) {
-            LoggerUtils.logColor(log, String.format("&3Successfully created a world with name &f[&e%s&f].", tempName));
+            LoggerUtils.logColor(log, String.format(AllStrings.SUCCESSFULLY_CREATED_ACTIVE_GAME.get(), tempName));
             createdAmountsMap.put(game, currentInt);
             if (activeGame == null) {
-                LoggerUtils.logColor(log, String.format("&cCould not create ActiveGame for &f[&e%s&f]", tempName));
+                LoggerUtils.logColor(log, String.format(AllStrings.ERROR_CREATE_ACTIVE_GAME.get(), tempName));
             } else {
-                LoggerUtils.logColor(log, "&3Added new ActiveGame &f[&e" + tempName + "&f].");
+                LoggerUtils.logColor(log,  AllStrings.ADDED_NEW_ACTIVE_GAME.get() + tempName + "&f].");
                 activeGameSet.add(activeGame);
             }
         } else {
-            LoggerUtils.logColor(log, String.format("&cSomething went wrong when creating world &f[&e%s&f].", tempName));
+            LoggerUtils.logColor(log, String.format(AllStrings.SOMETHING_WENT_WRONG_DURING_CREATION.get(), tempName));
         }
 
     }

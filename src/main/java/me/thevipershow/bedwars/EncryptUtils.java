@@ -10,7 +10,7 @@ public final class EncryptUtils {
 
     }
 
-    public static final StringBuilder alphabet = new StringBuilder();
+    public static final StringBuilder alphabet = new StringBuilder(126 - 32 + 4);
     private static Map<Character, Character> reverseAlphabet = null;
 
     static {
@@ -38,7 +38,7 @@ public final class EncryptUtils {
 
     public static String rotateBy(final String starting, final int key, final Direction direction) {
         if (key < 0) {
-            throw new IllegalArgumentException("Key is invalid ( key < 0 ).");
+            throw new IllegalArgumentException();
         }
         char[] chars = starting.toCharArray();
         final int length = chars.length;
