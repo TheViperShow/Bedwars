@@ -37,8 +37,6 @@ public class ShopInventories {
         return inventories.get(shopCategory);
     }
 
-
-
     public final EnumMap<ShopCategory, Inventory> getInventories() {
         return inventories;
     }

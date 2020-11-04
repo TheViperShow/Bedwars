@@ -8,11 +8,12 @@ public enum AllStrings {
     PERMISSION_USER_JOIN("bedwars.users.join"),
     PERMISSION_USER_EXP("bedwars.users.exp"),
     PERMISSION_ADMIN_EXP_VIEW("bedwars.admin.exp.view"),
-    PERMISSION_ADMIN_EXP_GIVE("abedwars.admin.exp.give"),
+    PERMISSION_ADMIN_EXP_GIVE("bedwars.admin.exp.give"),
 
     SUBCOMMAND_ILLEGAL_EXECUTOR("You cannot execute this command from here."),
     SUBCOMMAND_MISSING_PERM("You do not have enough permissions."),
     SUBCOMMAND_WRONG_ARGS("Wrong number of args: "),
+    ATTEMPT_LOAD("attempt-load"),
 
     INVALID_GAMEMODE("Invalid gamemode named: \""),
     NOT_IN_QUEUE("You are not in any queue."),
@@ -95,8 +96,10 @@ public enum AllStrings {
     MAP_SPAWNS("map-spawns"),
     SPAWNERS("spawners"),
     MERCHANTS("merchants"),
+    BEDS_POS("beds-locations"),
     SHOP("shop"),
     UPGRADES("upgrades"),
+    SPAWN_PROTECTION("spawn-protection"),
     TITLE("title"),
     SLOTS("slots"),
     ITEMS("items"),
@@ -175,7 +178,7 @@ public enum AllStrings {
     YOU_WON_GAME("§a§lYou have won this game!"),
     CONGRATULATIONS("§aCongratulations."),
     TEAM_WON("§7Team §"),
-    HAS_WON_THE_GAME(" §7has won the game!"),
+    HAS_WON_THE_GAME(" §cYou have lost the game!"),
     RETURNING_LOBBY("§7Returning to lobby in 15s"),
 
     DIAMOND_UPGRADE("The §b§lDIAMOND §7spawners have been upgraded to lvl. §e"),
@@ -253,8 +256,8 @@ public enum AllStrings {
     FINAL_KILL_EXT("§c§l FINAL KILL!"),
 
     LEVEL_UP("§7--------------------------------\n" +
-            "            §a♫ §6LEVEL UP! §a♫" +
-            "         §eYou are now §3Level %d" +
+            "            §a♫ §6LEVEL UP! §a♫\n" +
+            "         §eYou are now §3Level %d\n" +
             "§7--------------------------------"),
 
     GG("gg"),

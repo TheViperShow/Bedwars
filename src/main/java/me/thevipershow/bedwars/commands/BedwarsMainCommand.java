@@ -48,21 +48,17 @@ public final class BedwarsMainCommand implements CommandExecutor, TabExecutor {
             sendHelp(player);
         } else {
             final String firstArg = args[0].toLowerCase(Locale.ROOT);
+
             if (AllStrings.SET.get().equals(firstArg)) {
                 new SetCommand(this.gameManager, this.plugin, args).run(sender);
-
             } else if (AllStrings.REMOVE.get().equals(firstArg)) {
                 new RemoveCommand(this.gameManager, this.plugin, args).run(sender);
-
             } else if (AllStrings.JOIN.get().equals(firstArg)) {
                 new JoinCommand(this.gameManager, this.plugin, args).run(sender);
-
             } else if (AllStrings.QUIT.get().equals(firstArg)) {
                 new QuitCommand(this.gameManager, this.plugin, args).run(sender);
-
             } else if (AllStrings.EXP.get().equals(firstArg)) {
                 new ExpCommand(this.gameManager, this.plugin, args).run(sender);
-
             } else {
                 unknownArg(sender, firstArg);
             }

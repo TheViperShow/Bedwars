@@ -15,6 +15,7 @@ import me.thevipershow.bedwars.game.GameUtils;
 import me.thevipershow.bedwars.game.Pair;
 import me.thevipershow.bedwars.game.shop.ShopCategory;
 import me.thevipershow.bedwars.listeners.UnregisterableListener;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.HumanEntity;
@@ -79,7 +80,15 @@ public final class ShopInteractListener extends UnregisterableListener {
                     GameUtils.enchantArmor(Enchantment.PROTECTION_ENVIRONMENTAL, enchantLvl, player); // Adding enchant if he has the Upgrade.
                 }
             } else {
-                GameUtils.giveStackToPlayer(shopItem.getCachedGameStack(), player, playerInventory.getContents());
+                final ItemStack toGive = shopItem.getCachedGameStack();
+                if (toGive.getType() == Material.WOOL) {
+                    toGive.setDurability(activeGame.getPlayerTeam(player).getWoolColor());
+                } else if (toGive.getType() == Material.STAINED_GLASS) {
+                    toGive.setDurability(activeGame.getPlayerTeam(player).getGlassColor());
+                } else if (toGive.getType() == Material.HARD_CLAY) {
+                    toGive.setDurability(activeGame.getPlayerTeam(player).getClayColor());
+                }
+                GameUtils.giveStackToPlayer(toGive, player, playerInventory.getContents());
             }
 
             GameUtils.paySound(player);

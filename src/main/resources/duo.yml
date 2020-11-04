@@ -1,12 +1,41 @@
 duo:
   - map-filename: "bedwars-duo"
     start-timer: 20
-    minimum-games: 1
+    minimum-games: 2
     maximum-games: 8
     min-players: 4
     players: 16
     deathmatch-start: 1800 # in seconds
     tnt-fuse: 75 # in ticks (20 ticks = 1s)
+    beds-locations:
+      - x: -80.5 #Pink
+        y: 62.5
+        z: 38.5
+      - x: -80.5 #Grey
+        y: 62.5
+        z: -37.5
+      - x: -37.5 #Red
+        y: 62.5
+        z: -80.5
+      - x: 38.5 #Blue
+        y: 62.5
+        z: -80.5
+      - x: 81.5 #Green
+        y: 62.5
+        z: -37.5
+      - x: 81.5 #Yellow
+        y: 62.5
+        z: 38.5
+      - x: 38.5 #Cyan
+        y: 62.5
+        z: 81.5
+      - x: -37.5 #LightGray
+        y: 62.5
+        z: 81.5
+    spawn-protection:
+      x: 8.0 # These values correspond to the
+      y: 3.0 # minimum distance that a block has to be
+      z: 8.0 # distant from the set spawn position.
     teams:
       - "CYAN"
       - "PINK"
@@ -564,7 +593,7 @@ duo:
           - 16
           - 17
       upgradable-items:
-        - slot: 39 # pickaxe upgrades ->
+        - slot: 20 # pickaxe upgrades ->
           shop-category: "TOOLS"
           amount: 1
           levels:
@@ -611,7 +640,7 @@ duo:
               enchantments:
                 - level: 3
                   type: "DIG_SPEED"
-        - slot: 38 # axe upgrades ->
+        - slot: 21 # axe upgrades ->
           shop-category: "TOOLS"
           amount: 1
           levels:
@@ -662,7 +691,7 @@ duo:
         - material: "WOOL"
           shop-category: "BLOCKS"
           item-name: "§eWool Block"
-          slot: 20
+          slot: 19
           amount: 16
           buy-with: "IRON_INGOT"
           price: 4
@@ -673,18 +702,68 @@ duo:
         - material: "ENDER_PEARL"
           shop-category: "UTILITY"
           item-name: "§2Ender Pearl"
-          slot: 21
+          slot: 25
           amount: 2
           buy-with: "GOLD_INGOT"
-          price: 4
+          price: 16
           lore:
             - "§7This is an enderpearl,"
             - "§7you can throw it you will get teleported"
             - "§7in the same place it landed."
+        - material: "WATER_BUCKET"
+          shop-category: "UTILITY"
+          buy-with: "GOLD_INGOT"
+          slot: 26
+          amount: 1
+          item-name: "§bWater Bucket"
+          price: 3
+          lore:
+            - "§7Great to slow down incoming"
+            - "§7enemies. Can also protect you"
+            - "§7against explosives."
+        - material: "EGG"
+          shop-category: "UTILITY"
+          buy-with: "IRON_INGOT"
+          slot: 29
+          amount: 1
+          price: 8
+          item-name: "§7Chicken Egg"
+          lore:
+            - "§7Can be thrown at your"
+            - "§7enemies to apply knockback"
+            - "§7upon egg's impact, potentially"
+            - "§7causing them to fall."
+        - material: "MILK_BUCKET"
+          shop-category: "UTILITY"
+          buy-with: "GOLD_INGOT"
+          slot: 30
+          amount: 1
+          price: 4
+          item-name: "§fMilk Bucket"
+          lore: []
+        - material: "SPONGE"
+          shop-category: "UTILITY"
+          buy-with: "GOLD_INGOT"
+          slot: 30
+          amount: 4
+          price: 16
+          item-name: "§eSponge Block"
+          lore:
+            - "§7The sponge block is"
+            - "§7especially useful to remove"
+            - "§7water around you."
+        - material: "CHEST"
+          shop-category: "UTILITY"
+          buy-with: "GOLD_INGOT"
+          slot: 31
+          amount: 1
+          price: 8
+          item-name: "§eChest"
+          lore: []
         - material: "FIREBALL"
           shop-category: "UTILITY"
           item-name: "§cExplosive Charge"
-          slot: 22
+          slot: 23
           amount: 1
           price: 1
           buy-with: "DIAMOND"
@@ -695,12 +774,39 @@ duo:
         - material: "GOLDEN_APPLE"
           shop-category: "UTILITY"
           item-name: "§eGolden Apple"
-          slot: 23
+          slot: 20
           amount: 1
           price: 2
           buy-with: "DIAMOND"
           lore:
             - "§7A gold apple."
+        - material: "SNOW_BALL"
+          shop-category: "UTILITY"
+          item-name: "§fSnow ball"
+          slot: 21
+          amount: 1
+          price: 4
+          buy-with: "IRON_INGOT"
+          lore:
+            - "§7You can use snow balls"
+            - "§7to make your enemies"
+            - "§7fall into the void!"
+        - material: "BOW"
+          shop-category: "RANGED"
+          item-name: "§eBow"
+          slot: 21
+          amount: 1
+          price: 12
+          buy-with: "GOLD_INGOT"
+          lore: []
+        - material: "ARROW"
+          shop-category: "RANGED"
+          item-name: "§eArrows"
+          slot: 20
+          amount: 8
+          price: 12
+          buy-with: "IRON_INGOT"
+          lore: []
         - material: "TNT"
           shop-category: "UTILITY"
           item-name: "§cDynamite"
@@ -715,7 +821,7 @@ duo:
         - material: "WOOD"
           shop-category: "BLOCKS"
           item-name: "§eWooden Planks"
-          slot: 29
+          slot: 20
           amount: 16
           price: 12
           buy-with: "IRON_INGOT"
@@ -724,7 +830,7 @@ duo:
         - material: "STAINED_GLASS"
           shop-category: "BLOCKS"
           item-name: "§f§lGlass"
-          slot: 30
+          slot: 21
           amount: 16
           price: 8
           buy-with: "GOLD_INGOT"
@@ -733,16 +839,36 @@ duo:
         - material: "OBSIDIAN"
           shop-category: "BLOCKS"
           item-name: "§5§lObsidian Block"
-          slot: 31
+          slot: 22
           amount: 4
           price: 4
           buy-with: "EMERALD"
           lore:
             - "§7Obsidian blocks."
+        - material: "ENDER_STONE"
+          shop-category: "BLOCKS"
+          item-name: "§e§lEnder Stone"
+          slot: 23
+          amount: 12
+          price: 8
+          buy-with: "GOLD_INGOT"
+          lore:
+            - "§7Ender blocks will protect"
+            - "§7your bed from explosives damage!"
+        - material: "LADDER"
+          shop-category: "BLOCKS"
+          item-name: "§e§lLadder"
+          slot: 24
+          amount: 16
+          price: 8
+          buy-with: "IRON_INGOT"
+          lore:
+            - "§7Use ladders to climb"
+            - "§7anywhere you want to!"
         - material: "DIAMOND_CHESTPLATE"
           shop-category: "ARMOR"
           item-name: "§b§lPermanent Diamond Armor"
-          slot: 32
+          slot: 20
           amount: 1
           price: 6
           buy-with: "EMERALD"
@@ -752,7 +878,7 @@ duo:
         - material: "IRON_CHESTPLATE"
           shop-category: "ARMOR"
           item-name: "§7§lPermanent Iron Armor"
-          slot: 33
+          slot: 21
           amount: 1
           price: 6
           buy-with: "DIAMOND"
@@ -762,7 +888,7 @@ duo:
         - material: "STONE_SWORD"
           shop-category: "MELEE"
           item-name: "§7§lStone Sword"
-          slot: 25
+          slot: 22
           amount: 1
           price: 6
           buy-with: "IRON_INGOT"
@@ -772,7 +898,7 @@ duo:
         - material: "IRON_SWORD"
           shop-category: "MELEE"
           item-name: "§f§lIron Sword"
-          slot: 34
+          slot: 21
           amount: 1
           price: 12
           buy-with: "IRON_INGOT"
@@ -782,7 +908,7 @@ duo:
         - material: "DIAMOND_SWORD"
           shop-category: "MELEE"
           item-name: "§b§lDiamond Sword"
-          slot: 43
+          slot: 20
           amount: 1
           price: 8
           buy-with: "GOLD_INGOT"
@@ -791,7 +917,7 @@ duo:
             - "§7It will lose one tier upon death."
       potions:
         - item-name: "§f§lInvisibility Potion"
-          slot: 42
+          slot: 20
           amount: 1
           price: 2
           buy-with: "DIAMOND"
@@ -802,7 +928,7 @@ duo:
           length: 30
           level: 1
         - item-name: "§f§lSpeed Potion"
-          slot: 41
+          slot: 21
           amount: 1
           price: 2
           buy-with: "DIAMOND"
@@ -813,7 +939,7 @@ duo:
           length: 45
           level: 2
         - item-name: "§f§lJump Potion"
-          slot: 40
+          slot: 22
           amount: 1
           price: 2
           buy-with: "DIAMOND"

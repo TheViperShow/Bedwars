@@ -28,9 +28,9 @@ public final class GameTrapTriggerer {
             return;
         }
 
-        task = activeGame.getPlugin().getServer().getScheduler()
-                .runTaskTimer(activeGame.getPlugin(), () -> {
-                    teamTrapsLabel:
+        task = activeGame.getPlugin().getServer().getScheduler().runTaskTimer(activeGame.getPlugin(), () -> {
+
+                    teamTrapsLabel: // <- label :()
                     for (final Map.Entry<BedwarsTeam, LinkedList<ActiveTrap>> teamActiveTraps : activeGame.getTeamActiveTrapsList().entrySet()) {
                         final LinkedList<ActiveTrap> traps = teamActiveTraps.getValue();  // Getting all active traps lists
                         if (traps.isEmpty()) {                                            // and looping through each one of them
@@ -40,10 +40,9 @@ public final class GameTrapTriggerer {
 
                         for (final Map.Entry<BedwarsTeam, List<Player>> assignedTeams : activeGame.getAssignedTeams().entrySet()) {
                             if (assignedTeams.getKey() != trapTeamOwner) { // player from own team cannot trigger their traps. :-)
-
                                 for (final Player runner : assignedTeams.getValue()) {
                                     if (runner.isOnline() && !activeGame.isOutOfGame(runner) && !activeGame.getPlayersRespawning().contains(runner)) { // Ignoring all players that
-                                                                                                // are either out of game or left.
+                                                                                                                                                       // are either out of game or left.
                                         final SpawnPosition spawnPos = activeGame.getTeamSpawn(trapTeamOwner);
                                         final Location pLoc = runner.getLocation();
 
@@ -59,7 +58,7 @@ public final class GameTrapTriggerer {
                                                                                                                                             // has been activated.
 
                                         if ((System.currentTimeMillis() - lastTeamTrapActivation) / 1e+3 < 15.0) { // 15.0 seconds have not passed
-                                            continue teamTrapsLabel;                                              // skipping this team checks.
+                                            continue teamTrapsLabel;                                               // skipping this team checks.
                                         }
 
                                         if (xDist <= 20.0 && zDist <= 20.0 && yDist <= 5.01) { // Player has entered island's

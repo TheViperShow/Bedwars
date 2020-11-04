@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import static me.thevipershow.bedwars.AllStrings.BEDS_POS;
 import static me.thevipershow.bedwars.AllStrings.DEATHMATCH_START;
 import static me.thevipershow.bedwars.AllStrings.MAP_FILENAME;
 import static me.thevipershow.bedwars.AllStrings.MAP_LOBBY_SPAWN;
@@ -15,6 +16,7 @@ import static me.thevipershow.bedwars.AllStrings.MIN_PLAYERS;
 import static me.thevipershow.bedwars.AllStrings.PLAYERS;
 import static me.thevipershow.bedwars.AllStrings.SHOP;
 import static me.thevipershow.bedwars.AllStrings.SPAWNERS;
+import static me.thevipershow.bedwars.AllStrings.SPAWN_PROTECTION;
 import static me.thevipershow.bedwars.AllStrings.START_TIMER;
 import static me.thevipershow.bedwars.AllStrings.TEAMS;
 import static me.thevipershow.bedwars.AllStrings.TNT_FUSE;
@@ -25,8 +27,18 @@ import me.thevipershow.bedwars.config.objects.upgradeshop.UpgradeShop;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
 public final class DuoBedwars extends BedwarsGame implements ConfigurationSerializable {
-    protected DuoBedwars(int minGames, int maxGames, int minPlayers, int players, List<BedwarsTeam> teams, SpawnPosition lobbySpawn, String mapFilename, Set<TeamSpawnPosition> mapSpawns, List<Spawner> spawners, List<Merchant> merchants, Shop shop, UpgradeShop upgradeShop, int startTimer, int deathmatchStart, int tntFuse) {
-        super(Gamemode.DUO, minGames, maxGames, minPlayers, players, teams, lobbySpawn, mapFilename, mapSpawns, spawners, merchants, shop, upgradeShop, startTimer, deathmatchStart, tntFuse);
+    protected DuoBedwars(final int minGames, final int maxGames, final int minPlayers,
+                         final int players, final List<BedwarsTeam> teams, final SpawnPosition lobbySpawn, final String mapFilename,
+                         final Set<TeamSpawnPosition> mapSpawns, final List<Spawner> spawners, final List<Merchant> merchants,
+                         final Shop shop, final UpgradeShop upgradeShop, final int startTimer, final int deathmatchStart,
+                         final int tntFuse, final SpawnPosition spawnProtection, List<SpawnPosition> bedSpawnPositions) {
+
+        super(Gamemode.DUO, minGames, maxGames,
+                minPlayers, players, teams,
+                lobbySpawn, mapFilename, mapSpawns,
+                spawners, merchants, bedSpawnPositions, shop,
+                upgradeShop, startTimer, deathmatchStart,
+                tntFuse, spawnProtection);
     }
 
     /**
@@ -43,36 +55,38 @@ public final class DuoBedwars extends BedwarsGame implements ConfigurationSerial
     }
 
     public static DuoBedwars deserialize(final Map<String, Object> objectMap) {
-        String filename = (String) objectMap.get(MAP_FILENAME.get());
-        int minGames = (int) objectMap.get(MIN_GAMES.get());
-        int maxGames = (int) objectMap.get(MAX_GAMES.get());
-        int players = (int) objectMap.get(PLAYERS.get());
-        int minPlayers = (int) objectMap.get(MIN_PLAYERS.get());
-        int startTimer = (int) objectMap.get(START_TIMER.get());
-        int deathmatchStart = (int) objectMap.get(DEATHMATCH_START.get());
-        int tntFuse = (int) objectMap.get(TNT_FUSE.get());
-        List<String> teams = (List<String>) objectMap.get(TEAMS.get());
-        List<BedwarsTeam> actualTeams = teams.stream().map(BedwarsTeam::valueOf).collect(Collectors.toList());
-        Map<String, Object> mapLobbySpawn = (Map<String, Object>) objectMap.get(MAP_LOBBY_SPAWN.get());
+        final String filename = (String) objectMap.get(MAP_FILENAME.get());
+        final int minGames = (int) objectMap.get(MIN_GAMES.get());
+        final int maxGames = (int) objectMap.get(MAX_GAMES.get());
+        final int players = (int) objectMap.get(PLAYERS.get());
+        final int minPlayers = (int) objectMap.get(MIN_PLAYERS.get());
+        final int startTimer = (int) objectMap.get(START_TIMER.get());
+        final int deathmatchStart = (int) objectMap.get(DEATHMATCH_START.get());
+        final int tntFuse = (int) objectMap.get(TNT_FUSE.get());
+        final List<String> teams = (List<String>) objectMap.get(TEAMS.get());
+        final List<BedwarsTeam> actualTeams = teams.stream().map(BedwarsTeam::valueOf).collect(Collectors.toList());
+        final Map<String, Object> mapLobbySpawn = (Map<String, Object>) objectMap.get(MAP_LOBBY_SPAWN.get());
 
-        SpawnPosition mapLobbySpawnPos = SpawnPosition.deserialize(mapLobbySpawn);
-        List<Map<String, Object>> mapSpawns = (List<Map<String, Object>>) objectMap.get(MAP_SPAWNS.get());
-        Set<TeamSpawnPosition> mapSpawnPos = mapSpawns.stream()
+        final SpawnPosition mapLobbySpawnPos = SpawnPosition.deserialize(mapLobbySpawn);
+        final List<Map<String, Object>> mapSpawns = (List<Map<String, Object>>) objectMap.get(MAP_SPAWNS.get());
+        final Set<TeamSpawnPosition> mapSpawnPos = mapSpawns.stream()
                 .map(TeamSpawnPosition::deserialize)
                 .collect(Collectors.toSet());
 
-        List<Map<String, Object>> spawners = (List<Map<String, Object>>) objectMap.get(SPAWNERS.get());
-        List<Spawner> spawnerList = spawners.stream()
+        final List<Map<String, Object>> spawners = (List<Map<String, Object>>) objectMap.get(SPAWNERS.get());
+        final List<Spawner> spawnerList = spawners.stream()
                 .map(Spawner::deserialize)
                 .collect(Collectors.toList());
-        List<Map<String, Object>> merchantsSection = (List<Map<String, Object>>) objectMap.get(MERCHANTS.get());
+        final List<Map<String, Object>> merchantsSection = (List<Map<String, Object>>) objectMap.get(MERCHANTS.get());
 
-        List<Merchant> merchantsList = merchantsSection.stream()
+        final List<Merchant> merchantsList = merchantsSection.stream()
                 .map(Merchant::deserialize)
                 .collect(Collectors.toList());
-        Map<String, Object> shopSection = (Map<String, Object>) objectMap.get(SHOP.get());
-        Shop shop = Shop.deserialize(shopSection);
-        UpgradeShop upgradeShop = UpgradeShop.deserialize((Map<String, Object>) objectMap.get(UPGRADES.get()));
-        return new DuoBedwars(minGames, maxGames, minPlayers, players, actualTeams, mapLobbySpawnPos, filename, mapSpawnPos, spawnerList, merchantsList, shop, upgradeShop, startTimer, deathmatchStart, tntFuse);
+        final Map<String, Object> shopSection = (Map<String, Object>) objectMap.get(SHOP.get());
+        final Shop shop = Shop.deserialize(shopSection);
+        final UpgradeShop upgradeShop = UpgradeShop.deserialize((Map<String, Object>) objectMap.get(UPGRADES.get()));
+        final SpawnPosition spawnProtection = SpawnPosition.deserialize((Map<String, Object>) objectMap.get(SPAWN_PROTECTION.get()));
+        final List<SpawnPosition> bedSpawnPositions = ((List<Map<String, Object>>) objectMap.get(BEDS_POS.get())).stream().map(SpawnPosition::deserialize).collect(Collectors.toList());
+        return new DuoBedwars(minGames, maxGames, minPlayers, players, actualTeams, mapLobbySpawnPos, filename, mapSpawnPos, spawnerList, merchantsList, shop, upgradeShop, startTimer, deathmatchStart, tntFuse, spawnProtection, bedSpawnPositions);
     }
 }

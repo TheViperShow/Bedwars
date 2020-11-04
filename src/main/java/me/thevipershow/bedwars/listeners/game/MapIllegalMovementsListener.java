@@ -11,6 +11,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.util.Vector;
 
 public final class MapIllegalMovementsListener extends UnregisterableListener {
@@ -76,22 +77,26 @@ public final class MapIllegalMovementsListener extends UnregisterableListener {
         this.bounds = genBounds(activeGame);
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
-    public void onPlayerMove(final PlayerMoveEvent event) {
+    @EventHandler(ignoreCancelled = true)
+    public final void onPlayerMove(final PlayerMoveEvent event) {
         final Player player = event.getPlayer();
+        if (activeGame == null || activeGame.getAssociatedWorld() == null || !activeGame.getAssociatedWorld().equals(player.getWorld())) {
+            return;
+        }
+
         if (!activeGame.isHasStarted()) {
+            if (event.getTo().getY() <= 0.00) {
+                event.setCancelled(true);
+                player.teleport(activeGame.getCachedWaitingLocation());
+            }
             return;
         }
-        if (!activeGame.getAssociatedWorld().equals(player.getWorld())) {
-            return;
-        }
-        if (!activeGame.isHasStarted()) {
-            return;
-        }
+
+
         if (isOutOfBounds(player)) {
             if (activeGame.isOutOfGame(player)) {
                 event.setCancelled(true);
-                player.setVelocity(new Vector(0.d,0.d,0.d));
+                player.setVelocity(new Vector(0.000049568945687d,0.0000002355237d,0.000000050225d));
             } else {
                 //PlayerDeathListener.deathLogic(activeGame, activeGame.getPlayerTeam(player), player,
                 //        new EntityDamageEvent(player, EntityDamageEvent.DamageCause.VOID, 20.00));

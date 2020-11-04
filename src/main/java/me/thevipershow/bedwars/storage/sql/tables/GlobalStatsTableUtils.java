@@ -4,13 +4,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -162,7 +158,7 @@ public final class GlobalStatsTableUtils {
         }));
     }
 
-    public static void cacheWinsIntoMap(final LinkedHashMap<UUID, Wins> map, Map<Gamemode, LinkedList<Pair<UUID, Integer>>> top, final Plugin plugin) {
+    public static void cacheWinsIntoMap(final LinkedHashMap<UUID, Wins> map, Map<Gamemode, LinkedList<Pair<UUID, Integer>>> top, LinkedList<Pair<UUID, Integer>> total, final Plugin plugin) {
 
         final BukkitScheduler scheduler = plugin.getServer().getScheduler();
         final Optional<Connection> optionalConnection = MySQLDatabase.getConnection();
@@ -188,17 +184,23 @@ public final class GlobalStatsTableUtils {
                     final LinkedList<Pair<UUID, Integer>> soloWin = new LinkedList<>(), duoWin = new LinkedList<>(), quadWin = new LinkedList<>();
                     wMap.entrySet().stream()
                             .sorted(Map.Entry.comparingByValue((a, b) -> Math.max(a.getSoloWins(), b.getSoloWins())))
-                            .forEachOrdered(o -> soloWin.offerLast(new Pair<>(o.getKey(), o.getValue().getSoloWins())));
+                            .forEachOrdered(o -> soloWin.offerLast(new Pair<UUID, Integer>(o.getKey(), o.getValue().getSoloWins())));
                     wMap.entrySet().stream()
                             .sorted(Map.Entry.comparingByValue((a, b) -> Math.max(a.getDuoWins(), b.getDuoWins())))
-                            .forEachOrdered(o -> duoWin.offerLast(new Pair<>(o.getKey(), o.getValue().getDuoWins())));
+                            .forEachOrdered(o -> duoWin.offerLast(new Pair<UUID, Integer>(o.getKey(), o.getValue().getDuoWins())));
                     wMap.entrySet().stream()
                             .sorted(Map.Entry.comparingByValue((a, b) -> Math.max(a.getQuadWins(), b.getQuadWins())))
-                            .forEachOrdered(o -> quadWin.offerLast(new Pair<>(o.getKey(), o.getValue().getQuadWins())));
+                            .forEachOrdered(o -> quadWin.offerLast(new Pair<UUID, Integer>(o.getKey(), o.getValue().getQuadWins())));
 
                     top.put(SOLO, soloWin);
                     top.put(DUO, duoWin);
                     top.put(QUAD, quadWin);
+
+                    total.clear();
+
+                    wMap.entrySet().stream()
+                            .sorted(Map.Entry.comparingByValue((w, b) -> Math.max(w.getSum(), b.getSum())))
+                            .forEachOrdered(o -> total.offerLast(new Pair<UUID, Integer>(o.getKey(), o.getValue().getSum())));
                 });
 
             } catch (final SQLException e) {

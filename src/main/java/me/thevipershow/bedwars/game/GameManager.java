@@ -32,7 +32,10 @@ public final class GameManager {
 
     public void loadBaseAmount() {
         loading = true;
-        bedwarsGameSet.forEach(bedwarsGame -> {
+        bedwarsGameSet
+                .stream()
+                .filter(b -> worldsManager.getConfigManager().getDefaultConfiguration().getAttemptLoad().contains(b.getGamemode()))
+                .forEach(bedwarsGame -> {
             int count = 0;
             while (count < bedwarsGame.getMinGames()) {
                 worldsManager.load(bedwarsGame);

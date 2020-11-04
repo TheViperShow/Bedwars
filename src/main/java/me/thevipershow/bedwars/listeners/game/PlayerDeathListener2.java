@@ -240,6 +240,7 @@ public final class PlayerDeathListener2 extends UnregisterableListener {
         }
 
         event.setCancelled(true);
+        damaged.sendTitle("§cGame Over", "§cdude you literally suck so bad");
         final Location loc = damaged.getLocation();
         if (loc.getY() <= 0.00) {
             loc.setY(80.00);

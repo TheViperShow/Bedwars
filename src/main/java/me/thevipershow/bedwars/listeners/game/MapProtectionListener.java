@@ -1,10 +1,12 @@
 package me.thevipershow.bedwars.listeners.game;
 
+import me.thevipershow.bedwars.config.objects.SpawnPosition;
 import me.thevipershow.bedwars.config.objects.TeamSpawnPosition;
 import me.thevipershow.bedwars.game.AbstractActiveMerchant;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.ActiveSpawner;
 import me.thevipershow.bedwars.listeners.UnregisterableListener;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
@@ -22,21 +24,29 @@ public final class MapProtectionListener extends UnregisterableListener {
 
     private boolean isBlockNearSpawner(final Block block) {
         for (final ActiveSpawner activeSpawner : activeGame.getActiveSpawners())
-            if (activeSpawner.getSpawner().getSpawnPosition().squaredDistance(block.getLocation()) <= 12.0)
+            if (activeSpawner.getSpawner().getSpawnPosition().squaredDistance(block.getLocation()) <= 27.0) {
                 return true;
+            }
         return false;
     }
 
     private boolean isBlockInsideSpawn(final Block block) {
-        for (final TeamSpawnPosition spawn : activeGame.getBedwarsGame().getMapSpawns())
-            if (spawn.squaredDistance(block.getLocation()) < 16.01)
+        final Location blockLocation = block.getLocation();
+        final SpawnPosition spawnProtection = activeGame.getBedwarsGame().getSpawnProtection();
+        for (final TeamSpawnPosition spawn : activeGame.getBedwarsGame().getMapSpawns()) {
+            final double dX = spawn.xDistance(blockLocation);
+            final double dY = spawn.yDistance(blockLocation);
+            final double dZ = spawn.zDistance(blockLocation);
+            if (dX <= spawnProtection.getX() && dZ <= spawnProtection.getZ() && dY <= spawnProtection.getY()) {
                 return true;
+            }
+        }
         return false;
     }
 
     private boolean isBlockInsideMerchant(final Block block) { //TODO: Implement
         for (AbstractActiveMerchant activeMerchant : activeGame.getActiveMerchants()) {
-            if (activeMerchant.getMerchant().getMerchantPosition().squaredDistance(block.getLocation()) < 16.01) {
+            if (activeMerchant.getMerchant().getMerchantPosition().squaredDistance(block.getLocation()) < 15.00) {
                 return true;
             }
         }

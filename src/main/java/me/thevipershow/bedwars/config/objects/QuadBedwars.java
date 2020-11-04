@@ -13,8 +13,13 @@ import static me.thevipershow.bedwars.AllStrings.*;
 
 @SerializableAs("Quad")
 public final class QuadBedwars extends BedwarsGame implements ConfigurationSerializable {
-    private QuadBedwars(int minGames, int maxGames, int minPlayers, int players, List<BedwarsTeam> teams, SpawnPosition lobbySpawn, String mapFilename, Set<TeamSpawnPosition> mapSpawns, List<Spawner> spawners, List<Merchant> merchants, Shop shop, UpgradeShop upgradeShop, int startTimer, int deathmatchStart, int tntFuse) {
-        super(Gamemode.QUAD, minGames, maxGames, minPlayers, players, teams, lobbySpawn, mapFilename, mapSpawns, spawners, merchants, shop, upgradeShop, startTimer, deathmatchStart, tntFuse);
+    private QuadBedwars(int minGames, int maxGames, int minPlayers,
+                        int players, List<BedwarsTeam> teams, SpawnPosition lobbySpawn,
+                        String mapFilename, Set<TeamSpawnPosition> mapSpawns, List<Spawner> spawners,
+                        List<Merchant> merchants, Shop shop, UpgradeShop upgradeShop,
+                        int startTimer, int deathmatchStart, int tntFuse,
+                        SpawnPosition spawnProtection, List<SpawnPosition> bedSpawnPositions) {
+        super(Gamemode.QUAD, minGames, maxGames, minPlayers, players, teams, lobbySpawn, mapFilename, mapSpawns, spawners, merchants, bedSpawnPositions, shop, upgradeShop, startTimer, deathmatchStart, tntFuse, spawnProtection);
     }
 
     @Override
@@ -23,36 +28,38 @@ public final class QuadBedwars extends BedwarsGame implements ConfigurationSeria
     }
 
     public static QuadBedwars deserialize(final Map<String, Object> objectMap) {
-        String filename = (String) objectMap.get(MAP_FILENAME.get());
-        int minGames = (int) objectMap.get(MIN_GAMES.get());
-        int maxGames = (int) objectMap.get(MAX_GAMES.get());
-        int players = (int) objectMap.get(PLAYERS.get());
-        int minPlayers = (int) objectMap.get(MIN_PLAYERS.get());
-        int startTimer = (int) objectMap.get(START_TIMER.get());
-        int deathmatchStart = (int) objectMap.get(DEATHMATCH_START.get());
-        int tntFuse = (int) objectMap.get(TNT_FUSE.get());
-        List<String> teams = (List<String>) objectMap.get(TEAMS.get());
-        List<BedwarsTeam> actualTeams = teams.stream().map(BedwarsTeam::valueOf).collect(Collectors.toList());
-        Map<String, Object> mapLobbySpawn = (Map<String, Object>) objectMap.get(MAP_LOBBY_SPAWN.get());
+        final String filename = (String) objectMap.get(MAP_FILENAME.get());
+        final int minGames = (int) objectMap.get(MIN_GAMES.get());
+        final int maxGames = (int) objectMap.get(MAX_GAMES.get());
+        final int players = (int) objectMap.get(PLAYERS.get());
+        final int minPlayers = (int) objectMap.get(MIN_PLAYERS.get());
+        final int startTimer = (int) objectMap.get(START_TIMER.get());
+        final int deathmatchStart = (int) objectMap.get(DEATHMATCH_START.get());
+        final int tntFuse = (int) objectMap.get(TNT_FUSE.get());
+        final List<String> teams = (List<String>) objectMap.get(TEAMS.get());
+        final List<BedwarsTeam> actualTeams = teams.stream().map(BedwarsTeam::valueOf).collect(Collectors.toList());
+        final Map<String, Object> mapLobbySpawn = (Map<String, Object>) objectMap.get(MAP_LOBBY_SPAWN.get());
 
-        SpawnPosition mapLobbySpawnPos = SpawnPosition.deserialize(mapLobbySpawn);
-        List<Map<String, Object>> mapSpawns = (List<Map<String, Object>>) objectMap.get(MAP_SPAWNS.get());
-        Set<TeamSpawnPosition> mapSpawnPos = mapSpawns.stream()
+        final SpawnPosition mapLobbySpawnPos = SpawnPosition.deserialize(mapLobbySpawn);
+        final List<Map<String, Object>> mapSpawns = (List<Map<String, Object>>) objectMap.get(MAP_SPAWNS.get());
+        final Set<TeamSpawnPosition> mapSpawnPos = mapSpawns.stream()
                 .map(TeamSpawnPosition::deserialize)
                 .collect(Collectors.toSet());
 
-        List<Map<String, Object>> spawners = (List<Map<String, Object>>) objectMap.get(SPAWNERS.get());
-        List<Spawner> spawnerList = spawners.stream()
+        final List<Map<String, Object>> spawners = (List<Map<String, Object>>) objectMap.get(SPAWNERS.get());
+        final List<Spawner> spawnerList = spawners.stream()
                 .map(Spawner::deserialize)
                 .collect(Collectors.toList());
-        List<Map<String, Object>> merchantsSection = (List<Map<String, Object>>) objectMap.get(MERCHANTS.get());
+        final List<Map<String, Object>> merchantsSection = (List<Map<String, Object>>) objectMap.get(MERCHANTS.get());
 
-        List<Merchant> merchantsList = merchantsSection.stream()
+        final List<Merchant> merchantsList = merchantsSection.stream()
                 .map(Merchant::deserialize)
                 .collect(Collectors.toList());
-        Map<String, Object> shopSection = (Map<String, Object>) objectMap.get(SHOP.get());
-        Shop shop = Shop.deserialize(shopSection);
-        UpgradeShop upgradeShop = UpgradeShop.deserialize((Map<String, Object>) objectMap.get(UPGRADES.get()));
-        return new QuadBedwars(minGames, maxGames, minPlayers, players, actualTeams, mapLobbySpawnPos, filename, mapSpawnPos, spawnerList, merchantsList, shop, upgradeShop, startTimer, deathmatchStart, tntFuse);
+        final Map<String, Object> shopSection = (Map<String, Object>) objectMap.get(SHOP.get());
+        final Shop shop = Shop.deserialize(shopSection);
+        final UpgradeShop upgradeShop = UpgradeShop.deserialize((Map<String, Object>) objectMap.get(UPGRADES.get()));
+        final SpawnPosition spawnProtection = SpawnPosition.deserialize((Map<String, Object>) objectMap.get(SPAWN_PROTECTION.get()));
+        final List<SpawnPosition> bedSpawnPositions = ((List<Map<String, Object>>) objectMap.get(BEDS_POS.get())).stream().map(SpawnPosition::deserialize).collect(Collectors.toList());
+        return new QuadBedwars(minGames, maxGames, minPlayers, players, actualTeams, mapLobbySpawnPos, filename, mapSpawnPos, spawnerList, merchantsList, shop, upgradeShop, startTimer, deathmatchStart, tntFuse, spawnProtection, bedSpawnPositions);
     }
 }

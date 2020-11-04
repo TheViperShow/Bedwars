@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -17,6 +18,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
@@ -71,6 +73,7 @@ import org.bukkit.entity.Villager;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.material.Bed;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.scheduler.BukkitTask;
@@ -95,6 +98,7 @@ public abstract class ActiveGame {
     protected final GameTrapTriggerer gameTrapTriggerer;
     protected final KillTracker killTracker;
     protected final ShopInventories shopInventories;
+    protected final EnderchestManager enderchestManager;
 
     protected ActiveSpawner diamondSampleSpawner = null;
     protected ActiveSpawner emeraldSampleSpawner = null;
@@ -162,6 +166,7 @@ public abstract class ActiveGame {
         this.gameTrapTriggerer = new GameTrapTriggerer(this);
         this.killTracker = new KillTracker(this);
         this.shopInventories = new ShopInventories(bedwarsGame.getShop());
+        this.enderchestManager = new EnderchestManager(this);
     }
 
     protected final void setupUpgradeLevelsMap() {
@@ -179,37 +184,6 @@ public abstract class ActiveGame {
         associatedQueue.perform(p -> p.sendMessage(Bedwars.PREFIX + AllStrings.TEAMING_PROHIBITED.get()));
     }
 
-    /*protected final Inventory setupShopGUIs() {
-        final Shop shop = bedwarsGame.getShop();
-        final Inventory inv = Bukkit.createInventory(null, shop.getSlots(), AllStrings.BEDWARS_SHOP_TITLE.get());
-
-        for (final int glassSlot : shop.getGlassSlots()) {
-            final ItemStack glass = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) shop.getGlassColor());
-            final ItemMeta glassMeta = glass.getItemMeta();
-            glassMeta.setDisplayName("");
-            glassMeta.setLore(null);
-            glass.setItemMeta(glassMeta);
-            inv.setItem(glassSlot, glass);
-        }
-
-        for (final ShopItem item : shop.getItems()) {
-            final ItemStack stack = item.getCachedFancyStack();
-            inv.setItem(item.getSlot(), stack);
-        }
-
-        for (final PotionItem potionItem : shop.getPotionItem()) {
-            final ItemStack stack = potionItem.getCachedFancyStack();
-            inv.setItem(potionItem.getSlot(), stack);
-        }
-
-        for (final UpgradeItem item : shop.getUpgradeItems()) {
-            final UpgradeLevel first = item.getLevels().get(0);
-            final ItemStack s = first.generateFancyStack();
-            inv.setItem(item.getSlot(), s);
-        }
-        return inv;
-    }*/
-
     public void hidePlayer(final Player player) {
         final BedwarsTeam playerTeam = getPlayerTeam(player);
         for (Map.Entry<BedwarsTeam, List<Player>> entry : assignedTeams.entrySet()) {
@@ -225,6 +199,7 @@ public abstract class ActiveGame {
     }
 
     public void showPlayer(final Player player) {
+   //     player.spigot().getHiddenPlayers()
         for (final List<Player> players : assignedTeams.values()) {
             for (final Player p : players) {
                 if (p.isOnline() && !isOutOfGame(p)) {
@@ -233,6 +208,10 @@ public abstract class ActiveGame {
             }
         }
         hiddenPlayers.remove(player);
+    }
+
+    public void showAll() {
+        associatedWorld.getPlayers().forEach(this::showPlayer);
     }
 
     public final Inventory setupTrapsGUIs() {
@@ -313,7 +292,7 @@ public abstract class ActiveGame {
         @Override
         public List<Entry> getEntries(final Player player) {
             final EntryBuilder builder = new EntryBuilder();
-            builder.next("§7" + LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE));
+            builder.next("§7   " + LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE));
             builder.blank();
 
             if (diamondSampleSpawner != null && emeraldSampleSpawner != null) {
@@ -387,8 +366,12 @@ public abstract class ActiveGame {
         emeraldBoostDrops.forEach(BukkitTask::cancel);
         emeraldBoostDrops.clear();
         experienceManager.stopRewardTask();
-        hasStarted = false;
         destroyMap();
+        try {
+            finalize();
+        } catch (final Throwable e) {
+            e.printStackTrace();
+        }
     }
 
     public final SpawnPosition getTeamSpawn(final BedwarsTeam bedwarsTeam) {
@@ -482,6 +465,8 @@ public abstract class ActiveGame {
         final UnregisterableListener itemDegradeListener = new ItemDegradeListener(this);
         final UnregisterableListener playerSpectatePlayerListener = new PlayerSpectatePlayerListener(this);
         final UnregisterableListener potionModifyListener = new PotionModifyListener(this);
+        final UnregisterableListener chestInteractListener = new ChestInteractListener(this);
+        final UnregisterableListener dingSound = new KillSoundListener(this);
 
         final PluginManager pluginManager = plugin.getServer().getPluginManager();
 
@@ -505,6 +490,8 @@ public abstract class ActiveGame {
         pluginManager.registerEvents(itemDegradeListener, plugin);
         pluginManager.registerEvents(playerSpectatePlayerListener, plugin);
         pluginManager.registerEvents(potionModifyListener, plugin);
+        pluginManager.registerEvents(chestInteractListener, plugin);
+        pluginManager.registerEvents(dingSound, plugin);
 
         unregisterableListeners.add(mapIllegalMovementsListener);
         unregisterableListeners.add(mapProtectionListener);
@@ -526,6 +513,8 @@ public abstract class ActiveGame {
         unregisterableListeners.add(itemDegradeListener);
         unregisterableListeners.add(playerSpectatePlayerListener);
         unregisterableListeners.add(potionModifyListener);
+        unregisterableListeners.add(chestInteractListener);
+        unregisterableListeners.add(dingSound);
     }
 
     public final void unregisterAllListeners() {
@@ -597,6 +586,8 @@ public abstract class ActiveGame {
             giveAllDefaultSet();
             fillTraps();
             fillTrapsDelayMap();
+            breakNonPlayingBeds();
+            showAll();
             gameTrapTriggerer.start();
             abstractDeathmatch.start();
             experienceManager.startRewardTask();
@@ -691,6 +682,38 @@ public abstract class ActiveGame {
         return bedwarsTeams;
     }
 
+    public void breakNonPlayingBeds() {
+        final Set<BedwarsTeam> bedwarsTeams = assignedTeams.keySet();
+        for (final BedwarsTeam team : BedwarsTeam.values()) {
+            if (!bedwarsTeams.contains(team)) {
+
+                final SpawnPosition posOfTeam = bedwarsGame.spawnPosOfTeam(team);
+                SpawnPosition nearestBed = null;
+                double sqdDist = -1;
+                for (final SpawnPosition bedSpawnPosition : bedwarsGame.getBedSpawnPositions()) {
+                    final double tempSqdDist = posOfTeam.squaredDistance(bedSpawnPosition);
+                    if (nearestBed == null) {
+                        nearestBed = bedSpawnPosition;
+                        sqdDist = tempSqdDist;
+                    } else if (tempSqdDist <= sqdDist) {
+                        nearestBed = bedSpawnPosition;
+                        sqdDist = tempSqdDist;
+                    }
+                }
+                if (nearestBed != null) {
+                    final Location bedLoc = nearestBed.toLocation(associatedWorld);
+                    final Block block = bedLoc.getBlock();
+                    if (block != null && block.getType() == Material.BED) {
+                        final Bed b = (Bed) block.getState().getData();
+                        final Block facing = block.getRelative(b.getFacing());
+                        block.setType(Material.AIR);
+                        facing.setType(Material.AIR);
+                    }
+                }
+            }
+        }
+    }
+
     @SuppressWarnings("deprecation")
     public void declareWinner(final BedwarsTeam team) {
         if (winnerDeclared) {
@@ -711,7 +734,8 @@ public abstract class ActiveGame {
                     questManager.winDailyFirstGame(p);
                     GlobalStatsTableUtils.increaseWin(bedwarsGame.getGamemode(), plugin, p.getUniqueId());
                 } else {
-                    p.sendTitle(AllStrings.TEAM_WON.get() + team.getColorCode() + team.name() + AllStrings.HAS_WON_THE_GAME.get(), AllStrings.RETURNING_LOBBY.get());
+                    p.sendTitle(AllStrings.HAS_WON_THE_GAME.get(), AllStrings.RETURNING_LOBBY.get());
+                   // p.sendTitle(AllStrings.TEAM_WON.get() + team.getColorCode() + team.name() + AllStrings.HAS_WON_THE_GAME.get(), AllStrings.RETURNING_LOBBY.get());
                 }
                 questManager.gamePlayedReward(p);
             }
@@ -800,7 +824,6 @@ public abstract class ActiveGame {
             player.updateInventory();
         }
     }
-
 
     public boolean isOutOfGame(final Player p) {
         if (p != null) {
@@ -1078,6 +1101,10 @@ public abstract class ActiveGame {
 
     public final ExperienceManager getExperienceManager() {
         return experienceManager;
+    }
+
+    public final EnderchestManager getEnderchestManager() {
+        return enderchestManager;
     }
 
     public final List<BukkitTask> getEmeraldBoostDrops() {

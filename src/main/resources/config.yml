@@ -16,4 +16,8 @@ settings:
     db-name: "bedwars" #set your DB name
   lobby:
     world-name: "world"
+  attempt-load:
+    - "solo"
+    - "duo"
+    - "quad"
 

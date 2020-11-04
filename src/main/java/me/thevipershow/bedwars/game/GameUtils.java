@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import me.thevipershow.bedwars.bedwars.Gamemode;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.bedwars.objects.spawners.SpawnerType;
@@ -23,11 +24,14 @@ import org.bukkit.Sound;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -104,14 +108,8 @@ public final class GameUtils {
         return ((CraftPlayer) p).getHandle().playerConnection;
     }
 
-    public static void setAI(final Entity entity, boolean status) {
-        final net.minecraft.server.v1_8_R3.Entity e = ((CraftEntity) entity).getHandle();
-        NBTTagCompound eTag = e.getNBTTag();
-        if (eTag == null)
-            eTag = new NBTTagCompound();
-        e.c(eTag);
-        eTag.setInt(NO_AI_TAG, status ? 0 : 1);
-        e.f(eTag);
+    public static void setAI(final LivingEntity entity, boolean status) {
+        ((CraftEntity) entity).getHandle().ai = status;
     }
 
     public static BedwarsTeam findMerchantTeam(final Merchant merchant, final ActiveGame game) {

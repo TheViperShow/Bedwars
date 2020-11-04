@@ -8,9 +8,13 @@ import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.config.objects.SpawnPosition;
 import me.thevipershow.bedwars.config.objects.upgradeshop.UpgradeType;
 import me.thevipershow.bedwars.listeners.game.DragonTargetListener;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEnderDragon;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.EntityType;
+import org.bukkit.material.Bed;
 import org.bukkit.scheduler.BukkitTask;
 
 public abstract class AbstractDeathmatch {
@@ -58,11 +62,25 @@ public abstract class AbstractDeathmatch {
 
     public abstract void startDeathMatch();
 
+    public void breakBeds() {
+        activeGame.getBedwarsGame().getBedSpawnPositions().forEach(bed -> {
+            final Location location = bed.toLocation(activeGame.getAssociatedWorld());
+            final Block block = location.getBlock();
+            if (block != null && block.getType() == Material.BED) {
+                Bed b = (Bed) block.getState().getData();
+                final Block facing = block.getRelative(b.getFacing());
+                block.setType(Material.AIR);
+                facing.setType(Material.AIR);
+            }
+        });
+    }
+
     public void start() {
         this.task = activeGame.plugin.getServer().getScheduler().runTaskLater(activeGame.plugin, () -> {
             setRunning(true);
             this.startTime = System.currentTimeMillis();
             startDeathMatch();
+            breakBeds();
             activeGame.plugin.getServer().getPluginManager().registerEvents(dragonTargetListener, activeGame.plugin);
         }, startAfter * 20L);
     }

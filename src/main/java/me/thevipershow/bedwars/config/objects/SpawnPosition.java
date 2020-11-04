@@ -15,6 +15,8 @@ public class SpawnPosition implements ConfigurationSerializable, Cloneable {
     private final double y;
     private final double z;
 
+    private Location cachedLoc = null;
+
     public SpawnPosition(double x, double y, double z) {
         this.x = x;
         this.y = y;
@@ -104,6 +106,9 @@ public class SpawnPosition implements ConfigurationSerializable, Cloneable {
     }
 
     public final Location toLocation(final World world) {
-        return new Location(world, this.x, this.y, this.z);
+        if (this.cachedLoc == null) {
+            this.cachedLoc = new Location(world, this.x, this.y, this.z);
+        }
+        return this.cachedLoc;
     }
 }

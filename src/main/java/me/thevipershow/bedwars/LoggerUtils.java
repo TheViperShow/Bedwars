@@ -14,9 +14,8 @@ public final class LoggerUtils {
     public static final String ANSI_CYAN = "\u001B[36m";
     public static final String ANSI_WHITE = "\u001B[37m";
 
-    public static void logColor(final Logger logger, String text) {
-        logger.info(
-                text.replace("&r", ANSI_RESET)
+    public static void logColor(final Logger logger, final String text) {
+        logger.info(text.replace("&r", ANSI_RESET)
                         .replace("&0", ANSI_BLACK)
                         .replace("&c", ANSI_RED)
                         .replace("&a", ANSI_GREEN)
@@ -25,8 +24,7 @@ public final class LoggerUtils {
                         .replace("&5", ANSI_PURPLE)
                         .replace("&3", ANSI_CYAN)
                         .replace("&f", ANSI_WHITE)
-                        .concat(ANSI_RESET)
-        );
+                        .concat(ANSI_RESET));
     }
 
 }

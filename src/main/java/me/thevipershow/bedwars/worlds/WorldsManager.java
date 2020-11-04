@@ -126,6 +126,26 @@ public class WorldsManager {
         return activeGameSet;
     }
 
+    public ConfigManager getConfigManager() {
+        return configManager;
+    }
+
+    public JavaPlugin getPlugin() {
+        return plugin;
+    }
+
+    public File getWorldContainer() {
+        return worldContainer;
+    }
+
+    public File getPluginFolder() {
+        return pluginFolder;
+    }
+
+    public List<ActiveGame> getActiveGameSet() {
+        return activeGameSet;
+    }
+
     public HashMap<BedwarsGame, Integer> getCreatedAmountsMap() {
         return createdAmountsMap;
     }

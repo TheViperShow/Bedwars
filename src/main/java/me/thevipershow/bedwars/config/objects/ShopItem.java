@@ -33,7 +33,13 @@ public class ShopItem implements ConfigurationSerializable {
         final ItemStack stack = new ItemStack(material, amount);
         final ItemMeta meta = stack.getItemMeta();
         meta.setDisplayName(itemName);
-        final List<String> list = new ArrayList<>(this.lore);
+        final List<String> list = new ArrayList<>();
+        if (lore != null && !lore.isEmpty()) {
+            list.addAll(lore);
+        }
+        if (list.isEmpty()) {
+            list.add("§7Click here to buy!");
+        }
         list.addAll(AbstractActiveMerchant.priceDescriptorSection(this));
         meta.setLore(list);
         stack.setItemMeta(meta);
@@ -86,7 +92,6 @@ public class ShopItem implements ConfigurationSerializable {
         final int s = (int) objectMap.get(SLOT.get());
         final String itemName = (String) objectMap.get(ITEM_NAME.get());
         final List<String> lore = (List<String>) objectMap.get(LORE.get());
-        System.out.println(itemName);
 
         final String shopCategoryString = (String) objectMap.get(SHOP_CATEGORY.get());
         if (shopCategoryString != null) {
