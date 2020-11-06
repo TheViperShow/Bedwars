@@ -1,6 +1,7 @@
 package me.thevipershow.bedwars.game;
 
 import java.util.EnumMap;
+import lombok.Getter;
 import me.thevipershow.bedwars.Bedwars;
 import me.thevipershow.bedwars.config.objects.Shop;
 import me.thevipershow.bedwars.game.shop.ShopCategory;
@@ -9,11 +10,15 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-public class ShopInventories {
+@Getter
+public class GameInventories {
 
+    private final EnderchestManager enderchestManager;
     private final EnumMap<ShopCategory, Inventory> inventories = new EnumMap<>(ShopCategory.class);
 
-    public ShopInventories(final Shop shop) {
+    public GameInventories(final Shop shop) {
+        this.enderchestManager = new EnderchestManager();
+
         for (final ShopCategory shopCategory : ShopCategory.values()) {
             final Inventory inv = Bedwars.plugin.getServer().createInventory(null, 9 * 6, shopCategory.getTitle());
             shop.getGlassSlots().forEach(slot -> {
@@ -35,9 +40,5 @@ public class ShopInventories {
 
     public final Inventory getFromCategory(final ShopCategory shopCategory) {
         return inventories.get(shopCategory);
-    }
-
-    public final EnumMap<ShopCategory, Inventory> getInventories() {
-        return inventories;
     }
 }

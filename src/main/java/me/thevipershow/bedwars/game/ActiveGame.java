@@ -1,86 +1,165 @@
 package me.thevipershow.bedwars.game;
 
-import java.io.File;
-import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import me.thevipershow.bedwars.AllStrings;
-import me.thevipershow.bedwars.Bedwars;
-import me.thevipershow.bedwars.bedwars.Gamemode;
-import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
-import me.thevipershow.bedwars.bedwars.objects.shops.MerchantType;
-import me.thevipershow.bedwars.bedwars.objects.spawners.SpawnerType;
+import lombok.Data;
 import me.thevipershow.bedwars.config.objects.BedwarsGame;
-import me.thevipershow.bedwars.config.objects.Merchant;
-import me.thevipershow.bedwars.config.objects.PotionItem;
-import me.thevipershow.bedwars.config.objects.Shop;
-import me.thevipershow.bedwars.config.objects.ShopItem;
-import me.thevipershow.bedwars.config.objects.SpawnPosition;
-import me.thevipershow.bedwars.config.objects.TeamSpawnPosition;
-import me.thevipershow.bedwars.config.objects.UpgradeItem;
-import me.thevipershow.bedwars.config.objects.UpgradeLevel;
-import me.thevipershow.bedwars.config.objects.upgradeshop.DragonBuffUpgrade;
-import me.thevipershow.bedwars.config.objects.upgradeshop.HealPoolUpgrade;
-import me.thevipershow.bedwars.config.objects.upgradeshop.IronForgeUpgrade;
-import me.thevipershow.bedwars.config.objects.upgradeshop.ManiacMinerUpgrade;
-import me.thevipershow.bedwars.config.objects.upgradeshop.ReinforcedArmorUpgrade;
-import me.thevipershow.bedwars.config.objects.upgradeshop.SharpnessUpgrade;
-import me.thevipershow.bedwars.config.objects.upgradeshop.TrapUpgrades;
-import me.thevipershow.bedwars.config.objects.upgradeshop.UpgradeShop;
-import me.thevipershow.bedwars.config.objects.upgradeshop.UpgradeShopItem;
-import me.thevipershow.bedwars.config.objects.upgradeshop.UpgradeType;
-import me.thevipershow.bedwars.config.objects.upgradeshop.traps.AlarmTrap;
-import me.thevipershow.bedwars.config.objects.upgradeshop.traps.BlindnessAndPoisonTrap;
-import me.thevipershow.bedwars.config.objects.upgradeshop.traps.CounterOffensiveTrap;
-import me.thevipershow.bedwars.config.objects.upgradeshop.traps.MinerFatigueTrap;
-import me.thevipershow.bedwars.game.shop.ShopCategory;
-import me.thevipershow.bedwars.game.upgrades.ActiveHealPool;
-import me.thevipershow.bedwars.game.upgrades.ActiveTrap;
-import me.thevipershow.bedwars.listeners.UnregisterableListener;
-import me.thevipershow.bedwars.listeners.game.*;
-import me.thevipershow.bedwars.storage.sql.tables.GlobalStatsTableUtils;
-import me.thevipershow.bedwars.worlds.WorldsManager;
-import me.tigerhix.lib.scoreboard.common.EntryBuilder;
-import me.tigerhix.lib.scoreboard.type.Entry;
-import me.tigerhix.lib.scoreboard.type.Scoreboard;
-import me.tigerhix.lib.scoreboard.type.ScoreboardHandler;
-import org.apache.commons.io.FileUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import me.thevipershow.bedwars.game.objects.ActiveSpawnersManager;
+import me.thevipershow.bedwars.game.objects.CachedGameData;
+import me.thevipershow.bedwars.game.objects.GameListener;
+import me.thevipershow.bedwars.game.objects.InternalGameManager;
+import me.thevipershow.bedwars.game.objects.ListenersManager;
+import me.thevipershow.bedwars.game.objects.MovementsManager;
+import me.thevipershow.bedwars.game.objects.TeamManager;
+import me.thevipershow.bedwars.listeners.game.GameTrapTriggerer;
 import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Villager;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.material.Bed;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.PluginManager;
-import org.bukkit.scheduler.BukkitTask;
 
+@Data
 public abstract class ActiveGame {
 
+    private final InternalGameManager internalGameManager;
+    // This fields indicates if the game has effectively started or not
+    private boolean hasStarted = false;
+    // This game current state
+    private ActiveGameState gameState = ActiveGameState.NONE;
+
+    public ActiveGame(String gameWorldFilename, BedwarsGame bedwarsGame, World lobbyWorld, Plugin plugin) {
+        this.internalGameManager = InternalGameManager.build(this, gameWorldFilename, bedwarsGame, lobbyWorld, plugin);
+    }
+
+    public void initialize() {
+        gameState = ActiveGameState.INITIALIZING; // setting game state to initializing.
+
+        getListenersManager().enableListeners(GameListener.QUEUE); // registering map and movement protection.
+                                                                   // other listeners are not required before start of game!
+        getGameLobbyTicker().startTicking(); // starting to tick,
+    }
+
+    public void start() {
+        getListenersManager().disableListener(GameListener.QUEUE); // removing queue listener; not required.
+        getGameLobbyTicker().stopTicking(); // stop ticking.
+
+        getTeamManager().assignTeams();
+        getMovementsManager().moveToSpawnpoints();
+    }
+
+    public void stop() {}
+
+    /*-------------------------------------------------------------------------*/
+
+    public final MovementsManager getMovementsManager() {
+        return internalGameManager.getMovementsManager();
+    }
+
+    public final AbstractDeathmatch getAbstractDeathmatch() {
+        return internalGameManager.getAbstractDeathmatch();
+    }
+
+    public final ExperienceManager getExperienceManager() {
+        return internalGameManager.getExperienceManager();
+    }
+
+    public final QuestManager getQuestManager() {
+        return internalGameManager.getQuestManager();
+    }
+
+    public final GameTrapTriggerer getGameTrapTriggerer() {
+        return internalGameManager.getGameTrapTriggerer();
+    }
+
+    public final KillTracker getKillTracker() {
+        return internalGameManager.getKillTracker();
+    }
+
+    public final GameInventories getGameInventories() {
+        return internalGameManager.getGameInventories();
+    }
+
+    public final BedwarsGame getBedwarsGame() {
+        return internalGameManager.getBedwarsGame();
+    }
+
+    public final TeamManager getTeamManager() {
+        return internalGameManager.getTeamManager();
+    }
+
+    public final ListenersManager getListenersManager() {
+        return internalGameManager.getListenersManager();
+    }
+
+    public final GameLobbyTicker getGameLobbyTicker() {
+        return internalGameManager.getGameLobbyTicker();
+    }
+
+    public final Plugin getPlugin() {
+        return internalGameManager.getPlugin();
+    }
+
+    public final CachedGameData getCachedGameData() {
+        return internalGameManager.getCachedGameData();
+    }
+
+    public final ActiveSpawnersManager getActiveSpawnersManager() {
+        return internalGameManager.getActiveSpawnersManager();
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /*
+    protected ActiveSpawner diamondSampleSpawner = null;
+    protected ActiveSpawner emeraldSampleSpawner = null;
     protected final String associatedWorldFilename;
+    protected final EnderchestManager enderchestManager;
     protected final BedwarsGame bedwarsGame;
     protected final World associatedWorld;
     protected final World lobbyWorld;
@@ -97,11 +176,7 @@ public abstract class ActiveGame {
     protected final QuestManager questManager;
     protected final GameTrapTriggerer gameTrapTriggerer;
     protected final KillTracker killTracker;
-    protected final ShopInventories shopInventories;
-    protected final EnderchestManager enderchestManager;
-    protected ActiveSpawner diamondSampleSpawner = null;
-    protected ActiveSpawner emeraldSampleSpawner = null;
-    protected final SwordUpgrades swordUpgrades = new SwordUpgrades();
+    protected final GameInventories shopInventories;
     protected final List<BedwarsTeam> destroyedTeams = new ArrayList<>();
     protected final List<Player> playersOutOfGame = new ArrayList<>();
     protected final List<Player> playersRespawning = new ArrayList<>();
@@ -161,7 +236,7 @@ public abstract class ActiveGame {
         this.questManager = new QuestManager(this.experienceManager);
         this.gameTrapTriggerer = new GameTrapTriggerer(this);
         this.killTracker = new KillTracker(this);
-        this.shopInventories = new ShopInventories(bedwarsGame.getShop());
+        this.shopInventories = new GameInventories(bedwarsGame.getShop());
         this.enderchestManager = new EnderchestManager(this);
     }
 
@@ -912,204 +987,6 @@ public abstract class ActiveGame {
         }
         player.openInventory(this.associatedTrapsGUI.get(player.getUniqueId()));
     }
+*/
 
-    public final List<UnregisterableListener> getUnregisterableListeners() {
-        return unregisterableListeners;
-    }
-
-    public final BedwarsGame getBedwarsGame() {
-        return bedwarsGame;
-    }
-
-    public final String getAssociatedWorldFilename() {
-        return associatedWorldFilename;
-    }
-
-    public final Location getCachedWaitingLocation() {
-        return cachedWaitingLocation;
-    }
-
-    public final World getAssociatedWorld() {
-        return associatedWorld;
-    }
-
-    public final Set<Block> getPlayerPlacedBlocks() {
-        return playerPlacedBlocks;
-    }
-
-    public final World getLobbyWorld() {
-        return lobbyWorld;
-    }
-
-    public final List<Player> getPlayersOutOfGame() {
-        return playersOutOfGame;
-    }
-
-    public final SwordUpgrades getSwordUpgrades() {
-        return swordUpgrades;
-    }
-
-    public final Location getCachedLobbySpawnLocation() {
-        return cachedLobbySpawnLocation;
-    }
-
-    public final Plugin getPlugin() {
-        return plugin;
-    }
-
-    public final AbstractQueue<Player> getAssociatedQueue() {
-        return associatedQueue;
-    }
-
-    public final Set<ActiveSpawner> getActiveSpawners() {
-        return activeSpawners;
-    }
-
-    public final List<AbstractActiveMerchant> getActiveMerchants() {
-        return activeMerchants;
-    }
-
-    public final List<BedwarsTeam> getDestroyedTeams() {
-        return destroyedTeams;
-    }
-
-    public final boolean isWinnerDeclared() {
-        return winnerDeclared;
-    }
-
-    public final boolean isHasStarted() {
-        return hasStarted;
-    }
-
-    public final Map<BedwarsTeam, List<Player>> getAssignedTeams() {
-        return assignedTeams;
-    }
-
-    public Map<Player, Scoreboard> getActiveScoreboards() {
-        return activeScoreboards;
-    }
-
-    public final BukkitTask getTimerTask() {
-        return timerTask;
-    }
-
-    public final void setHasStarted(boolean hasStarted) {
-        this.hasStarted = hasStarted;
-    }
-
-    public final Map<Player, ArmorSet> getPlayerSetMap() {
-        return playerSetMap;
-    }
-
-    public final GameLobbyTicker getGameLobbyTicker() {
-        return gameLobbyTicker;
-    }
-
-    public final Map<String, Integer> getTopKills() {
-        return topKills;
-    }
-
-    public EnumMap<UpgradeType, Map<BedwarsTeam, Integer>> getUpgradesLevelsMap() {
-        return upgradesLevelsMap;
-    }
-
-    public final ScoreboardHandler getScoreboardHandler() {
-        return scoreboardHandler;
-    }
-
-    public Map<UUID, EnumMap<ShopCategory, Inventory>> getPlayerShop() {
-        return playerShop;
-    }
-
-    public final Map<Player, Map<UpgradeItem, Integer>> getPlayerUpgradeLevelsMap() {
-        return playerUpgradeLevelsMap;
-    }
-
-    public final Inventory getDefaultUpgradeInv() {
-        return defaultUpgradeInv;
-    }
-
-    public final Map<UUID, Inventory> getAssociatedUpgradeGUI() {
-        return associatedUpgradeGUI;
-    }
-
-    public final AbstractDeathmatch getAbstractDeathmatch() {
-        return abstractDeathmatch;
-    }
-
-    public final ActiveSpawner getDiamondSampleSpawner() {
-        return this.diamondSampleSpawner;
-    }
-
-    public final ActiveSpawner getEmeraldSampleSpawner() {
-        return this.emeraldSampleSpawner;
-    }
-
-    public final long getStartTime() {
-        return startTime;
-    }
-
-    public final List<ActiveHealPool> getHealPools() {
-        return healPools;
-    }
-
-    public final Inventory getDefaultTrapsInv() {
-        return defaultTrapsInv;
-    }
-
-    public final List<BukkitTask> getAnnouncementsTasks() {
-        return announcementsTasks;
-    }
-
-    public final Map<UUID, Inventory> getAssociatedTrapsGUI() {
-        return associatedTrapsGUI;
-    }
-
-    public final EnumMap<BedwarsTeam, LinkedList<ActiveTrap>> getTeamActiveTrapsList() {
-        return teamActiveTrapsList;
-    }
-
-    public final EnumMap<BedwarsTeam, Long> getLastActivatedTraps() {
-        return lastActivatedTraps;
-    }
-
-    public final List<Player> getImmuneTrapPlayers() {
-        return immuneTrapPlayers;
-    }
-
-    public final List<Player> getPlayersRespawning() {
-        return playersRespawning;
-    }
-
-    public final List<Player> getHiddenPlayers() {
-        return hiddenPlayers;
-    }
-
-    public final GameTrapTriggerer getGameTrapTriggerer() {
-        return gameTrapTriggerer;
-    }
-
-    public final QuestManager getQuestManager() {
-        return questManager;
-    }
-
-    public final ExperienceManager getExperienceManager() {
-        return experienceManager;
-    }
-
-    public final EnderchestManager getEnderchestManager() {
-        return enderchestManager;
-    }
-
-    public final List<BukkitTask> getEmeraldBoostDrops() {
-        return emeraldBoostDrops;
-    }
-
-    public final Map<UUID, UUID> getPlacedTntMap() {
-        return placedTntMap;
-    }
-
-    public final KillTracker getKillTracker() {
-        return killTracker;
-    }
 }

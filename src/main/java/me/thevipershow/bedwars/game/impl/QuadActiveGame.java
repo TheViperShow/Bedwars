@@ -24,44 +24,4 @@ public final class QuadActiveGame extends ActiveGame {
         super(associatedWorldFilename, bedwarsGame, lobbyWorld, plugin);
     }
 
-    @Override
-    public void moveTeamsToSpawns() {
-        assignedTeams.forEach((k, v) -> bedwarsGame.getMapSpawns()
-                .stream()
-                .filter(pos -> pos.getBedwarsTeam() == k)
-                .findAny()
-                .ifPresent(spawn -> v.forEach(p -> {
-                    p.teleport(spawn.toLocation(associatedWorld));
-                    p.setGameMode(GameMode.SURVIVAL);
-                })));
-    }
-
-    @Override
-    public void assignTeams() {
-        final List<BedwarsTeam> teams = bedwarsGame.getTeams();
-        Collections.shuffle(teams);
-        final Iterator<BedwarsTeam> teamsIterator = teams.iterator();
-
-        final LinkedList<Player> queue = getAssociatedQueue().getInQueue();
-        final Collection<Collection<Player>> splitTeams = GameUtils.redistributeEqually(queue, 4);
-
-        splitTeams.forEach(team -> {
-            if (teamsIterator.hasNext()) {
-                assignedTeams.put(teamsIterator.next(), new ArrayList<>(team));
-            }
-        });
-    }
-
-    @Override
-    public void assignScoreboards() {
-        for (final Map.Entry<BedwarsTeam, List<Player>> entry : assignedTeams.entrySet()) {
-            final List<Player> players = entry.getValue();
-            for (final Player player : players) {
-                final Scoreboard scoreboard = ScoreboardLib.createScoreboard(player);
-                scoreboard.setHandler(super.scoreboardHandler).setUpdateInterval(20L);
-                super.activeScoreboards.put(player, scoreboard);
-                scoreboard.activate();
-            }
-        }
-    }
 }

@@ -14,7 +14,7 @@ public abstract class AbstractLobbyTicker {
         final StringBuilder strB = new StringBuilder(AllStrings.STARTING_IN.get());
 
         byte start = 0x00;
-        final long toColor = 0x14 * (activeGame.bedwarsGame.getStartTimer() - missingTime) / activeGame.bedwarsGame.getStartTimer();
+        final long toColor = 0x14 * (activeGame.getBedwarsGame().getStartTimer() - missingTime) / activeGame.getBedwarsGame().getStartTimer();
 
         while (start <= 0x14) {
             strB.append('§').append(start > toColor ? 'c' : 'a').append('|');
@@ -24,17 +24,19 @@ public abstract class AbstractLobbyTicker {
     }
 
     protected final String generateMissingPlayerText() {
-        return Bedwars.PREFIX + AllStrings.MISSING.get() + (activeGame.bedwarsGame.getMinPlayers() - activeGame.associatedQueue.queueSize()) + " §7more players to play";
+        return Bedwars.PREFIX + AllStrings.MISSING.get() + (activeGame.getBedwarsGame().getMinPlayers() - activeGame.getGameLobbyTicker().getAssociatedQueue().queueSize()) + " §7more players to play";
     }
 
     public abstract void startTicking();
 
     public void stopTicking() {
-        if (gameStarterTask != null) this.gameStarterTask.cancel();
+        if (gameStarterTask != null) {
+            this.gameStarterTask.cancel();
+        }
     }
 
-    public AbstractLobbyTicker(final ActiveGame activeGame) {
+    public AbstractLobbyTicker(ActiveGame activeGame) {
         this.activeGame = activeGame;
-        this.missingTime = activeGame.bedwarsGame.getStartTimer();
+        this.missingTime = activeGame.getBedwarsGame().getStartTimer();
     }
 }

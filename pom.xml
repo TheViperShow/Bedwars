@@ -6,7 +6,7 @@
 
     <groupId>me.thevipershow</groupId>
     <artifactId>Bedwars</artifactId>
-    <version>1.0.2.3</version>
+    <version>1.1.0.0</version>
     <packaging>jar</packaging>
 
     <name>Bedwars</name>
@@ -103,6 +103,12 @@
             <artifactId>scoreboard</artifactId>
             <version>1.0.1</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.16</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>
