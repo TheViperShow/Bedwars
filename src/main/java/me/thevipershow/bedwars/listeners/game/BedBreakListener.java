@@ -45,7 +45,7 @@ public final class BedBreakListener extends UnregisterableListener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onBlockBreak(final BlockBreakEvent event) {
+    public final void onBlockBreak(final BlockBreakEvent event) {
         final Player p = event.getPlayer();
         final Block b = event.getBlock();
 
@@ -93,7 +93,9 @@ public final class BedBreakListener extends UnregisterableListener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onItemSpawn(final ItemSpawnEvent event) {
-        if (!event.getEntity().getWorld().equals(activeGame.getAssociatedWorld())) return;
+        if (!event.getEntity().getWorld().equals(activeGame.getAssociatedWorld())) {
+            return;
+        }
         if (event.getEntity().getItemStack().getType() == Material.BED) {
             event.setCancelled(true);
         }

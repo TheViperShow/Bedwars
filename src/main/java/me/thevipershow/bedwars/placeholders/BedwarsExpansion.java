@@ -272,6 +272,8 @@ public final class BedwarsExpansion extends PlaceholderExpansion {
         }
 
         switch (identifier) {
+            case "version":
+                return gameManager.getPlugin().getDescription().getVersion();
             case "rank":
                 return getRank(player);
             case "level":

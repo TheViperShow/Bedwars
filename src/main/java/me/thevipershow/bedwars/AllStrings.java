@@ -1,5 +1,7 @@
 package me.thevipershow.bedwars;
 
+import org.bukkit.ChatColor;
+
 public enum AllStrings {
 
     PERMISSION_ADMIN_USE("bedwars.admin.use"),
@@ -300,7 +302,7 @@ public enum AllStrings {
     }
 
     public String get() {
-        return this.s;
+        return ChatColor.translateAlternateColorCodes('§', this.s);
         //     return EncryptUtils.decrypt(this.s, EncryptUtils.alphabet.toString(), 27, 3, EncryptUtils.Direction.BACKWARDS, EncryptUtils.Direction.BACKWARDS);
     }
 }

@@ -99,26 +99,22 @@ public abstract class ActiveGame {
     protected final KillTracker killTracker;
     protected final ShopInventories shopInventories;
     protected final EnderchestManager enderchestManager;
-
     protected ActiveSpawner diamondSampleSpawner = null;
     protected ActiveSpawner emeraldSampleSpawner = null;
-
     protected final SwordUpgrades swordUpgrades = new SwordUpgrades();
     protected final List<BedwarsTeam> destroyedTeams = new ArrayList<>();
     protected final List<Player> playersOutOfGame = new ArrayList<>();
     protected final List<Player> playersRespawning = new ArrayList<>();
     protected final List<AbstractActiveMerchant> activeMerchants = new ArrayList<>();
-    protected final List<Block> playerPlacedBlocks = new ArrayList<>();
+    protected final Set<Block> playerPlacedBlocks = new HashSet<>();
     protected final List<UnregisterableListener> unregisterableListeners = new ArrayList<>();
     protected final List<ActiveHealPool> healPools = new ArrayList<>();
     protected final List<BukkitTask> announcementsTasks = new ArrayList<>();
     protected final List<BukkitTask> emeraldBoostDrops = new ArrayList<>();
     protected final List<Player> immuneTrapPlayers = new ArrayList<>();
     protected final List<Player> hiddenPlayers = new ArrayList<>();
-
     protected final Map<Player, ArmorSet> playerSetMap = new HashMap<>();
     protected final Map<String, Integer> topKills = new HashMap<>();
-    //protected final Map<UUID, Inventory> associatedShopGUI = new HashMap<>();
     protected final Map<UUID, EnumMap<ShopCategory, Inventory>> playerShop = new HashMap<>();
     protected final Map<UUID, Inventory> associatedUpgradeGUI = new HashMap<>();
     protected final Map<UUID, Inventory> associatedTrapsGUI = new HashMap<>();
@@ -735,7 +731,6 @@ public abstract class ActiveGame {
                     GlobalStatsTableUtils.increaseWin(bedwarsGame.getGamemode(), plugin, p.getUniqueId());
                 } else {
                     p.sendTitle(AllStrings.HAS_WON_THE_GAME.get(), AllStrings.RETURNING_LOBBY.get());
-                   // p.sendTitle(AllStrings.TEAM_WON.get() + team.getColorCode() + team.name() + AllStrings.HAS_WON_THE_GAME.get(), AllStrings.RETURNING_LOBBY.get());
                 }
                 questManager.gamePlayedReward(p);
             }
@@ -820,7 +815,6 @@ public abstract class ActiveGame {
                     }
                 }
             }
-            //        this.associatedShopGUI.get(player.getUniqueId()).setItem(item.getSlot(), downgradedItem);
             player.updateInventory();
         }
     }
@@ -939,7 +933,7 @@ public abstract class ActiveGame {
         return associatedWorld;
     }
 
-    public final List<Block> getPlayerPlacedBlocks() {
+    public final Set<Block> getPlayerPlacedBlocks() {
         return playerPlacedBlocks;
     }
 

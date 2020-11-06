@@ -6,7 +6,7 @@
 
     <groupId>me.thevipershow</groupId>
     <artifactId>Bedwars</artifactId>
-    <version>1.0.2.2</version>
+    <version>1.0.2.3</version>
     <packaging>jar</packaging>
 
     <name>Bedwars</name>
