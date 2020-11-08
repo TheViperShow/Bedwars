@@ -9,13 +9,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 
+@Deprecated
 public final class ChestInteractListener extends UnregisterableListener {
 
-    private final ActiveGame activeGame;
 
     public ChestInteractListener(final ActiveGame activeGame) {
-        this.activeGame = activeGame;
+        super(activeGame);
     }
+
+    /*
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerInteract(final PlayerInteractEvent event) {
@@ -35,4 +37,7 @@ public final class ChestInteractListener extends UnregisterableListener {
             }
         }
     }
+
+
+     */
 }

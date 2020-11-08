@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
+import me.thevipershow.bedwars.game.objects.TeamData;
 import org.bukkit.entity.Player;
 
 public final class KillTracker {
@@ -45,8 +46,21 @@ public final class KillTracker {
         final List<Map.Entry<UUID, Integer>> s = new ArrayList<>(killsMap.entrySet()).stream().sorted(Comparator.comparingInt(Map.Entry::getValue)).collect(Collectors.toList());
         final List<Map.Entry<UUID, Integer>> s_ = new ArrayList<>(finalKillsMap.entrySet()).stream().sorted(Comparator.comparingInt(Map.Entry::getValue)).collect(Collectors.toList());
 
-        final AtomicInteger count = new AtomicInteger(0x00);
+        final List<String> sMessage = s.stream().map(v -> "      §e" + activeGame.getPlugin().getServer().getOfflinePlayer(v.getKey()).getName() + " §7killed §6" + v.getValue() + " §7players.").collect(Collectors.toList());
+        final List<String> s_Message = s.stream().map(v -> "      §e" + activeGame.getPlugin().getServer().getOfflinePlayer(v.getKey()).getName() + " §7final killed §6" + v.getValue() + " §7players.").collect(Collectors.toList());
 
+        for (TeamData<?> value : activeGame.getTeamManager().getDataMap().values()) {
+            value.perform(bedwarsPlayer -> {
+                if (!sMessage.isEmpty()) {
+                    sMessage.forEach(bedwarsPlayer::sendMessage);
+                }
+                if (!s_Message.isEmpty()) {
+                    s_Message.forEach(bedwarsPlayer::sendMessage);
+                }
+            });
+        }
+
+        /*
         activeGame.getAssociatedWorld().getPlayers().forEach(p -> {
             if (!this.killsMap.isEmpty()) {
                 p.sendMessage(Bedwars.PREFIX + AllStrings.TOP_3_KILL.get());
@@ -75,6 +89,8 @@ public final class KillTracker {
                 }
             }
         });
+
+         */
     }
 
     public final Integer getKills(final UUID uuid) {

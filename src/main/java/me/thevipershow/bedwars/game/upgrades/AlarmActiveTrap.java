@@ -3,6 +3,7 @@ package me.thevipershow.bedwars.game.upgrades;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.config.objects.upgradeshop.traps.TrapType;
 import me.thevipershow.bedwars.game.ActiveGame;
+import me.thevipershow.bedwars.game.objects.BedwarsPlayer;
 import org.bukkit.entity.Player;
 
 public final class AlarmActiveTrap extends ActiveTrap {
@@ -12,8 +13,8 @@ public final class AlarmActiveTrap extends ActiveTrap {
     }
 
     @Override
-    public final void trigger(final Player player) {
-        activeGame.showPlayer(player);
+    public final void trigger(final BedwarsPlayer player) {
+        activeGame.getInternalGameManager().getInvisibilityManager().showPlayer(player);
         alertTrapOwners();
     }
 }

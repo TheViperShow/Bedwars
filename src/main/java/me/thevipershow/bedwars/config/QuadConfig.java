@@ -15,8 +15,7 @@ public final class QuadConfig extends BedwarsGamemodeConfig<QuadBedwars> {
 
     @Override
     public final void load() {
-        bedwarsObjects =
-                getConfig().getMapList(AllStrings.QUAD.get())
+        bedwarsObjects = getConfig().getMapList(AllStrings.QUAD.get())
                         .stream()
                         .map(map -> QuadBedwars.deserialize((Map<String, Object>) map))
                         .collect(Collectors.toSet());

@@ -14,16 +14,11 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.util.Vector;
 
+@Deprecated
 public final class MapIllegalMovementsListener extends UnregisterableListener {
-
-    private final ActiveGame activeGame;
-
     private final double[][] bounds;
-    // [x][0\1] -> These are the min. and max. map x axis bounds (first min, second max)
-    // [y][0\1] -> These are the min. and max. map y axis bounds (first min, second max)
-    // [z][0\1] -> These are the min. and max. map z axis bounds (first min, second max)
 
-    private static double[][] genBounds(final ActiveGame game) {
+    private static double[][] genBounds(ActiveGame game) {
         double minX = Double.MAX_VALUE;
         double maxX = Double.MIN_VALUE;
         double minZ = Double.MAX_VALUE;
@@ -31,7 +26,7 @@ public final class MapIllegalMovementsListener extends UnregisterableListener {
 
         final double[][] data = new double[3][2];
 
-        for (final ActiveSpawner spawner : game.getActiveSpawners()) {
+        for (final ActiveSpawner spawner : game.getActiveSpawnersManager().getActiveSpawners()) {
             final SpawnPosition pos = spawner.getSpawner().getSpawnPosition();
 
             final double tempX = pos.getX();
@@ -54,6 +49,16 @@ public final class MapIllegalMovementsListener extends UnregisterableListener {
         return data;
     }
 
+    public MapIllegalMovementsListener(ActiveGame activeGame) {
+        super(activeGame);
+        this.bounds = genBounds(activeGame);
+    }
+    /*
+    // [x][0\1] -> These are the min. and max. map x axis bounds (first min, second max)
+    // [y][0\1] -> These are the min. and max. map y axis bounds (first min, second max)
+
+    // [z][0\1] -> These are the min. and max. map z axis bounds (first min, second max)
+
     private boolean isOutOfBounds(final Location loc, final boolean considerY) {
         final double x = loc.getX();
         final double y = loc.getY();
@@ -70,11 +75,6 @@ public final class MapIllegalMovementsListener extends UnregisterableListener {
 
     private boolean isOutOfBounds(final Player player) {
         return isOutOfBounds(player.getLocation(), true);
-    }
-
-    public MapIllegalMovementsListener(final ActiveGame activeGame) {
-        this.activeGame = activeGame;
-        this.bounds = genBounds(activeGame);
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -96,11 +96,9 @@ public final class MapIllegalMovementsListener extends UnregisterableListener {
         if (isOutOfBounds(player)) {
             if (activeGame.isOutOfGame(player)) {
                 event.setCancelled(true);
-                player.setVelocity(new Vector(0.000049568945687d,0.0000002355237d,0.000000050225d));
-            } else {
-                //PlayerDeathListener.deathLogic(activeGame, activeGame.getPlayerTeam(player), player,
-                //        new EntityDamageEvent(player, EntityDamageEvent.DamageCause.VOID, 20.00));
+                player.setVelocity(new Vector(0,0,0));
             }
+
         }
     }
 
@@ -112,4 +110,6 @@ public final class MapIllegalMovementsListener extends UnregisterableListener {
             event.setCancelled(true);
         }
     }
+
+     */
 }

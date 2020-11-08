@@ -16,7 +16,7 @@ public class LeaveQueueEvent extends Event {
      * assumes the event is synchronous.
      */
     public LeaveQueueEvent(final ActiveGame activeGame) {
-        this.matchmakingQueue = activeGame.getAssociatedQueue();
+        this.matchmakingQueue = activeGame.getGameLobbyTicker().getAssociatedQueue();
         this.activeGame = activeGame;
     }
 

@@ -61,10 +61,10 @@ public final class GameManager {
         ActiveGame bestGame = null;
 
         for (final ActiveGame game : worldsManager.getActiveGameList()) {
-            if (game.bedwarsGame.getGamemode() != gamemode) continue;
+            if (game.getBedwarsGame().getGamemode() != gamemode) continue;
             if (game.isHasStarted()) continue;
-            final AbstractQueue<Player> queue = game.getAssociatedQueue();
-            final int newDiff = game.bedwarsGame.getPlayers() - queue.queueSize();
+            final AbstractQueue<Player> queue = game.getGameLobbyTicker().getAssociatedQueue();
+            final int newDiff = game.getBedwarsGame().getPlayers() - queue.queueSize();
             if (diff == null) {
                 diff = newDiff;
                 bestGame = game;
@@ -77,19 +77,18 @@ public final class GameManager {
         return bestGame == null ? Optional.empty() : Optional.of(bestGame);
     }
 
-    public final boolean addToQueue(final Player player, final ActiveGame activeGame) {
-        final AbstractQueue<Player> queue = activeGame.getAssociatedQueue();
+    public final void addToQueue(final Player player, final ActiveGame activeGame) {
+        final AbstractQueue<Player> queue = activeGame.getGameLobbyTicker().getAssociatedQueue();
         final ConnectToQueueEvent event = new ConnectToQueueEvent(activeGame);
         plugin.getServer().getPluginManager().callEvent(event);
-        if (event.isCancelled()) return false;
-        activeGame.moveToWaitingRoom(player);
+        if (event.isCancelled()) return;
+        activeGame.getMovementsManager().moveToWaitingRoom(player);
         queue.addToQueue(player);
-        return true;
     }
 
     public void removeFromAllQueues(final Player player) {
         worldsManager.getActiveGameList().forEach(b -> {
-            final AbstractQueue<Player> queue = b.getAssociatedQueue();
+            final AbstractQueue<Player> queue = b.getGameLobbyTicker().getAssociatedQueue();
             if (queue.contains(player)) {
                 final LeaveQueueEvent leaveQueueEvent = new LeaveQueueEvent(b);
                 queue.removeFromQueue(player);

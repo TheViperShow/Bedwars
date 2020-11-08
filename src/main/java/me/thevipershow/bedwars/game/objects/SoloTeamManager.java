@@ -3,30 +3,35 @@ package me.thevipershow.bedwars.game.objects;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import me.thevipershow.bedwars.bedwars.Gamemode;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
+import me.thevipershow.bedwars.game.AbstractQueue;
 import me.thevipershow.bedwars.game.ActiveGame;
+import org.bukkit.entity.Player;
 
-public final class SoloTeamManager extends TeamManager {
+public final class SoloTeamManager extends TeamManager<BedwarsPlayer> {
     public SoloTeamManager(ActiveGame activeGame) {
         super(activeGame);
     }
 
     @Override
-    public void assignTeams() {
-        List<BedwarsTeam> loadedTeams = getActiveGame().getBedwarsGame().getTeams(); // Ensuring that all teams
-        Collections.shuffle(loadedTeams);                                                  // are displaced randomly.
+    public final void assignTeams() {
+        AbstractQueue<Player> queue = getActiveGame().getGameLobbyTicker().getAssociatedQueue();
+        List<BedwarsTeam> availableTeams = getActiveGame().getBedwarsGame().getTeams(); // Shuffling the teams to ensure
+        Collections.shuffle(availableTeams);                                            // equal distribution.
 
-        Iterator<BedwarsTeam> teamsIterator = loadedTeams.iterator(); // Using an iterator to assign teams.
+        Iterator<BedwarsTeam> teamIterator = availableTeams.iterator();
+        Iterator<Player> playerIterator = queue.getIterator();
 
-        getActiveGame().getGameLobbyTicker().getAssociatedQueue().perform(player -> { // Looping through all players in the queue
-            final BedwarsPlayer bedwarsPlayer = BedwarsPlayer.from(player);           // and giving for granted that they're online.
-            getGamePlayers().add(bedwarsPlayer);
-
-            if (!teamsIterator.hasNext()) {
-                throw new RuntimeException("There were more players in this queue than the gamemode's maximum amount.");
+        while (playerIterator.hasNext()) {
+            Player player = playerIterator.next();
+            if (!teamIterator.hasNext()) {
+                throw new RuntimeException("Not enough teams for this game.");
+            } else {
+                TeamData<BedwarsPlayer> teamData = new SoloTeamData(Gamemode.SOLO, getActiveGame().getInternalGameManager().getPlayerMapper());
+                teamData.add(player);
+                super.getDataMap().put(teamIterator.next(), teamData);
             }
-
-            bedwarsPlayer.setBedwarsTeam(teamsIterator.next());
-        });
+        }
     }
 }

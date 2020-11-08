@@ -31,14 +31,14 @@ public final class QuitCommand extends SubCommand {
 
         final Optional<ActiveGame> activeGame = super.gameManager.getWorldsManager().getActiveGameList()
                 .stream()
-                .filter(game -> !game.isHasStarted() && game.getAssociatedQueue().getInQueue().stream().anyMatch(p -> p.equals(sender)))
+                .filter(game -> !game.isHasStarted() && game.getGameLobbyTicker().getAssociatedQueue().getInQueue().stream().anyMatch(p -> p.equals(sender)))
                 .findFirst();
 
         if (!activeGame.isPresent()) {
             sender.sendMessage(Bedwars.PREFIX + AllStrings.NOT_IN_QUEUE.get());
         } else {
-            activeGame.get().removePlayer((Player) sender);
-            activeGame.get().moveToLobby((Player) sender);
+            activeGame.get().getTeamManager().removePlayer((Player) sender);
+            activeGame.get().getMovementsManager().moveToSpawn((Player) sender);
             sender.sendMessage(Bedwars.PREFIX + AllStrings.LEFT_QUEUE.get());
         }
     }

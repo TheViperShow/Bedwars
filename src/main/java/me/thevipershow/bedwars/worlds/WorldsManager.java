@@ -12,7 +12,7 @@ import me.thevipershow.bedwars.config.BedwarsGamemodeConfig;
 import me.thevipershow.bedwars.config.ConfigManager;
 import me.thevipershow.bedwars.config.objects.BedwarsGame;
 import me.thevipershow.bedwars.game.ActiveGame;
-import me.thevipershow.bedwars.game.GamemodeUtilities;
+import me.thevipershow.bedwars.game.GameUtils;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -101,7 +101,7 @@ public class WorldsManager {
 
         LoggerUtils.logColor(log, String.format(AllStrings.LOADING_ACTIVE_GAME.get(), tempName));
 
-        final ActiveGame activeGame = GamemodeUtilities.fromGamemode(tempName, game, lobbyWorld, plugin);
+        final ActiveGame activeGame = GameUtils.from(tempName, game, lobbyWorld, plugin);
 
         if (w != null && copyResult) {
             LoggerUtils.logColor(log, String.format(AllStrings.SUCCESSFULLY_CREATED_ACTIVE_GAME.get(), tempName));

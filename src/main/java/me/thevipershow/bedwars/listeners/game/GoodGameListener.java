@@ -12,16 +12,17 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
+@Deprecated
 public final class GoodGameListener extends UnregisterableListener {
 
-    private final ActiveGame activeGame;
     private final List<Player> rewarded = new ArrayList<>();
     private static final Pattern spaces = Pattern.compile("\\s+");
 
-    public GoodGameListener(final ActiveGame activeGame) {
-        this.activeGame = activeGame;
+    public GoodGameListener(ActiveGame activeGame) {
+        super(activeGame);
     }
 
+    /*
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
     public void onAsyncPlayerChat(final AsyncPlayerChatEvent event) {
 
@@ -41,5 +42,5 @@ public final class GoodGameListener extends UnregisterableListener {
                 }
             }
         }
-    }
+    }*/
 }

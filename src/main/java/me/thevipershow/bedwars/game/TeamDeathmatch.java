@@ -1,11 +1,12 @@
 package me.thevipershow.bedwars.game;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
+import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
+import me.thevipershow.bedwars.game.objects.PlayerState;
+import me.thevipershow.bedwars.game.objects.TeamData;
 import org.bukkit.Sound;
-import org.bukkit.entity.Player;
 
 public final class TeamDeathmatch extends AbstractDeathmatch {
     public TeamDeathmatch(final ActiveGame activeGame) {
@@ -14,24 +15,25 @@ public final class TeamDeathmatch extends AbstractDeathmatch {
 
     @Override
     public void spawnEnderdragons() {
-        activeGame.getAssociatedQueue().perform(p -> {
-            p.sendMessage(Bedwars.PREFIX + AllStrings.DRAGONS_RELEASED.get());
-            p.playSound(p.getLocation(), Sound.ENDERDRAGON_GROWL, 8.5567f, 1.0f);
-        });
-        activeGame.getAssignedTeams().forEach((k, v) -> {
-            final List<Player> filteredList = v.stream().filter(p -> !activeGame.playersOutOfGame.contains(p)).collect(Collectors.toList());
-            if (!filteredList.isEmpty()) {
-                spawnDragon(k);
-            }
-        });
+        for (Map.Entry<BedwarsTeam, ? extends TeamData<?>> entry : activeGame.getTeamManager().getDataMap().entrySet()) {
+            entry.getValue().perform(bedwarsPlayer -> {
+                bedwarsPlayer.sendMessage(Bedwars.PREFIX + AllStrings.DRAGONS_RELEASED.get());
+                bedwarsPlayer.playSound(Sound.ENDERDRAGON_GROWL, 8.5f, 1.0f);
 
+                if (bedwarsPlayer.getPlayerState() != PlayerState.DEAD) {
+                    spawnDragon(entry.getKey());
+                }
+            });
+        }
     }
 
     @Override
     public void startDeathMatch() {
         announceDeathmatch();
-        activeGame.plugin.getServer().getScheduler().runTaskLater(activeGame.plugin, () -> {
-            if (isRunning()) spawnEnderdragons();
+        activeGame.getPlugin().getServer().getScheduler().runTaskLater(activeGame.getPlugin(), () -> {
+            if (isRunning()) {
+                spawnEnderdragons();
+            }
         }, 600L * 20L);
     }
 }

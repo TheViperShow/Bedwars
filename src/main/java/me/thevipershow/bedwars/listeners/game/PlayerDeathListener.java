@@ -4,16 +4,11 @@ import com.google.common.collect.Lists;
 import java.util.Map;
 import me.thevipershow.bedwars.Bedwars;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
-import me.thevipershow.bedwars.config.objects.SpawnPosition;
 import me.thevipershow.bedwars.config.objects.upgradeshop.UpgradeType;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.GameUtils;
 import me.thevipershow.bedwars.listeners.UnregisterableListener;
 import me.thevipershow.bedwars.storage.sql.tables.GlobalStatsTableUtils;
-import net.minecraft.server.v1_8_R3.ChatMessage;
-import net.minecraft.server.v1_8_R3.IChatBaseComponent;
-import net.minecraft.server.v1_8_R3.PacketPlayOutTitle;
-import net.minecraft.server.v1_8_R3.PlayerConnection;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -31,60 +26,17 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 
 @Deprecated
 public final class PlayerDeathListener extends UnregisterableListener {
 
-    private final ActiveGame activeGame;
     private static final ItemStack LOBBY_COMPASS = new ItemStack(Material.COMPASS, 0x01);
 
-    public PlayerDeathListener(final ActiveGame activeGame) {
-        this.activeGame = activeGame;
-
-        final ItemMeta compassMeta = LOBBY_COMPASS.getItemMeta();
-        compassMeta.setDisplayName(Bedwars.PREFIX + "§c§lReturn to lobby");
-        compassMeta.setLore(Lists.newArrayList(
-                "§7- You can use this compass to return to the server's lobby",
-                "§7  You can simply click on it and you will be automatically teleported.",
-                "§7  Remember that you can't join this game once you've left."
-        ));
-        LOBBY_COMPASS.setItemMeta(compassMeta);
+    public PlayerDeathListener(ActiveGame activeGame) {
+        super(activeGame);
     }
 
-    public static class RespawnRunnable extends BukkitRunnable {
-
-        private int secondsLeft = 5;
-        private final Player p;
-        private final ActiveGame activeGame;
-
-        public RespawnRunnable(final Player p, final ActiveGame activeGame) {
-            this.p = p;
-            this.activeGame = activeGame;
-        }
-
-        @Override
-        public final void run() {
-            if (!p.isOnline() && p.getWorld().equals(activeGame.getAssociatedWorld())) {
-                cancel();
-            } else if (secondsLeft == 0) {
-                final SpawnPosition spawnPos = activeGame.getBedwarsGame().spawnPosOfTeam(activeGame.getPlayerTeam(p));
-                if (spawnPos != null) {
-                    p.teleport(spawnPos.toLocation(activeGame.getAssociatedWorld())); // teleporting him to his spawn.
-                    p.setGameMode(GameMode.SURVIVAL);                                 // Setting his gamemode to survival
-                }
-                cancel();
-            } else {
-                final PlayerConnection conn = GameUtils.getPlayerConnection(p);
-                final PacketPlayOutTitle emptyTitle = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.TITLE, new ChatMessage(""), 2, 16, 2);
-                final IChatBaseComponent iChat = new ChatMessage(Bedwars.PREFIX + String.format("§eRespawning in §7%d §es", secondsLeft));
-                final PacketPlayOutTitle titlePacket = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.SUBTITLE, iChat, 2, 16, 2);
-                conn.sendPacket(emptyTitle);
-                conn.sendPacket(titlePacket);
-                secondsLeft--;
-            }
-        }
-    }
+    /*
 
     public static void givePlayerLobbyCompass(final Player p) {
         p.getInventory().setItemInHand(LOBBY_COMPASS);
@@ -311,5 +263,5 @@ public final class PlayerDeathListener extends UnregisterableListener {
         } else if (event.getCause() == DamageCause.FALL) {
             p.setNoDamageTicks(0x10);    // Making him invincible for 0.5s.
         }
-    }
+    }*/
 }

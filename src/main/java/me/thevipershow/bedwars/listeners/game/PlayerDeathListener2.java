@@ -31,13 +31,14 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
 import static me.thevipershow.bedwars.AllStrings.*;
 
+@Deprecated
 public final class PlayerDeathListener2 extends UnregisterableListener {
 
-    private final ActiveGame activeGame;
+    private static final ItemStack LOBBY_COMPASS = new ItemStack(Material.COMPASS, 1);
     private final Random random;
 
     public PlayerDeathListener2(final ActiveGame activeGame) {
-        this.activeGame = activeGame;
+        super(activeGame);
         this.random = new Random();
         final ItemMeta compassMeta = LOBBY_COMPASS.getItemMeta();
         compassMeta.setDisplayName(Bedwars.PREFIX + RETURN_LOBBY.get());
@@ -48,6 +49,8 @@ public final class PlayerDeathListener2 extends UnregisterableListener {
         ));
         LOBBY_COMPASS.setItemMeta(compassMeta);
     }
+
+    /*
 
     public boolean isFinalDeath(final Player player) {
         return (activeGame.getDestroyedTeams().contains(activeGame.getPlayerTeam(player)) || activeGame.getAbstractDeathmatch().isRunning());
@@ -106,8 +109,6 @@ public final class PlayerDeathListener2 extends UnregisterableListener {
 
         doDeathTimer(dead, activeGame);
     }
-
-    private static final ItemStack LOBBY_COMPASS = new ItemStack(Material.COMPASS, 0x01);
 
     public static void givePlayerLobbyCompass(final Player p) {
         p.getInventory().setItemInHand(LOBBY_COMPASS);
@@ -356,4 +357,6 @@ public final class PlayerDeathListener2 extends UnregisterableListener {
             }
         }
     }
+
+     */
 }

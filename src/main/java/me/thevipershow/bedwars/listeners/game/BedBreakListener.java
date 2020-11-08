@@ -16,13 +16,12 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 
+@Deprecated
 public final class BedBreakListener extends UnregisterableListener {
 
-    private final ActiveGame activeGame;
-
     public BedBreakListener(final ActiveGame activeGame) {
-        this.activeGame = activeGame;
-    }
+        super(activeGame);
+    }/*
 
     private BedwarsTeam teamOfBed(final Block block) {
         final Location loc = block.getLocation();
@@ -99,5 +98,5 @@ public final class BedBreakListener extends UnregisterableListener {
         if (event.getEntity().getItemStack().getType() == Material.BED) {
             event.setCancelled(true);
         }
-    }
+    }*/
 }

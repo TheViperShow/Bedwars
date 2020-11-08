@@ -10,14 +10,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
+@Deprecated
 public final class KillSoundListener extends UnregisterableListener {
-
-    private final ActiveGame activeGame;
-
-    public KillSoundListener(final ActiveGame activeGame) {
-        this.activeGame = activeGame;
+    public KillSoundListener(ActiveGame activeGame) {
+        super(activeGame);
     }
-
+/*
     @EventHandler(ignoreCancelled = false, priority = EventPriority.LOWEST)
     public void onEntityDamageByEntity(final EntityDamageByEntityEvent event) {
         final Entity damager = event.getDamager();
@@ -37,4 +35,6 @@ public final class KillSoundListener extends UnregisterableListener {
             }
         }
     }
+
+ */
 }

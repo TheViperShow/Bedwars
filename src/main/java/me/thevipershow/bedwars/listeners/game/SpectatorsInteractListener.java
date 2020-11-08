@@ -15,18 +15,18 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 
+@Deprecated
 public final class SpectatorsInteractListener extends UnregisterableListener {
 
-    private final ActiveGame activeGame;
+    public SpectatorsInteractListener(ActiveGame activeGame) {
+        super(activeGame);
+    }
 
+    /*
     private <T extends Event & Cancellable> void cancel(final Player player, final T cancellableEvent) {
         if (activeGame.isOutOfGame(player) && activeGame.isHasStarted()) {
             cancellableEvent.setCancelled(true);
         }
-    }
-
-    public SpectatorsInteractListener(final ActiveGame activeGame) {
-        this.activeGame = activeGame;
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -65,5 +65,7 @@ public final class SpectatorsInteractListener extends UnregisterableListener {
             cancel((Player) event.getDamager(), event);
         }
     }
+
+     */
 
 }

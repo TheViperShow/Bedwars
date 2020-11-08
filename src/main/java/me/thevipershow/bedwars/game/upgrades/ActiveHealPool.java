@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.config.objects.upgradeshop.HealPoolUpgrade;
 import me.thevipershow.bedwars.game.ActiveGame;
+import me.thevipershow.bedwars.game.objects.PlayerState;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -34,22 +35,22 @@ public final class ActiveHealPool {
                     .stream()
                     .filter(v -> v.getBedwarsTeam() == ownerTeam)
                     .findAny()
-                    .ifPresent(spawn -> this.spawnLoc = spawn.toLocation(activeGame.getAssociatedWorld()));
+                    .ifPresent(spawn -> this.spawnLoc = spawn.toLocation(activeGame.getCachedGameData().getGame()));
         }
 
         this.task = plugin.getServer().getScheduler().runTaskTimer(plugin, () -> {
             if (this.spawnLoc != null) {
-                activeGame.getAssociatedWorld()
+                activeGame.getCachedGameData().getGame()
                         .getNearbyEntities(spawnLoc, healPoolUpgrade.getHealRadius(), healPoolUpgrade.getHealRadius(), healPoolUpgrade.getHealRadius())
                         .stream()
                         .filter(e -> e instanceof Player)
-                        .map(p -> (Player) p)
-                        .filter(p -> activeGame.getPlayerTeam(p) == ownerTeam && !activeGame.isOutOfGame(p))
+                        .map(p -> activeGame.getPlayerMapper().get((Player) p))
+                        .filter(p -> p != null && p.getBedwarsTeam() == ownerTeam && p.getPlayerState() == PlayerState.PLAYING)
                         .forEach(p -> {
                             final double newHealth = p.getHealth() + (healPoolUpgrade.getHealAmount() * 2);
-                            if (newHealth <= 20.00) {
+                            if (newHealth <= 20) {
                                 p.setHealth(p.getHealth() + healPoolUpgrade.getHealAmount());
-                                new HealAnimation(p, activeGame.getPlugin()).start();
+                                new HealAnimation(p.getPlayer(), activeGame.getPlugin()).start();
                             }
                         });
             }

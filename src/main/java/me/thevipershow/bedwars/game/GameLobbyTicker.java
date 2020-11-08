@@ -1,22 +1,16 @@
 package me.thevipershow.bedwars.game;
 
-import lombok.Getter;
 import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
 import me.thevipershow.bedwars.events.GameStartEvent;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.minecraft.server.v1_8_R3.ChatMessage;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
 import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
 import org.bukkit.Sound;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 public final class GameLobbyTicker extends AbstractLobbyTicker {
 
-    @Getter
     private final AbstractQueue<Player> associatedQueue;
 
     public GameLobbyTicker(final ActiveGame activeGame) {
@@ -40,7 +34,7 @@ public final class GameLobbyTicker extends AbstractLobbyTicker {
                     if (gameStartEvent.isCancelled()) {
                         return;
                     }
-                    associatedQueue.perform(p -> p.playSound(p.getLocation(), Sound.ANVIL_LAND, 5.0f, 1.0f));
+                    associatedQueue.perform(p -> p.playSound(p.getLocation(), Sound.ENDERMAN_TELEPORT, 9.0f, .85f));
                     activeGame.start();
                 } else {
                     final IChatBaseComponent iChat = new ChatMessage(generateTimeText());
@@ -61,4 +55,7 @@ public final class GameLobbyTicker extends AbstractLobbyTicker {
         }, 1L, 20L);
     }
 
+    public final AbstractQueue<Player> getAssociatedQueue() {
+        return associatedQueue;
+    }
 }

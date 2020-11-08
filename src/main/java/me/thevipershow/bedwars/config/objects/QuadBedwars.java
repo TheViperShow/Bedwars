@@ -39,22 +39,13 @@ public final class QuadBedwars extends BedwarsGame implements ConfigurationSeria
         final List<String> teams = (List<String>) objectMap.get(TEAMS.get());
         final List<BedwarsTeam> actualTeams = teams.stream().map(BedwarsTeam::valueOf).collect(Collectors.toList());
         final Map<String, Object> mapLobbySpawn = (Map<String, Object>) objectMap.get(MAP_LOBBY_SPAWN.get());
-
         final SpawnPosition mapLobbySpawnPos = SpawnPosition.deserialize(mapLobbySpawn);
         final List<Map<String, Object>> mapSpawns = (List<Map<String, Object>>) objectMap.get(MAP_SPAWNS.get());
-        final Set<TeamSpawnPosition> mapSpawnPos = mapSpawns.stream()
-                .map(TeamSpawnPosition::deserialize)
-                .collect(Collectors.toSet());
-
+        final Set<TeamSpawnPosition> mapSpawnPos = mapSpawns.stream().map(TeamSpawnPosition::deserialize).collect(Collectors.toSet());
         final List<Map<String, Object>> spawners = (List<Map<String, Object>>) objectMap.get(SPAWNERS.get());
-        final List<Spawner> spawnerList = spawners.stream()
-                .map(Spawner::deserialize)
-                .collect(Collectors.toList());
+        final List<Spawner> spawnerList = spawners.stream().map(Spawner::deserialize).collect(Collectors.toList());
         final List<Map<String, Object>> merchantsSection = (List<Map<String, Object>>) objectMap.get(MERCHANTS.get());
-
-        final List<Merchant> merchantsList = merchantsSection.stream()
-                .map(Merchant::deserialize)
-                .collect(Collectors.toList());
+        final List<Merchant> merchantsList = merchantsSection.stream().map(Merchant::deserialize).collect(Collectors.toList());
         final Map<String, Object> shopSection = (Map<String, Object>) objectMap.get(SHOP.get());
         final Shop shop = Shop.deserialize(shopSection);
         final UpgradeShop upgradeShop = UpgradeShop.deserialize((Map<String, Object>) objectMap.get(UPGRADES.get()));

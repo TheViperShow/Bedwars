@@ -2,23 +2,23 @@ package me.thevipershow.bedwars.game.objects;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import java.util.Map;
 import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.ActiveSpawner;
 import me.thevipershow.bedwars.game.GameUtils;
+import me.tigerhix.lib.scoreboard.ScoreboardLib;
 import me.tigerhix.lib.scoreboard.common.EntryBuilder;
 import me.tigerhix.lib.scoreboard.type.Entry;
+import me.tigerhix.lib.scoreboard.type.Scoreboard;
 import me.tigerhix.lib.scoreboard.type.ScoreboardHandler;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
-@Data
 public final class ScoreboardManager {
 
     private final ActiveGame activeGame;
@@ -29,8 +29,9 @@ public final class ScoreboardManager {
 
     private BukkitTask scoreboardUpdateTask = null;
 
+    private final HashMap<BedwarsPlayer, Scoreboard> scoreboardMap = new HashMap<>();
 
-    protected final ScoreboardHandler scoreboardHandler = new ScoreboardHandler() {
+    private final ScoreboardHandler scoreboardHandler = new ScoreboardHandler() {
 
         @Override
         public final String getTitle(final Player player) {
@@ -59,8 +60,10 @@ public final class ScoreboardManager {
             //}
             // TODO: Reimplement^
 
-            for (BedwarsTeam team : assignedTeams.keySet()) {
-                builder.next(AllStrings.TEAM_SCOREBOARD.get() + team.getColorCode() + "§l" + team.name() + getTeamChar(team));
+            for (BedwarsTeam team : activeGame.getTeamManager().getDataMap().keySet()) {
+                final String status = activeGame.getTeamManager().getDataMap().get(team).getStatusCharacter();
+                final String append = AllStrings.TEAM_SCOREBOARD.get() + team.getColorCode() + "§l" + team.name() + " " + status;
+                builder.next(append);
             }
 
             builder.blank();
@@ -69,4 +72,37 @@ public final class ScoreboardManager {
         }
 
     };
+
+    public final BukkitTask getScoreboardUpdateTask() {
+        return scoreboardUpdateTask;
+    }
+
+    public final void setScoreboardUpdateTask(BukkitTask scoreboardUpdateTask) {
+        this.scoreboardUpdateTask = scoreboardUpdateTask;
+    }
+
+    public final ScoreboardHandler getScoreboardHandler() {
+        return scoreboardHandler;
+    }
+
+    public final HashMap<BedwarsPlayer, Scoreboard> getScoreboardMap() {
+        return scoreboardMap;
+    }
+
+    public final void activateAll() {
+        for (Scoreboard value : scoreboardMap.values()) {
+            value.activate();
+        }
+    }
+
+    public final void assignScoreboards() {
+        for (Map.Entry<BedwarsTeam, ? extends TeamData<?>> entry : activeGame.getTeamManager().getDataMap().entrySet()) {
+            entry.getValue().perform(bedwarsPlayer -> {
+                final Scoreboard scoreboard = ScoreboardLib.createScoreboard(bedwarsPlayer.getPlayer());
+                scoreboard.setHandler(scoreboardHandler);
+                scoreboard.setUpdateInterval(5 * 20);
+                scoreboardMap.put(bedwarsPlayer, scoreboard);
+            });
+        }
+    }
 }

@@ -51,14 +51,14 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
+@Deprecated
 public final class UpgradeInteractListener extends UnregisterableListener {
 
-    private final ActiveGame activeGame;
-
-    public UpgradeInteractListener(final ActiveGame activeGame) {
-        this.activeGame = activeGame;
+    public UpgradeInteractListener(ActiveGame activeGame) {
+        super(activeGame);
     }
 
+    /*
     private static void maxLevel(final Player player) {
         GameUtils.buyFailSound(player);
         player.sendMessage(Bedwars.PREFIX + AllStrings.ALREADY_BOUGHT_MAX_LVL.get());
@@ -340,4 +340,6 @@ public final class UpgradeInteractListener extends UnregisterableListener {
             trapLogic(player, clickedSlot);
         }
     }
+
+     */
 }

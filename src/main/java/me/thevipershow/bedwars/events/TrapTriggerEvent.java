@@ -1,6 +1,7 @@
 package me.thevipershow.bedwars.events;
 
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
+import me.thevipershow.bedwars.game.objects.BedwarsPlayer;
 import me.thevipershow.bedwars.game.upgrades.ActiveTrap;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -12,11 +13,11 @@ public final class TrapTriggerEvent extends Event implements Cancellable {
     private boolean cancelled = false;
     public static final HandlerList handlerList = new HandlerList();
 
-    private final Player triggerCause;
+    private final BedwarsPlayer triggerCause;
     private final ActiveTrap trapTriggered;
     private final BedwarsTeam playerTeam;
 
-    public TrapTriggerEvent(Player triggerCause, ActiveTrap trapTriggered, BedwarsTeam playerTeam) {
+    public TrapTriggerEvent(BedwarsPlayer triggerCause, ActiveTrap trapTriggered, BedwarsTeam playerTeam) {
         this.triggerCause = triggerCause;
         this.trapTriggered = trapTriggered;
         this.playerTeam = playerTeam;
@@ -41,7 +42,7 @@ public final class TrapTriggerEvent extends Event implements Cancellable {
         this.cancelled = cancel;
     }
 
-    public final Player getTriggerCause() {
+    public final BedwarsPlayer getTriggerCause() {
         return triggerCause;
     }
 

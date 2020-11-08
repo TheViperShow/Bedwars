@@ -11,14 +11,13 @@ import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 
+@Deprecated
 public final class ShopMerchantListener extends UnregisterableListener {
-
-    private final ActiveGame activeGame;
-
     public ShopMerchantListener(ActiveGame activeGame) {
-        this.activeGame = activeGame;
+        super(activeGame);
     }
 
+    /*
     @EventHandler(ignoreCancelled = true)
     public void onPlayerInteractEntity(final PlayerInteractEntityEvent event) {
         if (!activeGame.isHasStarted()) {
@@ -43,4 +42,6 @@ public final class ShopMerchantListener extends UnregisterableListener {
             event.setCancelled(true);
         }
     }
+
+     */
 }

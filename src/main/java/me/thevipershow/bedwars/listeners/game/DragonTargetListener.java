@@ -14,16 +14,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 
+@Deprecated
 public final class DragonTargetListener extends UnregisterableListener {
 
     private final Map<CraftEnderDragon, BedwarsTeam> dragonPlayerMap = new HashMap<>();
 
-    private final ActiveGame activeGame;
-
-    public DragonTargetListener(final ActiveGame activeGame) {
-        this.activeGame = activeGame;
+    public DragonTargetListener(ActiveGame activeGame) {
+        super(activeGame);
     }
-
+    /*
     @EventHandler(ignoreCancelled = true,priority = EventPriority.HIGHEST)
     public void onEntityTargetLivingEntity(final EntityTargetLivingEntityEvent event) {
         if (!event.getEntity().getWorld().equals(activeGame.getAssociatedWorld())) {
@@ -62,4 +61,6 @@ public final class DragonTargetListener extends UnregisterableListener {
     public final Map<CraftEnderDragon, BedwarsTeam> getDragonPlayerMap() {
         return dragonPlayerMap;
     }
+
+     */
 }

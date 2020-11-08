@@ -187,8 +187,8 @@ public enum AllStrings {
     EMERALD_UPGRADE("The §a§lEMERALD §7spawners have been upgraded to lvl. §e"),
     DESTROY_MAP_ERROR("Something went wrong while destroying map of "),
 
-    GRAPHIC_CROSS(" §c§l✘"),
-    GRAPHIC_TICK(" §a✓"),
+    GRAPHIC_CROSS("§l§c✘"),
+    GRAPHIC_TICK("§l§a✓"),
 
     STARTING_IN("§eStarting in §7§l[§r"),
     STARTING_END("§7§l] §6"),

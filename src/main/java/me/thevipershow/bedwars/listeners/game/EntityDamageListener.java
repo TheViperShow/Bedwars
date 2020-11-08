@@ -14,14 +14,13 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.util.Vector;
 
+@Deprecated
 public final class EntityDamageListener extends UnregisterableListener {
 
-    private final ActiveGame activeGame;
-
-    public EntityDamageListener(final ActiveGame activeGame) {
-        this.activeGame = activeGame;
+    public EntityDamageListener(ActiveGame activeGame) {
+        super(activeGame);
     }
-
+/*
     private boolean isInQueueRoom(final Entity player) {
         return activeGame.getCachedWaitingLocation().distanceSquared(player.getLocation()) <= 500;
     }
@@ -65,4 +64,6 @@ public final class EntityDamageListener extends UnregisterableListener {
             activeGame.showPlayer((Player) damaged);
         }
     }
+
+ */
 }

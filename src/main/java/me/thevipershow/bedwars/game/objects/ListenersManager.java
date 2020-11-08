@@ -3,7 +3,6 @@ package me.thevipershow.bedwars.game.objects;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
-import lombok.Getter;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.listeners.UnregisterableListener;
 import org.bukkit.plugin.Plugin;
@@ -13,7 +12,6 @@ public final class ListenersManager {
 
     private final ActiveGame activeGame;
 
-    @Getter
     private final Map<UnregisterableListener, Boolean> unregisterableListeners = new HashMap<>();
     private final Map<GameListener, UnregisterableListener> gameListenerMap = new EnumMap<>(GameListener.class);
 
@@ -56,5 +54,17 @@ public final class ListenersManager {
         for (UnregisterableListener unregisterableListener : unregisterableListeners.keySet()) {
             unregisterableListener.unregister();
         }
+    }
+
+    public final ActiveGame getActiveGame() {
+        return activeGame;
+    }
+
+    public final Map<UnregisterableListener, Boolean> getUnregisterableListeners() {
+        return unregisterableListeners;
+    }
+
+    public final Map<GameListener, UnregisterableListener> getGameListenerMap() {
+        return gameListenerMap;
     }
 }

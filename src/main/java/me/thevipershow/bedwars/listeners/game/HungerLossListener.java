@@ -7,14 +7,14 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 
+@Deprecated
 public class HungerLossListener extends UnregisterableListener {
 
-    private final ActiveGame activeGame;
-
     public HungerLossListener(ActiveGame activeGame) {
-        this.activeGame = activeGame;
+        super(activeGame);
     }
 
+    /*
     @EventHandler(ignoreCancelled = true,priority = EventPriority.HIGHEST)
     public void onFoodLevelChange(final FoodLevelChangeEvent event) {
         if (!activeGame.isHasStarted()) {
@@ -28,4 +28,6 @@ public class HungerLossListener extends UnregisterableListener {
         }
         event.setCancelled(true);
     }
+
+     */
 }

@@ -74,8 +74,8 @@ public class ActiveSpawner {
         this.type = spawner.getSpawnerType();
         this.game = game;
         this.currentLevel = spawner.getSpawnerLevels().get(0);
-        this.cachedAnimation = generateAnimation(spawner.getSpawnPosition().toLocation(game.getAssociatedWorld()));
-        final int gamemodeMultiplier = game.bedwarsGame.getGamemode() == Gamemode.SOLO ? 1 : 2;
+        this.cachedAnimation = generateAnimation(spawner.getSpawnPosition().toLocation(game.getCachedGameData().getGame()));
+        final int gamemodeMultiplier = game.getBedwarsGame().getGamemode() == Gamemode.SOLO ? 1 : 2;
         switch (type) {
             case DIAMOND:
                 this.maxNearby = 4 * gamemodeMultiplier;
@@ -104,7 +104,7 @@ public class ActiveSpawner {
     }
 
     private void drop() {
-        final World w = game.associatedWorld;
+        final World w = game.getCachedGameData().getGame();
         final Location dropSpawnPos = spawner.getSpawnPosition().toLocation(w);
         final int nearbyEntities = w.getNearbyEntities(dropSpawnPos, 1.501, 3.00, 1.501)
                 .stream()
@@ -140,31 +140,31 @@ public class ActiveSpawner {
         }
 
 
-        final Location spawnStandAt = spawner.getSpawnPosition().toLocation(game.associatedWorld);
+        final Location spawnStandAt = spawner.getSpawnPosition().toLocation(game.getCachedGameData().getGame());
         if (!spawnStandAt.getWorld().isChunkLoaded(spawnStandAt.getChunk())) {
             spawnStandAt.getWorld().loadChunk(spawnStandAt.getChunk());
         }
 
         if (!spawner.isInvisible()) {
-            this.stand = (ArmorStand) game.associatedWorld.spawnEntity(spawnStandAt, EntityType.ARMOR_STAND);
+            this.stand = (ArmorStand) game.getCachedGameData().getGame().spawnEntity(spawnStandAt, EntityType.ARMOR_STAND);
             this.stand.setGravity(false);
             this.stand.setVisible(false);
             this.stand.setCanPickupItems(false);
             this.stand.setCustomNameVisible(true);
             this.stand.setHelmet(type.getHeadItem().clone());
 
-            this.updateNameTask = game.plugin.getServer()
+            this.updateNameTask = game.getPlugin().getServer()
                     .getScheduler()
-                    .runTaskTimer(game.plugin, () -> this.stand.setCustomName(generateStandName()), 1L, 20L);
+                    .runTaskTimer(game.getPlugin(), () -> this.stand.setCustomName(generateStandName()), 1L, 20L);
 
-            this.animationTask = game.plugin.getServer()
+            this.animationTask = game.getPlugin().getServer()
                     .getScheduler()
-                    .runTaskTimer(game.plugin, () -> stand.teleport(cachedAnimation.move()), 1L, 1L);
+                    .runTaskTimer(game.getPlugin(), () -> stand.teleport(cachedAnimation.move()), 1L, 1L);
         }
 
-        this.dropTask = game.plugin.getServer()
+        this.dropTask = game.getPlugin().getServer()
                 .getScheduler()
-                .runTaskTimer(game.plugin, () -> {
+                .runTaskTimer(game.getPlugin(), () -> {
                     final long currentTime = now();
                     if (lastDrop == -1L ||
                             ((double) (currentTime - lastDrop) / 1000.0) > (spawner.getDropDelay() - currentLevel.getDecreaseSpawnDelay()) * Math.pow(0.5, (this.dropSpeedRegulator / 100))) {
@@ -173,9 +173,10 @@ public class ActiveSpawner {
                     }
                 }, 1, 5L);
 
-        game.plugin.getServer()
+        game.getPlugin()
+                .getServer()
                 .getScheduler()
-                .runTaskTimer(game.plugin, () -> timePassedSinceCreation++, 1L, 20L);
+                .runTaskTimer(game.getPlugin(), () -> timePassedSinceCreation++, 1L, 20L);
     }
 
 

@@ -1,8 +1,5 @@
 package me.thevipershow.bedwars.game.objects;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
 import me.thevipershow.bedwars.bedwars.Gamemode;
 import me.thevipershow.bedwars.config.objects.BedwarsGame;
 import me.thevipershow.bedwars.game.AbstractDeathmatch;
@@ -17,9 +14,30 @@ import me.thevipershow.bedwars.listeners.game.GameTrapTriggerer;
 import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
 
-@Builder(access = AccessLevel.PRIVATE)
-@Getter
 public final class InternalGameManager {
+
+    public InternalGameManager(AbstractDeathmatch abstractDeathmatch, ExperienceManager experienceManager, QuestManager questManager, GameTrapTriggerer gameTrapTriggerer, KillTracker killTracker, GameInventories gameInventories, BedwarsGame bedwarsGame, TeamManager<?> teamManager, ListenersManager listenersManager, GameLobbyTicker gameLobbyTicker, Plugin plugin, CachedGameData cachedGameData, ActiveSpawnersManager activeSpawnersManager, MovementsManager movementsManager, InvisibilityManager invisibilityManager, PlayerMapper playerMapper, ScoreboardManager scoreboardManager, MerchantManager merchantManager, TrapsManager trapsManager, MapManager mapManager) {
+        this.abstractDeathmatch = abstractDeathmatch;
+        this.experienceManager = experienceManager;
+        this.questManager = questManager;
+        this.gameTrapTriggerer = gameTrapTriggerer;
+        this.killTracker = killTracker;
+        this.gameInventories = gameInventories;
+        this.bedwarsGame = bedwarsGame;
+        this.teamManager = teamManager;
+        this.listenersManager = listenersManager;
+        this.gameLobbyTicker = gameLobbyTicker;
+        this.plugin = plugin;
+        this.cachedGameData = cachedGameData;
+        this.activeSpawnersManager = activeSpawnersManager;
+        this.movementsManager = movementsManager;
+        this.invisibilityManager = invisibilityManager;
+        this.playerMapper = playerMapper;
+        this.scoreboardManager = scoreboardManager;
+        this.merchantManager = merchantManager;
+        this.trapsManager = trapsManager;
+        this.mapManager = mapManager;
+    }
 
     //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     // AbstractDeathmatch is used to start the deathmatch mode
@@ -46,7 +64,7 @@ public final class InternalGameManager {
     private final BedwarsGame bedwarsGame;
     // The TeamManager is used to manage teams, by adding players, removing them, or changing
     // their current state during gameplay. The players are added onto it upon start();
-    private final TeamManager teamManager;
+    private final TeamManager<?> teamManager;
     // This class is used to register or unregister game listeners.
     private final ListenersManager listenersManager;
     // For lobby
@@ -59,26 +77,115 @@ public final class InternalGameManager {
     private final ActiveSpawnersManager activeSpawnersManager;
     private final MovementsManager movementsManager;
     private final InvisibilityManager invisibilityManager;
+    private final PlayerMapper playerMapper;
+    private final ScoreboardManager scoreboardManager;
+    private final MerchantManager merchantManager;
+    private final TrapsManager trapsManager;
+    private final MapManager mapManager;
     //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
     public static InternalGameManager build(ActiveGame activeGame, String gameWorldFilename, BedwarsGame bedwarsGame, World lobbyWorld, Plugin plugin) {
-        ExperienceManager experienceManager = new ExperienceManager(activeGame);
-        return builder()
-                .abstractDeathmatch(GameUtils.deathmatchFromGamemode(bedwarsGame.getGamemode(), activeGame))
-                .experienceManager(experienceManager)
-                .questManager(new QuestManager(experienceManager))
-                .gameTrapTriggerer(new GameTrapTriggerer(activeGame))
-                .killTracker(new KillTracker(activeGame))
-                .gameInventories(new GameInventories(bedwarsGame.getShop()))
-                .bedwarsGame(bedwarsGame)
-                .teamManager(bedwarsGame.getGamemode() == Gamemode.SOLO ? new SoloTeamManager(activeGame) : new MultipleTeamManager(activeGame))
-                .listenersManager(new ListenersManager(activeGame))
-                .gameLobbyTicker(new GameLobbyTicker(activeGame))
-                .plugin(plugin)
-                .cachedGameData(new CachedGameData(gameWorldFilename, lobbyWorld, bedwarsGame))
-                .activeSpawnersManager(new ActiveSpawnersManager(activeGame))
-                .movementsManager(new MovementsManager(activeGame))
-                .invisibilityManager(new InvisibilityManager(activeGame))
-                .build();
+        final ExperienceManager experienceManager = new ExperienceManager(activeGame);
+        final Gamemode gamemode = bedwarsGame.getGamemode();
+        return new InternalGameManager(GameUtils.deathmatchFromGamemode(gamemode, activeGame),
+                experienceManager,
+                new QuestManager(experienceManager),
+                new GameTrapTriggerer(activeGame),
+                new KillTracker(activeGame),
+                new GameInventories(activeGame),
+                bedwarsGame,
+                gamemode == Gamemode.SOLO ? new SoloTeamManager(activeGame) : new MultiTeamManager(activeGame),
+                new ListenersManager(activeGame),
+                new GameLobbyTicker(activeGame),
+                plugin,
+                new CachedGameData(gameWorldFilename, lobbyWorld, bedwarsGame),
+                new ActiveSpawnersManager(activeGame),
+                new MovementsManager(activeGame),
+                new InvisibilityManager(activeGame),
+                new PlayerMapper(),
+                new ScoreboardManager(activeGame),
+                new MerchantManager(activeGame),
+                new TrapsManager(activeGame),
+                new MapManager(activeGame));
+    }
+
+    public final MapManager getMapManager() {
+        return mapManager;
+    }
+
+    public final TrapsManager getTrapsManager() {
+        return trapsManager;
+    }
+
+    public final ScoreboardManager getScoreboardManager() {
+        return scoreboardManager;
+    }
+
+    public final MerchantManager getMerchantManager() {
+        return merchantManager;
+    }
+
+    public final AbstractDeathmatch getAbstractDeathmatch() {
+        return abstractDeathmatch;
+    }
+
+    public final ExperienceManager getExperienceManager() {
+        return experienceManager;
+    }
+
+    public final QuestManager getQuestManager() {
+        return questManager;
+    }
+
+    public final GameTrapTriggerer getGameTrapTriggerer() {
+        return gameTrapTriggerer;
+    }
+
+    public final KillTracker getKillTracker() {
+        return killTracker;
+    }
+
+    public final GameInventories getGameInventories() {
+        return gameInventories;
+    }
+
+    public final BedwarsGame getBedwarsGame() {
+        return bedwarsGame;
+    }
+
+    public final TeamManager<?> getTeamManager() {
+        return teamManager;
+    }
+
+    public final ListenersManager getListenersManager() {
+        return listenersManager;
+    }
+
+    public final GameLobbyTicker getGameLobbyTicker() {
+        return gameLobbyTicker;
+    }
+
+    public final Plugin getPlugin() {
+        return plugin;
+    }
+
+    public final CachedGameData getCachedGameData() {
+        return cachedGameData;
+    }
+
+    public final ActiveSpawnersManager getActiveSpawnersManager() {
+        return activeSpawnersManager;
+    }
+
+    public final MovementsManager getMovementsManager() {
+        return movementsManager;
+    }
+
+    public final InvisibilityManager getInvisibilityManager() {
+        return invisibilityManager;
+    }
+
+    public final PlayerMapper getPlayerMapper() {
+        return playerMapper;
     }
 }

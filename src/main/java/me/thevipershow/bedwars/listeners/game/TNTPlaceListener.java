@@ -10,14 +10,14 @@ import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockPlaceEvent;
 
+@Deprecated
 public final class TNTPlaceListener extends UnregisterableListener {
 
-    private final ActiveGame activeGame;
-
     public TNTPlaceListener(ActiveGame activeGame) {
-        this.activeGame = activeGame;
+        super(activeGame);
     }
 
+    /*
     @EventHandler(ignoreCancelled = true)
     public void onBlockPlace(final BlockPlaceEvent event) {
         if (!activeGame.isHasStarted()) {
@@ -35,5 +35,5 @@ public final class TNTPlaceListener extends UnregisterableListener {
             tnt.setFuseTicks(activeGame.getBedwarsGame().getTntFuse());
             activeGame.getPlacedTntMap().put(tnt.getUniqueId(), event.getPlayer().getUniqueId());
         }
-    }
+    }*/
 }

@@ -14,14 +14,13 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityExplodeEvent;
 
+@Deprecated
 public class ExplosionListener extends UnregisterableListener {
 
-    private final ActiveGame activeGame;
-
-    public ExplosionListener(final ActiveGame activeGame) {
-        this.activeGame = activeGame;
+    public ExplosionListener(ActiveGame activeGame) {
+        super(activeGame);
     }
-
+/*
     @EventHandler(ignoreCancelled = true)
     public void onEntityExplode(final EntityExplodeEvent event) {
         final Entity entity = event.getEntity();
@@ -53,4 +52,6 @@ public class ExplosionListener extends UnregisterableListener {
             toDestroy.forEach(b -> b.setType(Material.AIR));
         }
     }
+
+ */
 }

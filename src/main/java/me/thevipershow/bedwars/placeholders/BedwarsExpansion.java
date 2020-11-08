@@ -16,6 +16,8 @@ import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.ExperienceManager;
 import me.thevipershow.bedwars.game.GameManager;
 import me.thevipershow.bedwars.game.Pair;
+import me.thevipershow.bedwars.game.objects.BedwarsPlayer;
+import me.thevipershow.bedwars.game.objects.TeamData;
 import me.thevipershow.bedwars.storage.sql.tables.GlobalStatsTableUtils;
 import me.thevipershow.bedwars.storage.sql.tables.RankTableUtils;
 import org.bukkit.Bukkit;
@@ -119,12 +121,12 @@ public final class BedwarsExpansion extends PlaceholderExpansion {
         } else if (player.isOnline()) {
             final Player p = player.getPlayer();
             for (final ActiveGame activeGame : gameManager.getWorldsManager().getActiveGameList()) {
-                if (!activeGame.getAssociatedWorld().equals(p.getWorld())) {
+                if (!activeGame.getCachedGameData().getGame().equals(p.getWorld())) {
                     continue;
                 }
 
-                for (final Map.Entry<BedwarsTeam, List<Player>> entry : activeGame.getAssignedTeams().entrySet()) {
-                    for (final Player player1 : entry.getValue()) {
+                for (final Map.Entry<BedwarsTeam, ? extends TeamData<?>> entry : activeGame.getTeamManager().getDataMap().entrySet()) {
+                    for (final BedwarsPlayer player1 : entry.getValue().getAll()) {
                         if (player1.getUniqueId().equals(player.getUniqueId())) {
                             final Character pChar = entry.getKey().getColorCode();
                             cachedTeamColors.put(player.getUniqueId(), new Pair<>(System.currentTimeMillis(), pChar));

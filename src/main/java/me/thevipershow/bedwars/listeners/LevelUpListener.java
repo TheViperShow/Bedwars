@@ -10,8 +10,9 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 
-public final class LevelUpListener extends UnregisterableListener {
+public final class LevelUpListener implements Listener {
 
     private final Random rand = new Random(System.currentTimeMillis());
 

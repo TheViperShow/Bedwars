@@ -10,9 +10,32 @@ import java.util.function.Consumer;
 import me.thevipershow.bedwars.bedwars.Gamemode;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.bedwars.objects.spawners.SpawnerType;
+import me.thevipershow.bedwars.bedwars.spawner.SpawnerLevel;
+import me.thevipershow.bedwars.config.objects.BedwarsGame;
+import me.thevipershow.bedwars.config.objects.DuoBedwars;
 import me.thevipershow.bedwars.config.objects.Merchant;
+import me.thevipershow.bedwars.config.objects.QuadBedwars;
+import me.thevipershow.bedwars.config.objects.Shop;
+import me.thevipershow.bedwars.config.objects.ShopItem;
+import me.thevipershow.bedwars.config.objects.SoloBedwars;
+import me.thevipershow.bedwars.config.objects.Spawner;
 import me.thevipershow.bedwars.config.objects.TeamSpawnPosition;
+import me.thevipershow.bedwars.config.objects.UpgradeItem;
+import me.thevipershow.bedwars.config.objects.UpgradeLevel;
+import me.thevipershow.bedwars.config.objects.upgradeshop.DragonBuffUpgrade;
+import me.thevipershow.bedwars.config.objects.upgradeshop.HealPoolUpgrade;
+import me.thevipershow.bedwars.config.objects.upgradeshop.IronForgeUpgrade;
+import me.thevipershow.bedwars.config.objects.upgradeshop.ManiacMinerUpgrade;
+import me.thevipershow.bedwars.config.objects.upgradeshop.ReinforcedArmorUpgrade;
+import me.thevipershow.bedwars.config.objects.upgradeshop.SharpnessUpgrade;
+import me.thevipershow.bedwars.config.objects.upgradeshop.TrapUpgrades;
+import me.thevipershow.bedwars.config.objects.upgradeshop.UpgradeShop;
 import me.thevipershow.bedwars.config.objects.upgradeshop.UpgradeType;
+import me.thevipershow.bedwars.config.objects.upgradeshop.traps.AlarmTrap;
+import me.thevipershow.bedwars.config.objects.upgradeshop.traps.BlindnessAndPoisonTrap;
+import me.thevipershow.bedwars.config.objects.upgradeshop.traps.CounterOffensiveTrap;
+import me.thevipershow.bedwars.config.objects.upgradeshop.traps.MinerFatigueTrap;
+import me.thevipershow.bedwars.game.objects.BedwarsPlayer;
 import me.thevipershow.bedwars.listeners.game.Slots;
 import net.minecraft.server.v1_8_R3.ChatMessage;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
@@ -21,6 +44,8 @@ import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
 import net.minecraft.server.v1_8_R3.PlayerConnection;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.enchantments.Enchantment;
@@ -115,7 +140,7 @@ public final class GameUtils {
     public static BedwarsTeam findMerchantTeam(final Merchant merchant, final ActiveGame game) {
         TeamSpawnPosition nearest = null;
         double sqdDistance = Double.MAX_VALUE;
-        for (final TeamSpawnPosition teamSpawnPosition : game.bedwarsGame.getMapSpawns()) {
+        for (final TeamSpawnPosition teamSpawnPosition : game.getBedwarsGame().getMapSpawns()) {
             final double tempSqdDistance = merchant.getMerchantPosition().squaredDistance(teamSpawnPosition);
             if (tempSqdDistance < sqdDistance) {
                 nearest = teamSpawnPosition;
@@ -171,7 +196,7 @@ public final class GameUtils {
     }
 
     public static PacketPlayOutChat killActionBar(final ActiveGame activeGame, final Player killed) {
-        final BedwarsTeam killedTeam = activeGame.getPlayerTeam(killed);
+        final BedwarsTeam killedTeam = activeGame.getPlayerMapper().get(killed).getBedwarsTeam();
         final IChatBaseComponent iChatBaseComponent = new ChatMessage(
                 "§e⚔ You killed player §" + killedTeam.getColorCode() + killed.getName() + " §r§e⚔"
         );
@@ -183,6 +208,7 @@ public final class GameUtils {
         conn.sendPacket(killActionBar(activeGame, killed));
     }
 
+    /*
     public static void clearInvExceptArmorAndTools(final Player player, final ActiveGame game) {
         final PlayerInventory inv = player.getInventory();
         final ItemStack[] contents = inv.getContents();
@@ -219,6 +245,7 @@ public final class GameUtils {
             GameUtils.enchantSwords(Enchantment.DAMAGE_ALL, enchantLvl, player); // Adding enchant if he has the Upgrade.
         }
     }
+    */
 
     public static void giveStackToPlayer(final ItemStack itemStack, final Player player, final ItemStack[] contents) {
         final PlayerInventory inv = player.getInventory();
@@ -586,5 +613,37 @@ public final class GameUtils {
 
     public static boolean anyMatchMaterial(final Collection<ItemStack> stack, final Material material) {
         return stack.stream().anyMatch(s -> s.getType() == material);
+    }
+
+    public static ActiveGame from(final String associatedWorldName, final BedwarsGame game, final World lobbyWorld, final Plugin plugin) {
+        return new ActiveGame(associatedWorldName, game, lobbyWorld, plugin);
+    }
+
+    public static void registerSerializers() {
+        ConfigurationSerialization.registerClass(DragonBuffUpgrade.class);
+        ConfigurationSerialization.registerClass(HealPoolUpgrade.class);
+        ConfigurationSerialization.registerClass(IronForgeUpgrade.class);
+        ConfigurationSerialization.registerClass(ManiacMinerUpgrade.class);
+        ConfigurationSerialization.registerClass(ReinforcedArmorUpgrade.class);
+        ConfigurationSerialization.registerClass(SharpnessUpgrade.class);
+        ConfigurationSerialization.registerClass(UpgradeShop.class);
+        ConfigurationSerialization.registerClass(me.thevipershow.bedwars.config.objects.Enchantment.class);
+        ConfigurationSerialization.registerClass(UpgradeItem.class);
+        ConfigurationSerialization.registerClass(UpgradeLevel.class);
+        ConfigurationSerialization.registerClass(SpawnerLevel.class);
+        ConfigurationSerialization.registerClass(Spawner.class);
+        ConfigurationSerialization.registerClass(ShopItem.class);
+        ConfigurationSerialization.registerClass(Shop.class);
+        ConfigurationSerialization.registerClass(Merchant.class);
+        ConfigurationSerialization.registerClass(SoloBedwars.class);
+        ConfigurationSerialization.registerClass(ShopItem.class);
+        ConfigurationSerialization.registerClass(TeamSpawnPosition.class);
+        ConfigurationSerialization.registerClass(DuoBedwars.class);
+        ConfigurationSerialization.registerClass(MinerFatigueTrap.class);
+        ConfigurationSerialization.registerClass(BlindnessAndPoisonTrap.class);
+        ConfigurationSerialization.registerClass(CounterOffensiveTrap.class);
+        ConfigurationSerialization.registerClass(AlarmTrap.class);
+        ConfigurationSerialization.registerClass(TrapUpgrades.class);
+        ConfigurationSerialization.registerClass(QuadBedwars.class);
     }
 }

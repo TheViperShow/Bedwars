@@ -1,14 +1,14 @@
 package me.thevipershow.bedwars.listeners;
 
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import me.thevipershow.bedwars.game.ActiveGame;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
-@RequiredArgsConstructor
-@Data
 public abstract class UnregisterableListener implements Listener {
+
+    public UnregisterableListener(ActiveGame activeGame) {
+        this.activeGame = activeGame;
+    }
 
     protected boolean isUnregistered = false;
 
@@ -23,4 +23,15 @@ public abstract class UnregisterableListener implements Listener {
         isUnregistered = true;
     }
 
+    public boolean isUnregistered() {
+        return isUnregistered;
+    }
+
+    public void setUnregistered(boolean unregistered) {
+        isUnregistered = unregistered;
+    }
+
+    public ActiveGame getActiveGame() {
+        return activeGame;
+    }
 }

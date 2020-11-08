@@ -1,11 +1,11 @@
 package me.thevipershow.bedwars.game.upgrades;
 
-import java.util.Collection;
-import java.util.stream.Collectors;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.config.objects.upgradeshop.traps.TrapType;
 import me.thevipershow.bedwars.game.ActiveGame;
-import org.bukkit.entity.Player;
+import me.thevipershow.bedwars.game.objects.BedwarsPlayer;
+import me.thevipershow.bedwars.game.objects.PlayerState;
+import me.thevipershow.bedwars.game.objects.TeamData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -16,15 +16,19 @@ public final class CounterOffensiveActiveTrap extends ActiveTrap {
     }
 
     @Override
-    public final void trigger(final Player player) {
-        final Collection<Player> giveEffectTo = activeGame.getTeamPlayers(owner).stream().filter(p -> p.isOnline() && !activeGame.getPlayersRespawning().contains(p) && !activeGame.isOutOfGame(p)).collect(Collectors.toSet());
+    public final void trigger(final BedwarsPlayer player) {
 
-        giveEffectTo.forEach(p -> {
-            final PotionEffect strengthEffect = new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 15 * 20, 1, true);
-            final PotionEffect speedEffect = new PotionEffect(PotionEffectType.SPEED, 15 * 20, 1, true);
-            p.addPotionEffect(strengthEffect);
-            p.addPotionEffect(speedEffect);
-        });
+        for (TeamData<?> value : activeGame.getTeamManager().getDataMap().values()) {
+            for (BedwarsPlayer bedwarsPlayer : value.getAll()) {
+                PlayerState state = bedwarsPlayer.getPlayerState();
+                if (state != PlayerState.RESPAWNING && state != PlayerState.DEAD) {
+                    final PotionEffect strengthEffect = new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 15 * 20, 1, true);
+                    final PotionEffect speedEffect = new PotionEffect(PotionEffectType.SPEED, 15 * 20, 1, true);
+                    bedwarsPlayer.getPlayer().addPotionEffect(strengthEffect);
+                    bedwarsPlayer.getPlayer().addPotionEffect(speedEffect);
+                }
+            }
+        }
 
         alertTrapOwners();
     }

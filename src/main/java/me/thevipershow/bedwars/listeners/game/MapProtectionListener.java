@@ -14,14 +14,13 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 
+@Deprecated
 public final class MapProtectionListener extends UnregisterableListener {
 
-    private final ActiveGame activeGame;
-
-    public MapProtectionListener(final ActiveGame activeGame) {
-        this.activeGame = activeGame;
+    public MapProtectionListener(ActiveGame activeGame) {
+        super(activeGame);
     }
-
+/*
     private boolean isBlockNearSpawner(final Block block) {
         for (final ActiveSpawner activeSpawner : activeGame.getActiveSpawners())
             if (activeSpawner.getSpawner().getSpawnPosition().squaredDistance(block.getLocation()) <= 27.0) {
@@ -79,4 +78,6 @@ public final class MapProtectionListener extends UnregisterableListener {
         }
     }
 
+
+ */
 }

@@ -10,14 +10,13 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 
+@Deprecated
 public final class PlayerSpectatePlayerListener extends UnregisterableListener {
-
-    private final ActiveGame activeGame;
-
-    public PlayerSpectatePlayerListener(final ActiveGame activeGame) {
-        this.activeGame = activeGame;
+    public PlayerSpectatePlayerListener(ActiveGame activeGame) {
+        super(activeGame);
     }
 
+    /*
     @EventHandler(ignoreCancelled = true,priority = EventPriority.HIGHEST)
     public void onPlayerInteractEntity(final PlayerInteractEntityEvent event) {
         if (!activeGame.isHasStarted()) {
@@ -37,4 +36,6 @@ public final class PlayerSpectatePlayerListener extends UnregisterableListener {
             }
         }
     }
+
+     */
 }

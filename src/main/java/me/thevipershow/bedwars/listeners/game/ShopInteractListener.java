@@ -27,14 +27,14 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+@Deprecated
 public final class ShopInteractListener extends UnregisterableListener {
 
-    private final ActiveGame activeGame;
-
     public ShopInteractListener(ActiveGame activeGame) {
-        this.activeGame = activeGame;
+        super(activeGame);
     }
 
+    /*
     private boolean clickedAir(final ItemStack clicked) {
         return clicked == null;
     }
@@ -306,7 +306,7 @@ public final class ShopInteractListener extends UnregisterableListener {
                 }
             }
         }
-         */
+
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
@@ -333,5 +333,5 @@ public final class ShopInteractListener extends UnregisterableListener {
                 return;
             }
         }
-    }
+    }*/
 }

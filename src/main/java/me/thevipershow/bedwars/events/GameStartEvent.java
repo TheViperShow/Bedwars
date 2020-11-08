@@ -14,7 +14,7 @@ public class GameStartEvent extends Event implements Cancellable {
     private final ActiveGame activeGame;
 
     public GameStartEvent(ActiveGame activeGame) {
-        this.matchmakingQueue = activeGame.getAssociatedQueue();
+        this.matchmakingQueue = activeGame.getGameLobbyTicker().getAssociatedQueue();
         this.activeGame = activeGame;
     }
 

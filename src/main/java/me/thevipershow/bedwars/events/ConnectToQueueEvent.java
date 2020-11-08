@@ -19,7 +19,7 @@ public class ConnectToQueueEvent extends Event implements Cancellable {
      * assumes the event is synchronous.
      */
     public ConnectToQueueEvent(final ActiveGame activeGame) {
-        this.matchmakingQueue = activeGame.getAssociatedQueue();
+        this.matchmakingQueue = activeGame.getGameLobbyTicker().getAssociatedQueue();
         this.activeGame = activeGame;
     }
 

@@ -2,15 +2,11 @@ package me.thevipershow.bedwars.game;
 
 import java.util.HashMap;
 import java.util.UUID;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 
-@Getter
-@NoArgsConstructor
 public final class EnderchestManager {
 
     private final HashMap<UUID, Inventory> enderchestMap = new HashMap<>();

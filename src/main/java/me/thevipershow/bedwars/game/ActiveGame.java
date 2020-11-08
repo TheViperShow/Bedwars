@@ -1,24 +1,30 @@
 package me.thevipershow.bedwars.game;
 
-import lombok.Data;
 import me.thevipershow.bedwars.config.objects.BedwarsGame;
 import me.thevipershow.bedwars.game.objects.ActiveSpawnersManager;
 import me.thevipershow.bedwars.game.objects.CachedGameData;
 import me.thevipershow.bedwars.game.objects.GameListener;
 import me.thevipershow.bedwars.game.objects.InternalGameManager;
 import me.thevipershow.bedwars.game.objects.ListenersManager;
+import me.thevipershow.bedwars.game.objects.MerchantManager;
 import me.thevipershow.bedwars.game.objects.MovementsManager;
+import me.thevipershow.bedwars.game.objects.PlayerMapper;
+import me.thevipershow.bedwars.game.objects.ScoreboardManager;
 import me.thevipershow.bedwars.game.objects.TeamManager;
+import me.thevipershow.bedwars.game.objects.TrapsManager;
 import me.thevipershow.bedwars.listeners.game.GameTrapTriggerer;
 import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.Contract;
 
-@Data
-public abstract class ActiveGame {
+public final class ActiveGame {
 
     private final InternalGameManager internalGameManager;
     // This fields indicates if the game has effectively started or not
     private boolean hasStarted = false;
+    // the time the game started at
+    private long startTime;
     // This game current state
     private ActiveGameState gameState = ActiveGameState.NONE;
 
@@ -26,32 +32,94 @@ public abstract class ActiveGame {
         this.internalGameManager = InternalGameManager.build(this, gameWorldFilename, bedwarsGame, lobbyWorld, plugin);
     }
 
-    public void initialize() {
-        gameState = ActiveGameState.INITIALIZING; // setting game state to initializing.
+    public final void initialize() {
+        setGameState(ActiveGameState.INITIALIZING); // setting game state to initializing.
 
         getListenersManager().enableListeners(GameListener.QUEUE); // registering map and movement protection.
-                                                                   // other listeners are not required before start of game!
+        // other listeners are not required before start of game!
         getGameLobbyTicker().startTicking(); // starting to tick,
+
+        setGameState(ActiveGameState.QUEUE);
+
+        getActiveSpawnersManager().addSpawners();
     }
 
-    public void start() {
+    public final void start() {
+        setGameState(ActiveGameState.STARTED);
+
+        startTime = System.currentTimeMillis();
+
         getListenersManager().disableListener(GameListener.QUEUE); // removing queue listener; not required.
+        getListenersManager().enableAllListeners();
+
         getGameLobbyTicker().stopTicking(); // stop ticking.
 
-        getTeamManager().assignTeams();
-        getMovementsManager().moveToSpawnpoints();
+        getPlayerMapper().addAll(getGameLobbyTicker().getAssociatedQueue().getInQueue()); // Assign mapping for players
+                                                                                          // and BedwarsPlayer objects.
+        getTeamManager().assignTeams(); // IMPORTANT:
+                                        // Teams must be assigned after the player mapper has been correctly
+                                        // filled with the players from the AbstractQueue.
+
+        getTeamManager().updateBedwarsPlayersTeam(); // Updating the team field in each of the BedwarsPlayer objects
+                                                     // (we should rely on it as less as possible).
+
+        getActiveSpawnersManager().createAnnouncements(); // Creating update announcements.
+        getActiveSpawnersManager().spawnAll(); // Spawn all spawners
+
+        getMerchantManager().createAll(); // First creating all AbstractMerchants
+        getMerchantManager().spawnAll(); // then spawning them in the game
+
+        getScoreboardManager().assignScoreboards(); // first we assign all,
+        getScoreboardManager().activateAll();       // then we activate them.
+
+        getAbstractDeathmatch().start(); // starting the deathmatch
+
+        getMovementsManager().moveToSpawnpoints(); // Ideally we want everything to get generated before teleporting.
     }
 
-    public void stop() {}
+    public final void stop() {
+        getActiveSpawnersManager().cancelAnnouncements();
+        getMovementsManager().moveAllSpawn();
 
-    /*-------------------------------------------------------------------------*/
+        try { finalize(); } catch (Throwable ignored) { }
+    }
+
+    /*---------------------------------------------------------------------------------------------------------------*/
+
+    public final long getStartTime() {
+        return startTime;
+    }
+
+    public final void setStartTime(long startTime) {
+        this.startTime = startTime;
+    }
+
+    public final TrapsManager getTrapsManager() {
+        return internalGameManager.getTrapsManager();
+    }
 
     public final MovementsManager getMovementsManager() {
         return internalGameManager.getMovementsManager();
     }
 
+    public final MerchantManager getMerchantManager() {
+        return internalGameManager.getMerchantManager();
+    }
+
     public final AbstractDeathmatch getAbstractDeathmatch() {
         return internalGameManager.getAbstractDeathmatch();
+    }
+
+    public final boolean isHasStarted() {
+        return hasStarted;
+    }
+
+    public final void setGameState(ActiveGameState gameState) {
+        this.gameState = gameState;
+    }
+
+    public final void setHasStarted(boolean hasStarted) {
+        this.hasStarted = hasStarted;
     }
 
     public final ExperienceManager getExperienceManager() {
@@ -78,7 +146,7 @@ public abstract class ActiveGame {
         return internalGameManager.getBedwarsGame();
     }
 
-    public final TeamManager getTeamManager() {
+    public final TeamManager<?> getTeamManager() {
         return internalGameManager.getTeamManager();
     }
 
@@ -102,58 +170,21 @@ public abstract class ActiveGame {
         return internalGameManager.getActiveSpawnersManager();
     }
 
+    public final ActiveGameState getGameState() {
+        return gameState;
+    }
 
+    public final InternalGameManager getInternalGameManager() {
+        return internalGameManager;
+    }
 
+    public final ScoreboardManager getScoreboardManager() {
+        return internalGameManager.getScoreboardManager();
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    public final PlayerMapper getPlayerMapper() {
+        return internalGameManager.getPlayerMapper();
+    }
 
     /*
     protected ActiveSpawner diamondSampleSpawner = null;

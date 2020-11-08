@@ -12,13 +12,13 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
+@Deprecated
 public final class LobbyCompassListener extends UnregisterableListener {
-
-    private final ActiveGame activeGame;
-
-    public LobbyCompassListener(final ActiveGame activeGame) {
-        this.activeGame = activeGame;
+    public LobbyCompassListener(ActiveGame activeGame) {
+        super(activeGame);
     }
+
+    /*
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onInventoryClick(final PlayerInteractEvent event) {
@@ -50,4 +50,6 @@ public final class LobbyCompassListener extends UnregisterableListener {
             }
         }
     }
+
+     */
 }

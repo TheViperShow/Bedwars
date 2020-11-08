@@ -8,12 +8,11 @@ import org.bukkit.event.player.PlayerItemDamageEvent;
 
 public final class ItemDegradeListener extends UnregisterableListener {
 
-    private final ActiveGame activeGame;
-
-    public ItemDegradeListener(final ActiveGame activeGame) {
-        this.activeGame = activeGame;
+    public ItemDegradeListener(ActiveGame activeGame) {
+        super(activeGame);
     }
 
+    /*
     @EventHandler(ignoreCancelled = true)
     public void onPlayerItemConsume(final PlayerItemDamageEvent event) {
         final Player player = event.getPlayer();
@@ -27,6 +26,8 @@ public final class ItemDegradeListener extends UnregisterableListener {
             event.setCancelled(true);
         }
     }
+
+     */
 
 
 }

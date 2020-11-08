@@ -3,8 +3,6 @@ package me.thevipershow.bedwars.game.objects;
 import java.lang.reflect.Constructor;
 import java.util.EnumMap;
 import java.util.Map;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.listeners.UnregisterableListener;
 import me.thevipershow.bedwars.listeners.game.BedBreakListener;
@@ -33,8 +31,6 @@ import me.thevipershow.bedwars.listeners.game.UpgradeInteractListener;
 import me.thevipershow.bedwars.listeners.game.UpgradeMerchantListener;
 import me.thevipershow.bedwars.listeners.unregisterable.QueueUnregisterableListener;
 
-@Getter
-@RequiredArgsConstructor
 public enum GameListener {
     BED_BREAK(BedBreakListener.class),
     CHEST_INTERACT(ChestInteractListener.class),
@@ -65,6 +61,14 @@ public enum GameListener {
     QUEUE(QueueUnregisterableListener.class);
 
     private final Class<? extends UnregisterableListener> ownClass;
+
+    GameListener(Class<? extends UnregisterableListener> ownClass) {
+        this.ownClass = ownClass;
+    }
+
+    public Class<? extends UnregisterableListener> getOwnClass() {
+        return ownClass;
+    }
 
     private static final Map<GameListener, Constructor<?>> constructorsCache = new EnumMap<>(GameListener.class);
 

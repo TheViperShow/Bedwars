@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import me.thevipershow.bedwars.events.BedwarsLevelUpEvent;
+import me.thevipershow.bedwars.game.objects.PlayerState;
+import me.thevipershow.bedwars.game.objects.TeamData;
 import me.thevipershow.bedwars.storage.sql.tables.RankTableUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
@@ -81,7 +83,7 @@ public final class ExperienceManager {
     }
 
     public static void rewardPlayer(final int experience, final Player p, final ActiveGame activeGame) {
-        if (p.isOnline() && !activeGame.isOutOfGame(p)) {
+        if (p.isOnline() && activeGame.getPlayerMapper().get(p) != null) {
             RankTableUtils.getPlayerExp(p.getUniqueId(), activeGame.getPlugin())
                     .thenAccept(pExp -> {
                         if (pExp + experience != 0) {
@@ -98,13 +100,18 @@ public final class ExperienceManager {
     }
 
     private void rewardAllPlayingPlayers(final int experience) {
-        for (final List<Player> value : activeGame.getAssignedTeams().values()) {
+        for (TeamData<?> value : activeGame.getTeamManager().getDataMap().values()) {
+            value.perform(bedwarsPlayer -> {
+
+            });
+        }
+        /*for (final List<Player> value : activeGame.getAssignedTeams().values()) {
             for (final Player player : value) {
                 if (player.isOnline()) {
                     rewardPlayer(experience, player, this.activeGame);
                 }
             }
-        }
+        }*/
     }
 
     public final void startRewardTask() {

@@ -8,6 +8,7 @@ import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.config.objects.SpawnPosition;
 import me.thevipershow.bedwars.config.objects.upgradeshop.UpgradeType;
 import me.thevipershow.bedwars.listeners.game.DragonTargetListener;
+import me.thevipershow.bedwars.listeners.unregisterable.DragonRedirectorListener;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -20,7 +21,7 @@ import org.bukkit.scheduler.BukkitTask;
 public abstract class AbstractDeathmatch {
 
     protected final ActiveGame activeGame;
-    protected final DragonTargetListener dragonTargetListener;
+    protected final DragonRedirectorListener dragonTargetListener;
     protected final int startAfter;
 
     protected long startTime = -1L;
@@ -30,24 +31,24 @@ public abstract class AbstractDeathmatch {
     public AbstractDeathmatch(final ActiveGame activeGame) {
         this.activeGame = activeGame;
         this.startAfter = activeGame.getBedwarsGame().getDeathmatchStart();
-        this.dragonTargetListener = new DragonTargetListener(activeGame);
+        this.dragonTargetListener = new DragonRedirectorListener(activeGame);
     }
 
-    public final int numberOfDragonsToSpawn(final BedwarsTeam team) {
-        final Map<BedwarsTeam, Integer> m = this.activeGame.getUpgradesLevelsMap().get(UpgradeType.DRAGON_BUFF);
-        final Integer i = Objects.requireNonNull(m.get(team));
-        return i == 0 ? 1 : 2;
-    }
+    // TODO: Reimplement !
+    //public final int numberOfDragonsToSpawn(final BedwarsTeam team) {
+    //    final Map<BedwarsTeam, Integer> m = this.activeGame.getUpgradesLevelsMap().get(UpgradeType.DRAGON_BUFF);
+    //    final Integer i = Objects.requireNonNull(m.get(team));
+    //    return i == 0 ? 1 : 2;
+    //}
 
     public final void spawnDragon(final BedwarsTeam bedwarsTeam) {
-        final int toSpawn = numberOfDragonsToSpawn(bedwarsTeam);
+        final int toSpawn = 1; // numberOfDragonsToSpawn(bedwarsTeam);
         int spawned = 0;
         while (spawned < toSpawn) {
             final SpawnPosition teamSpawn = activeGame.getBedwarsGame().spawnPosOfTeam(bedwarsTeam);
-            final EnderDragon enderDragon = (EnderDragon) activeGame.associatedWorld.spawnEntity(teamSpawn.toLocation(activeGame.getAssociatedWorld()).add(0.0, 30.0, 0.0), EntityType.ENDER_DRAGON);
+            final EnderDragon enderDragon = (EnderDragon) activeGame.getCachedGameData().getGame().spawnEntity(teamSpawn.toLocation(activeGame.getCachedGameData().getGame()).add(0.0, 25.0, 0.0), EntityType.ENDER_DRAGON);
             enderDragon.setRemoveWhenFarAway(false);
-            final CraftEnderDragon coolDragon = ((CraftEnderDragon) enderDragon);
-            dragonTargetListener.getDragonPlayerMap().put(coolDragon, bedwarsTeam);
+            dragonTargetListener.getDragonTeamsMap().put(enderDragon.getUniqueId(), bedwarsTeam);
             spawned++;
         }
     }
@@ -55,16 +56,14 @@ public abstract class AbstractDeathmatch {
     public abstract void spawnEnderdragons();
 
     public void announceDeathmatch() {
-        activeGame.getAssociatedQueue().perform(p -> {
-            p.sendMessage(Bedwars.PREFIX + AllStrings.ANNOUNCE_DEATHMATCH.get());
-        });
+        activeGame.getTeamManager().getDataMap().values().forEach(v -> v.perform(b -> b.sendMessage(Bedwars.PREFIX + AllStrings.ANNOUNCE_DEATHMATCH.get())));
     }
 
     public abstract void startDeathMatch();
 
     public void breakBeds() {
         activeGame.getBedwarsGame().getBedSpawnPositions().forEach(bed -> {
-            final Location location = bed.toLocation(activeGame.getAssociatedWorld());
+            final Location location = bed.toLocation(activeGame.getCachedGameData().getGame());
             final Block block = location.getBlock();
             if (block != null && block.getType() == Material.BED) {
                 Bed b = (Bed) block.getState().getData();
@@ -76,19 +75,21 @@ public abstract class AbstractDeathmatch {
     }
 
     public void start() {
-        this.task = activeGame.plugin.getServer().getScheduler().runTaskLater(activeGame.plugin, () -> {
+        this.task = activeGame.getPlugin().getServer().getScheduler().runTaskLater(activeGame.getPlugin(), () -> {
             setRunning(true);
             this.startTime = System.currentTimeMillis();
             startDeathMatch();
             breakBeds();
-            activeGame.plugin.getServer().getPluginManager().registerEvents(dragonTargetListener, activeGame.plugin);
+            activeGame.getPlugin().getServer().getPluginManager().registerEvents(dragonTargetListener, activeGame.getPlugin());
         }, startAfter * 20L);
     }
 
     public void stop() {
         this.running = false;
-        if (task != null) task.cancel();
-        dragonTargetListener.getDragonPlayerMap().clear();
+        if (task != null) {
+            task.cancel();
+        }
+        dragonTargetListener.getDragonTeamsMap().clear();
         dragonTargetListener.unregister();
     }
 

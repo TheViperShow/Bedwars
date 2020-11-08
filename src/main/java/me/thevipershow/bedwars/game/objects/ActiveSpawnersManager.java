@@ -1,8 +1,6 @@
 package me.thevipershow.bedwars.game.objects;
 
 import java.util.HashSet;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
 import static me.thevipershow.bedwars.Bedwars.plugin;
@@ -10,11 +8,14 @@ import me.thevipershow.bedwars.bedwars.objects.spawners.SpawnerType;
 import me.thevipershow.bedwars.config.objects.Spawner;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.ActiveSpawner;
+import org.bukkit.Material;
 import org.bukkit.scheduler.BukkitTask;
 
-@Data
-@RequiredArgsConstructor
 public final class ActiveSpawnersManager {
+
+    public ActiveSpawnersManager(ActiveGame activeGame) {
+        this.activeGame = activeGame;
+    }
 
     private final ActiveGame activeGame;
 
@@ -56,5 +57,33 @@ public final class ActiveSpawnersManager {
 
     public final void cancelAnnouncements() {
         announcementsTasks.forEach(BukkitTask::cancel);
+    }
+
+    public ActiveGame getActiveGame() {
+        return activeGame;
+    }
+
+    public HashSet<ActiveSpawner> getActiveSpawners() {
+        return activeSpawners;
+    }
+
+    public HashSet<BukkitTask> getAnnouncementsTasks() {
+        return announcementsTasks;
+    }
+
+    public ActiveSpawner getEmeraldSampleSpawner() {
+        return emeraldSampleSpawner;
+    }
+
+    public void setEmeraldSampleSpawner(ActiveSpawner emeraldSampleSpawner) {
+        this.emeraldSampleSpawner = emeraldSampleSpawner;
+    }
+
+    public ActiveSpawner getDiamondSampleSpawner() {
+        return diamondSampleSpawner;
+    }
+
+    public void setDiamondSampleSpawner(ActiveSpawner diamondSampleSpawner) {
+        this.diamondSampleSpawner = diamondSampleSpawner;
     }
 }

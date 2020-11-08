@@ -13,13 +13,13 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+@Deprecated
 public final class PlayerQuitDuringGameListener extends UnregisterableListener {
-    private final ActiveGame activeGame;
-
-    public PlayerQuitDuringGameListener(final ActiveGame activeGame) {
-        this.activeGame = activeGame;
+    public PlayerQuitDuringGameListener(ActiveGame activeGame) {
+        super(activeGame);
     }
 
+    /*
     @EventHandler(ignoreCancelled = true)
     public void onPlayerQuit(final PlayerQuitEvent event) {
 
@@ -64,4 +64,6 @@ public final class PlayerQuitDuringGameListener extends UnregisterableListener {
             }
         }
     }
+
+     */
 }

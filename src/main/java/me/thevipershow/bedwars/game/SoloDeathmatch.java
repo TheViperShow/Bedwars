@@ -1,8 +1,11 @@
 package me.thevipershow.bedwars.game;
 
+import java.util.Map;
 import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
+import me.thevipershow.bedwars.game.objects.PlayerState;
+import me.thevipershow.bedwars.game.objects.TeamData;
 import org.bukkit.Sound;
 
 public final class SoloDeathmatch extends AbstractDeathmatch {
@@ -13,24 +16,22 @@ public final class SoloDeathmatch extends AbstractDeathmatch {
 
     @Override
     public void spawnEnderdragons() {
-        activeGame.getAssociatedQueue().perform(p -> {
-            p.sendMessage(Bedwars.PREFIX + AllStrings.DRAGONS_RELEASED.get());
-            p.playSound(p.getLocation(), Sound.ENDERDRAGON_GROWL, 8.4565f, 1.0f);
-        });
-        activeGame.getAssociatedQueue().perform(p -> {
-            if (!activeGame.getPlayersOutOfGame().contains(p)) {
-                final BedwarsTeam pTeam = activeGame.getPlayerTeam(p);
-                if (pTeam != null) {
-                    spawnDragon(pTeam);
+        for (Map.Entry<BedwarsTeam, ? extends TeamData<?>> entry : activeGame.getTeamManager().getDataMap().entrySet()) {
+            entry.getValue().perform(bedwarsPlayer -> {
+                bedwarsPlayer.sendMessage(Bedwars.PREFIX + AllStrings.DRAGONS_RELEASED.get());
+                bedwarsPlayer.playSound(Sound.ENDERDRAGON_GROWL, 8.5f, 1.0f);
+
+                if (bedwarsPlayer.getPlayerState() != PlayerState.DEAD) {
+                    spawnDragon(entry.getKey());
                 }
-            }
-        });
+            });
+        }
     }
 
     @Override
     public void startDeathMatch() {
         announceDeathmatch();
-        activeGame.plugin.getServer().getScheduler().runTaskLater(activeGame.plugin, () -> {
+        activeGame.getPlugin().getServer().getScheduler().runTaskLater(activeGame.getPlugin(), () -> {
             if (isRunning()) {
                 spawnEnderdragons();
             }

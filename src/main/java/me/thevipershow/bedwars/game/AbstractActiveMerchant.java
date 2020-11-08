@@ -50,32 +50,32 @@ public abstract class AbstractActiveMerchant {
     public void setupVillager() {
         if (isActive()) return;
 
-        final Location spawnAt = merchant.getMerchantPosition().toLocation(activeGame.associatedWorld);
+        final Location spawnAt = merchant.getMerchantPosition().toLocation(activeGame.getCachedGameData().getGame());
         if (!spawnAt.getWorld().isChunkLoaded(spawnAt.getChunk()))
             spawnAt.getWorld().loadChunk(spawnAt.getChunk());
 
-        this.villager = (Villager) activeGame.associatedWorld.spawnEntity(spawnAt, EntityType.VILLAGER);
+        this.villager = (Villager) activeGame.getCachedGameData().getGame().spawnEntity(spawnAt, EntityType.VILLAGER);
         villager.setCustomNameVisible(true);
         villager.setCustomName(this.merchant.getMerchantName());
         villager.setCanPickupItems(false);
         GameUtils.setAI(this.villager, false);
     }
 
-    public void spawn() {
+    public final void spawn() {
         setupVillager();
-        activeGame.activeMerchants.add(this);
     }
 
-    public void delete() {
-        if (isActive())
+    public final void delete() {
+        if (isActive()) {
             this.villager.remove();
+        }
     }
 
-    public Merchant getMerchant() {
+    public final Merchant getMerchant() {
         return merchant;
     }
 
-    public Villager getVillager() {
+    public final Villager getVillager() {
         return villager;
     }
 }

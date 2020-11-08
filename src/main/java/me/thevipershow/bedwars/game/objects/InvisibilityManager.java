@@ -1,38 +1,48 @@
 package me.thevipershow.bedwars.game.objects;
 
 import java.util.HashSet;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import java.util.Set;
 import me.thevipershow.bedwars.game.ActiveGame;
-import org.bukkit.entity.Player;
 
-@Getter
-@RequiredArgsConstructor
 public final class InvisibilityManager {
+
+    public InvisibilityManager(ActiveGame activeGame) {
+        this.activeGame = activeGame;
+    }
 
     private final ActiveGame activeGame;
 
-    private final HashSet<BedwarsPlayer> hiddenPlayers = new HashSet<>();
-
-    public final void hidePlayer(Player player) {
-        BedwarsPlayer bedwarsPlayer = activeGame.getTeamManager().get(player);
-        if (bedwarsPlayer != null && !hiddenPlayers.contains(bedwarsPlayer)) {
-            hiddenPlayers.add(bedwarsPlayer);
-            for (BedwarsPlayer gamePlayer : activeGame.getTeamManager().getGamePlayers()) {
-                if (!gamePlayer.getPlayer().equals(player) && gamePlayer.getBedwarsTeam() != bedwarsPlayer.getBedwarsTeam()) {
-                    gamePlayer.getPlayer().hidePlayer(player);
+    public final void hidePlayer(BedwarsPlayer player) {
+        for (TeamData<?> value : activeGame.getTeamManager().getDataMap().values()) {
+            value.perform(bedwarsPlayer -> {
+                if (bedwarsPlayer.equals(player)) {
+                    bedwarsPlayer.setHidden(true);
+                } else {
+                    bedwarsPlayer.getPlayer().hidePlayer(player.getPlayer());
                 }
-            }
+            });
         }
     }
 
-    public final void showPlayer(Player player) {
-        BedwarsPlayer bedwarsPlayer = activeGame.getTeamManager().get(player);
-        if (bedwarsPlayer != null && hiddenPlayers.contains(bedwarsPlayer)) {
-            hiddenPlayers.remove(bedwarsPlayer);
-            for (BedwarsPlayer gamePlayer : activeGame.getTeamManager().getGamePlayers()) {
-                gamePlayer.getPlayer().showPlayer(player);
+    public final void showPlayer(BedwarsPlayer player) {
+        for (TeamData<?> value : activeGame.getTeamManager().getDataMap().values()) {
+            value.perform(bedwarsPlayer -> {
+                if (bedwarsPlayer.equals(player)) {
+                    bedwarsPlayer.setHidden(false);
+                } else {
+                    bedwarsPlayer.getPlayer().showPlayer(player.getPlayer());
+                }
+            });
+        }
+    }
+
+    public final Set<BedwarsPlayer> getHiddenPlayers() {
+        final Set<BedwarsPlayer> set = new HashSet<>();
+        for (BedwarsPlayer value : activeGame.getInternalGameManager().getPlayerMapper().getMappings().values()) {
+            if (value.isHidden()) {
+                set.add(value);
             }
         }
+        return set;
     }
 }

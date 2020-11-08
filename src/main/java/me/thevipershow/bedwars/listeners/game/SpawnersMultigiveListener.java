@@ -13,13 +13,13 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 
+@Deprecated
 public final class SpawnersMultigiveListener extends UnregisterableListener {
-
-    private final ActiveGame activeGame;
-
-    public SpawnersMultigiveListener(final ActiveGame activeGame) {
-        this.activeGame = activeGame;
+    public SpawnersMultigiveListener(ActiveGame activeGame) {
+        super(activeGame);
     }
+
+    /*
 
     @EventHandler(ignoreCancelled = true)
     public final void onPlayerPickupItem(final PlayerPickupItemEvent event) {
@@ -50,4 +50,6 @@ public final class SpawnersMultigiveListener extends UnregisterableListener {
                 break;
         }
     }
+
+     */
 }

@@ -33,13 +33,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.util.Vector;
 
+@Deprecated
 public final class PlayerFireballInteractListener extends UnregisterableListener {
 
-    private final ActiveGame activeGame;
-
-    public PlayerFireballInteractListener(final ActiveGame activeGame) {
-        this.activeGame = activeGame;
+    public PlayerFireballInteractListener(ActiveGame activeGame) {
+        super(activeGame);
     }
+    /*
 
     static final class CustomFireball extends EntityLargeFireball {
 
@@ -98,5 +98,7 @@ public final class PlayerFireballInteractListener extends UnregisterableListener
             GameUtils.decreaseItemInHand(player);
         }
     }
+
+     */
 
 }

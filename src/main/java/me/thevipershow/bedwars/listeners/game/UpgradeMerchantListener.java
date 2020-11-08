@@ -10,14 +10,14 @@ import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 
+@Deprecated
 public final class UpgradeMerchantListener extends UnregisterableListener {
 
-    private final ActiveGame activeGame;
-
     public UpgradeMerchantListener(ActiveGame activeGame) {
-        this.activeGame = activeGame;
+        super(activeGame);
     }
 
+    /*
     @EventHandler(ignoreCancelled = true)
     public void onPlayerInteractEntity(final PlayerInteractEntityEvent event) {
         final Entity entity = event.getRightClicked();
@@ -44,4 +44,6 @@ public final class UpgradeMerchantListener extends UnregisterableListener {
             activeGame.openUpgrade(p);
         }
     }
+
+     */
 }
