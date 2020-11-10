@@ -14,9 +14,9 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.util.Vector;
 
-public final class QueueUnregisterableListener extends UnregisterableListener {
+public final class LobbyUnregisterableListener extends UnregisterableListener {
 
-    public QueueUnregisterableListener(ActiveGame activeGame) {
+    public LobbyUnregisterableListener(ActiveGame activeGame) {
         super(activeGame);
     }
 

@@ -16,11 +16,10 @@ public final class JoinCommand extends SubCommand {
     }
 
     private void joinGamemode(final Player player, final Gamemode gamemode) {
-        if (super.gameManager.getWorldsManager().getActiveGameList()
-                .stream()
+        if (super.gameManager.getWorldsManager().getActiveGameList().stream()
                 .flatMap(game -> game.getGameLobbyTicker().getAssociatedQueue().getInQueue().stream())
-                .noneMatch(p -> p.equals(player)))
-        {
+                .noneMatch(p -> p.getUniqueId().equals(player.getUniqueId()))) {
+
             final Optional<ActiveGame> opt = gameManager.findOptimalGame(gamemode);
             if (opt.isPresent()) {
                 final ActiveGame found = opt.get();

@@ -15,7 +15,7 @@ public enum AllStrings {
     SUBCOMMAND_ILLEGAL_EXECUTOR("You cannot execute this command from here."),
     SUBCOMMAND_MISSING_PERM("You do not have enough permissions."),
     SUBCOMMAND_WRONG_ARGS("Wrong number of args: "),
-    ATTEMPT_LOAD("attempt-load"),
+    ATTEMPT_LOAD("settings.attempt-load"),
 
     INVALID_GAMEMODE("Invalid gamemode named: \""),
     NOT_IN_QUEUE("You are not in any queue."),
@@ -37,6 +37,7 @@ public enum AllStrings {
     EXP_ADDED_MSG("§7If that player was present in the database, his exp increased by §6§l"),
     LAST_ARG_NOT_NUMBER("§7The last argument is not a number."),
     UNKNOWN_ARG("Unknown command argument \""),
+GAMEMODE("gamemode"),
 
     SET("set"),
     REMOVE("remove"),

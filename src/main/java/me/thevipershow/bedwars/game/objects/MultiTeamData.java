@@ -43,17 +43,14 @@ public final class MultiTeamData extends TeamData<Set<BedwarsPlayer>> {
     }
 
     @Override
-    public void updateStatusCharacter() {
+    public String getStatusCharacter() {
         switch (getStatus()) {
             case BED_EXISTS:
-                setStatusCharacter(AllStrings.GRAPHIC_TICK.get());
-                break;
+                return AllStrings.GRAPHIC_TICK.get();
             case BED_BROKEN:
-                setStatusCharacter("§f§l" + getData().size());
-                break;
+                return "§f§l" + getData().size();
             default:
-                setStatusCharacter(AllStrings.GRAPHIC_CROSS.get());
-                break;
+                return AllStrings.GRAPHIC_CROSS.get();
         }
     }
 }

@@ -6,18 +6,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 import me.thevipershow.bedwars.bedwars.Gamemode;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.bedwars.objects.spawners.SpawnerType;
 import me.thevipershow.bedwars.bedwars.spawner.SpawnerLevel;
 import me.thevipershow.bedwars.config.objects.BedwarsGame;
-import me.thevipershow.bedwars.config.objects.DuoBedwars;
 import me.thevipershow.bedwars.config.objects.Merchant;
-import me.thevipershow.bedwars.config.objects.QuadBedwars;
 import me.thevipershow.bedwars.config.objects.Shop;
 import me.thevipershow.bedwars.config.objects.ShopItem;
-import me.thevipershow.bedwars.config.objects.SoloBedwars;
 import me.thevipershow.bedwars.config.objects.Spawner;
 import me.thevipershow.bedwars.config.objects.TeamSpawnPosition;
 import me.thevipershow.bedwars.config.objects.UpgradeItem;
@@ -30,16 +26,13 @@ import me.thevipershow.bedwars.config.objects.upgradeshop.ReinforcedArmorUpgrade
 import me.thevipershow.bedwars.config.objects.upgradeshop.SharpnessUpgrade;
 import me.thevipershow.bedwars.config.objects.upgradeshop.TrapUpgrades;
 import me.thevipershow.bedwars.config.objects.upgradeshop.UpgradeShop;
-import me.thevipershow.bedwars.config.objects.upgradeshop.UpgradeType;
 import me.thevipershow.bedwars.config.objects.upgradeshop.traps.AlarmTrap;
 import me.thevipershow.bedwars.config.objects.upgradeshop.traps.BlindnessAndPoisonTrap;
 import me.thevipershow.bedwars.config.objects.upgradeshop.traps.CounterOffensiveTrap;
 import me.thevipershow.bedwars.config.objects.upgradeshop.traps.MinerFatigueTrap;
-import me.thevipershow.bedwars.game.objects.BedwarsPlayer;
 import me.thevipershow.bedwars.listeners.game.Slots;
 import net.minecraft.server.v1_8_R3.ChatMessage;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
-import net.minecraft.server.v1_8_R3.NBTTagCompound;
 import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
 import net.minecraft.server.v1_8_R3.PlayerConnection;
 import org.bukkit.Material;
@@ -49,8 +42,6 @@ import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -615,8 +606,8 @@ public final class GameUtils {
         return stack.stream().anyMatch(s -> s.getType() == material);
     }
 
-    public static ActiveGame from(final String associatedWorldName, final BedwarsGame game, final World lobbyWorld, final Plugin plugin) {
-        return new ActiveGame(associatedWorldName, game, lobbyWorld, plugin);
+    public static ActiveGame from(final World world, final BedwarsGame game, final World lobbyWorld, final Plugin plugin) {
+        return new ActiveGame(world, game, lobbyWorld, plugin);
     }
 
     public static void registerSerializers() {
@@ -635,15 +626,12 @@ public final class GameUtils {
         ConfigurationSerialization.registerClass(ShopItem.class);
         ConfigurationSerialization.registerClass(Shop.class);
         ConfigurationSerialization.registerClass(Merchant.class);
-        ConfigurationSerialization.registerClass(SoloBedwars.class);
         ConfigurationSerialization.registerClass(ShopItem.class);
         ConfigurationSerialization.registerClass(TeamSpawnPosition.class);
-        ConfigurationSerialization.registerClass(DuoBedwars.class);
         ConfigurationSerialization.registerClass(MinerFatigueTrap.class);
         ConfigurationSerialization.registerClass(BlindnessAndPoisonTrap.class);
         ConfigurationSerialization.registerClass(CounterOffensiveTrap.class);
         ConfigurationSerialization.registerClass(AlarmTrap.class);
         ConfigurationSerialization.registerClass(TrapUpgrades.class);
-        ConfigurationSerialization.registerClass(QuadBedwars.class);
     }
 }

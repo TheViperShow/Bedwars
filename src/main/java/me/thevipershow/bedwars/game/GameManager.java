@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import me.thevipershow.bedwars.bedwars.Gamemode;
-import me.thevipershow.bedwars.config.BedwarsGamemodeConfig;
+import me.thevipershow.bedwars.config.folders.BedwarsGameFactory;
 import me.thevipershow.bedwars.config.objects.BedwarsGame;
 import me.thevipershow.bedwars.events.ConnectToQueueEvent;
 import me.thevipershow.bedwars.events.LeaveQueueEvent;
@@ -14,34 +14,29 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public final class GameManager {
 
-    @SafeVarargs
     public GameManager(final JavaPlugin plugin,
                        final WorldsManager worldsManager,
-                       final BedwarsGamemodeConfig<? extends BedwarsGame>... configs) {
+                       final BedwarsGameFactory bedwarsGameFactory) {
         this.plugin = plugin;
         this.worldsManager = worldsManager;
-        for (final BedwarsGamemodeConfig<? extends BedwarsGame> config : configs) {
-            this.bedwarsGameSet.addAll(config.getBedwarsObjects());
-        }
+        this.bedwarsGameSet.addAll(bedwarsGameFactory.buildGameObjects());
     }
 
     private final JavaPlugin plugin;
     private final WorldsManager worldsManager;
     private final List<BedwarsGame> bedwarsGameSet = new ArrayList<>();
-    private boolean loading = false;
+    private volatile boolean loading = false;
 
     public void loadBaseAmount() {
         loading = true;
-        bedwarsGameSet
-                .stream()
-                .filter(b -> worldsManager.getConfigManager().getDefaultConfiguration().getAttemptLoad().contains(b.getGamemode()))
-                .forEach(bedwarsGame -> {
-            int count = 0;
-            while (count < bedwarsGame.getMinGames()) {
-                worldsManager.load(bedwarsGame);
-                count++;
+        final List<Gamemode> allowed = worldsManager.getConfigManager().getDefaultConfiguration().getAttemptLoad();
+        for (BedwarsGame bedwarsGame : bedwarsGameSet) {
+            if (allowed.contains(bedwarsGame.getGamemode())) {
+                for (int i = 0; i < bedwarsGame.getMinGames(); i++) {
+                    worldsManager.load(bedwarsGame);
+                }
             }
-        });
+        }
         loading = false;
     }
 
@@ -94,6 +89,7 @@ public final class GameManager {
                 queue.removeFromQueue(player);
                 plugin.getServer().getPluginManager().callEvent(leaveQueueEvent);
             }
+            b.getTeamManager().removePlayer(player);
         });
     }
 

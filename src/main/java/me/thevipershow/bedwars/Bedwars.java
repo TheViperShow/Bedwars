@@ -1,15 +1,16 @@
 package me.thevipershow.bedwars;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URISyntaxException;
 import me.thevipershow.bedwars.commands.BedwarsMainCommand;
-import me.thevipershow.bedwars.config.BedwarsGamemodeConfig;
 import me.thevipershow.bedwars.config.ConfigManager;
 import me.thevipershow.bedwars.config.DefaultConfiguration;
-import me.thevipershow.bedwars.config.DuoConfig;
-import me.thevipershow.bedwars.config.QuadConfig;
-import me.thevipershow.bedwars.config.SoloConfig;
-import me.thevipershow.bedwars.config.objects.DuoBedwars;
-import me.thevipershow.bedwars.config.objects.QuadBedwars;
-import me.thevipershow.bedwars.config.objects.SoloBedwars;
+import me.thevipershow.bedwars.config.folders.BedwarsGameFactory;
+import me.thevipershow.bedwars.config.folders.ConfigFiles;
+import me.thevipershow.bedwars.config.folders.ValidFoldersDiscoverer;
 import me.thevipershow.bedwars.game.GameManager;
 import me.thevipershow.bedwars.game.GameUtils;
 import me.thevipershow.bedwars.listeners.LevelUpListener;
@@ -21,6 +22,7 @@ import me.thevipershow.bedwars.storage.sql.Database;
 import me.thevipershow.bedwars.storage.sql.MySQLDatabase;
 import me.thevipershow.bedwars.worlds.WorldsManager;
 import me.tigerhix.lib.scoreboard.ScoreboardLib;
+import org.apache.commons.io.FileUtils;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
@@ -37,11 +39,10 @@ public final class Bedwars extends JavaPlugin {
     private GameManager gameManager = null;
     private Database database = null;
     private DefaultConfiguration defaultConfiguration = null;
-    // loading file configurations:
-    private BedwarsGamemodeConfig<SoloBedwars> soloConfig = null;
-    private BedwarsGamemodeConfig<DuoBedwars> duoConfig = null;
-    private BedwarsGamemodeConfig<QuadBedwars> quadConfig = null;
+
     private ConfigManager configManager = null;
+    private ValidFoldersDiscoverer validFoldersDiscoverer;
+    private BedwarsGameFactory bedwarsGameFactory;
 
     // Global Listeners section
     private Listener matchmakingVillagerListener = null;
@@ -59,6 +60,29 @@ public final class Bedwars extends JavaPlugin {
         }
     }
 
+    private void exportSampleFolder() {
+        try {
+            File output = new File(getDataFolder(), "sample-game");
+            if (!output.exists()) {
+                output.mkdir();
+            } else {
+                return;
+            }
+            for (ConfigFiles value : ConfigFiles.values()) {
+                File current = new File(output, value.getFilename());
+                if (!current.exists()) {
+                    current.createNewFile();
+                }
+                try (InputStream inputStream = getResource(value.getFilename())) {
+                    FileUtils.copyInputStreamToFile(inputStream, current);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //    plugin.saveResource("sample-game" + File.separatorChar, false);
+    }
+
     @Override
     public final void onLoad() {
         GameUtils.registerSerializers();
@@ -68,24 +92,21 @@ public final class Bedwars extends JavaPlugin {
     public final void onEnable() { // Plugin startup logic
         plugin = this;
         ScoreboardLib.setPluginInstance(this);                       // Setting the plugin instance for the ScoreboardLib
+
+        exportSampleFolder(); // saving sample-game folder if it didn't exist.
+
+        validFoldersDiscoverer = new ValidFoldersDiscoverer(this);
+        bedwarsGameFactory = new BedwarsGameFactory(validFoldersDiscoverer);
+
         defaultConfiguration = new DefaultConfiguration(this); // Instantiating new DefaultConfiguration
 
-        soloConfig = new SoloConfig(this); // Instantiating all configs:
-        soloConfig.saveDefaultConfig(); //saving them
-
-        duoConfig = new DuoConfig(this);
-        duoConfig.saveDefaultConfig();
-
-        quadConfig = new QuadConfig(this);
-        quadConfig.saveDefaultConfig();
-
-        configManager = new ConfigManager(defaultConfiguration, soloConfig, duoConfig, quadConfig);
+        configManager = new ConfigManager(defaultConfiguration);
 
         worldsManager = WorldsManager.getInstanceSafe(configManager, this);
         worldsManager.cleanPreviousDirs();
 
         database = new MySQLDatabase(this, defaultConfiguration);
-        gameManager = new GameManager(this, worldsManager, soloConfig, duoConfig, quadConfig);
+        gameManager = new GameManager(this, worldsManager, bedwarsGameFactory);
         gameManager.loadBaseAmount();
 
         final PluginCommand pluginCommand = getServer().getPluginCommand(AllStrings.MAIN_COMMAND.get());

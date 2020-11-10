@@ -17,9 +17,9 @@ public final class CachedGameData {
     private final Location cachedWaitingLocation, cachedServerSpawnLocation;
     private final Map<BedwarsTeam, SpawnPosition> cachedTeamSpawnPositions = new EnumMap<>(BedwarsTeam.class);
 
-    public CachedGameData(String gameFilename, World lobby, BedwarsGame bedwarsGame) {
+    public CachedGameData(World gameWorld, World lobby, BedwarsGame bedwarsGame) {
         this.lobby = Objects.requireNonNull(lobby, "A lobby world with that name could not be found!");
-        this.game = Objects.requireNonNull(Bukkit.getWorld(gameFilename), "The world for this game could not be found!");
+        this.game = Objects.requireNonNull(gameWorld, "The world for this game could not be found!");
         this.cachedWaitingLocation = bedwarsGame.getLobbySpawn().toLocation(this.game);
         this.cachedServerSpawnLocation = lobby.getSpawnLocation();
         for (TeamSpawnPosition mapSpawn : bedwarsGame.getMapSpawns()) {

@@ -29,7 +29,7 @@ import me.thevipershow.bedwars.listeners.game.SpectatorsInteractListener;
 import me.thevipershow.bedwars.listeners.game.TNTPlaceListener;
 import me.thevipershow.bedwars.listeners.game.UpgradeInteractListener;
 import me.thevipershow.bedwars.listeners.game.UpgradeMerchantListener;
-import me.thevipershow.bedwars.listeners.unregisterable.QueueUnregisterableListener;
+import me.thevipershow.bedwars.listeners.unregisterable.LobbyUnregisterableListener;
 
 public enum GameListener {
     BED_BREAK(BedBreakListener.class),
@@ -58,7 +58,7 @@ public enum GameListener {
     UPGRADE_MERCHANT(UpgradeMerchantListener.class),
 
     // The new listeners:;
-    QUEUE(QueueUnregisterableListener.class);
+    QUEUE(LobbyUnregisterableListener.class);
 
     private final Class<? extends UnregisterableListener> ownClass;
 

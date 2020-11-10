@@ -29,17 +29,14 @@ public final class SoloTeamData extends TeamData<BedwarsPlayer> {
     }
 
     @Override
-    public void updateStatusCharacter() {
+    public String getStatusCharacter() {
         switch (getStatus()) {
             case BED_EXISTS:
-                setStatusCharacter(AllStrings.GRAPHIC_TICK.get());
-                break;
+                return AllStrings.GRAPHIC_TICK.get();
             case BED_BROKEN:
-                setStatusCharacter("§f§l1");
-                break;
+                return "§f§l1";
             default:
-                setStatusCharacter(AllStrings.GRAPHIC_CROSS.get());
-                break;
+                return AllStrings.GRAPHIC_CROSS.get();
         }
     }
 }

@@ -8,6 +8,7 @@ import java.util.Map;
 import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
+import me.thevipershow.bedwars.game.AbstractDeathmatch;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.ActiveSpawner;
 import me.thevipershow.bedwars.game.GameUtils;
@@ -41,7 +42,7 @@ public final class ScoreboardManager {
         @Override
         public final List<Entry> getEntries(final Player player) {
             final EntryBuilder builder = new EntryBuilder();
-            builder.next("   " + LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE));
+            builder.next("  " + LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE));
             builder.blank();
 
             ActiveSpawner emeraldSample = activeGame.getActiveSpawnersManager().getEmeraldSampleSpawner();
@@ -54,11 +55,11 @@ public final class ScoreboardManager {
                 builder.blank();
             }
 
-            //if (abstractDeathmatch.isRunning()) {
-            //    builder.next(GameUtils.generateDeathmatch(abstractDeathmatch));
-            //    builder.next(GameUtils.generateDragons(abstractDeathmatch));
-            //}
-            // TODO: Reimplement^
+            AbstractDeathmatch deathmatch = activeGame.getAbstractDeathmatch();
+            if (deathmatch.isRunning()) {
+                builder.next(GameUtils.generateDeathmatch(deathmatch));
+                builder.next(GameUtils.generateDragons(deathmatch));
+            }
 
             for (BedwarsTeam team : activeGame.getTeamManager().getDataMap().keySet()) {
                 final String status = activeGame.getTeamManager().getDataMap().get(team).getStatusCharacter();
@@ -100,7 +101,7 @@ public final class ScoreboardManager {
             entry.getValue().perform(bedwarsPlayer -> {
                 final Scoreboard scoreboard = ScoreboardLib.createScoreboard(bedwarsPlayer.getPlayer());
                 scoreboard.setHandler(scoreboardHandler);
-                scoreboard.setUpdateInterval(5 * 20);
+                scoreboard.setUpdateInterval(20L);
                 scoreboardMap.put(bedwarsPlayer, scoreboard);
             });
         }

@@ -1,0 +1,40 @@
+map-spawns:
+  - x: -93.0 # Please set this <- SPAWN #1
+    y: 62.0 # Please set this
+    z: -37.0 # Please set this
+    team: "GREY"
+
+  - x: -93.0 # Please set this <- SPAWN #2
+    y: 62.0 # Please set this
+    z: 38.0 # Please set this
+    team: "PINK"
+
+  - x: 94.0 # Please set this <- SPAWN #3
+    y: 62.0 # Please set this
+    z: 38.0 # Please set this
+    team: "YELLOW"
+
+  - x: 94.0 # Please set this <- SPAWN #4
+    y: 62.0 # Please set this
+    z: -37.0 # Please set this
+    team: "GREEN"
+
+  - x: -37.0 # Please set this <- SPAWN #5
+    y: 62.0 # Please set this
+    z: -93.0 # Please set this
+    team: "RED"
+
+  - x: 38.0 # Please set this <- SPAWN #6
+    y: 62.0 # Please set this
+    z: -93.0 # Please set this
+    team: "BLUE"
+
+  - x: -37.0 # Please set this <- SPAWN #7
+    y: 62.0 # Please set this
+    z: 94.0 # Please set this
+    team: "WHITE"
+
+  - x: 38.0 # Please set this <- SPAWN #8
+    y: 62.0 # Please set this
+    z: 94.0 # Please set this
+    team: "CYAN"

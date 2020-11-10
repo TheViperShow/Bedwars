@@ -13,7 +13,6 @@ public abstract class TeamData<T> {
     }
 
     private T data;
-    private String statusCharacter;
     private TeamStatus status = TeamStatus.BED_EXISTS;
     private final Gamemode gamemode;
     private final PlayerMapper playerMapper;
@@ -23,8 +22,6 @@ public abstract class TeamData<T> {
     public abstract void perform(Consumer<? super BedwarsPlayer> consumer);
 
     public abstract Set<BedwarsPlayer> getAll();
-
-    public abstract void updateStatusCharacter();
 
     public final TeamStatus getStatus() {
         return status;
@@ -42,13 +39,7 @@ public abstract class TeamData<T> {
         return data;
     }
 
-    public final String getStatusCharacter() {
-        return statusCharacter;
-    }
-
-    public final void setStatusCharacter(String statusCharacter) {
-        this.statusCharacter = statusCharacter;
-    }
+    public abstract String getStatusCharacter();
 
     public final Gamemode getGamemode() {
         return gamemode;

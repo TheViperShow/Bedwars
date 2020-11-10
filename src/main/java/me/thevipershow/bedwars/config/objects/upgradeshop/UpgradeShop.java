@@ -1,6 +1,8 @@
 package me.thevipershow.bedwars.config.objects.upgradeshop;
 
 import java.util.Map;
+import me.thevipershow.bedwars.config.folders.files.AbstractFileConfig;
+import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import static me.thevipershow.bedwars.AllStrings.*;
 import sun.security.provider.SHA;
@@ -43,7 +45,9 @@ public final class UpgradeShop implements ConfigurationSerializable {
         final IronForgeUpgrade ironForgeUpgrade = IronForgeUpgrade.deserialize((Map<String, Object>) map.get(IRON_FORGE.get()));
         final HealPoolUpgrade healPoolUpgrade = HealPoolUpgrade.deserialize((Map<String, Object>) map.get(HEAL_POOL.get()));
         final DragonBuffUpgrade dragonBuffUpgrade = DragonBuffUpgrade.deserialize((Map<String, Object>) map.get(DRAGON_BUFF.get()));
-        final TrapUpgrades trapUpgrades = TrapUpgrades.deserialize((Map<String, Object>) map.get(TRAPS.get()));
+        final Object tU = map.get(TRAPS.get());
+        System.out.println(tU.toString());
+        final TrapUpgrades trapUpgrades = TrapUpgrades.deserialize(AbstractFileConfig.removeMemorySections((Map<String, Object>) tU));
         return new UpgradeShop(sharpnessUpgrade, reinforcedArmorUpgrade, maniacMinerUpgrade, ironForgeUpgrade, healPoolUpgrade, dragonBuffUpgrade, trapUpgrades, slots);
     }
 

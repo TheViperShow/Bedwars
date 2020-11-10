@@ -5,10 +5,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Logger;
 import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.LoggerUtils;
-import me.thevipershow.bedwars.config.BedwarsGamemodeConfig;
 import me.thevipershow.bedwars.config.ConfigManager;
 import me.thevipershow.bedwars.config.objects.BedwarsGame;
 import me.thevipershow.bedwars.game.ActiveGame;
@@ -56,7 +56,22 @@ public class WorldsManager {
     public final void cleanPreviousDirs() {
         final File[] filez = worldContainer.listFiles();
         assert filez != null;
-        if (filez.length == 0) return;
+        if (filez.length == 0) {
+            return;
+        }
+        for (BedwarsGame bedwarsGame : createdAmountsMap.keySet()) {
+            for (File file : filez) {
+                if (file.getName().contains(bedwarsGame.getMapFilename())) {
+                    try {
+                        FileUtils.deleteDirectory(file);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+
+        /*
         for (final BedwarsGamemodeConfig<? extends BedwarsGame> config : configManager.getConfigs()) {
             for (final BedwarsGame game : config.getBedwarsObjects()) {
                 for (final File file : filez) {
@@ -69,16 +84,39 @@ public class WorldsManager {
                     }
                 }
             }
-        }
+        }*/
     }
 
-    public final void load(final BedwarsGame game) {
+    public static boolean cleanWorldUUIDs(File worldFolder) {
+        if (!worldFolder.exists())
+            throw new RuntimeException("Map File source did not exist?");
+        if (!worldFolder.isDirectory())
+            throw new RuntimeException("Map File source was not a folder!");
+        for (final File file : worldFolder.listFiles()) {
+            if (file.getName().equals("uid.dat")) {
+                file.delete();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public final void load(BedwarsGame game) {
         final Logger log = plugin.getLogger();
         final String fileName = game.getMapFilename();
         final Integer i = createdAmountsMap.get(game);
-        final int currentInt = i == null ? 1 : i + 1;
+        final int currentInt = (i == null ? 1 : i + 1);
         final String tempName = fileName + "-" + currentInt;
-        final File sourceFile = new File(pluginFolder.getAbsolutePath(), game.getMapFilename());
+
+        if (plugin.getServer().getWorlds().stream().anyMatch(w -> w.getName().equals(tempName))) {
+            throw new RuntimeException("The plugin tried to load a world that already existed and was loaded -> " + tempName);
+        }
+
+        final File sourceFile = new File(game.getConfigurationFolder(), game.getMapFilename());
+
+        if (cleanWorldUUIDs(sourceFile)) {
+            LoggerUtils.logColor(log, "Bedwars has deleted uid.dat from " + game.getMapFilename() + " in order to prevent future copying issues!");
+        }
 
         if (!sourceFile.exists()) {
             LoggerUtils.logColor(log, String.format(AllStrings.COULD_NOT_FIND_WORLD_FOLDER.get(),  sourceFile.getAbsolutePath()));
@@ -93,15 +131,17 @@ public class WorldsManager {
 
         LoggerUtils.logColor(log, String.format(AllStrings.ATTEMPT_CREATE.get(), tempName));
 
-        final World w = WorldCreator.name(tempName)
-                .environment(World.Environment.NORMAL)
-                .generateStructures(false)
-                .type(WorldType.CUSTOMIZED)
-                .createWorld();
+        World w = Objects.requireNonNull(
+                WorldCreator.name(tempName)
+                        .environment(World.Environment.NORMAL)
+                        .generateStructures(false)
+                        .type(WorldType.CUSTOMIZED)
+                        .createWorld(),
+                "Something has went wrong during World creation for " + tempName);
 
         LoggerUtils.logColor(log, String.format(AllStrings.LOADING_ACTIVE_GAME.get(), tempName));
 
-        final ActiveGame activeGame = GameUtils.from(tempName, game, lobbyWorld, plugin);
+        final ActiveGame activeGame = GameUtils.from(w, game, lobbyWorld, plugin);
 
         if (w != null && copyResult) {
             LoggerUtils.logColor(log, String.format(AllStrings.SUCCESSFULLY_CREATED_ACTIVE_GAME.get(), tempName));
@@ -116,6 +156,7 @@ public class WorldsManager {
             LoggerUtils.logColor(log, String.format(AllStrings.SOMETHING_WENT_WRONG_DURING_CREATION.get(), tempName));
         }
 
+        activeGame.initialize(); // Initializing the game!
     }
 
     public World getLobbyWorld() {

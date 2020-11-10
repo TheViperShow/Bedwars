@@ -1,22 +1,37 @@
 package me.thevipershow.bedwars.game.objects;
 
-import me.thevipershow.bedwars.bedwars.Gamemode;
 import me.thevipershow.bedwars.config.objects.BedwarsGame;
 import me.thevipershow.bedwars.game.AbstractDeathmatch;
-import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.ExperienceManager;
 import me.thevipershow.bedwars.game.GameInventories;
 import me.thevipershow.bedwars.game.GameLobbyTicker;
-import me.thevipershow.bedwars.game.GameUtils;
 import me.thevipershow.bedwars.game.KillTracker;
 import me.thevipershow.bedwars.game.QuestManager;
 import me.thevipershow.bedwars.listeners.game.GameTrapTriggerer;
-import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
 
 public final class InternalGameManager {
 
-    public InternalGameManager(AbstractDeathmatch abstractDeathmatch, ExperienceManager experienceManager, QuestManager questManager, GameTrapTriggerer gameTrapTriggerer, KillTracker killTracker, GameInventories gameInventories, BedwarsGame bedwarsGame, TeamManager<?> teamManager, ListenersManager listenersManager, GameLobbyTicker gameLobbyTicker, Plugin plugin, CachedGameData cachedGameData, ActiveSpawnersManager activeSpawnersManager, MovementsManager movementsManager, InvisibilityManager invisibilityManager, PlayerMapper playerMapper, ScoreboardManager scoreboardManager, MerchantManager merchantManager, TrapsManager trapsManager, MapManager mapManager) {
+    public InternalGameManager(AbstractDeathmatch abstractDeathmatch,
+                               ExperienceManager experienceManager,
+                               QuestManager questManager,
+                               GameTrapTriggerer gameTrapTriggerer,
+                               KillTracker killTracker,
+                               GameInventories gameInventories,
+                               BedwarsGame bedwarsGame,
+                               TeamManager<?> teamManager,
+                               ListenersManager listenersManager,
+                               GameLobbyTicker gameLobbyTicker,
+                               Plugin plugin,
+                               CachedGameData cachedGameData,
+                               ActiveSpawnersManager activeSpawnersManager,
+                               MovementsManager movementsManager,
+                               InvisibilityManager invisibilityManager,
+                               PlayerMapper playerMapper,
+                               ScoreboardManager scoreboardManager,
+                               MerchantManager merchantManager,
+                               TrapsManager trapsManager,
+                               MapManager mapManager) {
         this.abstractDeathmatch = abstractDeathmatch;
         this.experienceManager = experienceManager;
         this.questManager = questManager;
@@ -83,31 +98,6 @@ public final class InternalGameManager {
     private final TrapsManager trapsManager;
     private final MapManager mapManager;
     //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-    public static InternalGameManager build(ActiveGame activeGame, String gameWorldFilename, BedwarsGame bedwarsGame, World lobbyWorld, Plugin plugin) {
-        final ExperienceManager experienceManager = new ExperienceManager(activeGame);
-        final Gamemode gamemode = bedwarsGame.getGamemode();
-        return new InternalGameManager(GameUtils.deathmatchFromGamemode(gamemode, activeGame),
-                experienceManager,
-                new QuestManager(experienceManager),
-                new GameTrapTriggerer(activeGame),
-                new KillTracker(activeGame),
-                new GameInventories(activeGame),
-                bedwarsGame,
-                gamemode == Gamemode.SOLO ? new SoloTeamManager(activeGame) : new MultiTeamManager(activeGame),
-                new ListenersManager(activeGame),
-                new GameLobbyTicker(activeGame),
-                plugin,
-                new CachedGameData(gameWorldFilename, lobbyWorld, bedwarsGame),
-                new ActiveSpawnersManager(activeGame),
-                new MovementsManager(activeGame),
-                new InvisibilityManager(activeGame),
-                new PlayerMapper(),
-                new ScoreboardManager(activeGame),
-                new MerchantManager(activeGame),
-                new TrapsManager(activeGame),
-                new MapManager(activeGame));
-    }
 
     public final MapManager getMapManager() {
         return mapManager;

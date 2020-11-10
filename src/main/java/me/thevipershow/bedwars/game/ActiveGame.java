@@ -1,22 +1,27 @@
 package me.thevipershow.bedwars.game;
 
+import java.util.Objects;
+import me.thevipershow.bedwars.bedwars.Gamemode;
 import me.thevipershow.bedwars.config.objects.BedwarsGame;
 import me.thevipershow.bedwars.game.objects.ActiveSpawnersManager;
 import me.thevipershow.bedwars.game.objects.CachedGameData;
 import me.thevipershow.bedwars.game.objects.GameListener;
 import me.thevipershow.bedwars.game.objects.InternalGameManager;
+import me.thevipershow.bedwars.game.objects.InvisibilityManager;
 import me.thevipershow.bedwars.game.objects.ListenersManager;
+import me.thevipershow.bedwars.game.objects.MapManager;
 import me.thevipershow.bedwars.game.objects.MerchantManager;
 import me.thevipershow.bedwars.game.objects.MovementsManager;
+import me.thevipershow.bedwars.game.objects.MultiTeamManager;
 import me.thevipershow.bedwars.game.objects.PlayerMapper;
 import me.thevipershow.bedwars.game.objects.ScoreboardManager;
+import me.thevipershow.bedwars.game.objects.SoloTeamManager;
 import me.thevipershow.bedwars.game.objects.TeamManager;
 import me.thevipershow.bedwars.game.objects.TrapsManager;
 import me.thevipershow.bedwars.listeners.game.GameTrapTriggerer;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitTask;
-import org.jetbrains.annotations.Contract;
 
 public final class ActiveGame {
 
@@ -27,9 +32,39 @@ public final class ActiveGame {
     private long startTime;
     // This game current state
     private ActiveGameState gameState = ActiveGameState.NONE;
+    // Other fields
+    private final BedwarsGame bedwarsGame;
+    private final World lobbyWorld;
+    private final World gameWorld;
+    private final Plugin plugin;
 
-    public ActiveGame(String gameWorldFilename, BedwarsGame bedwarsGame, World lobbyWorld, Plugin plugin) {
-        this.internalGameManager = InternalGameManager.build(this, gameWorldFilename, bedwarsGame, lobbyWorld, plugin);
+    public ActiveGame(World gameWorld, BedwarsGame bedwarsGame, World lobbyWorld, Plugin plugin) {
+        this.bedwarsGame = Objects.requireNonNull(bedwarsGame, "BedwarsGame was null during ActiveGame creation.");
+        this.plugin = Objects.requireNonNull(plugin, "Plugin was null during ActiveGame creation.");
+        this.lobbyWorld = Objects.requireNonNull(lobbyWorld, "lobby World was null during ActiveGame creation.");
+        this.gameWorld = Objects.requireNonNull(gameWorld, "game World was null during ActiveGame creation.");
+        ExperienceManager experienceManager = new ExperienceManager(this);
+        this.internalGameManager = new InternalGameManager(GameUtils.deathmatchFromGamemode(bedwarsGame.getGamemode(), this),
+                experienceManager,
+                new QuestManager(experienceManager),
+                new GameTrapTriggerer(this),
+                new KillTracker(this),
+                new GameInventories(this),
+                bedwarsGame,
+                bedwarsGame.getGamemode() == Gamemode.SOLO ? new SoloTeamManager(this) : new MultiTeamManager(this),
+                new ListenersManager(this),
+                new GameLobbyTicker(this),
+                plugin,
+                new CachedGameData(gameWorld, lobbyWorld, bedwarsGame),
+                new ActiveSpawnersManager(this),
+                new MovementsManager(this),
+                new InvisibilityManager(this),
+                new PlayerMapper(),
+                new ScoreboardManager(this),
+                new MerchantManager(this),
+                new TrapsManager(this),
+                new MapManager(this)
+        );
     }
 
     public final void initialize() {
@@ -55,13 +90,13 @@ public final class ActiveGame {
         getGameLobbyTicker().stopTicking(); // stop ticking.
 
         getPlayerMapper().addAll(getGameLobbyTicker().getAssociatedQueue().getInQueue()); // Assign mapping for players
-                                                                                          // and BedwarsPlayer objects.
+        // and BedwarsPlayer objects.
         getTeamManager().assignTeams(); // IMPORTANT:
-                                        // Teams must be assigned after the player mapper has been correctly
-                                        // filled with the players from the AbstractQueue.
+        // Teams must be assigned after the player mapper has been correctly
+        // filled with the players from the AbstractQueue.
 
         getTeamManager().updateBedwarsPlayersTeam(); // Updating the team field in each of the BedwarsPlayer objects
-                                                     // (we should rely on it as less as possible).
+        // (we should rely on it as less as possible).
 
         getActiveSpawnersManager().createAnnouncements(); // Creating update announcements.
         getActiveSpawnersManager().spawnAll(); // Spawn all spawners
@@ -81,7 +116,10 @@ public final class ActiveGame {
         getActiveSpawnersManager().cancelAnnouncements();
         getMovementsManager().moveAllSpawn();
 
-        try { finalize(); } catch (Throwable ignored) { }
+        try {
+            finalize();
+        } catch (Throwable ignored) {
+        }
     }
 
     /*---------------------------------------------------------------------------------------------------------------*/
@@ -143,7 +181,7 @@ public final class ActiveGame {
     }
 
     public final BedwarsGame getBedwarsGame() {
-        return internalGameManager.getBedwarsGame();
+        return this.bedwarsGame;
     }
 
     public final TeamManager<?> getTeamManager() {
@@ -159,7 +197,7 @@ public final class ActiveGame {
     }
 
     public final Plugin getPlugin() {
-        return internalGameManager.getPlugin();
+        return this.plugin;
     }
 
     public final CachedGameData getCachedGameData() {
