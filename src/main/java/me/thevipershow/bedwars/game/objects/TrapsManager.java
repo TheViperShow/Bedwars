@@ -16,7 +16,10 @@ public final class TrapsManager {
     }
 
     private final Map<BedwarsTeam, LinkedList<ActiveTrap>> activeTraps = new EnumMap<>(BedwarsTeam.class);
+
     private final Map<BedwarsTeam, Long> trapsActivationTime = new EnumMap<>(BedwarsTeam.class);
+
+    /*---------------------------------------------------------------------------------------------------------*/
 
     public final Map<BedwarsTeam, LinkedList<ActiveTrap>> getActiveTraps() {
         return activeTraps;

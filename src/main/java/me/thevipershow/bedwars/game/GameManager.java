@@ -56,8 +56,12 @@ public final class GameManager {
         ActiveGame bestGame = null;
 
         for (final ActiveGame game : worldsManager.getActiveGameList()) {
-            if (game.getBedwarsGame().getGamemode() != gamemode) continue;
-            if (game.isHasStarted()) continue;
+            if (game.getBedwarsGame().getGamemode() != gamemode) {
+                continue;
+            }
+            if (game.getGameState() == ActiveGameState.STARTED) {
+                continue;
+            }
             final AbstractQueue<Player> queue = game.getGameLobbyTicker().getAssociatedQueue();
             final int newDiff = game.getBedwarsGame().getPlayers() - queue.queueSize();
             if (diff == null) {
@@ -74,9 +78,11 @@ public final class GameManager {
 
     public final void addToQueue(final Player player, final ActiveGame activeGame) {
         final AbstractQueue<Player> queue = activeGame.getGameLobbyTicker().getAssociatedQueue();
-        final ConnectToQueueEvent event = new ConnectToQueueEvent(activeGame);
+        final ConnectToQueueEvent event = new ConnectToQueueEvent(activeGame, player);
         plugin.getServer().getPluginManager().callEvent(event);
-        if (event.isCancelled()) return;
+        if (event.isCancelled()) {
+            return;
+        }
         activeGame.getMovementsManager().moveToWaitingRoom(player);
         queue.addToQueue(player);
     }
@@ -85,7 +91,7 @@ public final class GameManager {
         worldsManager.getActiveGameList().forEach(b -> {
             final AbstractQueue<Player> queue = b.getGameLobbyTicker().getAssociatedQueue();
             if (queue.contains(player)) {
-                final LeaveQueueEvent leaveQueueEvent = new LeaveQueueEvent(b);
+                final LeaveQueueEvent leaveQueueEvent = new LeaveQueueEvent(b, player);
                 queue.removeFromQueue(player);
                 plugin.getServer().getPluginManager().callEvent(leaveQueueEvent);
             }

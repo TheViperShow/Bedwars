@@ -24,12 +24,12 @@ public final class SoloTeamData extends TeamData<BedwarsPlayer> {
     }
 
     @Override
-    public Set<BedwarsPlayer> getAll() {
+    public final Set<BedwarsPlayer> getAll() {
         return Collections.singleton(getData());
     }
 
     @Override
-    public String getStatusCharacter() {
+    public final String getStatusCharacter() {
         switch (getStatus()) {
             case BED_EXISTS:
                 return AllStrings.GRAPHIC_TICK.get();

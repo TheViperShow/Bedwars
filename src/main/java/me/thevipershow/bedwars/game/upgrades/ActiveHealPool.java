@@ -72,11 +72,11 @@ public final class ActiveHealPool {
             this.target = target;
             this.plugin = plugin;
             this.w = target.getWorld();
-            final Location startingLocation = target.getLocation().add(0, 0.15, 0);
+            final Location startingLocation = target.getLocation().add(0.00, 0.15, 0.00);
             final LinkedList<Location> locations = new LinkedList<>();
             double increaseY = 0.00d;
 
-            for (double d = 0d; d < 360d; d += 12.0, increaseY += 0.0625325) {
+            for (double d = 0d; d < 360d; d += 12.0, increaseY += 0.062532) {
                 final Location modified = new Location(w,
                         (startingLocation.getX() + (radius * Math.sin(d))),
                         increaseY + startingLocation.getY(),

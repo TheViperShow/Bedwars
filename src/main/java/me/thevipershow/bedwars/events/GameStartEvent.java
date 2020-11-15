@@ -6,16 +6,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
 
-public class GameStartEvent extends Event implements Cancellable {
+public class GameStartEvent extends ActiveGameEvent implements Cancellable {
     private boolean isCancelled = false;
     public static final HandlerList handlerList = new HandlerList();
-    private final AbstractQueue<Player> matchmakingQueue;
-    private final ActiveGame activeGame;
 
-    public GameStartEvent(ActiveGame activeGame) {
-        this.matchmakingQueue = activeGame.getGameLobbyTicker().getAssociatedQueue();
-        this.activeGame = activeGame;
+    public GameStartEvent(@NotNull ActiveGame activeGame) {
+        super(activeGame);
     }
 
     /**
@@ -49,11 +47,4 @@ public class GameStartEvent extends Event implements Cancellable {
         return handlerList;
     }
 
-    public AbstractQueue<Player> getMatchmakingQueue() {
-        return matchmakingQueue;
-    }
-
-    public ActiveGame getActiveGame() {
-        return activeGame;
-    }
 }

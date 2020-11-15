@@ -1,13 +1,10 @@
 package me.thevipershow.bedwars.game;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import me.thevipershow.bedwars.events.BedwarsLevelUpEvent;
-import me.thevipershow.bedwars.game.objects.PlayerState;
 import me.thevipershow.bedwars.game.objects.TeamData;
 import me.thevipershow.bedwars.storage.sql.tables.RankTableUtils;
 import org.bukkit.entity.Player;
@@ -102,16 +99,9 @@ public final class ExperienceManager {
     private void rewardAllPlayingPlayers(final int experience) {
         for (TeamData<?> value : activeGame.getTeamManager().getDataMap().values()) {
             value.perform(bedwarsPlayer -> {
-
+                rewardPlayer(experience, bedwarsPlayer.getPlayer(), this.activeGame);
             });
         }
-        /*for (final List<Player> value : activeGame.getAssignedTeams().values()) {
-            for (final Player player : value) {
-                if (player.isOnline()) {
-                    rewardPlayer(experience, player, this.activeGame);
-                }
-            }
-        }*/
     }
 
     public final void startRewardTask() {

@@ -51,35 +51,53 @@ public final class UpgradeShop implements ConfigurationSerializable {
         return new UpgradeShop(sharpnessUpgrade, reinforcedArmorUpgrade, maniacMinerUpgrade, ironForgeUpgrade, healPoolUpgrade, dragonBuffUpgrade, trapUpgrades, slots);
     }
 
-    public SharpnessUpgrade getSharpnessUpgrade() {
+    public final SharpnessUpgrade getSharpnessUpgrade() {
         return sharpnessUpgrade;
     }
 
-    public ReinforcedArmorUpgrade getReinforcedArmorUpgrade() {
+    public final ReinforcedArmorUpgrade getReinforcedArmorUpgrade() {
         return reinforcedArmorUpgrade;
     }
 
-    public ManiacMinerUpgrade getManiacMinerUpgrade() {
+    public final ManiacMinerUpgrade getManiacMinerUpgrade() {
         return maniacMinerUpgrade;
     }
 
-    public IronForgeUpgrade getIronForgeUpgrade() {
+    public final IronForgeUpgrade getIronForgeUpgrade() {
         return ironForgeUpgrade;
     }
 
-    public HealPoolUpgrade getHealPoolUpgrade() {
+    public final HealPoolUpgrade getHealPoolUpgrade() {
         return healPoolUpgrade;
     }
 
-    public DragonBuffUpgrade getDragonBuffUpgrade() {
+    public final DragonBuffUpgrade getDragonBuffUpgrade() {
         return dragonBuffUpgrade;
     }
 
-    public int getSlots() {
+    public final int getSlots() {
         return slots;
     }
 
-    public TrapUpgrades getTrapUpgrades() {
+    public final TrapUpgrades getTrapUpgrades() {
         return trapUpgrades;
+    }
+
+    public final <T extends Upgrade> T getUpgrade(UpgradeType upgradeType) {
+        switch (upgradeType) {
+            case HEAL_POOL:
+                return (T) this.healPoolUpgrade;
+            case SHARPNESS:
+                return (T) this.sharpnessUpgrade;
+            case IRON_FORGE:
+                return (T) this.ironForgeUpgrade;
+            case DRAGON_BUFF:
+                return (T) this.dragonBuffUpgrade;
+            case MANIAC_MINER:
+                return (T) this.maniacMinerUpgrade;
+            case REINFORCED_ARMOR:
+                return (T) this.reinforcedArmorUpgrade;
+        }
+        return null;
     }
 }

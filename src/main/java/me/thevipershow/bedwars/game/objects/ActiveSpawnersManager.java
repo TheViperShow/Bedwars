@@ -1,13 +1,22 @@
 package me.thevipershow.bedwars.game.objects;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import java.util.Collection;
+import java.util.EnumMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
 import static me.thevipershow.bedwars.Bedwars.plugin;
+import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.bedwars.objects.spawners.SpawnerType;
+import me.thevipershow.bedwars.config.objects.SpawnPosition;
 import me.thevipershow.bedwars.config.objects.Spawner;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.ActiveSpawner;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -21,6 +30,7 @@ public final class ActiveSpawnersManager {
 
     private final HashSet<ActiveSpawner> activeSpawners = new HashSet<>();
     private final HashSet<BukkitTask> announcementsTasks = new HashSet<>();
+    private final HashSet<BukkitTask> emeraldBoostsTasks = new HashSet<>();
     private ActiveSpawner emeraldSampleSpawner, diamondSampleSpawner;
 
     public final void addSpawners() {
@@ -63,27 +73,58 @@ public final class ActiveSpawnersManager {
         return activeGame;
     }
 
-    public HashSet<ActiveSpawner> getActiveSpawners() {
+    private final Map<BedwarsTeam, Collection<ActiveSpawner>> cachedTeamSpawners = new EnumMap<>(BedwarsTeam.class);
+
+    public final Collection<ActiveSpawner> getTeamSpawners(BedwarsTeam bedwarsTeam) {
+        if (cachedTeamSpawners.containsKey(bedwarsTeam)) {
+            return cachedTeamSpawners.get(bedwarsTeam);
+        } else {
+            ActiveSpawner nearestGold = findNearest(bedwarsTeam, SpawnerType.GOLD), nearestIron = findNearest(bedwarsTeam, SpawnerType.IRON);
+            final Set<ActiveSpawner> set = ImmutableSet.of(nearestIron, nearestGold);
+            this.cachedTeamSpawners.put(bedwarsTeam, set);
+            return set;
+        }
+    }
+
+    public ActiveSpawner findNearest(BedwarsTeam bedwarsTeam, SpawnerType spawnerType) {
+        ActiveSpawner nearest = null;
+        final SpawnPosition spawnLoc = activeGame.getCachedGameData().getCachedTeamSpawnPositions().get(bedwarsTeam);
+        double lastDistance = 0D;
+        for (final ActiveSpawner activeSpawner : this.activeSpawners) {
+            final double tempSquaredDistance = activeSpawner.getSpawner().getSpawnPosition().squaredDistance(spawnLoc);
+            if (nearest == null || tempSquaredDistance < lastDistance) {
+                nearest = activeSpawner;
+                lastDistance = tempSquaredDistance;
+            }
+        }
+        return nearest;
+    }
+
+    public final HashSet<ActiveSpawner> getActiveSpawners() {
         return activeSpawners;
     }
 
-    public HashSet<BukkitTask> getAnnouncementsTasks() {
+    public final HashSet<BukkitTask> getAnnouncementsTasks() {
         return announcementsTasks;
     }
 
-    public ActiveSpawner getEmeraldSampleSpawner() {
+    public final ActiveSpawner getEmeraldSampleSpawner() {
         return emeraldSampleSpawner;
     }
 
-    public void setEmeraldSampleSpawner(ActiveSpawner emeraldSampleSpawner) {
+    public final void setEmeraldSampleSpawner(ActiveSpawner emeraldSampleSpawner) {
         this.emeraldSampleSpawner = emeraldSampleSpawner;
     }
 
-    public ActiveSpawner getDiamondSampleSpawner() {
+    public final ActiveSpawner getDiamondSampleSpawner() {
         return diamondSampleSpawner;
     }
 
-    public void setDiamondSampleSpawner(ActiveSpawner diamondSampleSpawner) {
+    public final HashSet<BukkitTask> getEmeraldBoostsTasks() {
+        return emeraldBoostsTasks;
+    }
+
+    public final void setDiamondSampleSpawner(ActiveSpawner diamondSampleSpawner) {
         this.diamondSampleSpawner = diamondSampleSpawner;
     }
 }

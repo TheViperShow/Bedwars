@@ -4,6 +4,7 @@ import java.util.Objects;
 import me.thevipershow.bedwars.bedwars.Gamemode;
 import me.thevipershow.bedwars.config.objects.BedwarsGame;
 import me.thevipershow.bedwars.game.objects.ActiveSpawnersManager;
+import me.thevipershow.bedwars.game.objects.BedDestroyer;
 import me.thevipershow.bedwars.game.objects.CachedGameData;
 import me.thevipershow.bedwars.game.objects.GameListener;
 import me.thevipershow.bedwars.game.objects.InternalGameManager;
@@ -18,16 +19,14 @@ import me.thevipershow.bedwars.game.objects.ScoreboardManager;
 import me.thevipershow.bedwars.game.objects.SoloTeamManager;
 import me.thevipershow.bedwars.game.objects.TeamManager;
 import me.thevipershow.bedwars.game.objects.TrapsManager;
+import me.thevipershow.bedwars.game.objects.UpgradesManager;
 import me.thevipershow.bedwars.listeners.game.GameTrapTriggerer;
-import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
 
 public final class ActiveGame {
 
     private final InternalGameManager internalGameManager;
-    // This fields indicates if the game has effectively started or not
-    private boolean hasStarted = false;
     // the time the game started at
     private long startTime;
     // This game current state
@@ -63,14 +62,15 @@ public final class ActiveGame {
                 new ScoreboardManager(this),
                 new MerchantManager(this),
                 new TrapsManager(this),
-                new MapManager(this)
-        );
+                new MapManager(this),
+                new BedDestroyer(this),
+                new UpgradesManager(this));
     }
 
     public final void initialize() {
         setGameState(ActiveGameState.INITIALIZING); // setting game state to initializing.
 
-        getListenersManager().enableListeners(GameListener.QUEUE); // registering map and movement protection.
+        getListenersManager().enableAllByPhase(GameListener.RegistrationStage.INITIALIZATION); // registering map and movement protection.
         // other listeners are not required before start of game!
         getGameLobbyTicker().startTicking(); // starting to tick,
 
@@ -84,32 +84,39 @@ public final class ActiveGame {
 
         startTime = System.currentTimeMillis();
 
-        getListenersManager().disableListener(GameListener.QUEUE); // removing queue listener; not required.
-        getListenersManager().enableAllListeners();
+        getListenersManager().disableAllByPhase(GameListener.RegistrationStage.INITIALIZATION); // removing queue listener; not required.
+        getListenersManager().enableAllByPhase(GameListener.RegistrationStage.STARTUP);
 
         getGameLobbyTicker().stopTicking(); // stop ticking.
 
         getPlayerMapper().addAll(getGameLobbyTicker().getAssociatedQueue().getInQueue()); // Assign mapping for players
-        // and BedwarsPlayer objects.
+                                                                                          // and BedwarsPlayer objects.
         getTeamManager().assignTeams(); // IMPORTANT:
-        // Teams must be assigned after the player mapper has been correctly
-        // filled with the players from the AbstractQueue.
+                                        // Teams must be assigned after the player mapper has been correctly
+                                        // filled with the players from the AbstractQueue.
+
+        getBedDestroyer().destroyInactiveBeds(); // removing all beds that are not assigned from the map
+
+        getGameInventories().assignPlayerShop(); // assigning a shop to each player
+
+        getTrapsManager().fillTraps();      // filling traps list, we made sure teams are already assigned
+        getTrapsManager().fillTrapsDelay(); // filling the last activation time
 
         getTeamManager().updateBedwarsPlayersTeam(); // Updating the team field in each of the BedwarsPlayer objects
-        // (we should rely on it as less as possible).
+                                                     // (we should rely on it as less as possible).
 
         getActiveSpawnersManager().createAnnouncements(); // Creating update announcements.
-        getActiveSpawnersManager().spawnAll(); // Spawn all spawners
+        getActiveSpawnersManager().spawnAll();            // Spawn all spawners
 
         getMerchantManager().createAll(); // First creating all AbstractMerchants
-        getMerchantManager().spawnAll(); // then spawning them in the game
+        getMerchantManager().spawnAll();  // then spawning them in the game
 
         getScoreboardManager().assignScoreboards(); // first we assign all,
         getScoreboardManager().activateAll();       // then we activate them.
 
-        getAbstractDeathmatch().start(); // starting the deathmatch
+        getAbstractDeathmatch().start();            // starting the deathmatch
 
-        getMovementsManager().moveToSpawnpoints(); // Ideally we want everything to get generated before teleporting.
+        getMovementsManager().moveToSpawnpoints();  // Ideally we want everything to get generated before teleporting.
     }
 
     public final void stop() {
@@ -123,6 +130,12 @@ public final class ActiveGame {
     }
 
     /*---------------------------------------------------------------------------------------------------------------*/
+
+    public final UpgradesManager getUpgradesManager() { return internalGameManager.getUpgradesManager();}
+
+    public final BedDestroyer getBedDestroyer() {
+        return internalGameManager.getBedDestroyer();
+    }
 
     public final long getStartTime() {
         return startTime;
@@ -148,16 +161,8 @@ public final class ActiveGame {
         return internalGameManager.getAbstractDeathmatch();
     }
 
-    public final boolean isHasStarted() {
-        return hasStarted;
-    }
-
     public final void setGameState(ActiveGameState gameState) {
         this.gameState = gameState;
-    }
-
-    public final void setHasStarted(boolean hasStarted) {
-        this.hasStarted = hasStarted;
     }
 
     public final ExperienceManager getExperienceManager() {

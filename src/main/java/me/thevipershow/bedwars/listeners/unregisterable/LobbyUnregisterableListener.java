@@ -1,6 +1,7 @@
 package me.thevipershow.bedwars.listeners.unregisterable;
 
 import me.thevipershow.bedwars.game.ActiveGame;
+import me.thevipershow.bedwars.game.ActiveGameState;
 import me.thevipershow.bedwars.listeners.UnregisterableListener;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -23,7 +24,7 @@ public final class LobbyUnregisterableListener extends UnregisterableListener {
     @EventHandler(ignoreCancelled = true)
     public final void onBlockBreak(BlockBreakEvent event) {
         Block block = event.getBlock();
-        if (!activeGame.isHasStarted() && block.getWorld().equals(activeGame.getCachedGameData().getGame())) {
+        if (activeGame.getGameState() == ActiveGameState.QUEUE && block.getWorld().equals(activeGame.getCachedGameData().getGame())) {
             event.setCancelled(true);
         }
     }
@@ -31,7 +32,7 @@ public final class LobbyUnregisterableListener extends UnregisterableListener {
     @EventHandler(ignoreCancelled = true)
     public final void onBlockPlace(BlockPlaceEvent event) {
         Block block = event.getBlock();
-        if (!activeGame.isHasStarted() && block.getWorld().equals(activeGame.getCachedGameData().getGame())) {
+        if (activeGame.getGameState() == ActiveGameState.QUEUE && block.getWorld().equals(activeGame.getCachedGameData().getGame())) {
             event.setCancelled(true);
         }
     }
@@ -39,7 +40,7 @@ public final class LobbyUnregisterableListener extends UnregisterableListener {
     @EventHandler(ignoreCancelled = true)
     public final void onEntityDamageByEntity(EntityDamageEvent event) {
         Entity damaged = event.getEntity();
-        if (!activeGame.isHasStarted() && damaged.getWorld().equals(activeGame.getCachedGameData().getGame())) {
+        if (activeGame.getGameState() == ActiveGameState.QUEUE && damaged.getWorld().equals(activeGame.getCachedGameData().getGame())) {
             event.setCancelled(true);
         }
     }
@@ -47,8 +48,9 @@ public final class LobbyUnregisterableListener extends UnregisterableListener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
     public final void onPlayerMove(PlayerMoveEvent event) {
         final double y = event.getTo().getY();
-        if (y < 0.0 && (!activeGame.isHasStarted() && event.getTo().getWorld().equals(activeGame.getCachedGameData().getGame()))) {
+        if (y < 0 && (activeGame.getGameState() == ActiveGameState.QUEUE && event.getTo().getWorld().equals(activeGame.getCachedGameData().getGame()))) {
             event.setCancelled(true);
+            event.getPlayer().setVelocity(new Vector(0,0,0));
             event.getPlayer().teleport(activeGame.getCachedGameData().getCachedWaitingLocation());
         }
     }

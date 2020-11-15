@@ -2,24 +2,29 @@ package me.thevipershow.bedwars.events;
 
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.game.ActiveGame;
+import me.thevipershow.bedwars.game.objects.BedwarsPlayer;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
 
-public final class TeamBedDestroyEvent extends Event implements Cancellable {
+public final class TeamBedDestroyEvent extends ActiveGameEvent implements Cancellable {
     private boolean isCancelled = false;
     public static final HandlerList handlerList = new HandlerList();
 
-    private final ActiveGame activeGame;
-    private final BedwarsTeam team;
+    private final BedwarsTeam destroyedTeam;
+    private final BedwarsPlayer destroyer;
 
     /**
-     * The default constructor is defined for cleaner code. This constructor
-     * assumes the event is synchronous.
+     * Event for when a Bed gets broken during Bedwars game.
+     * @param activeGame The ActiveGame instance of the running game.
+     * @param team The team whose bed has been broken.
+     * @param destroyer The BedwarsPlayer that has broken this bed.
      */
-    public TeamBedDestroyEvent(final ActiveGame activeGame, final BedwarsTeam team) {
-        this.activeGame = activeGame;
-        this.team = team;
+    public TeamBedDestroyEvent(@NotNull ActiveGame activeGame, @NotNull BedwarsTeam team, @NotNull BedwarsPlayer destroyer) {
+        super(activeGame);
+        this.destroyedTeam = team;
+        this.destroyer = destroyer;
     }
 
     /**
@@ -49,15 +54,17 @@ public final class TeamBedDestroyEvent extends Event implements Cancellable {
         return handlerList;
     }
 
+    @NotNull
+    public final BedwarsPlayer getDestroyer() {
+        return destroyer;
+    }
+
     public static HandlerList getHandlerList() {
         return handlerList;
     }
 
-    public ActiveGame getActiveGame() {
-        return activeGame;
-    }
-
-    public BedwarsTeam getTeam() {
-        return team;
+    @NotNull
+    public final BedwarsTeam getDestroyedTeam() {
+        return destroyedTeam;
     }
 }

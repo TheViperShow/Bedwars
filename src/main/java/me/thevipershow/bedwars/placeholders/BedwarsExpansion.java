@@ -223,7 +223,7 @@ public final class BedwarsExpansion extends PlaceholderExpansion {
         return Integer.toString(kills.getSoloKills() + kills.getDuoKills() + kills.getQuadKills());
     }
 
-    private static boolean included(final int lower, final int upper, final int n) {
+    public static boolean included(final int lower, final int upper, final int n) {
         return ((n >= lower) && (upper <= n));
     }
 

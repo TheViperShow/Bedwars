@@ -20,7 +20,7 @@ public final class GameLobbyTicker extends AbstractLobbyTicker {
 
     public void startTicking() {
         this.gameStarterTask = activeGame.getPlugin().getServer().getScheduler().runTaskTimer(activeGame.getPlugin(), () -> {
-            if (activeGame.isHasStarted()) {
+            if (activeGame.getGameState() == ActiveGameState.STARTED) {
                 stopTicking();
             } else if (associatedQueue.queueSize() < activeGame.getBedwarsGame().getMinPlayers()) {
                 missingTime = activeGame.getBedwarsGame().getStartTimer();

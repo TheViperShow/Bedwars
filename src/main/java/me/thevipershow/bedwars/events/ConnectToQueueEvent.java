@@ -6,21 +6,27 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
 
-public class ConnectToQueueEvent extends Event implements Cancellable {
+/**
+ * This event represents a connection to a game's queue.
+ * An online player is always involved in it.
+ */
+public final class ConnectToQueueEvent extends ActiveGameEvent implements Cancellable {
 
-    private boolean isCancelled = false;
     public static final HandlerList handlerList = new HandlerList();
     private final AbstractQueue<Player> matchmakingQueue;
-    private final ActiveGame activeGame;
+    private final Player connected;
+    private boolean isCancelled = false;
 
     /**
      * The default constructor is defined for cleaner code. This constructor
      * assumes the event is synchronous.
      */
-    public ConnectToQueueEvent(final ActiveGame activeGame) {
+    public ConnectToQueueEvent(@NotNull ActiveGame activeGame, @NotNull Player connected) {
+        super(activeGame);
+        this.connected = connected;
         this.matchmakingQueue = activeGame.getGameLobbyTicker().getAssociatedQueue();
-        this.activeGame = activeGame;
     }
 
     /**
@@ -54,11 +60,13 @@ public class ConnectToQueueEvent extends Event implements Cancellable {
         return handlerList;
     }
 
+    @NotNull
     public AbstractQueue<Player> getMatchmakingQueue() {
         return matchmakingQueue;
     }
 
-    public ActiveGame getActiveGame() {
-        return activeGame;
+    @NotNull
+    public final Player getConnected() {
+        return connected;
     }
 }

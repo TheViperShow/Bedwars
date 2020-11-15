@@ -12,26 +12,7 @@ import org.bukkit.plugin.Plugin;
 
 public final class InternalGameManager {
 
-    public InternalGameManager(AbstractDeathmatch abstractDeathmatch,
-                               ExperienceManager experienceManager,
-                               QuestManager questManager,
-                               GameTrapTriggerer gameTrapTriggerer,
-                               KillTracker killTracker,
-                               GameInventories gameInventories,
-                               BedwarsGame bedwarsGame,
-                               TeamManager<?> teamManager,
-                               ListenersManager listenersManager,
-                               GameLobbyTicker gameLobbyTicker,
-                               Plugin plugin,
-                               CachedGameData cachedGameData,
-                               ActiveSpawnersManager activeSpawnersManager,
-                               MovementsManager movementsManager,
-                               InvisibilityManager invisibilityManager,
-                               PlayerMapper playerMapper,
-                               ScoreboardManager scoreboardManager,
-                               MerchantManager merchantManager,
-                               TrapsManager trapsManager,
-                               MapManager mapManager) {
+    public InternalGameManager(AbstractDeathmatch abstractDeathmatch, ExperienceManager experienceManager, QuestManager questManager, GameTrapTriggerer gameTrapTriggerer, KillTracker killTracker, GameInventories gameInventories, BedwarsGame bedwarsGame, TeamManager<?> teamManager, ListenersManager listenersManager, GameLobbyTicker gameLobbyTicker, Plugin plugin, CachedGameData cachedGameData, ActiveSpawnersManager activeSpawnersManager, MovementsManager movementsManager, InvisibilityManager invisibilityManager, PlayerMapper playerMapper, ScoreboardManager scoreboardManager, MerchantManager merchantManager, TrapsManager trapsManager, MapManager mapManager, BedDestroyer bedDestroyer, UpgradesManager upgradesManager) {
         this.abstractDeathmatch = abstractDeathmatch;
         this.experienceManager = experienceManager;
         this.questManager = questManager;
@@ -52,6 +33,8 @@ public final class InternalGameManager {
         this.merchantManager = merchantManager;
         this.trapsManager = trapsManager;
         this.mapManager = mapManager;
+        this.bedDestroyer = bedDestroyer;
+        this.upgradesManager = upgradesManager;
     }
 
     //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -97,7 +80,18 @@ public final class InternalGameManager {
     private final MerchantManager merchantManager;
     private final TrapsManager trapsManager;
     private final MapManager mapManager;
+    private final BedDestroyer bedDestroyer;
+    private final UpgradesManager upgradesManager;
     //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+    public final UpgradesManager getUpgradesManager() {
+        return upgradesManager;
+    }
+
+    public final BedDestroyer getBedDestroyer() {
+        return bedDestroyer;
+    }
 
     public final MapManager getMapManager() {
         return mapManager;

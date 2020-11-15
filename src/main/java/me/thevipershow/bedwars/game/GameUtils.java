@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import me.thevipershow.bedwars.AllStrings;
+import me.thevipershow.bedwars.Bedwars;
 import me.thevipershow.bedwars.bedwars.Gamemode;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.bedwars.objects.spawners.SpawnerType;
@@ -30,11 +32,13 @@ import me.thevipershow.bedwars.config.objects.upgradeshop.traps.AlarmTrap;
 import me.thevipershow.bedwars.config.objects.upgradeshop.traps.BlindnessAndPoisonTrap;
 import me.thevipershow.bedwars.config.objects.upgradeshop.traps.CounterOffensiveTrap;
 import me.thevipershow.bedwars.config.objects.upgradeshop.traps.MinerFatigueTrap;
+import me.thevipershow.bedwars.game.objects.BedwarsPlayer;
 import me.thevipershow.bedwars.listeners.game.Slots;
 import net.minecraft.server.v1_8_R3.ChatMessage;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
 import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
 import net.minecraft.server.v1_8_R3.PlayerConnection;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -44,12 +48,14 @@ import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.NotNull;
 
 public final class GameUtils {
     public final static String NO_AI_TAG = "NoAi";
@@ -186,57 +192,67 @@ public final class GameUtils {
         return false;
     }
 
-    public static PacketPlayOutChat killActionBar(final ActiveGame activeGame, final Player killed) {
-        final BedwarsTeam killedTeam = activeGame.getPlayerMapper().get(killed).getBedwarsTeam();
-        final IChatBaseComponent iChatBaseComponent = new ChatMessage(
-                "§e⚔ You killed player §" + killedTeam.getColorCode() + killed.getName() + " §r§e⚔"
-        );
+
+    public static String color(String msg) {
+        return ChatColor.translateAlternateColorCodes('&', msg);
+    }
+
+    /**
+     * Generate a kill action bar.
+     * @param activeGame The ActiveGame that the player is playing in.
+     * @param killed The BedwarsPlayer that has been killed.
+     * @return The Packet for the ActionBar.
+     */
+    public static PacketPlayOutChat killActionBar(ActiveGame activeGame, BedwarsPlayer killed) {
+        final BedwarsTeam killedTeam = killed.getBedwarsTeam();
+        final IChatBaseComponent iChatBaseComponent = new ChatMessage(color("&e⚔ You killed player &" + killedTeam.getColorCode() + killed.getName() + " &r&e⚔"));
         return new PacketPlayOutChat(iChatBaseComponent, (byte) 0x02);
     }
 
-    public static void sendKillActionBar(final ActiveGame activeGame, final Player killer, final Player killed) {
-        final PlayerConnection conn = getPlayerConnection(killer);
+    /**
+     * Send the predefined action bar for Bedwars kills.
+     * @param activeGame The ActiveGame where the kill has happened.
+     * @param killer The BedwarsPlayer who performed this kill.
+     * @param killed The BedwarsPlayer who has been killed.
+     */
+    public static void sendKillActionBar(ActiveGame activeGame, BedwarsPlayer killer, BedwarsPlayer killed) {
+        final PlayerConnection conn = getPlayerConnection(killer.getPlayer());
         conn.sendPacket(killActionBar(activeGame, killed));
     }
 
-    /*
-    public static void clearInvExceptArmorAndTools(final Player player, final ActiveGame game) {
-        final PlayerInventory inv = player.getInventory();
-        final ItemStack[] contents = inv.getContents();
-
-        for (int i = 0; i < contents.length; i++) {
-            final ItemStack stack = contents[i];
-            if (stack == null) {
-                continue;
-            } else if (stack.getType().name().endsWith("_SWORD")) { // Checking if player has sword
-                if (stack.getType() != Material.WOOD_SWORD) {
-                    final Map<Enchantment, Integer> availableEnchs = stack.getEnchantments();
-                    if (availableEnchs.isEmpty()) {
-                        inv.setItem(i, new ItemStack(Material.WOOD_SWORD, 1));
-                    } else {
-                        final ItemStack es = new ItemStack(Material.WOOD_SWORD, 1);
-                        es.addEnchantments(availableEnchs);
-                        inv.setItem(i, es);
-                    }
-                }
-                continue;
-            } else if (game.getBedwarsGame().getShop().getUpgradeItems()
-                    .stream()
-                    .flatMap(shop -> shop.getLevels().stream())
-                    .anyMatch(lvl -> lvl.getCachedGameStack().isSimilar(stack))) {
-                continue;
-            }
-            inv.setItem(i, null);
-        }
-
-        game.downgradePlayerTools(player);
-
-        final int enchantLvl = game.getUpgradesLevelsMap().get(UpgradeType.SHARPNESS).get(game.getPlayerTeam(player));
-        if (enchantLvl != 0) {
-            GameUtils.enchantSwords(Enchantment.DAMAGE_ALL, enchantLvl, player); // Adding enchant if he has the Upgrade.
-        }
+    /**
+     * This is the predefined sound that gets played after a kill.
+     * @param bedwarsPlayer The player who will hear the sound.
+     */
+    public static void sendKillSound(BedwarsPlayer bedwarsPlayer) {
+        bedwarsPlayer.playSound(Sound.NOTE_PLING, 9.0f, 0.805f);
     }
-    */
+
+    /**
+     * Generate a death message when for a BedwarsPlayer that has not been killed by an entity.
+     * @param cause The DamageCause.
+     * @param dead The BedwarsPlayer that has did.
+     * @return The String associated with his kind of death.
+     */
+    @NotNull
+    public static String generateDeathMessage(EntityDamageEvent.DamageCause cause, BedwarsPlayer dead) {
+        final StringBuilder builder = new StringBuilder(color(String.format("&%c%s &7", dead.getBedwarsTeam().getColorCode(), dead.getName())));
+        switch (cause) {
+            case VOID:
+                builder.append("has &ointentionally&r&7 voided");
+                break;
+            case FALL:
+                builder.append("has fallen to death");
+                break;
+            case SUFFOCATION:
+                builder.append("forgot how to breathe");
+                break;
+            default:
+                builder.append("has died in a mysterious way");
+                break;
+        }
+        return builder.toString();
+    }
 
     public static void giveStackToPlayer(final ItemStack itemStack, final Player player, final ItemStack[] contents) {
         final PlayerInventory inv = player.getInventory();
@@ -426,30 +442,30 @@ public final class GameUtils {
     public static String generateDeathmatch(final AbstractDeathmatch abstractDeathmatch) {
         final long t = abstractDeathmatch.timeUntilDeathmatch();
         if (t < 0) {
-            return "§6§lDEATHMATCH §r§7(§fStarted§7)";
+            return color("&6&lDEATHMATCH &r&7(&fStarted&7)");
         }
-        return "§6§lDEATHMATCH §r§7in §e" + t + "§7s";
+        return color("&6&lDEATHMATCH &r&7in &e" + t + "&7s");
     }
 
     public static String generateDragons(final AbstractDeathmatch abstractDeathmatch) {
         final long t = abstractDeathmatch.timeUntilDeathmatch();
         if (t < 0) {
-            return "§5§lDRAGONS §r§7(§fReleased§7)";
+            return color("&5&lDRAGONS &r&7(&fReleased&7)");
         }
-        return "§5§lDRAGONS §r§7in §e" + t + "§7s";
+        return color("&5&lDRAGONS &r&7in &e" + t + "&7s");
     }
 
     public static String generateScoreboardMissingTimeSpawners(final ActiveSpawner activeSpawner) {
         final SpawnerType type = activeSpawner.getType();
         final StringBuilder str = new StringBuilder();
         if (type == SpawnerType.DIAMOND) {
-            str.append("§b");
+            str.append(ChatColor.BLUE);
         } else if (type == SpawnerType.EMERALD) {
-            str.append("§a");
+            str.append(ChatColor.GREEN);
         } else if (type == SpawnerType.GOLD) {
-            str.append("§e");
+            str.append(ChatColor.GOLD);
         } else {
-            str.append("§f");
+            str.append(ChatColor.WHITE);
         }
 
         str.append(type.name());
@@ -457,12 +473,9 @@ public final class GameUtils {
         final long timeLeft = activeSpawner.getTimeUntilNextLevel();
 
         if (timeLeft == -1L) {
-            str.append(" §7Spawner (§eMax Lvl.§7)");
+            str.append(color(" &7Spawner (&eMax Lvl.&7)"));
         } else {
-            str.append(" §7Lvl. §e")
-                    .append(toRoman(1 + activeSpawner.getCurrentLevel().getLevel()))
-                    .append(" §7in §e").append(timeLeft)
-                    .append("§7s");
+            str.append(color(" &7Lvl. &e")).append(toRoman(1 + activeSpawner.getCurrentLevel().getLevel())).append(ChatColor.GRAY + " in " + ChatColor.YELLOW).append(timeLeft).append(ChatColor.GRAY + "s");
         }
         return str.toString();
     }
@@ -608,6 +621,41 @@ public final class GameUtils {
 
     public static ActiveGame from(final World world, final BedwarsGame game, final World lobbyWorld, final Plugin plugin) {
         return new ActiveGame(world, game, lobbyWorld, plugin);
+    }
+
+    public static void payMaterial(Material material, int amount, Inventory inventory) {
+        Map<Integer, ? extends ItemStack> map = inventory.all(material);
+        if (!map.isEmpty()) {
+            int collected = 0x00;
+            for (Map.Entry<Integer, ? extends ItemStack> entry : map.entrySet()) {
+                int slot = entry.getKey();
+                ItemStack stack = entry.getValue();
+                int stackAmount = stack.getAmount();
+                int toTake = Math.min(stackAmount, amount - collected);
+                if (toTake == stackAmount) {
+                    inventory.setItem(slot, null);
+                } else {
+                    stack.setAmount(stackAmount - toTake);
+                }
+                collected += toTake;
+                if (collected >= amount) {
+                    return;
+                }
+            }
+        }
+    }
+
+    public static boolean pay(Player player, Inventory playerInventory, Material buyWith, int price, String successMsg, String failMsg) {
+        if (playerInventory.contains(buyWith, price)) {
+            GameUtils.payMaterial(buyWith, price, playerInventory);
+            GameUtils.paySound(player);
+            player.sendMessage(successMsg);
+            return true;
+        } else {
+            GameUtils.buyFailSound(player);
+            player.sendMessage(failMsg);
+            return false;
+        }
     }
 
     public static void registerSerializers() {

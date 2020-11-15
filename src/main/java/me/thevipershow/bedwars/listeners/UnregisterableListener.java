@@ -21,6 +21,11 @@ public abstract class UnregisterableListener implements Listener {
 
         HandlerList.unregisterAll(this);
         isUnregistered = true;
+        try {
+            finalize();
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean isUnregistered() {

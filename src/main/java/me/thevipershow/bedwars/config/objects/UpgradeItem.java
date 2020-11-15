@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import me.thevipershow.bedwars.AllStrings;
+import me.thevipershow.bedwars.game.ActiveGame;
+import me.thevipershow.bedwars.game.objects.BedwarsPlayer;
+import me.thevipershow.bedwars.game.objects.TeamData;
 import me.thevipershow.bedwars.game.shop.ShopCategory;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
@@ -30,7 +33,7 @@ public final class UpgradeItem implements ConfigurationSerializable {
         final int slot = (int) map.get(AllStrings.SLOT.get());
         final int amount = (int) map.get(AllStrings.AMOUNT.get());
         final List<Map<String, Object>> levels = (List<Map<String, Object>>) map.get(AllStrings.LEVELS.get());
-        final List<UpgradeLevel> levels_ = levels.stream().map(lvl -> UpgradeLevel.deserialize(lvl)).collect(Collectors.toList());
+        final List<UpgradeLevel> levels_ = levels.stream().map(UpgradeLevel::deserialize).collect(Collectors.toList());
         final ShopCategory shopCategory = ShopCategory.valueOf((String) map.get(AllStrings.SHOP_CATEGORY.get()));
         return new UpgradeItem(slot, amount, shopCategory, levels_);
     }

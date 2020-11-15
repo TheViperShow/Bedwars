@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.UUID;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.game.ActiveGame;
+import me.thevipershow.bedwars.game.ActiveGameState;
 import me.thevipershow.bedwars.listeners.UnregisterableListener;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.EnderDragon;
@@ -30,7 +31,7 @@ public final class DragonRedirectorListener extends UnregisterableListener {
         if (!(event.getTarget() instanceof Player)) {
             return;
         }
-        if (!activeGame.isHasStarted()) {
+        if (activeGame.getGameState() != ActiveGameState.STARTED) {
             return;
         }
         Player target = (Player) event.getTarget();

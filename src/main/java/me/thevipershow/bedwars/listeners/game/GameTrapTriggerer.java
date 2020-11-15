@@ -33,7 +33,6 @@ public final class GameTrapTriggerer {
 
         task = activeGame.getPlugin().getServer().getScheduler().runTaskTimer(activeGame.getPlugin(), () -> {
 
-
             teamLabel:
             for (final Map.Entry<BedwarsTeam, LinkedList<ActiveTrap>> teamActiveTraps : activeGame.getTrapsManager().getActiveTraps().entrySet()) {
                 final LinkedList<ActiveTrap> traps = teamActiveTraps.getValue();  // Getting all active traps lists
@@ -75,7 +74,7 @@ public final class GameTrapTriggerer {
                                         continue;         // when player is immune
                                     }
 
-                                    final TrapTriggerEvent trapTriggerEvent = new TrapTriggerEvent(bedwarsPlayer, traps.getFirst(), trapTeamOwner);
+                                    final TrapTriggerEvent trapTriggerEvent = new TrapTriggerEvent(activeGame, bedwarsPlayer, traps.getFirst(), trapTeamOwner);
                                     activeGame.getPlugin().getServer().getPluginManager().callEvent(trapTriggerEvent);
                                     if (trapTriggerEvent.isCancelled()) {
                                         return;

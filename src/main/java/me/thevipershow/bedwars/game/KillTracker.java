@@ -24,6 +24,7 @@ public final class KillTracker {
 
     private final HashMap<UUID, Integer> killsMap = new HashMap<>();
     private final HashMap<UUID, Integer> finalKillsMap = new HashMap<>();
+    private final HashMap<UUID, UUID> placedTNTMap = new HashMap<>();
 
     public final void increaseKillsCounter(final Player player) {
         if (killsMap.containsKey(player.getUniqueId())) {
@@ -41,14 +42,15 @@ public final class KillTracker {
         }
     }
 
-    public final void announceTopThreeScores() {
+    public final HashMap<UUID, UUID> getPlacedTNTMap() {
+        return placedTNTMap;
+    }
 
+    public final void announceTopThreeScores() {
         final List<Map.Entry<UUID, Integer>> s = new ArrayList<>(killsMap.entrySet()).stream().sorted(Comparator.comparingInt(Map.Entry::getValue)).collect(Collectors.toList());
         final List<Map.Entry<UUID, Integer>> s_ = new ArrayList<>(finalKillsMap.entrySet()).stream().sorted(Comparator.comparingInt(Map.Entry::getValue)).collect(Collectors.toList());
-
         final List<String> sMessage = s.stream().map(v -> "      §e" + activeGame.getPlugin().getServer().getOfflinePlayer(v.getKey()).getName() + " §7killed §6" + v.getValue() + " §7players.").collect(Collectors.toList());
         final List<String> s_Message = s.stream().map(v -> "      §e" + activeGame.getPlugin().getServer().getOfflinePlayer(v.getKey()).getName() + " §7final killed §6" + v.getValue() + " §7players.").collect(Collectors.toList());
-
         for (TeamData<?> value : activeGame.getTeamManager().getDataMap().values()) {
             value.perform(bedwarsPlayer -> {
                 if (!sMessage.isEmpty()) {
@@ -59,38 +61,6 @@ public final class KillTracker {
                 }
             });
         }
-
-        /*
-        activeGame.getAssociatedWorld().getPlayers().forEach(p -> {
-            if (!this.killsMap.isEmpty()) {
-                p.sendMessage(Bedwars.PREFIX + AllStrings.TOP_3_KILL.get());
-                final Iterator<Map.Entry<UUID, Integer>> killIterator = s.iterator();
-                while (count.getAndIncrement() < 3) {
-                    if (killIterator.hasNext()) {
-                        final Map.Entry<UUID, Integer> next = killIterator.next();
-                        p.sendMessage("      §e" + activeGame.getPlugin().getServer().getOfflinePlayer(next.getKey()).getName() + " §7killed §6" + next.getValue() + " §7players.");
-                    } else {
-                        break;
-                    }
-                }
-            }
-
-            if (!this.finalKillsMap.isEmpty()) {
-                count.set(0x00);
-                p.sendMessage(Bedwars.PREFIX + AllStrings.TOP_3_FINAL_KILL.get());
-                final Iterator<Map.Entry<UUID, Integer>> finalKillsIterator = s_.iterator();
-                while (count.getAndIncrement() < 3) {
-                    if (finalKillsIterator.hasNext()) {
-                        final Map.Entry<UUID, Integer> next = finalKillsIterator.next();
-                        p.sendMessage("      §e" + activeGame.getPlugin().getServer().getOfflinePlayer(next.getKey()).getName() + " §7final killed §6" + next.getValue() + " §7players.");
-                    } else {
-                        break;
-                    }
-                }
-            }
-        });
-
-         */
     }
 
     public final Integer getKills(final UUID uuid) {

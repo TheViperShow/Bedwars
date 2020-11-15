@@ -30,7 +30,7 @@ public final class BedwarsGame {
     protected final Set<TeamSpawnPosition> mapSpawns;
     protected final List<Spawner> spawners;
     protected final List<Merchant> merchants;
-    protected final List<SpawnPosition> bedSpawnPositions;
+    protected final List<TeamSpawnPosition> bedSpawnPositions;
     protected final Shop shop;
     protected final UpgradeShop upgradeShop;
     protected final int startTimer;
@@ -97,7 +97,7 @@ public final class BedwarsGame {
             final Gamemode gamemode, final int minGames, final int maxGames,
             final int minPlayers, final int players, final List<BedwarsTeam> teams,
             final SpawnPosition lobbySpawn, final String mapFilename, final Set<TeamSpawnPosition> mapSpawns,
-            final List<Spawner> spawners, final List<Merchant> merchants, final List<SpawnPosition> bedSpawnPositions,
+            final List<Spawner> spawners, final List<Merchant> merchants, final List<TeamSpawnPosition> bedSpawnPositions,
             final Shop shop, final UpgradeShop upgradeShop, final int startTimer,
             final int deathmatchStart, final int tntFuse, final SpawnPosition spawnProtection, File configurationFolder) {
         this.gamemode = gamemode;
@@ -186,7 +186,7 @@ public final class BedwarsGame {
         return startTimer;
     }
 
-    public final List<SpawnPosition> getBedSpawnPositions() {
+    public final List<TeamSpawnPosition> getBedSpawnPositions() {
         return bedSpawnPositions;
     }
 

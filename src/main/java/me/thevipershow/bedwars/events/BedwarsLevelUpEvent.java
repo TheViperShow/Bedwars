@@ -5,21 +5,21 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
 
-public final class BedwarsLevelUpEvent extends Event implements Cancellable {
+public final class BedwarsLevelUpEvent extends ActiveGameEvent implements Cancellable {
 
     private boolean cancel = false;
     public static HandlerList handler = new HandlerList();
 
     private final Player player;
     private final int oldLevel, newLevel;
-    private final ActiveGame playingIn;
 
-    public BedwarsLevelUpEvent(final Player player, final int oldLevel, final int newLevel, final ActiveGame playingIn) {
+    public BedwarsLevelUpEvent(@NotNull Player player, int oldLevel, int newLevel, @NotNull ActiveGame activeGame) {
+        super(activeGame);
         this.player = player;
         this.oldLevel = oldLevel;
         this.newLevel = newLevel;
-        this.playingIn = playingIn;
     }
 
     @Override
@@ -45,6 +45,7 @@ public final class BedwarsLevelUpEvent extends Event implements Cancellable {
         return cancel;
     }
 
+    @NotNull
     public final Player getPlayer() {
         return player;
     }
@@ -55,9 +56,5 @@ public final class BedwarsLevelUpEvent extends Event implements Cancellable {
 
     public final int getNewLevel() {
         return newLevel;
-    }
-
-    public final ActiveGame getPlayingIn() {
-        return playingIn;
     }
 }

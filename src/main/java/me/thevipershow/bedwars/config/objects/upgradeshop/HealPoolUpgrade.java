@@ -3,10 +3,11 @@ package me.thevipershow.bedwars.config.objects.upgradeshop;
 import java.util.Map;
 import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.config.objects.ShopItem;
+import me.thevipershow.bedwars.config.objects.upgradeshop.traps.ShopUpgrade;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
 public final class
-HealPoolUpgrade implements ConfigurationSerializable , Upgrade {
+HealPoolUpgrade implements ConfigurationSerializable , ShopUpgrade {
 
     @Override
     public Map<String, Object> serialize() {
@@ -32,7 +33,8 @@ HealPoolUpgrade implements ConfigurationSerializable , Upgrade {
         return new HealPoolUpgrade(ShopItem.deserialize(map), healRadius, healFrequency, healAmount);
     }
 
-    public final ShopItem getItem() {
+    @Override
+    public final ShopItem getShopItem() {
         return item;
     }
 
@@ -51,5 +53,15 @@ HealPoolUpgrade implements ConfigurationSerializable , Upgrade {
     @Override
     public final UpgradeType getType() {
         return UpgradeType.HEAL_POOL;
+    }
+
+    @Override
+    public final boolean hasStages() {
+        return false;
+    }
+
+    @Override
+    public final int getSlot() {
+        return this.item.getSlot();
     }
 }

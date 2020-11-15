@@ -1,21 +1,23 @@
 package me.thevipershow.bedwars.game.objects;
 
 import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.config.objects.BedwarsGame;
 import me.thevipershow.bedwars.config.objects.SpawnPosition;
 import me.thevipershow.bedwars.config.objects.TeamSpawnPosition;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 
 public final class CachedGameData {
 
     private final World lobby, game;
     private final Location cachedWaitingLocation, cachedServerSpawnLocation;
     private final Map<BedwarsTeam, SpawnPosition> cachedTeamSpawnPositions = new EnumMap<>(BedwarsTeam.class);
+    private final HashSet<Block> cachedPlacedBlocks = new HashSet<>();
 
     public CachedGameData(World gameWorld, World lobby, BedwarsGame bedwarsGame) {
         this.lobby = Objects.requireNonNull(lobby, "A lobby world with that name could not be found!");
@@ -33,6 +35,10 @@ public final class CachedGameData {
 
     public final World getGame() {
         return game;
+    }
+
+    public final HashSet<Block> getCachedPlacedBlocks() {
+        return cachedPlacedBlocks;
     }
 
     public final Map<BedwarsTeam, SpawnPosition> getCachedTeamSpawnPositions() {

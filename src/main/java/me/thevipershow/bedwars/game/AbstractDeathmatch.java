@@ -7,6 +7,7 @@ import me.thevipershow.bedwars.Bedwars;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.config.objects.SpawnPosition;
 import me.thevipershow.bedwars.config.objects.upgradeshop.UpgradeType;
+import me.thevipershow.bedwars.game.objects.TeamData;
 import me.thevipershow.bedwars.listeners.game.DragonTargetListener;
 import me.thevipershow.bedwars.listeners.unregisterable.DragonRedirectorListener;
 import org.bukkit.Location;
@@ -34,15 +35,24 @@ public abstract class AbstractDeathmatch {
         this.dragonTargetListener = new DragonRedirectorListener(activeGame);
     }
 
-    // TODO: Reimplement !
-    //public final int numberOfDragonsToSpawn(final BedwarsTeam team) {
-    //    final Map<BedwarsTeam, Integer> m = this.activeGame.getUpgradesLevelsMap().get(UpgradeType.DRAGON_BUFF);
-    //    final Integer i = Objects.requireNonNull(m.get(team));
-    //    return i == 0 ? 1 : 2;
-    //}
+    public final int numberOfDragonsToSpawn(final BedwarsTeam team) {
+        for (Map.Entry<BedwarsTeam, ? extends TeamData<?>> entry : activeGame.getTeamManager().getDataMap().entrySet()) {
+            BedwarsTeam b = entry.getKey();
+            TeamData<?> data = entry.getValue();
+            if (b != team) {
+                continue;
+            }
+            if (data.getUpgradeLevel(UpgradeType.DRAGON_BUFF) == 0) {
+                return 1;
+            } else {
+                return 2;
+            }
+        }
+        return 1;
+    }
 
     public final void spawnDragon(final BedwarsTeam bedwarsTeam) {
-        final int toSpawn = 1; // numberOfDragonsToSpawn(bedwarsTeam);
+        final int toSpawn = numberOfDragonsToSpawn(bedwarsTeam);
         int spawned = 0;
         while (spawned < toSpawn) {
             final SpawnPosition teamSpawn = activeGame.getBedwarsGame().spawnPosOfTeam(bedwarsTeam);
@@ -98,15 +108,15 @@ public abstract class AbstractDeathmatch {
     }
 
     public final long timeUntilDeathmatch() {
-        if (activeGame.isHasStarted()) {
-            return ((activeGame.getStartTime() / 1000L) + startAfter)  - (System.currentTimeMillis() / 1000L);
+        if (activeGame.getGameState() == ActiveGameState.STARTED) {
+            return ((activeGame.getStartTime() / 1000L) + startAfter) - (System.currentTimeMillis() / 1000L);
         }
         return -1L;
     }
 
     public final long timeUntilDragons() {
-        if (activeGame.isHasStarted()) {
-            return ((activeGame.getStartTime() / 1000L) + startAfter + 600)  - (System.currentTimeMillis() / 1000L);
+        if (activeGame.getGameState() == ActiveGameState.STARTED) {
+            return ((activeGame.getStartTime() / 1000L) + startAfter + 600) - (System.currentTimeMillis() / 1000L);
         }
         return -1L;
     }

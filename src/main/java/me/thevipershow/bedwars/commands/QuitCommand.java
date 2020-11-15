@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
 import me.thevipershow.bedwars.game.ActiveGame;
+import me.thevipershow.bedwars.game.ActiveGameState;
 import me.thevipershow.bedwars.game.GameManager;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -34,7 +35,7 @@ public final class QuitCommand extends SubCommand {
         final Collection<ActiveGame> activeGame = super.gameManager.getWorldsManager().getActiveGameList()
                 .stream()
                 .filter(game ->
-                        !game.isHasStarted() &&
+                        game.getGameState() == ActiveGameState.QUEUE &&
                                 game.getGameLobbyTicker().getAssociatedQueue().getInQueue()
                                         .stream()
                                         .anyMatch(p -> p.getUniqueId().equals(((Player) sender).getUniqueId())))
