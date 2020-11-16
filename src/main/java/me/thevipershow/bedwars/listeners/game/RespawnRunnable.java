@@ -23,6 +23,7 @@ public final class RespawnRunnable extends BukkitRunnable {
     public RespawnRunnable(BedwarsPlayer p, ActiveGame activeGame) {
         this.p = p;
         this.activeGame = activeGame;
+        p.setPlayerState(PlayerState.RESPAWNING);
         p.getPlayer().setGameMode(GameMode.SPECTATOR);
     }
 

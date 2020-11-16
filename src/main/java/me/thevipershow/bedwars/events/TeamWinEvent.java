@@ -7,27 +7,48 @@ import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * This event represents the loss of a game by a team.
+ * This event represents the win of a game by a BedwarsTeam.
+ * Hence you can listen for this event if you want to find out
+ * when a game has finished.
+ * It should only be fired when a team wins and no other enemies
+ * are left to play against.
+ * This event is cancellable and cancelling it will influence the game.
  */
-public final class TeamLoseEvent extends ActiveGameEvent implements Cancellable {
+public final class TeamWinEvent extends ActiveGameEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
     private final BedwarsTeam bedwarsTeam;
     private boolean cancelled = false;
 
-    public TeamLoseEvent(@NotNull ActiveGame activeGame, @NotNull BedwarsTeam bedwarsTeam) {
+
+    /**
+     * Constructor for the TeamWinEvent class
+     *
+     * @param activeGame  The ActiveGame where the winning has happened.
+     * @param bedwarsTeam The BedwarsTeam that has won.
+     */
+    public TeamWinEvent(@NotNull ActiveGame activeGame, @NotNull BedwarsTeam bedwarsTeam) {
         super(activeGame);
         this.bedwarsTeam = bedwarsTeam;
     }
 
     /**
-     * Get the team that has just been eliminated from the game.
+     * Gets the BedwarsTeam that has won this game.
      *
-     * @return The team that has lost this game.
+     * @return The Bedwars team that has won the game.
      */
     @NotNull
     public final BedwarsTeam getBedwarsTeam() {
         return bedwarsTeam;
+    }
+
+    @Override
+    public HandlerList getHandlers() {
+        return handlers;
+    }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
     }
 
     /**
@@ -50,14 +71,5 @@ public final class TeamLoseEvent extends ActiveGameEvent implements Cancellable 
     @Override
     public final void setCancelled(boolean cancel) {
         this.cancelled = cancel;
-    }
-
-    @Override
-    public HandlerList getHandlers() {
-        return handlers;
-    }
-
-    public static HandlerList getHandlerList() {
-        return handlers;
     }
 }

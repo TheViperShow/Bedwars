@@ -1,11 +1,17 @@
 package me.thevipershow.bedwars.listeners.unregisterable;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.UUID;
 import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
+import me.thevipershow.bedwars.config.objects.SpawnPosition;
 import me.thevipershow.bedwars.config.objects.TeamSpawnPosition;
 import me.thevipershow.bedwars.events.TeamBedDestroyEvent;
+import me.thevipershow.bedwars.game.AbstractActiveMerchant;
 import me.thevipershow.bedwars.game.ActiveGame;
+import me.thevipershow.bedwars.game.ActiveSpawner;
+import me.thevipershow.bedwars.game.GameUtils;
 import me.thevipershow.bedwars.game.objects.BedwarsPlayer;
 import me.thevipershow.bedwars.game.objects.CachedGameData;
 import me.thevipershow.bedwars.listeners.UnregisterableListener;
@@ -14,6 +20,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -28,8 +35,15 @@ public final class MapProtectionUnregisterableListener extends UnregisterableLis
         this.cachedGameData = activeGame.getCachedGameData();
     }
 
-    private boolean isOwnBed(Player player, Block block) {
-        BedwarsPlayer bedwarsPlayer = activeGame.getPlayerMapper().get(player);
+    /**
+     * This method checks if the given {@link BedwarsPlayer} has broke a bed that he owned.
+     * Each team has a bed, players should not be able to break their own bed.
+     *
+     * @param bedwarsPlayer The BedwarsPlayer who has broken the block.
+     * @param block The Block broken.
+     * @return True if the bed was his own, false otherwise.
+     */
+    private boolean isOwnBed(BedwarsPlayer bedwarsPlayer, Block block) {
         if (bedwarsPlayer == null) {
             return true;
         }
@@ -57,18 +71,24 @@ public final class MapProtectionUnregisterableListener extends UnregisterableLis
             activeGame.getPlugin().getServer().getPluginManager().callEvent(destroyEvent);
         }
 
-        System.out.println(returnValue);
         return returnValue;
     }
 
     @EventHandler(ignoreCancelled = true)
     public final void onBlockBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
+        if (!player.getWorld().equals(activeGame.getCachedGameData().getGame())) {
+            return;
+        }
+        BedwarsPlayer bedwarsPlayer = activeGame.getPlayerMapper().get(player);
+        if (bedwarsPlayer == null) {
+            return;
+        }
         Block broken = event.getBlock();
         Material type = broken.getType();
 
         if (type == Material.BED_BLOCK) {
-            if (isOwnBed(player, broken)) {
+            if (isOwnBed(bedwarsPlayer, broken)) {
                 event.setCancelled(true);
                 player.sendMessage(AllStrings.PREFIX.get() + AllStrings.CANNOT_BREAK_OWN_BED.get());
             }
@@ -82,8 +102,69 @@ public final class MapProtectionUnregisterableListener extends UnregisterableLis
         }
     }
 
+    private boolean isBlockNearSpawner(Block block) {
+        for (final ActiveSpawner activeSpawner : activeGame.getActiveSpawnersManager().getActiveSpawners())
+            if (activeSpawner.getSpawner().getSpawnPosition().squaredDistance(block.getLocation()) <= 27.0) {
+                return true;
+            }
+        return false;
+    }
+
+    private boolean isBlockInsideSpawn(Block block) {
+        final Location blockLocation = block.getLocation();
+        final SpawnPosition spawnProtection = activeGame.getBedwarsGame().getSpawnProtection();
+        for (final TeamSpawnPosition spawn : activeGame.getBedwarsGame().getMapSpawns()) {
+            final double dX = spawn.xDistance(blockLocation);
+            final double dY = spawn.yDistance(blockLocation);
+            final double dZ = spawn.zDistance(blockLocation);
+            if (dX <= spawnProtection.getX() && dZ <= spawnProtection.getZ() && dY <= spawnProtection.getY()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isBlockInsideMerchant(Block block) { //TODO: Implement
+        for (AbstractActiveMerchant activeMerchant : activeGame.getMerchantManager().getActiveMerchants()) {
+            if (activeMerchant.getMerchant().getMerchantPosition().squaredDistance(block.getLocation()) < 15.00) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    public boolean isValidPlacement(Block block) {
+        return !isBlockInsideMerchant(block) && !isBlockInsideSpawn(block) && !isBlockNearSpawner(block);
+    }
+
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
     public final void onBlockPlace(BlockPlaceEvent event) {
-        cachedGameData.getCachedPlacedBlocks().add(event.getBlock());
+        final Block block = event.getBlockPlaced();
+        if (block.getType() == Material.TNT) {
+            event.setCancelled(true);
+            spawnTNT(event.getPlayer(), block);
+        } else {
+            if (!isValidPlacement(block)) {
+                event.setCancelled(true);
+            } else {
+                cachedGameData.getCachedPlacedBlocks().add(block);
+            }
+        }
+    }
+
+    /**
+     * Used to spawn a TNT where the player placed a TNT block.
+     * This method also handles item removal and scheduling.
+     * @param whoPlaced The Player who placed the block.
+     * @param blockPlaced The block placed.
+     */
+    private void spawnTNT(Player whoPlaced, Block blockPlaced) {
+        TNTPrimed tntPrimed = whoPlaced.getWorld().spawn(blockPlaced.getLocation().add(+.5, +.05, +.5), TNTPrimed.class);
+        UUID tntUUID = tntPrimed.getUniqueId();
+        HashMap<UUID, UUID> tntMap = activeGame.getKillTracker().getPlacedTNTMap();
+        tntMap.put(tntPrimed.getUniqueId(), tntUUID);
+        activeGame.getPlugin().getServer().getScheduler().runTaskLater(activeGame.getPlugin(), () -> tntMap.remove(tntUUID), tntPrimed.getFuseTicks() + 1L);
+        GameUtils.decreaseItemInHand(whoPlaced);
     }
 }

@@ -24,6 +24,14 @@ import me.thevipershow.bedwars.listeners.game.GameTrapTriggerer;
 import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
 
+/**
+ * This class represents the implementation of a running game.
+ * This class is responsible for every single action happening
+ * during a 'Bedwars' game.
+ * All of the important data is saved inside the {@link InternalGameManager}
+ * object, which is loaded at runtime.
+ * This class should be deleted as soon as the game is determined to be finished.
+ */
 public final class ActiveGame {
 
     private final InternalGameManager internalGameManager;
@@ -67,6 +75,30 @@ public final class ActiveGame {
                 new UpgradesManager(this));
     }
 
+    /*---------------------------------------------------------------------------------------------------------------*/
+
+    /**
+     * INITIALIZATION PHASE:
+     * This method represents the initialization of the ActiveGame.
+     * When the ActiveGame enters the initialization stage it is crucial
+     * that its gameState is set to {@link ActiveGameState#INITIALIZING}
+     * <p>
+     * During this phase all listeners that are marked for the registration phase
+     * {@link me.thevipershow.bedwars.game.objects.GameListener.RegistrationStage#INITIALIZATION}
+     * will be registered via the {@link ListenersManager#enableAllByPhase(GameListener.RegistrationStage)}
+     * <p>
+     * This phase is also associated with the 'queue' phase.
+     * During this phase players will be forming a queue into the area
+     * designed for players to wait the start of the game.
+     * Nonetheless it is considered essential to start the ticking of the lobby
+     * and start the matchmaking algorithms in this stage.
+     * <p>
+     * Other objects may be instantiated in this stage,
+     * such as spawners and\or merchants.
+     * <p>
+     * As soon as this phase finished the game will move
+     * to the {@link ActiveGameState#STARTED} phase using the {@link ActiveGame#start()} method.
+     */
     public final void initialize() {
         setGameState(ActiveGameState.INITIALIZING); // setting game state to initializing.
 
@@ -79,10 +111,54 @@ public final class ActiveGame {
         getActiveSpawnersManager().addSpawners();
     }
 
+    /*---------------------------------------------------------------------------------------------------------------*/
+
+    /**
+     * START PHASE:
+     * This method represents the start of the ActiveGame.
+     * It is called right after the initialization stage has finished,
+     * hence we set the gameState to {@link ActiveGameState#STARTED}.
+     * <p>
+     * This method should only be called when the minimum
+     * amount of player is present in the queue. This value
+     * is determined by the method {@link BedwarsGame#getMinPlayers()}.
+     * <p>
+     * When a game starts it is crucial to enable all of the listeners
+     * that have been marked with a registration stage of type
+     * {@link me.thevipershow.bedwars.game.objects.GameListener.RegistrationStage#STARTUP},
+     * however it is not less important that we don't forget to
+     * remove and disable all of the listeners that have been previously
+     * started during the initialization phase.
+     * <p>
+     * Several things are done after the previously listed:
+     * we get all of the Players from {@link GameLobbyTicker#getAssociatedQueue()}
+     * and we automatically assign teams. This allows us to have an easily
+     * obtainable list of objects that are custom players and store data
+     * relative to this game instance.
+     * When a game starts all of the Players objects will be used
+     * to form teams and build all of the {@link me.thevipershow.bedwars.game.objects.BedwarsPlayer} objects.
+     * It is important to note that during this phase these objects may be removed from the
+     * managers that store them.
+     * The only cause that can trigger the removal of a BedwarsPlayer object from this game's managers
+     * is the {@link org.bukkit.event.player.PlayerQuitEvent} which will trigger instantaneous removal
+     * of all references of that player from this game.
+     * <p>
+     * What is to be done after this, is assigning all objects that will be necessary for a
+     * correct game experience, such as:
+     * - game traps,
+     * - spawners
+     * - merchants
+     * - deathmatch mode manager
+     * - scoreboards
+     * etc.
+     * <p>
+     * This phase will only come to an end when a single teams is left in the game,
+     * and as soon as that happens, the method {@link #start()} should be called.
+     */
     public final void start() {
         setGameState(ActiveGameState.STARTED);
 
-        startTime = System.currentTimeMillis();
+        this.startTime = System.currentTimeMillis();
 
         getListenersManager().disableAllByPhase(GameListener.RegistrationStage.INITIALIZATION); // removing queue listener; not required.
         getListenersManager().enableAllByPhase(GameListener.RegistrationStage.STARTUP);
@@ -90,10 +166,10 @@ public final class ActiveGame {
         getGameLobbyTicker().stopTicking(); // stop ticking.
 
         getPlayerMapper().addAll(getGameLobbyTicker().getAssociatedQueue().getInQueue()); // Assign mapping for players
-                                                                                          // and BedwarsPlayer objects.
+        // and BedwarsPlayer objects.
         getTeamManager().assignTeams(); // IMPORTANT:
-                                        // Teams must be assigned after the player mapper has been correctly
-                                        // filled with the players from the AbstractQueue.
+        // Teams must be assigned after the player mapper has been correctly
+        // filled with the players from the AbstractQueue.
 
         getBedDestroyer().destroyInactiveBeds(); // removing all beds that are not assigned from the map
 
@@ -103,7 +179,7 @@ public final class ActiveGame {
         getTrapsManager().fillTrapsDelay(); // filling the last activation time
 
         getTeamManager().updateBedwarsPlayersTeam(); // Updating the team field in each of the BedwarsPlayer objects
-                                                     // (we should rely on it as less as possible).
+        // (we should rely on it as less as possible).
 
         getActiveSpawnersManager().createAnnouncements(); // Creating update announcements.
         getActiveSpawnersManager().spawnAll();            // Spawn all spawners
@@ -119,19 +195,29 @@ public final class ActiveGame {
         getMovementsManager().moveToSpawnpoints();  // Ideally we want everything to get generated before teleporting.
     }
 
+    /**
+     * This method stops the game.
+     */
     public final void stop() {
+        setGameState(ActiveGameState.FINISHED);
+
         getActiveSpawnersManager().cancelAnnouncements();
+
         getMovementsManager().moveAllSpawn();
 
+        getListenersManager().disableAllByPhase(GameListener.RegistrationStage.STARTUP);
         try {
             finalize();
-        } catch (Throwable ignored) {
+        } catch (final Throwable ignored) {
+            ignored.printStackTrace();
         }
     }
 
     /*---------------------------------------------------------------------------------------------------------------*/
 
-    public final UpgradesManager getUpgradesManager() { return internalGameManager.getUpgradesManager();}
+    public final UpgradesManager getUpgradesManager() {
+        return internalGameManager.getUpgradesManager();
+    }
 
     public final BedDestroyer getBedDestroyer() {
         return internalGameManager.getBedDestroyer();
@@ -228,6 +314,7 @@ public final class ActiveGame {
     public final PlayerMapper getPlayerMapper() {
         return internalGameManager.getPlayerMapper();
     }
+
 
     /*
     protected ActiveSpawner diamondSampleSpawner = null;

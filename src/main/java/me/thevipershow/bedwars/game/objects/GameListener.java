@@ -28,25 +28,34 @@ import me.thevipershow.bedwars.listeners.game.ShopMerchantListener;
 import me.thevipershow.bedwars.listeners.game.SpawnersMultigiveListener;
 import me.thevipershow.bedwars.listeners.game.SpectatorsInteractListener;
 import me.thevipershow.bedwars.listeners.game.TNTPlaceListener;
+import me.thevipershow.bedwars.listeners.unregisterable.BedDestroyUnregisterableListener;
 import me.thevipershow.bedwars.listeners.unregisterable.BedwarsPlayerDeathUnregisterableListener;
+import me.thevipershow.bedwars.listeners.unregisterable.DragonRedirectorListener;
+import me.thevipershow.bedwars.listeners.unregisterable.FireballShootUnregisterableListener;
 import me.thevipershow.bedwars.listeners.unregisterable.LobbyUnregisterableListener;
 import me.thevipershow.bedwars.listeners.unregisterable.MapProtectionUnregisterableListener;
 import me.thevipershow.bedwars.listeners.unregisterable.PlayerDeathUnregisterableListener;
 import me.thevipershow.bedwars.listeners.unregisterable.ShopInteractUnregisterableListener;
 import me.thevipershow.bedwars.listeners.unregisterable.ShopMerchantUnregisterableListener;
+import me.thevipershow.bedwars.listeners.unregisterable.TeamWinUnregisterableListener;
 import me.thevipershow.bedwars.listeners.unregisterable.UpgradeInteractUnregisterableListener;
 import me.thevipershow.bedwars.listeners.unregisterable.UpgradeMerchantUnregisterableListener;
 
 public enum GameListener {
 
     // The new listeners:,
-    UPGRADE_INTERACT(UpgradeInteractUnregisterableListener.class, RegistrationStage.STARTUP),
-    UPGRADE_MERCHANT(UpgradeMerchantUnregisterableListener.class, RegistrationStage.STARTUP),
+
+    BED_DESTROY(BedDestroyUnregisterableListener.class, RegistrationStage.STARTUP),
+    BEDWARS_PLAYER_DEATH(BedwarsPlayerDeathUnregisterableListener.class, RegistrationStage.STARTUP),
+    DRAGON_REDIRECTOR(DragonRedirectorListener.class, RegistrationStage.STARTUP),
+    FIREBALL_SHOOT(FireballShootUnregisterableListener.class, RegistrationStage.STARTUP),
+    MAP_PROTECTION(MapProtectionUnregisterableListener.class, RegistrationStage.STARTUP),
+    PLAYER_DEATH(PlayerDeathUnregisterableListener.class, RegistrationStage.STARTUP),
     SHOP_INTERACT(ShopInteractUnregisterableListener.class, RegistrationStage.STARTUP),
     SHOP_MERCHANT(ShopMerchantUnregisterableListener.class, RegistrationStage.STARTUP),
-    PLAYER_DEATH(PlayerDeathUnregisterableListener.class, RegistrationStage.STARTUP),
-    MAP_PROTECTION(MapProtectionUnregisterableListener.class, RegistrationStage.STARTUP),
-    BEDWARS_PLAYER_DEATH(BedwarsPlayerDeathUnregisterableListener.class, RegistrationStage.STARTUP),
+    TEAM_WIN(TeamWinUnregisterableListener.class, RegistrationStage.STARTUP),
+    UPGRADE_INTERACT(UpgradeInteractUnregisterableListener.class, RegistrationStage.STARTUP),
+    UPGRADE_MERCHANT(UpgradeMerchantUnregisterableListener.class, RegistrationStage.STARTUP),
 
     QUEUE(LobbyUnregisterableListener.class, RegistrationStage.INITIALIZATION);
 

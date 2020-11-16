@@ -1,14 +1,20 @@
 package me.thevipershow.bedwars.listeners.unregisterable;
 
+import com.google.common.collect.ImmutableList;
 import java.util.UUID;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.events.BedwarsPlayerDeathEvent;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.GameUtils;
 import me.thevipershow.bedwars.game.objects.BedwarsPlayer;
+import me.thevipershow.bedwars.game.objects.PlayerState;
 import me.thevipershow.bedwars.game.objects.TeamManager;
 import me.thevipershow.bedwars.listeners.UnregisterableListener;
 import me.thevipershow.bedwars.listeners.game.RespawnRunnable;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -16,6 +22,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.projectiles.ProjectileSource;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,8 +42,8 @@ public final class BedwarsPlayerDeathUnregisterableListener extends Unregisterab
      * @param bedwarsPlayer The BedwarsPlayer to be teleported.
      */
     private void preventVoidBug(@NotNull BedwarsPlayer bedwarsPlayer) {
-        if (bedwarsPlayer.getLocation().getY() <= 0.00) {
-            bedwarsPlayer.slideTeleport('y', +150);
+        if (bedwarsPlayer.getLocation().getY() <= 0) {
+            bedwarsPlayer.slideTeleport('y', 150);
         }
     }
 
@@ -145,6 +154,7 @@ public final class BedwarsPlayerDeathUnregisterableListener extends Unregisterab
     /**
      * This methods generates a funny message for players that died
      * but were not killed by an entity.
+     *
      * @param cause The DamageCause.
      * @return The message.
      */
@@ -156,6 +166,7 @@ public final class BedwarsPlayerDeathUnregisterableListener extends Unregisterab
 
     /**
      * Slain kill msg
+     *
      * @param killer .
      * @return The message.
      */
@@ -186,8 +197,11 @@ public final class BedwarsPlayerDeathUnregisterableListener extends Unregisterab
         Entity killerEntity = event.getKillerEntity();
         boolean isFinalKill = event.isFinalKill();
 
-        activeGame.getTeamManager().checkForTeamLose(killed.getBedwarsTeam()); // checking if that team has lost after
+        teamManager.checkForTeamLose(killed.getBedwarsTeam()); // checking if that team has lost after
         // that this player has been killed.
+
+        System.out.println("TEAM WIN"  + teamManager.checkForTeamWin()); // checking if any team has won after that player has been killed. (it can happen!)
+
         RespawnRunnable.startForBedwarsPlayer(this.activeGame, killed); // starting his animation
 
         GameUtils.sendKillSound(killed); // sending a kill sound to the killed.
@@ -216,11 +230,46 @@ public final class BedwarsPlayerDeathUnregisterableListener extends Unregisterab
 
         if (isFinalKill) {
             deathMessage.append(color("&7. &c&lFINAL KILL!")); // adding final kill to the output because the player was final killed!
+            setGameSpectator(killed);     // he dead bro.
         }
 
         final String sendToAll = deathMessage.toString();
         teamManager.sendMessageToAll(sendToAll); // sending the message to everyone in the game!
     }
 
+    /**
+     * Make a player enter the spectator mode.
+     * When in this gamemode the player will be in survival,
+     * invisible, and unable to interact with anything present
+     * in the game.
+     *
+     * @param target The BedwarsPlayer.
+     */
+    private void setGameSpectator(BedwarsPlayer target) {
+        ItemStack compassToGive = generateLobbyCompass();
+        Player targetPlayer = target.getPlayer();
+        targetPlayer.setGameMode(GameMode.SURVIVAL);
+        activeGame.getInternalGameManager().getInvisibilityManager().hidePlayer(target);
+        targetPlayer.setAllowFlight(true);
 
+    }
+
+    private ItemStack generateLobbyCompass() {
+        if (LOBBY_COMPASS == null) {
+            final ItemStack compass = new ItemStack(Material.COMPASS);
+            final ItemMeta compassMeta = compass.getItemMeta();
+            compassMeta.setDisplayName(GameUtils.color("&8[&c&lRETURN TO LOBBY&r&8]"));
+            compass.addUnsafeEnchantment(Enchantment.DURABILITY, 1);
+            compassMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            compassMeta.setLore(ImmutableList.of(
+                    ChatColor.GRAY + "Click on this item to",
+                    ChatColor.GRAY + "return to the server's lobby."
+            ));
+            compass.setItemMeta(compassMeta);
+            LOBBY_COMPASS = compass;
+        }
+        return LOBBY_COMPASS.clone();
+    }
+
+    private static ItemStack LOBBY_COMPASS = null;
 }

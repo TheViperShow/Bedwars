@@ -20,6 +20,10 @@ public final class MerchantManager {
     private final ActiveGame activeGame;
     private final HashSet<AbstractActiveMerchant> activeMerchants = new HashSet<>();
 
+    public final HashSet<AbstractActiveMerchant> getActiveMerchants() {
+        return activeMerchants;
+    }
+
     public final void createAll() {
         for (Merchant merchant : activeGame.getBedwarsGame().getMerchants()) {
             AbstractActiveMerchant abstractActiveMerchant = GameUtils.fromMerchant(merchant, activeGame);

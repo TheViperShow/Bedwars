@@ -4,6 +4,7 @@ import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.events.TeamBedDestroyEvent;
 import me.thevipershow.bedwars.game.ActiveGame;
+import me.thevipershow.bedwars.game.GameUtils;
 import me.thevipershow.bedwars.game.objects.BedwarsPlayer;
 import me.thevipershow.bedwars.game.objects.TeamData;
 import me.thevipershow.bedwars.game.objects.TeamManager;
@@ -25,6 +26,7 @@ public final class BedDestroyUnregisterableListener extends UnregisterableListen
         }
 
         BedwarsPlayer brokenBy = event.getDestroyer();
+        BedwarsTeam brokenByTeam = brokenBy.getBedwarsTeam();
 
         TeamManager<?> teamManager = activeGame.getTeamManager();
         TeamData<?> data = teamManager.dataOfTeam(team);
@@ -33,7 +35,7 @@ public final class BedDestroyUnregisterableListener extends UnregisterableListen
         data.perform(bedwarsPlayer -> bedwarsPlayer.sendTitle(null, AllStrings.YOUR_BED_BROKEN.get()));
         teamManager.performAll(bedwarsPlayer -> {
             bedwarsPlayer.playSound(Sound.ENDERDRAGON_GROWL, 9.0f, 1.25f);
-            bedwarsPlayer.sendMessage(AllStrings.BED_BROKEN_BY.get() + brokenBy.getBedwarsTeam().getColorCode() + brokenBy.getName());
+            bedwarsPlayer.sendMessage(GameUtils.color("&" + brokenByTeam.getColorCode() + brokenByTeam.name() + AllStrings.BED_BROKEN_BY.get() + brokenBy.getBedwarsTeam().getColorCode() + brokenBy.getName()));
         });
     }
 }

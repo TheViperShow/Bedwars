@@ -14,10 +14,10 @@ import org.bukkit.event.Listener;
 
 public final class LevelUpListener implements Listener {
 
-    private final Random rand = new Random(System.currentTimeMillis());
+    private final Random rand = new Random(System.nanoTime());
 
     private void sendLevelUpMsg(final BedwarsLevelUpEvent e) {
-        final Player player = e.getPlayer();
+        final Player player = e.getPlayer().getPlayer();
         player.sendMessage(String.format(AllStrings.LEVEL_UP.get(), e.getNewLevel()));
     }
 
@@ -30,8 +30,8 @@ public final class LevelUpListener implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
-    public void onBedwarsLevelUp(final BedwarsLevelUpEvent event) {
+    public final void onBedwarsLevelUp(final BedwarsLevelUpEvent event) {
         sendLevelUpMsg(event);
-        levelUpEffects(event.getPlayer());
+        levelUpEffects(event.getPlayer().getPlayer());
     }
 }
