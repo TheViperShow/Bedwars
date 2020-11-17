@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 
 public abstract class AbstractQueue<T> {
 
-    private int maximumSize;
+    private final int maximumSize;
     private final LinkedList<T> inQueue = new LinkedList<>();
 
     public AbstractQueue(final int maximumSize) {

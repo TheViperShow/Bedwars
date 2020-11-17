@@ -197,10 +197,10 @@ public final class BedwarsPlayerDeathUnregisterableListener extends Unregisterab
         Entity killerEntity = event.getKillerEntity();
         boolean isFinalKill = event.isFinalKill();
 
-        teamManager.checkForTeamLose(killed.getBedwarsTeam()); // checking if that team has lost after
+       // teamManager.checkForTeamLose(killed.getBedwarsTeam()); // checking if that team has lost after
         // that this player has been killed.
 
-        System.out.println("TEAM WIN"  + teamManager.checkForTeamWin()); // checking if any team has won after that player has been killed. (it can happen!)
+       // teamManager.checkForTeamWin(); // checking if any team has won after that player has been killed. (it can happen!)
 
         RespawnRunnable.startForBedwarsPlayer(this.activeGame, killed); // starting his animation
 

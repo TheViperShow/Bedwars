@@ -196,4 +196,14 @@ public final class BedwarsPlayer {
     public final void setHidden(boolean hidden) {
         this.hidden = hidden;
     }
+
+    @Override
+    public String toString() {
+        return "BedwarsPlayer{" +
+                "uuid=" + getUniqueId() + "," +
+                "player=" + player +
+                ", playerState=" + playerState +
+                ", bedwarsTeam=" + bedwarsTeam +
+                '}';
+    }
 }

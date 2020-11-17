@@ -39,7 +39,7 @@ public final class MultiTeamData extends TeamData<Set<BedwarsPlayer>> {
 
     @Override
     public final Set<BedwarsPlayer> getAll() {
-        return getData();
+        return this.data;
     }
 
     @Override

@@ -3,6 +3,9 @@ package me.thevipershow.bedwars.listeners.unregisterable;
 import me.thevipershow.bedwars.events.BedwarsPlayerDeathEvent;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.objects.BedwarsPlayer;
+import me.thevipershow.bedwars.game.objects.PlayerState;
+import me.thevipershow.bedwars.game.objects.TeamData;
+import me.thevipershow.bedwars.game.objects.TeamManager;
 import me.thevipershow.bedwars.game.objects.TeamStatus;
 import me.thevipershow.bedwars.listeners.UnregisterableListener;
 import org.bukkit.entity.Entity;
@@ -28,13 +31,15 @@ public final class PlayerDeathUnregisterableListener extends UnregisterableListe
     final public void onEntityDamage(EntityDamageEvent event) {
         DamageCause cause = event.getCause();
         Entity damaged = event.getEntity();
+
         if (damaged.getType() != EntityType.PLAYER) {
             return;
         }
+
         Player player = (Player) damaged;
         BedwarsPlayer bedwarsPlayer = activeGame.getPlayerMapper().get(player);
-        boolean isInVoid = player.getLocation().getY() <= -0.00d;
-        boolean isKill = player.getHealth() - event.getFinalDamage() <= +0.00d;
+        boolean isInVoid = player.getLocation().getY() <= 0;
+        boolean isKill = player.getHealth() - event.getFinalDamage() <= 0;
         boolean isFinalKill = isFinalKill(bedwarsPlayer);
 
         if (isKill || isInVoid) {
@@ -54,8 +59,27 @@ public final class PlayerDeathUnregisterableListener extends UnregisterableListe
 
             if (!bedwarsPlayerDeathEvent.isCancelled()) {
                 event.setCancelled(true);
+                if (isFinalKill) {
+                    updatePlayerStateAfterDeath(bedwarsPlayer);
+                    activeGame.getTeamManager().checkForTeamLose(bedwarsPlayer.getBedwarsTeam());
+                }
             }
         }
 
+    }
+
+    private void updatePlayerStateAfterDeath(final BedwarsPlayer bedwarsPlayer) {
+        TeamManager<?> teamManager = activeGame.getTeamManager();
+        TeamData<?> dataOfPlayer = teamManager.dataOfBedwarsPlayer(bedwarsPlayer);
+
+        if (dataOfPlayer == null) {
+            return;
+        }
+
+        if (dataOfPlayer.getStatus() == TeamStatus.BED_BROKEN) {
+            bedwarsPlayer.setPlayerState(PlayerState.DEAD);
+            System.out.println("We set " + bedwarsPlayer.getName() + " state to DEAD");
+            System.out.println("Set on reference " + bedwarsPlayer.toString());
+        }
     }
 }

@@ -22,7 +22,6 @@ public final class TeamWinUnregisterableListener extends UnregisterableListener 
 
     @EventHandler(ignoreCancelled = true)
     public final void onTeamWin(TeamWinEvent event) {
-        System.out.println("1");
         BedwarsTeam winnerTeam = event.getBedwarsTeam(); // the team that has just won this game.
         ActiveGame activeGame = event.getActiveGame(); // getting the game.
 

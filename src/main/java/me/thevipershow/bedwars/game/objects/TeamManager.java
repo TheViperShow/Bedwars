@@ -1,11 +1,14 @@
 package me.thevipershow.bedwars.game.objects;
 
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import me.thevipershow.bedwars.bedwars.Gamemode;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
-import me.thevipershow.bedwars.events.TeamLoseEvent;
+import me.thevipershow.bedwars.events.TeamEliminationEvent;
 import me.thevipershow.bedwars.events.TeamWinEvent;
 import me.thevipershow.bedwars.game.ActiveGame;
 import org.bukkit.entity.Player;
@@ -29,10 +32,19 @@ public abstract class TeamManager<T> {
         }
     }
 
+    public final void setEveryoneStatus(PlayerState status) {
+        performAll(bp -> bp.setPlayerState(status));
+    }
+
     public final TeamData<T> dataOfTeam(BedwarsTeam team) {
         return this.dataMap.get(team);
     }
 
+    /**
+     * Perform an action to every BedwarsPlayer of the game.
+     *
+     * @param consumer The action to perform.
+     */
     public final void performAll(final Consumer<? super BedwarsPlayer> consumer) {
         for (final TeamData<T> data : dataMap.values()) {
             data.perform(consumer);
@@ -50,63 +62,56 @@ public abstract class TeamManager<T> {
 
     /**
      * Check if a team has permanently lost the game and
-     * throws a {@link TeamLoseEvent} when this happens.
+     * throws a {@link TeamEliminationEvent} when this happens.
      *
      * @param team The {@link BedwarsTeam} to check for.
-     * @return true if the team has lost, false otherwise.
      */
-    public final boolean checkForTeamLose(BedwarsTeam team) {
-        for (Map.Entry<BedwarsTeam, TeamData<T>> entry : dataMap.entrySet()) {
-            BedwarsTeam key = entry.getKey();
-            if (key != team) {
-                continue;
-            }
-            TeamData<T> teamData = entry.getValue();
-            if (teamData.getAll()
-                    .stream()
-                    .map(BedwarsPlayer::getPlayerState)
-                    .allMatch(state -> state != PlayerState.PLAYING && state != PlayerState.RESPAWNING)
-                    && teamData.getStatus() != TeamStatus.ELIMINATED) {
-                TeamLoseEvent teamLoseEvent = new TeamLoseEvent(this.activeGame, key);
-                activeGame.getPlugin().getServer().getPluginManager().callEvent(teamLoseEvent);
-                return true;
+    public final void checkForTeamLose(BedwarsTeam team) {
+
+        TeamData<T> data = this.dataMap.get(team);
+
+        if (data.getStatus() == TeamStatus.BED_EXISTS) {
+            return;
+        }
+
+        if (data == null) {
+            return;
+        }
+
+        boolean teamHasLost = data.getAll().stream().noneMatch(bp -> bp.getPlayerState() != PlayerState.DEAD);
+
+        if (teamHasLost && data.getStatus() == TeamStatus.BED_BROKEN) {
+            TeamEliminationEvent teamLoseEvent = new TeamEliminationEvent(activeGame, team);
+            activeGame.callGameEvent(teamLoseEvent);
+            if (!teamLoseEvent.isCancelled()) {
+                data.setStatus(TeamStatus.ELIMINATED);
             }
         }
-        return false;
     }
 
     /**
      * Check if a team has won the game and
      * throws a {@link TeamWinEvent} when this happens.
-     *
-     * @return true if any team has won, false otherwise.
      */
-    public final boolean checkForTeamWin() {
-        System.out.println("A");
-        int inGame = 0;
-        BedwarsTeam winner = null;
-        for (Map.Entry<BedwarsTeam, TeamData<T>> entry : dataMap.entrySet()) {
-            BedwarsTeam team = entry.getKey();
-            TeamData<T> data = entry.getValue();
-            if (data.getStatus() != TeamStatus.ELIMINATED) {
-                if (inGame > 0) {
-                    return false;
-                } else {
-                    inGame++;
-                    winner = team;
-                }
-            }
+    public final void checkForTeamWin() {
+
+        short playingTeamsCount = 0;
+
+        List<BedwarsTeam> result = dataMap.entrySet()
+                .stream()
+                .filter(e -> e.getValue().getStatus() != TeamStatus.ELIMINATED)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+
+        if (result.size() != 1) {
+            return;
         }
 
-        if (winner == null) {
-            return false;
-        }
+        BedwarsTeam winner = result.get(0);
 
-        System.out.println("B");
         Plugin plugin = activeGame.getPlugin();
         TeamWinEvent teamWinEvent = new TeamWinEvent(this.activeGame, winner);
         plugin.getServer().getPluginManager().callEvent(teamWinEvent);
-        return true;
     }
 
     public final void removePlayer(Player player) {

@@ -23,7 +23,7 @@ public abstract class TeamData<T> {
         this.upgradesShopLevelsMap = map;
     }
 
-    private T data;
+    protected T data;
     private TeamStatus status = TeamStatus.BED_EXISTS;
     private final Map<UpgradeType, Integer> upgradesShopLevelsMap;
     private ActiveHealPool activeHealPool;
@@ -41,8 +41,6 @@ public abstract class TeamData<T> {
     }
 
     public abstract void perform(Consumer<? super BedwarsPlayer> consumer);
-
-
 
     public abstract Set<BedwarsPlayer> getAll();
 
@@ -82,5 +80,14 @@ public abstract class TeamData<T> {
 
     public final Map<UpgradeType, Integer> getUpgradesShopLevelsMap() {
         return upgradesShopLevelsMap;
+    }
+
+    @Override
+    final public String toString() {
+        return "TeamData{" +
+                "data=" + data +
+                ", status=" + status +
+                ", gamemode=" + gamemode +
+                '}';
     }
 }

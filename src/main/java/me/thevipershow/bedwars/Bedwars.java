@@ -13,6 +13,7 @@ import me.thevipershow.bedwars.config.folders.ConfigFiles;
 import me.thevipershow.bedwars.config.folders.ValidFoldersDiscoverer;
 import me.thevipershow.bedwars.game.GameManager;
 import me.thevipershow.bedwars.game.GameUtils;
+import me.thevipershow.bedwars.listeners.ActiveGameTerminateListener;
 import me.thevipershow.bedwars.listeners.LevelUpListener;
 import me.thevipershow.bedwars.listeners.queue.MatchmakingVillagersListener;
 import me.thevipershow.bedwars.listeners.queue.QueueResizerListener;
@@ -48,6 +49,7 @@ public final class Bedwars extends JavaPlugin {
     private Listener matchmakingVillagerListener = null;
     private Listener queueResizerListener = null;
     private Listener levelUpListener = null;
+    private Listener activeGameTerminateListener = null;
 
     // Cleaners
     private DataCleaner dataCleaner = null;
@@ -117,9 +119,11 @@ public final class Bedwars extends JavaPlugin {
         matchmakingVillagerListener = new MatchmakingVillagersListener(this, gameManager); // Insantiating listeners
         queueResizerListener = new QueueResizerListener(gameManager);
         levelUpListener = new LevelUpListener();
+        activeGameTerminateListener = new ActiveGameTerminateListener(worldsManager);
         getServer().getPluginManager().registerEvents(matchmakingVillagerListener, this); // Registering global listeners
         getServer().getPluginManager().registerEvents(queueResizerListener, this);
         getServer().getPluginManager().registerEvents(levelUpListener, this);
+        getServer().getPluginManager().registerEvents(activeGameTerminateListener, this);
 
         dataCleaner = new DataCleaner(this);
         dataCleaner.startTasks();

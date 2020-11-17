@@ -6,30 +6,9 @@ import java.util.EnumMap;
 import java.util.Map;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.listeners.UnregisterableListener;
-import me.thevipershow.bedwars.listeners.game.BedBreakListener;
-import me.thevipershow.bedwars.listeners.game.ChestInteractListener;
-import me.thevipershow.bedwars.listeners.game.DragonTargetListener;
-import me.thevipershow.bedwars.listeners.game.EntityDamageListener;
-import me.thevipershow.bedwars.listeners.game.ExplosionListener;
-import me.thevipershow.bedwars.listeners.game.GoodGameListener;
-import me.thevipershow.bedwars.listeners.game.HungerLossListener;
-import me.thevipershow.bedwars.listeners.game.ItemDegradeListener;
-import me.thevipershow.bedwars.listeners.game.KillSoundListener;
-import me.thevipershow.bedwars.listeners.game.LobbyCompassListener;
-import me.thevipershow.bedwars.listeners.game.MapIllegalMovementsListener;
-import me.thevipershow.bedwars.listeners.game.MapProtectionListener;
-import me.thevipershow.bedwars.listeners.game.PlayerDeathListener2;
-import me.thevipershow.bedwars.listeners.game.PlayerFireballInteractListener;
-import me.thevipershow.bedwars.listeners.game.PlayerQuitDuringGameListener;
-import me.thevipershow.bedwars.listeners.game.PlayerSpectatePlayerListener;
-import me.thevipershow.bedwars.listeners.game.PotionModifyListener;
-import me.thevipershow.bedwars.listeners.game.ShopInteractListener;
-import me.thevipershow.bedwars.listeners.game.ShopMerchantListener;
-import me.thevipershow.bedwars.listeners.game.SpawnersMultigiveListener;
-import me.thevipershow.bedwars.listeners.game.SpectatorsInteractListener;
-import me.thevipershow.bedwars.listeners.game.TNTPlaceListener;
 import me.thevipershow.bedwars.listeners.unregisterable.BedDestroyUnregisterableListener;
 import me.thevipershow.bedwars.listeners.unregisterable.BedwarsPlayerDeathUnregisterableListener;
+import me.thevipershow.bedwars.listeners.unregisterable.BedwarsPlayerQuitUnregisterableListener;
 import me.thevipershow.bedwars.listeners.unregisterable.DragonRedirectorListener;
 import me.thevipershow.bedwars.listeners.unregisterable.FireballShootUnregisterableListener;
 import me.thevipershow.bedwars.listeners.unregisterable.LobbyUnregisterableListener;
@@ -37,6 +16,7 @@ import me.thevipershow.bedwars.listeners.unregisterable.MapProtectionUnregistera
 import me.thevipershow.bedwars.listeners.unregisterable.PlayerDeathUnregisterableListener;
 import me.thevipershow.bedwars.listeners.unregisterable.ShopInteractUnregisterableListener;
 import me.thevipershow.bedwars.listeners.unregisterable.ShopMerchantUnregisterableListener;
+import me.thevipershow.bedwars.listeners.unregisterable.TeamEliminationUnregisterableListener;
 import me.thevipershow.bedwars.listeners.unregisterable.TeamWinUnregisterableListener;
 import me.thevipershow.bedwars.listeners.unregisterable.UpgradeInteractUnregisterableListener;
 import me.thevipershow.bedwars.listeners.unregisterable.UpgradeMerchantUnregisterableListener;
@@ -56,6 +36,8 @@ public enum GameListener {
     TEAM_WIN(TeamWinUnregisterableListener.class, RegistrationStage.STARTUP),
     UPGRADE_INTERACT(UpgradeInteractUnregisterableListener.class, RegistrationStage.STARTUP),
     UPGRADE_MERCHANT(UpgradeMerchantUnregisterableListener.class, RegistrationStage.STARTUP),
+    TEAM_LOSE(TeamEliminationUnregisterableListener.class, RegistrationStage.STARTUP),
+    BEDWARS_PLAYER_QUIT(BedwarsPlayerQuitUnregisterableListener.class, RegistrationStage.STARTUP),
 
     QUEUE(LobbyUnregisterableListener.class, RegistrationStage.INITIALIZATION);
 

@@ -8,8 +8,10 @@ import java.util.concurrent.CompletableFuture;
 import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
 import me.thevipershow.bedwars.bedwars.Gamemode;
+import me.thevipershow.bedwars.game.AbstractQueue;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.GameManager;
+import me.thevipershow.bedwars.game.objects.TeamManager;
 import me.thevipershow.bedwars.storage.sql.MySQLDatabase;
 import me.thevipershow.bedwars.storage.sql.tables.QueueTableUtils;
 import org.bukkit.entity.Entity;
@@ -20,11 +22,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.plugin.Plugin;
 
-public class MatchmakingVillagersListener implements Listener {
+public final class MatchmakingVillagersListener implements Listener {
 
     private final Plugin plugin;
     private final GameManager gameManager;
-    // private final QueueLoader queueLoader;
 
     private final HashMap<Player, Long> lastClick = new HashMap<>();
 
@@ -57,7 +58,9 @@ public class MatchmakingVillagersListener implements Listener {
 
         final Optional<Connection> conn = MySQLDatabase.getConnection();
 
-        if (!conn.isPresent()) return;
+        if (!conn.isPresent()) {
+            return;
+        }
 
         final CompletableFuture<Optional<Gamemode>> future = QueueTableUtils.getVillagerGamemode(uuid, plugin);
 
@@ -78,7 +81,10 @@ public class MatchmakingVillagersListener implements Listener {
             }
 
             final ActiveGame activeGame = opt.get();
-            gameManager.removeFromAllQueues(player);
+
+            final ActiveGame playerCurrentGame = gameManager.getPlayerCurrentGame(player);
+            playerCurrentGame.getGameLobbyTicker().getAssociatedQueue().removeFromQueue(player);
+        //    gameManager.removeFromAllQueues(player);
             plugin.getServer().getScheduler().runTaskLater(plugin, () -> gameManager.addToQueue(player, activeGame), 1L);
         }, 1L));
 

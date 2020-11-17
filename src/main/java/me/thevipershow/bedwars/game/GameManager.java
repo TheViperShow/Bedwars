@@ -87,16 +87,15 @@ public final class GameManager {
         queue.addToQueue(player);
     }
 
-    public void removeFromAllQueues(final Player player) {
-        worldsManager.getActiveGameList().forEach(b -> {
-            final AbstractQueue<Player> queue = b.getGameLobbyTicker().getAssociatedQueue();
-            if (queue.contains(player)) {
-                final LeaveQueueEvent leaveQueueEvent = new LeaveQueueEvent(b, player);
-                queue.removeFromQueue(player);
-                plugin.getServer().getPluginManager().callEvent(leaveQueueEvent);
+    public ActiveGame getPlayerCurrentGame(Player player) {
+        for (ActiveGame activeGame : this.worldsManager.getActiveGameList()) {
+            for (Player p : activeGame.getGameLobbyTicker().getAssociatedQueue().getInQueue()) {
+                if (player.equals(p)) {
+                    return activeGame;
+                }
             }
-            b.getTeamManager().removePlayer(player);
-        });
+        }
+        return null;
     }
 
     public final boolean isLoading() {

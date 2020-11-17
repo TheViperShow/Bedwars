@@ -70,21 +70,6 @@ public class WorldsManager {
                 }
             }
         }
-
-        /*
-        for (final BedwarsGamemodeConfig<? extends BedwarsGame> config : configManager.getConfigs()) {
-            for (final BedwarsGame game : config.getBedwarsObjects()) {
-                for (final File file : filez) {
-                    if (file.getName().contains(game.getMapFilename())) {
-                        try {
-                            FileUtils.deleteDirectory(file);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
-        }*/
     }
 
     public static boolean cleanWorldUUIDs(File worldFolder) {
@@ -181,10 +166,6 @@ public class WorldsManager {
 
     public File getPluginFolder() {
         return pluginFolder;
-    }
-
-    public List<ActiveGame> getActiveGameSet() {
-        return activeGameSet;
     }
 
     public HashMap<BedwarsGame, Integer> getCreatedAmountsMap() {

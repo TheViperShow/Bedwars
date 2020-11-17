@@ -3,6 +3,8 @@ package me.thevipershow.bedwars.game;
 import java.util.Objects;
 import me.thevipershow.bedwars.bedwars.Gamemode;
 import me.thevipershow.bedwars.config.objects.BedwarsGame;
+import me.thevipershow.bedwars.events.ActiveGameEvent;
+import me.thevipershow.bedwars.events.ActiveGameTerminateEvent;
 import me.thevipershow.bedwars.game.objects.ActiveSpawnersManager;
 import me.thevipershow.bedwars.game.objects.BedDestroyer;
 import me.thevipershow.bedwars.game.objects.CachedGameData;
@@ -15,6 +17,7 @@ import me.thevipershow.bedwars.game.objects.MerchantManager;
 import me.thevipershow.bedwars.game.objects.MovementsManager;
 import me.thevipershow.bedwars.game.objects.MultiTeamManager;
 import me.thevipershow.bedwars.game.objects.PlayerMapper;
+import me.thevipershow.bedwars.game.objects.PlayerState;
 import me.thevipershow.bedwars.game.objects.ScoreboardManager;
 import me.thevipershow.bedwars.game.objects.SoloTeamManager;
 import me.thevipershow.bedwars.game.objects.TeamManager;
@@ -32,6 +35,7 @@ import org.bukkit.plugin.Plugin;
  * object, which is loaded at runtime.
  * This class should be deleted as soon as the game is determined to be finished.
  */
+@SuppressWarnings({"JavaDoc", "FieldCanBeLocal"})
 public final class ActiveGame {
 
     private final InternalGameManager internalGameManager;
@@ -156,9 +160,9 @@ public final class ActiveGame {
      * and as soon as that happens, the method {@link #start()} should be called.
      */
     public final void start() {
-        setGameState(ActiveGameState.STARTED);
-
         this.startTime = System.currentTimeMillis();
+
+        setGameState(ActiveGameState.STARTED); // setting start time as now.
 
         getListenersManager().disableAllByPhase(GameListener.RegistrationStage.INITIALIZATION); // removing queue listener; not required.
         getListenersManager().enableAllByPhase(GameListener.RegistrationStage.STARTUP);
@@ -170,6 +174,8 @@ public final class ActiveGame {
         getTeamManager().assignTeams(); // IMPORTANT:
         // Teams must be assigned after the player mapper has been correctly
         // filled with the players from the AbstractQueue.
+
+        getTeamManager().setEveryoneStatus(PlayerState.PLAYING); // setting everyone's status to playing
 
         getBedDestroyer().destroyInactiveBeds(); // removing all beds that are not assigned from the map
 
@@ -196,7 +202,10 @@ public final class ActiveGame {
     }
 
     /**
+     * STOP PHASE:
      * This method stops the game.
+     * All references of the game will be removed by listeners
+     * of {@link ActiveGameTerminateEvent} to avoid memory leaks.
      */
     public final void stop() {
         setGameState(ActiveGameState.FINISHED);
@@ -206,14 +215,16 @@ public final class ActiveGame {
         getMovementsManager().moveAllSpawn();
 
         getListenersManager().disableAllByPhase(GameListener.RegistrationStage.STARTUP);
-        try {
-            finalize();
-        } catch (final Throwable ignored) {
-            ignored.printStackTrace();
-        }
+
+        // The game is marked as finished from now on.
+        callGameEvent(new ActiveGameTerminateEvent(this));
     }
 
     /*---------------------------------------------------------------------------------------------------------------*/
+
+    public final void callGameEvent(ActiveGameEvent activeGameEvent) {
+        this.plugin.getServer().getPluginManager().callEvent(activeGameEvent);
+    }
 
     public final UpgradesManager getUpgradesManager() {
         return internalGameManager.getUpgradesManager();
@@ -225,10 +236,6 @@ public final class ActiveGame {
 
     public final long getStartTime() {
         return startTime;
-    }
-
-    public final void setStartTime(long startTime) {
-        this.startTime = startTime;
     }
 
     public final TrapsManager getTrapsManager() {

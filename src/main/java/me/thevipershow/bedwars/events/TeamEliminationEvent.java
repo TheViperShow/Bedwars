@@ -9,13 +9,13 @@ import org.jetbrains.annotations.NotNull;
 /**
  * This event represents the loss of a game by a team.
  */
-public final class TeamLoseEvent extends ActiveGameEvent implements Cancellable {
+public final class TeamEliminationEvent extends ActiveGameEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
     private final BedwarsTeam bedwarsTeam;
     private boolean cancelled = false;
 
-    public TeamLoseEvent(@NotNull ActiveGame activeGame, @NotNull BedwarsTeam bedwarsTeam) {
+    public TeamEliminationEvent(@NotNull ActiveGame activeGame, @NotNull BedwarsTeam bedwarsTeam) {
         super(activeGame);
         this.bedwarsTeam = bedwarsTeam;
     }
