@@ -6,7 +6,6 @@ import java.util.UUID;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.ActiveGameState;
-import me.thevipershow.bedwars.listeners.UnregisterableListener;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Player;

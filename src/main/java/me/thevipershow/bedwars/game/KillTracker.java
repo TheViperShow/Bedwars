@@ -3,15 +3,11 @@ package me.thevipershow.bedwars.game;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import me.thevipershow.bedwars.AllStrings;
-import me.thevipershow.bedwars.Bedwars;
-import me.thevipershow.bedwars.game.objects.TeamData;
+import me.thevipershow.bedwars.game.data.teams.TeamData;
 import org.bukkit.entity.Player;
 
 public final class KillTracker {
@@ -24,7 +20,6 @@ public final class KillTracker {
 
     private final HashMap<UUID, Integer> killsMap = new HashMap<>();
     private final HashMap<UUID, Integer> finalKillsMap = new HashMap<>();
-    private final HashMap<UUID, UUID> placedTNTMap = new HashMap<>();
 
     public final void increaseKillsCounter(final Player player) {
         if (killsMap.containsKey(player.getUniqueId())) {
@@ -40,10 +35,6 @@ public final class KillTracker {
         } else {
             finalKillsMap.put(player.getUniqueId(), 1);
         }
-    }
-
-    public final HashMap<UUID, UUID> getPlacedTNTMap() {
-        return placedTNTMap;
     }
 
     public final void announceTopThreeScores() {

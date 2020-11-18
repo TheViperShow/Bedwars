@@ -1,7 +1,7 @@
 package me.thevipershow.bedwars.events;
 
 import me.thevipershow.bedwars.game.ActiveGame;
-import me.thevipershow.bedwars.game.objects.BedwarsPlayer;
+import me.thevipershow.bedwars.game.data.game.BedwarsPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;

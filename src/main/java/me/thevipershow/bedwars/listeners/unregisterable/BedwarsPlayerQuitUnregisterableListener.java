@@ -4,9 +4,8 @@ import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.events.BedwarsPlayerQuitEvent;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.GameUtils;
-import me.thevipershow.bedwars.game.objects.BedwarsPlayer;
-import me.thevipershow.bedwars.game.objects.TeamManager;
-import me.thevipershow.bedwars.listeners.UnregisterableListener;
+import me.thevipershow.bedwars.game.data.game.BedwarsPlayer;
+import me.thevipershow.bedwars.game.managers.TeamManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 
@@ -18,7 +17,7 @@ public final class BedwarsPlayerQuitUnregisterableListener extends Unregisterabl
     private void announcePlayerQuit(BedwarsPlayer bedwarsPlayer) {
         TeamManager<?> teamManager = activeGame.getTeamManager();
         BedwarsTeam quitTeam = bedwarsPlayer.getBedwarsTeam();
-        final String message = GameUtils.color("&" + quitTeam.getColorCode() + bedwarsPlayer.getName() + " &7has quit this game.");
+        String message = GameUtils.color("&" + quitTeam.getColorCode() + bedwarsPlayer.getName() + " &7has quit this game.");
         teamManager.performAll(bp -> bp.sendMessage(message));
     }
 

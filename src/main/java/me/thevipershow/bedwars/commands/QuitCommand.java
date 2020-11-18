@@ -1,13 +1,12 @@
 package me.thevipershow.bedwars.commands;
 
 import java.util.Collection;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.ActiveGameState;
-import me.thevipershow.bedwars.game.GameManager;
+import me.thevipershow.bedwars.game.managers.GameManager;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;

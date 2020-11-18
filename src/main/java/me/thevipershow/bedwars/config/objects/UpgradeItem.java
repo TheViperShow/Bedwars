@@ -4,9 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import me.thevipershow.bedwars.AllStrings;
-import me.thevipershow.bedwars.game.ActiveGame;
-import me.thevipershow.bedwars.game.objects.BedwarsPlayer;
-import me.thevipershow.bedwars.game.objects.TeamData;
 import me.thevipershow.bedwars.game.shop.ShopCategory;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 

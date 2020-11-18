@@ -8,13 +8,12 @@ import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.config.objects.SpawnPosition;
 import me.thevipershow.bedwars.config.objects.TeamSpawnPosition;
 import me.thevipershow.bedwars.events.TeamBedDestroyEvent;
-import me.thevipershow.bedwars.game.AbstractActiveMerchant;
+import me.thevipershow.bedwars.game.upgrades.merchants.AbstractActiveMerchant;
 import me.thevipershow.bedwars.game.ActiveGame;
-import me.thevipershow.bedwars.game.ActiveSpawner;
+import me.thevipershow.bedwars.game.spawners.ActiveSpawner;
 import me.thevipershow.bedwars.game.GameUtils;
-import me.thevipershow.bedwars.game.objects.BedwarsPlayer;
-import me.thevipershow.bedwars.game.objects.CachedGameData;
-import me.thevipershow.bedwars.listeners.UnregisterableListener;
+import me.thevipershow.bedwars.game.data.game.BedwarsPlayer;
+import me.thevipershow.bedwars.game.data.game.CachedGameData;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -160,11 +159,11 @@ public final class MapProtectionUnregisterableListener extends UnregisterableLis
      * @param blockPlaced The block placed.
      */
     private void spawnTNT(Player whoPlaced, Block blockPlaced) {
-        TNTPrimed tntPrimed = whoPlaced.getWorld().spawn(blockPlaced.getLocation().add(+.5, +.05, +.5), TNTPrimed.class);
-        UUID tntUUID = tntPrimed.getUniqueId();
-        HashMap<UUID, UUID> tntMap = activeGame.getKillTracker().getPlacedTNTMap();
-        tntMap.put(tntPrimed.getUniqueId(), tntUUID);
-        activeGame.getPlugin().getServer().getScheduler().runTaskLater(activeGame.getPlugin(), () -> tntMap.remove(tntUUID), tntPrimed.getFuseTicks() + 1L);
+        whoPlaced.getWorld().spawn(blockPlaced.getLocation().add(0.5, 0.05, 0.5), TNTPrimed.class);
+       // UUID tntUUID = tntPrimed.getUniqueId();
+       // HashMap<UUID, UUID> tntMap = activeGame.getKillTracker().getPlacedTNTMap();
+       // tntMap.put(tntPrimed.getUniqueId(), tntUUID);
+       // activeGame.getPlugin().getServer().getScheduler().runTaskLater(activeGame.getPlugin(), () -> tntMap.remove(tntUUID), tntPrimed.getFuseTicks() + 1L);
         GameUtils.decreaseItemInHand(whoPlaced);
     }
 }

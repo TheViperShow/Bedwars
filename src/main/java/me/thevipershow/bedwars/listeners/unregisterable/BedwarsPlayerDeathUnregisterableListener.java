@@ -6,11 +6,10 @@ import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.events.BedwarsPlayerDeathEvent;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.GameUtils;
-import me.thevipershow.bedwars.game.objects.BedwarsPlayer;
-import me.thevipershow.bedwars.game.objects.PlayerState;
-import me.thevipershow.bedwars.game.objects.TeamManager;
-import me.thevipershow.bedwars.listeners.UnregisterableListener;
-import me.thevipershow.bedwars.listeners.game.RespawnRunnable;
+import me.thevipershow.bedwars.game.data.game.BedwarsPlayer;
+import me.thevipershow.bedwars.game.managers.TeamManager;
+import me.thevipershow.bedwars.game.runnables.RespawnRunnable;
+import me.thevipershow.bedwars.listeners.DeathMessages;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -56,16 +55,17 @@ public final class BedwarsPlayerDeathUnregisterableListener extends Unregisterab
      */
     @Nullable
     private BedwarsPlayer findTNTOwner(@NotNull TNTPrimed tnt) {
-        UUID tntUUID = tnt.getUniqueId();
-        UUID bedwarsPlayerUUID = activeGame.getKillTracker().getPlacedTNTMap().get(tntUUID);
-        if (bedwarsPlayerUUID == null) {
+        Entity tntSource = tnt.getSource();
+        if (tntSource == null || tntSource.getType() != EntityType.PLAYER) {
             return null;
         }
-        Player player = activeGame.getPlugin().getServer().getPlayer(bedwarsPlayerUUID);
-        if (player == null) {
+
+        Player player = (Player) tntSource;
+        if (!player.getWorld().equals(activeGame.getCachedGameData().getGame())) {
             return null;
         }
-        return activeGame.getPlayerMapper().get(bedwarsPlayerUUID);
+
+        return activeGame.getPlayerMapper().get(player);
     }
 
     /**

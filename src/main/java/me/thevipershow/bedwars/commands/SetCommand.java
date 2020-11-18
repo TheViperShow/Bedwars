@@ -5,7 +5,7 @@ import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
 import me.thevipershow.bedwars.bedwars.Gamemode;
 import me.thevipershow.bedwars.commands.tasks.VillagerQueueInteractor;
-import me.thevipershow.bedwars.game.GameManager;
+import me.thevipershow.bedwars.game.managers.GameManager;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;

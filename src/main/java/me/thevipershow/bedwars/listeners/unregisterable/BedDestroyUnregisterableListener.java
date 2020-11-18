@@ -5,11 +5,10 @@ import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.events.TeamBedDestroyEvent;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.GameUtils;
-import me.thevipershow.bedwars.game.objects.BedwarsPlayer;
-import me.thevipershow.bedwars.game.objects.TeamData;
-import me.thevipershow.bedwars.game.objects.TeamManager;
-import me.thevipershow.bedwars.game.objects.TeamStatus;
-import me.thevipershow.bedwars.listeners.UnregisterableListener;
+import me.thevipershow.bedwars.game.data.game.BedwarsPlayer;
+import me.thevipershow.bedwars.game.data.teams.TeamData;
+import me.thevipershow.bedwars.game.managers.TeamManager;
+import me.thevipershow.bedwars.game.data.game.enums.TeamStatus;
 import org.bukkit.Sound;
 import org.bukkit.event.EventHandler;
 

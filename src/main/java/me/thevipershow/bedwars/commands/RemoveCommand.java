@@ -2,7 +2,7 @@ package me.thevipershow.bedwars.commands;
 
 import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.commands.tasks.VillageQueueRemover;
-import me.thevipershow.bedwars.game.GameManager;
+import me.thevipershow.bedwars.game.managers.GameManager;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;

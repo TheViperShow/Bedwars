@@ -2,7 +2,6 @@ package me.thevipershow.bedwars.listeners.unregisterable;
 
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.GameUtils;
-import me.thevipershow.bedwars.listeners.UnregisterableListener;
 import net.minecraft.server.v1_8_R3.EntityLargeFireball;
 import net.minecraft.server.v1_8_R3.EntityLiving;
 import net.minecraft.server.v1_8_R3.World;

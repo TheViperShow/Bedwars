@@ -2,7 +2,8 @@ package me.thevipershow.bedwars.game;
 
 import java.util.concurrent.CompletableFuture;
 import me.thevipershow.bedwars.AllStrings;
-import me.thevipershow.bedwars.game.objects.BedwarsPlayer;
+import me.thevipershow.bedwars.game.managers.ExperienceManager;
+import me.thevipershow.bedwars.game.data.game.BedwarsPlayer;
 import me.thevipershow.bedwars.storage.sql.tables.QuestsTableUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;

@@ -23,8 +23,8 @@ import me.thevipershow.bedwars.config.objects.upgradeshop.traps.AlarmTrap;
 import me.thevipershow.bedwars.config.objects.upgradeshop.traps.BlindnessAndPoisonTrap;
 import me.thevipershow.bedwars.config.objects.upgradeshop.traps.CounterOffensiveTrap;
 import me.thevipershow.bedwars.config.objects.upgradeshop.traps.MinerFatigueTrap;
-import me.thevipershow.bedwars.game.objects.BedwarsPlayer;
-import me.thevipershow.bedwars.game.objects.TeamData;
+import me.thevipershow.bedwars.game.managers.EnderchestManager;
+import me.thevipershow.bedwars.game.data.teams.TeamData;
 import me.thevipershow.bedwars.game.shop.ShopCategory;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -32,7 +32,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.jetbrains.annotations.NotNull;
 
 public final class GameInventories {
     private final ActiveGame activeGame;

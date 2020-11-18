@@ -1,22 +1,20 @@
 package me.thevipershow.bedwars;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import me.thevipershow.bedwars.commands.BedwarsMainCommand;
 import me.thevipershow.bedwars.config.ConfigManager;
 import me.thevipershow.bedwars.config.DefaultConfiguration;
 import me.thevipershow.bedwars.config.folders.BedwarsGameFactory;
 import me.thevipershow.bedwars.config.folders.ConfigFiles;
 import me.thevipershow.bedwars.config.folders.ValidFoldersDiscoverer;
-import me.thevipershow.bedwars.game.GameManager;
+import me.thevipershow.bedwars.game.managers.GameManager;
 import me.thevipershow.bedwars.game.GameUtils;
-import me.thevipershow.bedwars.listeners.ActiveGameTerminateListener;
-import me.thevipershow.bedwars.listeners.LevelUpListener;
-import me.thevipershow.bedwars.listeners.queue.MatchmakingVillagersListener;
-import me.thevipershow.bedwars.listeners.queue.QueueResizerListener;
+import me.thevipershow.bedwars.listeners.global.ActiveGameTerminateListener;
+import me.thevipershow.bedwars.listeners.global.LevelUpListener;
+import me.thevipershow.bedwars.listeners.global.MatchmakingVillagersListener;
+import me.thevipershow.bedwars.listeners.global.QueueResizerListener;
 import me.thevipershow.bedwars.placeholders.BedwarsExpansion;
 import me.thevipershow.bedwars.storage.sql.DataCleaner;
 import me.thevipershow.bedwars.storage.sql.Database;

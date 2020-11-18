@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import me.thevipershow.bedwars.game.Pair;
+import me.thevipershow.bedwars.game.data.Pair;
 import me.thevipershow.bedwars.storage.sql.MySQLDatabase;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;

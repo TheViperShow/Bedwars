@@ -2,12 +2,11 @@ package me.thevipershow.bedwars.listeners.unregisterable;
 
 import me.thevipershow.bedwars.events.BedwarsPlayerDeathEvent;
 import me.thevipershow.bedwars.game.ActiveGame;
-import me.thevipershow.bedwars.game.objects.BedwarsPlayer;
-import me.thevipershow.bedwars.game.objects.PlayerState;
-import me.thevipershow.bedwars.game.objects.TeamData;
-import me.thevipershow.bedwars.game.objects.TeamManager;
-import me.thevipershow.bedwars.game.objects.TeamStatus;
-import me.thevipershow.bedwars.listeners.UnregisterableListener;
+import me.thevipershow.bedwars.game.data.game.BedwarsPlayer;
+import me.thevipershow.bedwars.game.data.game.enums.PlayerState;
+import me.thevipershow.bedwars.game.data.teams.TeamData;
+import me.thevipershow.bedwars.game.managers.TeamManager;
+import me.thevipershow.bedwars.game.data.game.enums.TeamStatus;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;

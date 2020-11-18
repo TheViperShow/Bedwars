@@ -1,14 +1,15 @@
 package me.thevipershow.bedwars.listeners.unregisterable;
 
-import com.google.common.collect.Maps;
 import java.util.Map;
 import java.util.UUID;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
+import me.thevipershow.bedwars.events.BedwarsFriendlyFireEvent;
 import me.thevipershow.bedwars.game.ActiveGame;
-import me.thevipershow.bedwars.game.objects.BedwarsPlayer;
-import me.thevipershow.bedwars.game.objects.TeamData;
-import me.thevipershow.bedwars.listeners.UnregisterableListener;
+import me.thevipershow.bedwars.game.data.game.BedwarsPlayer;
+import me.thevipershow.bedwars.game.data.teams.TeamData;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
@@ -27,25 +28,23 @@ public final class GameEntitiesProtectionUnregisterableListener extends Unregist
     private boolean isArmorStand(UUID uuid) {
         return activeGame.getActiveSpawnersManager().getActiveSpawners()
                 .stream()
+                .filter(s -> !s.getSpawner().isInvisible())
                 .anyMatch(s -> s.getStand().getUniqueId().equals(uuid));
     }
 
-    private boolean isFriend(BedwarsTeam attackerTeam, UUID attacked) {
+    private BedwarsPlayer isFriend(BedwarsTeam attackerTeam, UUID attacked) {
         for (Map.Entry<BedwarsTeam, ? extends TeamData<?>> entry : activeGame.getTeamManager().getDataMap().entrySet()) {
             if (entry.getKey() == attackerTeam) {
                 for (BedwarsPlayer bedwarsPlayer : entry.getValue().getAll()) {
                     if (bedwarsPlayer.getUniqueId().equals(attacked)) {
-                        return true;
+                        return bedwarsPlayer;
                     }
                 }
                 break;
             }
         }
-        return false;
-        //return activeGame.getTeamManager().getDataMap().entrySet()
-        //         .stream()
-        //        .filter(e -> e.getKey() == attackerTeam)
-        //        .anyMatch(e -> e.getValue().getAll().stream().anyMatch(bp -> bp.getUniqueId().equals(attacked)));
+
+        return null;
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -56,6 +55,24 @@ public final class GameEntitiesProtectionUnregisterableListener extends Unregist
             return;
         }
 
+        if (isGameMerchant(damagedUUID) || isArmorStand(damagedUUID)) {
+            event.setCancelled(true);
+        }
 
+        Entity damager = event.getDamager();
+        if (damager.getType() == EntityType.PLAYER) {
+            BedwarsPlayer damagerBedwarsPlayer = activeGame.getPlayerMapper().get((Player) damager);
+            if (damagerBedwarsPlayer == null) {
+                return;
+            }
+            BedwarsPlayer friend = isFriend(damagerBedwarsPlayer.getBedwarsTeam(), damagedUUID);
+            if (friend != null) {
+                BedwarsFriendlyFireEvent friendlyFireEvent = new BedwarsFriendlyFireEvent(activeGame, damagerBedwarsPlayer, friend);
+                if (!friendlyFireEvent.isCancelled()) {
+                    event.setCancelled(true);
+                }
+            }
+
+        }
     }
 }

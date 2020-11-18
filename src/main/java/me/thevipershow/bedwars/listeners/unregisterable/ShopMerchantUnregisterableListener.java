@@ -2,8 +2,7 @@ package me.thevipershow.bedwars.listeners.unregisterable;
 
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.ActiveGameState;
-import me.thevipershow.bedwars.game.ShopActiveMerchant;
-import me.thevipershow.bedwars.listeners.UnregisterableListener;
+import me.thevipershow.bedwars.game.upgrades.merchants.impl.ShopActiveMerchant;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;

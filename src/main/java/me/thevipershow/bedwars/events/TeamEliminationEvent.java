@@ -11,13 +11,19 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class TeamEliminationEvent extends ActiveGameEvent implements Cancellable {
 
+    public enum EliminationCause {
+        DEATH, QUIT
+    }
+
     private static final HandlerList handlers = new HandlerList();
     private final BedwarsTeam bedwarsTeam;
     private boolean cancelled = false;
+    private final EliminationCause eliminationCause;
 
-    public TeamEliminationEvent(@NotNull ActiveGame activeGame, @NotNull BedwarsTeam bedwarsTeam) {
+    public TeamEliminationEvent(@NotNull ActiveGame activeGame, @NotNull BedwarsTeam bedwarsTeam, @NotNull EliminationCause eliminationCause) {
         super(activeGame);
         this.bedwarsTeam = bedwarsTeam;
+        this.eliminationCause = eliminationCause;
     }
 
     /**
