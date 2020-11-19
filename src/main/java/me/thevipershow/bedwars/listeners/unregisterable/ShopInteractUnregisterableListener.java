@@ -11,8 +11,10 @@ import me.thevipershow.bedwars.config.objects.ShopItem;
 import me.thevipershow.bedwars.config.objects.UpgradeItem;
 import me.thevipershow.bedwars.config.objects.UpgradeLevel;
 import me.thevipershow.bedwars.game.ActiveGame;
+import me.thevipershow.bedwars.game.ArmorSet;
 import me.thevipershow.bedwars.game.GameUtils;
 import me.thevipershow.bedwars.game.data.game.BedwarsPlayer;
+import me.thevipershow.bedwars.game.data.teams.TeamData;
 import me.thevipershow.bedwars.game.shop.ShopCategory;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -26,6 +28,8 @@ public final class ShopInteractUnregisterableListener extends UnregisterableList
     public ShopInteractUnregisterableListener(ActiveGame activeGame) {
         super(activeGame);
     }
+
+
 
     private void shopLogic(BedwarsPlayer bedwarsPlayer, ShopCategory shopCategory, int clickedSlot, ItemStack clickedItem) {
         final BedwarsGame bedwarsGame = activeGame.getBedwarsGame();
@@ -57,8 +61,14 @@ public final class ShopInteractUnregisterableListener extends UnregisterableList
                 if (inv.contains(buyWith, cost)) {
                     GameUtils.paySound(bedwarsPlayer.getPlayer());
                     GameUtils.payMaterial(buyWith, cost, inv);
-                    GameUtils.giveStackToPlayer(item.getCachedGameStack(), bedwarsPlayer.getPlayer(), inv.getContents());
-                    //inv.addItem(item.getCachedGameStack());
+
+                    if (GameUtils.isArmor(clickedItem)) {
+                        TeamData<?> data = activeGame.getTeamManager().dataOfBedwarsPlayer(bedwarsPlayer);
+                        ArmorSet.setArmorFromType(bedwarsPlayer.getPlayer(), clickedItem.getType().name().split("_")[0], true, data.getArmorProtection());
+                    } else {
+                        GameUtils.giveStackToPlayer(item.getCachedGameStack(), bedwarsPlayer.getPlayer(), inv.getContents());
+                    }
+
                 } else {
                     GameUtils.buyFailSound(bedwarsPlayer.getPlayer());
                     bedwarsPlayer.sendMessage(AllStrings.PREFIX.get() + AllStrings.YOU_DID_NOT_HAVE_ENOUGH.get() + GameUtils.beautifyCaps(buyWith.name()));

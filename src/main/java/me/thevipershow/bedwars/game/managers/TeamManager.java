@@ -3,18 +3,19 @@ package me.thevipershow.bedwars.game.managers;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import me.thevipershow.bedwars.bedwars.Gamemode;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
-import me.thevipershow.bedwars.events.TeamEliminationEvent;
-import me.thevipershow.bedwars.events.TeamWinEvent;
+import me.thevipershow.bedwars.api.TeamEliminationEvent;
+import me.thevipershow.bedwars.api.TeamWinEvent;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.data.game.BedwarsPlayer;
-import me.thevipershow.bedwars.game.data.teams.impl.MultiTeamData;
 import me.thevipershow.bedwars.game.data.game.enums.PlayerState;
-import me.thevipershow.bedwars.game.data.teams.TeamData;
 import me.thevipershow.bedwars.game.data.game.enums.TeamStatus;
+import me.thevipershow.bedwars.game.data.teams.TeamData;
+import me.thevipershow.bedwars.game.data.teams.impl.MultiTeamData;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -42,6 +43,23 @@ public abstract class TeamManager<T> {
 
     public final TeamData<T> dataOfTeam(BedwarsTeam team) {
         return this.dataMap.get(team);
+    }
+
+    /**
+     * Clean all inventories for teams.
+     */
+    public final void cleanAllInventories() {
+        this.performAll(bedwarsPlayer -> bedwarsPlayer.getInventory().clear());
+    }
+
+    /**
+     * Cleann all effects for teams.
+     */
+    public final void cleanAllEffects() {
+        this.performAll(bedwarsPlayer -> {
+            Player player = bedwarsPlayer.getPlayer();
+            player.getActivePotionEffects().forEach(pe -> player.removePotionEffect(pe.getType()));
+        });
     }
 
     /**
@@ -104,7 +122,7 @@ public abstract class TeamManager<T> {
         List<BedwarsTeam> result = dataMap.entrySet()
                 .stream()
                 .filter(e -> e.getValue().getStatus() != TeamStatus.ELIMINATED)
-                .map(Map.Entry::getKey)
+                .map(Entry::getKey)
                 .collect(Collectors.toList());
 
         if (result.size() != 1) {

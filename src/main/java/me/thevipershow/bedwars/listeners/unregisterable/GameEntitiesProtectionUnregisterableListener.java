@@ -3,7 +3,7 @@ package me.thevipershow.bedwars.listeners.unregisterable;
 import java.util.Map;
 import java.util.UUID;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
-import me.thevipershow.bedwars.events.BedwarsFriendlyFireEvent;
+import me.thevipershow.bedwars.api.BedwarsFriendlyFireEvent;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.data.game.BedwarsPlayer;
 import me.thevipershow.bedwars.game.data.teams.TeamData;
@@ -12,6 +12,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 
 public final class GameEntitiesProtectionUnregisterableListener extends UnregisterableListener {
 
@@ -73,6 +74,17 @@ public final class GameEntitiesProtectionUnregisterableListener extends Unregist
                 }
             }
 
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
+        Entity entity = event.getRightClicked();
+        if (!entity.getWorld().equals(activeGame.getCachedGameData().getGame())) {
+            return;
+        }
+        if (entity.getType() == EntityType.ARMOR_STAND) {
+            event.setCancelled(true);
         }
     }
 }

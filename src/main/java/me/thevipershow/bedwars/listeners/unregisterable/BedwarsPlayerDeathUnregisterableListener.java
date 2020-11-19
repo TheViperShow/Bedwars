@@ -1,9 +1,8 @@
 package me.thevipershow.bedwars.listeners.unregisterable;
 
 import com.google.common.collect.ImmutableList;
-import java.util.UUID;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
-import me.thevipershow.bedwars.events.BedwarsPlayerDeathEvent;
+import me.thevipershow.bedwars.api.BedwarsPlayerDeathEvent;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.GameUtils;
 import me.thevipershow.bedwars.game.data.game.BedwarsPlayer;

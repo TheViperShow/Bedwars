@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
-import me.thevipershow.bedwars.events.BedwarsLevelUpEvent;
+import me.thevipershow.bedwars.api.BedwarsLevelUpEvent;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.data.game.BedwarsPlayer;
 import me.thevipershow.bedwars.storage.sql.tables.RankTableUtils;

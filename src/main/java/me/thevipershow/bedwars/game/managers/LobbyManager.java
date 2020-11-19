@@ -2,8 +2,7 @@ package me.thevipershow.bedwars.game.managers;
 
 import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
-import me.thevipershow.bedwars.events.GameStartEvent;
-import me.thevipershow.bedwars.game.AbstractLobbyTicker;
+import me.thevipershow.bedwars.api.GameStartEvent;
 import me.thevipershow.bedwars.game.AbstractQueue;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.ActiveGameState;
@@ -15,7 +14,7 @@ import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
-public final class LobbyManager extends AbstractLobbyTicker {
+public final class LobbyManager extends AbstractLobbyManager {
 
     private final AbstractQueue<Player> associatedQueue;
 

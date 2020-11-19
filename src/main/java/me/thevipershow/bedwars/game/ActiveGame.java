@@ -3,10 +3,11 @@ package me.thevipershow.bedwars.game;
 import java.util.Objects;
 import me.thevipershow.bedwars.bedwars.Gamemode;
 import me.thevipershow.bedwars.config.objects.BedwarsGame;
-import me.thevipershow.bedwars.events.ActiveGameEvent;
-import me.thevipershow.bedwars.events.ActiveGameTerminateEvent;
+import me.thevipershow.bedwars.api.ActiveGameEvent;
+import me.thevipershow.bedwars.api.ActiveGameTerminateEvent;
 import me.thevipershow.bedwars.game.data.game.BedwarsPlayer;
 import me.thevipershow.bedwars.game.deathmatch.AbstractDeathmatch;
+import me.thevipershow.bedwars.game.managers.ArmorManager;
 import me.thevipershow.bedwars.game.managers.ExperienceManager;
 import me.thevipershow.bedwars.game.managers.LobbyManager;
 import me.thevipershow.bedwars.game.managers.ActiveSpawnersManager;
@@ -82,7 +83,8 @@ public final class ActiveGame {
                 new TrapsManager(this),
                 new MapManager(this),
                 new BedManager(this),
-                new UpgradesManager(this));
+                new UpgradesManager(this),
+                new ArmorManager(this));
     }
 
     /*---------------------------------------------------------------------------------------------------------------*/
@@ -183,7 +185,7 @@ public final class ActiveGame {
 
         getTeamManager().setEveryoneStatus(PlayerState.PLAYING); // setting everyone's status to playing
 
-        getBedDestroyer().destroyInactiveBeds(); // removing all beds that are not assigned from the map
+        getBedManager().destroyInactiveBeds(); // removing all beds that are not assigned from the map
 
         getGameInventories().assignPlayerShop(); // assigning a shop to each player
 
@@ -205,6 +207,8 @@ public final class ActiveGame {
         getAbstractDeathmatch().start();            // starting the deathmatch
 
         getMovementsManager().moveToSpawnpoints();  // Ideally we want everything to get generated before teleporting.
+
+        getArmorManager().giveDefaultColoredSet(); // giving default colored leather armor with enchant.
     }
 
     /**
@@ -223,6 +227,9 @@ public final class ActiveGame {
         getListenersManager().disableAllByPhase(GameListener.RegistrationStage.STARTUP);
         getListenersManager().disableAllByPhase(GameListener.RegistrationStage.INITIALIZATION);
 
+        getTeamManager().cleanAllEffects(); // clean all effects.
+        getTeamManager().cleanAllInventories(); // clean all inventories.
+
         // The game is marked as finished from now on.
         callGameEvent(new ActiveGameTerminateEvent(this));
     }
@@ -233,11 +240,15 @@ public final class ActiveGame {
         this.plugin.getServer().getPluginManager().callEvent(activeGameEvent);
     }
 
+    public final ArmorManager getArmorManager() {
+        return internalGameManager.getArmorManager();
+    }
+
     public final UpgradesManager getUpgradesManager() {
         return internalGameManager.getUpgradesManager();
     }
 
-    public final BedManager getBedDestroyer() {
+    public final BedManager getBedManager() {
         return internalGameManager.getBedDestroyer();
     }
 

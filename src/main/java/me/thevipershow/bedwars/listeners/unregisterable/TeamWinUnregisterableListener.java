@@ -2,7 +2,7 @@ package me.thevipershow.bedwars.listeners.unregisterable;
 
 import me.thevipershow.bedwars.bedwars.Gamemode;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
-import me.thevipershow.bedwars.events.TeamWinEvent;
+import me.thevipershow.bedwars.api.TeamWinEvent;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.GameUtils;
 import me.thevipershow.bedwars.game.data.teams.TeamData;

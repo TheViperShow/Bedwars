@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.config.objects.SpawnPosition;
-import me.thevipershow.bedwars.events.TrapTriggerEvent;
+import me.thevipershow.bedwars.api.TrapTriggerEvent;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.data.game.BedwarsPlayer;
 import me.thevipershow.bedwars.game.data.game.enums.PlayerState;

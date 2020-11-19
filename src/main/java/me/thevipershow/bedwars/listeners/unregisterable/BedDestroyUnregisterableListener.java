@@ -2,7 +2,7 @@ package me.thevipershow.bedwars.listeners.unregisterable;
 
 import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
-import me.thevipershow.bedwars.events.TeamBedDestroyEvent;
+import me.thevipershow.bedwars.api.TeamBedDestroyEvent;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.GameUtils;
 import me.thevipershow.bedwars.game.data.game.BedwarsPlayer;
@@ -32,6 +32,7 @@ public final class BedDestroyUnregisterableListener extends UnregisterableListen
         data.setStatus(TeamStatus.BED_BROKEN);
 
         data.perform(bedwarsPlayer -> bedwarsPlayer.sendTitle(null, AllStrings.YOUR_BED_BROKEN.get()));
+
         teamManager.performAll(bedwarsPlayer -> {
             bedwarsPlayer.playSound(Sound.ENDERDRAGON_GROWL, 10.0f, 1.0f);
             bedwarsPlayer.sendMessage(GameUtils.color("&" + brokenTeam.getColorCode() + brokenTeam.name() + AllStrings.BED_BROKEN_BY.get() + brokenByTeam.getColorCode() + brokenBy.getName()));

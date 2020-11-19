@@ -1,4 +1,4 @@
-package me.thevipershow.bedwars.events;
+package me.thevipershow.bedwars.api;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;

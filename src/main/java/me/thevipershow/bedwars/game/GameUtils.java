@@ -186,15 +186,11 @@ public final class GameUtils {
 
     public static boolean isArmor(final ItemStack stack) {
         final Material material = stack.getType();
-        if (material.isBlock() || material.isSolid()) {
-            return false;
-        }
-        for (Slots value : Slots.values()) {
-            for (Material m : value.getBindMap().values()) {
-                if (m == material) return true;
-            }
-        }
-        return false;
+        final boolean isHelmet = material.name().endsWith("_HELMET");
+        final boolean isChestplate = material.name().endsWith("_CHESTPLATE");
+        final boolean isLeggings = material.name().endsWith("_LEGGINGS");
+        final boolean isBoots = material.name().endsWith("_BOOTS");
+        return isHelmet || isChestplate || isLeggings || isBoots;
     }
 
 

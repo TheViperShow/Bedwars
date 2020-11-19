@@ -1,7 +1,9 @@
 package me.thevipershow.bedwars.game.data.teams;
 
+import com.google.common.collect.Maps;
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Consumer;
 import me.thevipershow.bedwars.bedwars.Gamemode;
@@ -10,7 +12,9 @@ import me.thevipershow.bedwars.game.data.game.BedwarsPlayer;
 import me.thevipershow.bedwars.game.data.game.PlayerMapper;
 import me.thevipershow.bedwars.game.data.game.enums.TeamStatus;
 import me.thevipershow.bedwars.game.upgrades.traps.ActiveHealPool;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 public abstract class TeamData<T> {
 
@@ -30,6 +34,16 @@ public abstract class TeamData<T> {
     private ActiveHealPool activeHealPool;
     private final Gamemode gamemode;
     private final PlayerMapper playerMapper;
+
+    @Nullable
+    public Entry<Enchantment, Integer> getArmorProtection() {
+        final Integer protectionUpgradeLevel = this.upgradesShopLevelsMap.get(UpgradeType.REINFORCED_ARMOR);
+        if (protectionUpgradeLevel == 0) {
+            return null;
+        } else {
+            return Maps.immutableEntry(Enchantment.PROTECTION_ENVIRONMENTAL, protectionUpgradeLevel);
+        }
+    }
 
     public abstract void add(Player player);
 

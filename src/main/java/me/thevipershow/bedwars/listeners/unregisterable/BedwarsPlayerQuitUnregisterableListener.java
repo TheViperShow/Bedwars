@@ -1,7 +1,7 @@
 package me.thevipershow.bedwars.listeners.unregisterable;
 
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
-import me.thevipershow.bedwars.events.BedwarsPlayerQuitEvent;
+import me.thevipershow.bedwars.api.BedwarsPlayerQuitEvent;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.GameUtils;
 import me.thevipershow.bedwars.game.data.game.BedwarsPlayer;

@@ -1,6 +1,6 @@
 package me.thevipershow.bedwars.listeners.global;
 
-import me.thevipershow.bedwars.events.ActiveGameTerminateEvent;
+import me.thevipershow.bedwars.api.ActiveGameTerminateEvent;
 import me.thevipershow.bedwars.worlds.WorldsManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

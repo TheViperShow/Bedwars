@@ -1,10 +1,11 @@
-package me.thevipershow.bedwars.game;
+package me.thevipershow.bedwars.game.managers;
 
 import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
+import me.thevipershow.bedwars.game.ActiveGame;
 import org.bukkit.scheduler.BukkitTask;
 
-public abstract class AbstractLobbyTicker {
+public abstract class AbstractLobbyManager {
 
     protected final ActiveGame activeGame;
     protected BukkitTask gameStarterTask = null;
@@ -35,7 +36,7 @@ public abstract class AbstractLobbyTicker {
         }
     }
 
-    public AbstractLobbyTicker(ActiveGame activeGame) {
+    public AbstractLobbyManager(ActiveGame activeGame) {
         this.activeGame = activeGame;
         this.missingTime = activeGame.getBedwarsGame().getStartTimer();
     }

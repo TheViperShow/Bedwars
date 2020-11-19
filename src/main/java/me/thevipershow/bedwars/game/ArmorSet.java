@@ -1,57 +1,91 @@
 package me.thevipershow.bedwars.game;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.Map;
-import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
+import com.google.common.collect.Maps;
+import java.util.Locale;
+import java.util.Map.Entry;
+import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
-public final class ArmorSet {
+public enum ArmorSet {
 
-    public static class MapBuilder<K, V> {
-        private final Map<K, V> map;
-
-        public MapBuilder(Map<K, V> map) {
-            this.map = map;
+    BOOTS(Maps.immutableEntry("leather", Material.LEATHER_BOOTS),
+            Maps.immutableEntry("iron", Material.IRON_BOOTS),
+            Maps.immutableEntry("diamond", Material.DIAMOND_BOOTS)) {
+        @Override
+        public final void setArmorPiece(PlayerInventory inventory, ItemStack stack) {
+            inventory.setBoots(stack);
         }
+    },
 
-        public MapBuilder<K, V> put(K k, V v) {
-            map.put(k, v);
-            return this;
+    LEGGINGS(Maps.immutableEntry("leather", Material.LEATHER_LEGGINGS),
+            Maps.immutableEntry("iron", Material.IRON_LEGGINGS),
+            Maps.immutableEntry("diamond", Material.DIAMOND_LEGGINGS)) {
+        @Override
+        public final void setArmorPiece(PlayerInventory inventory, ItemStack stack) {
+            inventory.setLeggings(stack);
         }
+    },
 
-        public Map<K, V> build() {
-            return Collections.unmodifiableMap(this.map);
+    HELMET(Maps.immutableEntry("leather", Material.LEATHER_HELMET),
+            Maps.immutableEntry("iron", Material.IRON_HELMET),
+            Maps.immutableEntry("diamond", Material.DIAMOND_HELMET)) {
+        @Override
+        public final void setArmorPiece(PlayerInventory inventory, ItemStack stack) {
+            inventory.setHelmet(stack);
+        }
+    },
+
+    CHESTPLATE(Maps.immutableEntry("leather", Material.LEATHER_CHESTPLATE),
+            Maps.immutableEntry("iron", Material.IRON_CHESTPLATE),
+            Maps.immutableEntry("diamond", Material.DIAMOND_CHESTPLATE)) {
+        @Override
+        public final void setArmorPiece(PlayerInventory inventory, ItemStack stack) {
+            inventory.setChestplate(stack);
         }
     }
+    ;
 
-    private final EnumMap<Slots, ItemStack> armorSet = new EnumMap<>(Slots.class);
+    private final Entry<String, Material>[] entries;
 
-    public final void upgradeAll(final String type) {
-        armorSet.put(Slots.LEGGINGS, Slots.LEGGINGS.generateItemStack(type));
-        armorSet.put(Slots.BOOTS, Slots.BOOTS.generateItemStack(type));
+    public abstract void setArmorPiece(PlayerInventory inventory, ItemStack stack);
+
+    @SafeVarargs
+    ArmorSet(Entry<String, Material>... entries) {
+        this.entries = entries;
     }
 
-    public ArmorSet(final BedwarsTeam team) {
-        if (team == null) {
-            throw new UnsupportedOperationException();
-        }
-        for (final Slots slots : Slots.values()) {
-            final ItemStack toSet = slots.generateColoredItemStack(team, "LEATHER");
-            if (slots == Slots.HELMET) {
-                toSet.addEnchantment(Enchantment.WATER_WORKER, 1);
+    @SafeVarargs
+    public final void setArmor(Player player, String type, final Entry<Enchantment, Integer>... applyToAll) {
+        PlayerInventory inv = player.getInventory();
+        for (Entry<String, Material> entry : entries) {
+            if (entry.getKey().equals(type)) {
+                ItemStack stack = new ItemStack(entry.getValue(), 1);
+                for (Entry<Enchantment, Integer> enchantmentIntegerEntry : applyToAll) {
+                    if (enchantmentIntegerEntry != null) {
+                        stack.addUnsafeEnchantment(enchantmentIntegerEntry.getKey(), enchantmentIntegerEntry.getValue());
+                    }
+                }
+                setArmorPiece(inv, stack);
+                break;
             }
-            armorSet.put(slots, toSet);
         }
     }
 
-    public Collection<ItemStack> getItems() {
-        return getArmorSet().values();
-    }
+    final static ArmorSet[] r = {LEGGINGS, BOOTS};
 
-    public EnumMap<Slots, ItemStack> getArmorSet() {
-        return armorSet;
+    @SafeVarargs
+    public static void setArmorFromType(Player player, String armorRarityType, boolean restricted, final Entry<Enchantment, Integer>... applyToAll) {
+        final ArmorSet[] restrictedGroup = !restricted ? values() : r;
+        for (ArmorSet armorSet : restrictedGroup) {
+            for (Entry<String, Material> entry : armorSet.entries) {
+                if (entry.getKey().equals(armorRarityType.toLowerCase(Locale.ROOT))) {
+                    armorSet.setArmor(player, armorRarityType, applyToAll);
+                    break;
+                }
+            }
+        }
     }
 }

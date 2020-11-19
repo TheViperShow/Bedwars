@@ -2,7 +2,7 @@ package me.thevipershow.bedwars.listeners.global;
 
 import java.util.Random;
 import me.thevipershow.bedwars.AllStrings;
-import me.thevipershow.bedwars.events.BedwarsLevelUpEvent;
+import me.thevipershow.bedwars.api.BedwarsLevelUpEvent;
 import org.bukkit.Effect;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;

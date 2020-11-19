@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Set;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.config.objects.TeamSpawnPosition;
-import me.thevipershow.bedwars.events.TeamBedDestroyEvent;
 import me.thevipershow.bedwars.game.ActiveGame;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -34,14 +33,14 @@ public final class BedManager {
         cleanNearbyBeds(block.getLocation());
     }
 
-    private static void breakOrdered(Block bedHead, Block bedFoot) {
+    public static void breakOrdered(Block bedHead, Block bedFoot) {
         final Material air = Material.AIR;
         bedHead.setType(air);
         bedFoot.setType(air);
     }
 
-    private static void cleanNearbyBeds(Location loc) {
-        loc.getWorld().getNearbyEntities(loc, 3.0, 2.0, 3.0)
+    public static void cleanNearbyBeds(Location loc) {
+        loc.getWorld().getNearbyEntities(loc, 2.0, 1.5, 2.0)
                 .stream()
                 .filter(i -> i.getType() == EntityType.DROPPED_ITEM && ((Item) i).getItemStack().getType() == Material.BED)
                 .forEach(Entity::remove);

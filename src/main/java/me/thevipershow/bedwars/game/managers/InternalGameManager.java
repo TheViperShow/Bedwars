@@ -12,7 +12,7 @@ import org.bukkit.plugin.Plugin;
 
 public final class InternalGameManager {
 
-    public InternalGameManager(AbstractDeathmatch abstractDeathmatch, ExperienceManager experienceManager, QuestManager questManager, GameTrapTriggerer gameTrapTriggerer, KillTracker killTracker, GameInventories gameInventories, BedwarsGame bedwarsGame, TeamManager<?> teamManager, ListenersManager listenersManager, LobbyManager lobbyManager, Plugin plugin, CachedGameData cachedGameData, ActiveSpawnersManager activeSpawnersManager, MovementsManager movementsManager, InvisibilityManager invisibilityManager, PlayerMapper playerMapper, ScoreboardManager scoreboardManager, MerchantManager merchantManager, TrapsManager trapsManager, MapManager mapManager, BedManager bedManager, UpgradesManager upgradesManager) {
+    public InternalGameManager(AbstractDeathmatch abstractDeathmatch, ExperienceManager experienceManager, QuestManager questManager, GameTrapTriggerer gameTrapTriggerer, KillTracker killTracker, GameInventories gameInventories, BedwarsGame bedwarsGame, TeamManager<?> teamManager, ListenersManager listenersManager, LobbyManager lobbyManager, Plugin plugin, CachedGameData cachedGameData, ActiveSpawnersManager activeSpawnersManager, MovementsManager movementsManager, InvisibilityManager invisibilityManager, PlayerMapper playerMapper, ScoreboardManager scoreboardManager, MerchantManager merchantManager, TrapsManager trapsManager, MapManager mapManager, BedManager bedManager, UpgradesManager upgradesManager, ArmorManager armorManager) {
         this.abstractDeathmatch = abstractDeathmatch;
         this.experienceManager = experienceManager;
         this.questManager = questManager;
@@ -35,6 +35,7 @@ public final class InternalGameManager {
         this.mapManager = mapManager;
         this.bedManager = bedManager;
         this.upgradesManager = upgradesManager;
+        this.armorManager = armorManager;
     }
 
     //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -82,8 +83,13 @@ public final class InternalGameManager {
     private final MapManager mapManager;
     private final BedManager bedManager;
     private final UpgradesManager upgradesManager;
+    private final ArmorManager armorManager;
     //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+
+    public final ArmorManager getArmorManager() {
+        return armorManager;
+    }
 
     public final UpgradesManager getUpgradesManager() {
         return upgradesManager;

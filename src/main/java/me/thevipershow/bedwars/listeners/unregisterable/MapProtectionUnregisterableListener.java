@@ -1,13 +1,12 @@
 package me.thevipershow.bedwars.listeners.unregisterable;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.UUID;
 import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.config.objects.SpawnPosition;
 import me.thevipershow.bedwars.config.objects.TeamSpawnPosition;
-import me.thevipershow.bedwars.events.TeamBedDestroyEvent;
+import me.thevipershow.bedwars.api.TeamBedDestroyEvent;
+import me.thevipershow.bedwars.game.managers.BedManager;
 import me.thevipershow.bedwars.game.upgrades.merchants.AbstractActiveMerchant;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.spawners.ActiveSpawner;
@@ -68,6 +67,9 @@ public final class MapProtectionUnregisterableListener extends UnregisterableLis
         if (!returnValue) {
             TeamBedDestroyEvent destroyEvent = new TeamBedDestroyEvent(activeGame, destroyedBedTeamOwner, bedwarsPlayer);
             activeGame.getPlugin().getServer().getPluginManager().callEvent(destroyEvent);
+            if (!destroyEvent.isCancelled()) {
+                BedManager.cleanNearbyBeds(block.getLocation());
+            }
         }
 
         return returnValue;
@@ -160,10 +162,6 @@ public final class MapProtectionUnregisterableListener extends UnregisterableLis
      */
     private void spawnTNT(Player whoPlaced, Block blockPlaced) {
         whoPlaced.getWorld().spawn(blockPlaced.getLocation().add(0.5, 0.05, 0.5), TNTPrimed.class);
-       // UUID tntUUID = tntPrimed.getUniqueId();
-       // HashMap<UUID, UUID> tntMap = activeGame.getKillTracker().getPlacedTNTMap();
-       // tntMap.put(tntPrimed.getUniqueId(), tntUUID);
-       // activeGame.getPlugin().getServer().getScheduler().runTaskLater(activeGame.getPlugin(), () -> tntMap.remove(tntUUID), tntPrimed.getFuseTicks() + 1L);
         GameUtils.decreaseItemInHand(whoPlaced);
     }
 }

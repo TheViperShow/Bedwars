@@ -1,9 +1,7 @@
-package me.thevipershow.bedwars.events;
+package me.thevipershow.bedwars.api;
 
 import me.thevipershow.bedwars.game.ActiveGame;
-import me.thevipershow.bedwars.game.AbstractQueue;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 

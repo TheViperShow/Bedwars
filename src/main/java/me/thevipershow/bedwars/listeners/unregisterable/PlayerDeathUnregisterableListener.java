@@ -1,6 +1,6 @@
 package me.thevipershow.bedwars.listeners.unregisterable;
 
-import me.thevipershow.bedwars.events.BedwarsPlayerDeathEvent;
+import me.thevipershow.bedwars.api.BedwarsPlayerDeathEvent;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.data.game.BedwarsPlayer;
 import me.thevipershow.bedwars.game.data.game.enums.PlayerState;

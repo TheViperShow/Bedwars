@@ -1,4 +1,4 @@
-package me.thevipershow.bedwars.events;
+package me.thevipershow.bedwars.api;
 
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.game.ActiveGame;
