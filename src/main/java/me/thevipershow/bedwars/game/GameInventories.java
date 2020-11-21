@@ -2,6 +2,7 @@ package me.thevipershow.bedwars.game;
 
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import me.thevipershow.bedwars.AllStrings;
@@ -9,6 +10,7 @@ import me.thevipershow.bedwars.Bedwars;
 import me.thevipershow.bedwars.config.objects.BedwarsGame;
 import me.thevipershow.bedwars.config.objects.Shop;
 import me.thevipershow.bedwars.config.objects.ShopItem;
+import me.thevipershow.bedwars.config.objects.UpgradeItem;
 import me.thevipershow.bedwars.config.objects.UpgradeLevel;
 import me.thevipershow.bedwars.config.objects.upgradeshop.DragonBuffUpgrade;
 import me.thevipershow.bedwars.config.objects.upgradeshop.HealPoolUpgrade;
@@ -23,8 +25,10 @@ import me.thevipershow.bedwars.config.objects.upgradeshop.traps.AlarmTrap;
 import me.thevipershow.bedwars.config.objects.upgradeshop.traps.BlindnessAndPoisonTrap;
 import me.thevipershow.bedwars.config.objects.upgradeshop.traps.CounterOffensiveTrap;
 import me.thevipershow.bedwars.config.objects.upgradeshop.traps.MinerFatigueTrap;
+import me.thevipershow.bedwars.game.data.game.BedwarsPlayer;
 import me.thevipershow.bedwars.game.managers.EnderchestManager;
 import me.thevipershow.bedwars.game.data.teams.TeamData;
+import me.thevipershow.bedwars.game.managers.TeamManager;
 import me.thevipershow.bedwars.game.shop.ShopCategory;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -34,10 +38,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 public final class GameInventories {
+
     private final ActiveGame activeGame;
     private final EnderchestManager enderchestManager;
     private final Map<ShopCategory, Inventory> inventories = new EnumMap<>(ShopCategory.class);
     private final Map<UUID, Map<ShopCategory, Inventory>> playerShop = new HashMap<>();
+    private final Map<UUID, Map<UpgradeItem, Integer>> playerUpgradeLevels = new HashMap<>();
     private final Map<UUID, Inventory> associatedUpgradeGUI = new HashMap<>();
     private final Map<UUID, Inventory> associatedTrapsGUI = new HashMap<>();
     private final Inventory defaultUpgradeInv;
@@ -51,28 +57,89 @@ public final class GameInventories {
         this.defaultUpgradeInv = setupUpgradeGUIs(activeGame.getBedwarsGame());
     }
 
+    public final UpgradeLevel getNextUpgradeLevel(BedwarsPlayer bedwarsPlayer, UpgradeItem upgradeItem) {
+        Map<UpgradeItem, Integer> levels = this.playerUpgradeLevels.get(bedwarsPlayer.getUniqueId());
+        if (levels.containsKey(upgradeItem)) {
+            int currentLevel = levels.get(upgradeItem);
+            if (upgradeItem.getLevels().size() >= 2 + currentLevel) {
+                return upgradeItem.getLevels().get(1 + currentLevel);
+            }
+        }
+        return null;
+    }
+
+    public final boolean canUpgrade(BedwarsPlayer bedwarsPlayer, UpgradeItem upgradeItem) {
+        Map<UpgradeItem, Integer> levels = this.playerUpgradeLevels.get(bedwarsPlayer.getUniqueId());
+        if (levels.containsKey(upgradeItem)) {
+            int currentLevel = levels.get(upgradeItem);
+            return 2 + currentLevel <= upgradeItem.getLevels().size();
+        }
+        return false;
+    }
+
+    public final void assignUpgradeLevelsToAll() {
+        TeamManager<?> teamManager = activeGame.getTeamManager();
+        final List<UpgradeItem> upgradeItems = activeGame.getBedwarsGame().getShop().getUpgradeItems();
+        teamManager.performAll(bedwarsPlayer -> {
+            final UUID uuid = bedwarsPlayer.getUniqueId();
+            final Map<UpgradeItem, Integer> map = new HashMap<>();
+            upgradeItems.forEach(upgradeItem -> map.put(upgradeItem, -1));
+            this.playerUpgradeLevels.put(uuid, map);
+        });
+    }
+
     public final void assignPlayerShop() {
-        for (final TeamData<?> teamData : activeGame.getTeamManager().getDataMap().values()) {
+        for (TeamData<?> teamData : activeGame.getTeamManager().getDataMap().values()) {
             teamData.perform(bedwarsPlayer -> {
-                final Map<ShopCategory, Inventory> shopMap = new EnumMap<>(ShopCategory.class);
-                for (final ShopCategory category : ShopCategory.values()) {
-                    shopMap.put(category, cloneInventory(inventories.get(category)));
+                Map<ShopCategory, Inventory> shopMap = new EnumMap<>(ShopCategory.class);
+                for (ShopCategory category : ShopCategory.values()) {
+                    shopMap.put(category, cloneInventory(this.inventories.get(category)));
                 }
                 this.playerShop.put(bedwarsPlayer.getUniqueId(), shopMap);
             });
         }
     }
 
-    public final void updateItemUpgrade(ShopCategory category, int slot, UpgradeLevel newLevel, UUID of) {
+    public final void updateItemUpgrade(ShopCategory category, UpgradeItem upgradeItem, int slot, UUID of) {
+        BedwarsPlayer bedwarsPlayer = activeGame.getPlayerMapper().get(of);
+        if (bedwarsPlayer == null) {
+            return;
+        }
+
         Map<ShopCategory, Inventory> map = this.playerShop.get(of);
         if (map == null) {
             return;
         }
-        Inventory inv = map.get(category);
-        if (inv == null || newLevel == null) {
+
+        Map<UpgradeItem, Integer> levels = this.playerUpgradeLevels.get(of);
+        if (!levels.containsKey(upgradeItem)) {
             return;
         }
-        inv.setItem(slot, newLevel.generateFancyStack());
+
+        int currentLevel = levels.get(upgradeItem);
+        int levelToReach = 2 + currentLevel;
+
+        if (!(upgradeItem.getLevels().size() >= 1 + levelToReach)) {
+            return;
+        }
+
+        UpgradeLevel upgradeLevelToReach = upgradeItem.getLevels().get(levelToReach);
+        if (upgradeLevelToReach == null) {
+            return;
+        }
+
+        Inventory inventoryToUpdate = map.get(category);
+        if (inventoryToUpdate == null) {
+            return;
+        }
+
+        System.out.println("BINV" + inventoryToUpdate);
+
+
+        ItemStack toSet = upgradeLevelToReach.generateGameStack(); // Todo: test this shit out ->
+        inventoryToUpdate.setItem(slot, toSet);
+        levels.put(upgradeItem, 1 + currentLevel);
+        bedwarsPlayer.getPlayer().openInventory(inventoryToUpdate);
     }
 
     public final ShopCategory getOpenShopCategory(UUID uuid, Inventory openInventory) {
@@ -161,7 +228,7 @@ public final class GameInventories {
 
         shop.getItems().forEach(item -> inventories.get(item.getShopCategory()).setItem(item.getSlot(), item.getCachedFancyStack()));
         shop.getPotionItem().forEach(item -> inventories.get(item.getShopCategory()).setItem(item.getSlot(), item.getCachedFancyStack()));
-        shop.getUpgradeItems().forEach(item -> inventories.get(item.getShopCategory()).setItem(item.getSlot(), item.getLevels().get(0x00).getCachedFancyStack()));
+        shop.getUpgradeItems().forEach(item -> inventories.get(item.getShopCategory()).setItem(item.getSlot(), item.getLevels().get(0).getCachedFancyStack()));
     }
 
     public static Inventory setupTrapsGUIs(BedwarsGame bedwarsGame) {

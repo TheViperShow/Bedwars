@@ -1,7 +1,8 @@
 package me.thevipershow.bedwars.game;
 
 import com.google.common.collect.Maps;
-import java.util.Locale;
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.Map.Entry;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -45,10 +46,18 @@ public enum ArmorSet {
         public final void setArmorPiece(PlayerInventory inventory, ItemStack stack) {
             inventory.setChestplate(stack);
         }
-    }
-    ;
+    };
 
     private final Entry<String, Material>[] entries;
+
+    public final ItemStack generate(String type) {
+        for (Entry<String, Material> entry : entries) {
+            if (entry.getKey().equals(type)) {
+                return new ItemStack(entry.getValue(), 1);
+            }
+        }
+        return null;
+    }
 
     public abstract void setArmorPiece(PlayerInventory inventory, ItemStack stack);
 
@@ -65,27 +74,44 @@ public enum ArmorSet {
                 ItemStack stack = new ItemStack(entry.getValue(), 1);
                 for (Entry<Enchantment, Integer> enchantmentIntegerEntry : applyToAll) {
                     if (enchantmentIntegerEntry != null) {
-                        stack.addUnsafeEnchantment(enchantmentIntegerEntry.getKey(), enchantmentIntegerEntry.getValue());
+                        Enchantment enchantment = enchantmentIntegerEntry.getKey();
+                        int level = enchantmentIntegerEntry.getValue();
+                        System.out.println("added enchant " + enchantment.getName() + " " + level);
+                        stack.addUnsafeEnchantment(enchantment, level);
                     }
                 }
                 setArmorPiece(inv, stack);
+                System.out.println(stack.toString());
                 break;
             }
         }
     }
 
-    final static ArmorSet[] r = {LEGGINGS, BOOTS};
+    private final static ArmorSet[] r = {LEGGINGS, BOOTS};
 
-    @SafeVarargs
-    public static void setArmorFromType(Player player, String armorRarityType, boolean restricted, final Entry<Enchantment, Integer>... applyToAll) {
-        final ArmorSet[] restrictedGroup = !restricted ? values() : r;
-        for (ArmorSet armorSet : restrictedGroup) {
-            for (Entry<String, Material> entry : armorSet.entries) {
-                if (entry.getKey().equals(armorRarityType.toLowerCase(Locale.ROOT))) {
-                    armorSet.setArmor(player, armorRarityType, applyToAll);
+    public static Map<ArmorSet, ItemStack> generateFromType(String type) {
+        EnumMap<ArmorSet, ItemStack> enumMap = new EnumMap<>(ArmorSet.class);
+        for (final ArmorSet armorSet : values()) {
+            for (final Entry<String, Material> entry : armorSet.entries) {
+                if (entry.getKey().equals(type)) {
+                    enumMap.put(armorSet, new ItemStack(entry.getValue(), 1));
                     break;
                 }
             }
+        }
+        return enumMap;
+    }
+
+    public static void setArmorFromType(Player player, String armorRarityType, boolean restricted, Entry<Enchantment, Integer> applyToAll) {
+        final ArmorSet[] restrictedGroup = restricted ? r : values();
+        PlayerInventory playerInventory = player.getInventory();
+        for (int i = 0; i < restrictedGroup.length; i++) {
+            ArmorSet armorSet = restrictedGroup[i];
+            ItemStack armorStack = armorSet.generate(armorRarityType);
+            if (applyToAll != null) {
+                armorStack.addUnsafeEnchantment(applyToAll.getKey(), applyToAll.getValue());
+            }
+            armorSet.setArmorPiece(playerInventory, armorStack);
         }
     }
 }

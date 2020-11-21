@@ -1,6 +1,6 @@
 package me.thevipershow.bedwars.listeners.unregisterable;
 
-import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import me.thevipershow.bedwars.AllStrings;
@@ -12,6 +12,7 @@ import me.thevipershow.bedwars.config.objects.UpgradeItem;
 import me.thevipershow.bedwars.config.objects.UpgradeLevel;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.ArmorSet;
+import me.thevipershow.bedwars.game.GameInventories;
 import me.thevipershow.bedwars.game.GameUtils;
 import me.thevipershow.bedwars.game.data.game.BedwarsPlayer;
 import me.thevipershow.bedwars.game.data.teams.TeamData;
@@ -29,95 +30,114 @@ public final class ShopInteractUnregisterableListener extends UnregisterableList
         super(activeGame);
     }
 
+    private boolean moveShopCategory(ShopCategory category, int clickedSlot, BedwarsPlayer bedwarsPlayer) {
+        if (category.getSlot() == clickedSlot) {
+            final Map<ShopCategory, Inventory> map = activeGame.getGameInventories().getPlayerShop().get(bedwarsPlayer.getUniqueId());
+            if (map != null) {
+                Inventory tI = map.get(category);
+                if (tI != null) {
+                    bedwarsPlayer.playSound(Sound.NOTE_STICKS, 9.0f, 0.750f);
+                    bedwarsPlayer.getPlayer().openInventory(tI);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
+    private boolean buyShopItem(ShopItem item, ShopCategory shopCategory, int clickedSlot, Inventory inv, BedwarsPlayer bedwarsPlayer, ItemStack clickedItem) {
+        if (item.getShopCategory() == shopCategory && item.getSlot() == clickedSlot) {
+            Material buyWith = item.getBuyWith();
+            int cost = item.getBuyCost();
+            if (inv.contains(buyWith, cost)) {
+                GameUtils.paySound(bedwarsPlayer.getPlayer());
+                GameUtils.payMaterial(buyWith, cost, inv);
+
+                if (GameUtils.isArmor(clickedItem)) {
+                    TeamData<?> data = activeGame.getTeamManager().dataOfBedwarsPlayer(bedwarsPlayer);
+                    final String type = clickedItem.getType().name().split("_")[0].toLowerCase(Locale.ROOT);
+                    ArmorSet.setArmorFromType(bedwarsPlayer.getPlayer(), type, true, data.getArmorProtection());
+                } else {
+                    GameUtils.giveStackToPlayer(item.getCachedGameStack(), bedwarsPlayer.getPlayer(), inv.getContents());
+                }
+                return true;
+            } else {
+                GameUtils.buyFailSound(bedwarsPlayer.getPlayer());
+                bedwarsPlayer.sendMessage(AllStrings.PREFIX.get() + AllStrings.YOU_DID_NOT_HAVE_ENOUGH.get() + GameUtils.beautifyCaps(buyWith.name()));
+            }
+        }
+        return false;
+    }
+
+    private boolean buyPotionItem(PotionItem item, ShopCategory shopCategory, int clickedSlot, Inventory inv, BedwarsPlayer bedwarsPlayer) {
+        if (item.getShopCategory() == shopCategory && item.getSlot() == clickedSlot) {
+            Material buyWith = item.getBuyWith();
+            int cost = item.getPrice();
+            if (inv.contains(buyWith, cost)) {
+                GameUtils.paySound(bedwarsPlayer.getPlayer());
+                GameUtils.payMaterial(buyWith, cost, inv);
+                GameUtils.giveStackToPlayer(item.getGameStack(), bedwarsPlayer.getPlayer(), inv.getContents());
+                return true;
+            } else {
+                GameUtils.buyFailSound(bedwarsPlayer.getPlayer());
+                bedwarsPlayer.sendMessage(AllStrings.PREFIX.get() + AllStrings.YOU_DID_NOT_HAVE_ENOUGH.get() + GameUtils.beautifyCaps(buyWith.name()));
+            }
+        }
+        return false;
+
+    }
+
+    private boolean buyUpgradeItem(UpgradeItem upgradeItem, ShopCategory shopCategory, int clickedSlot, Inventory inv, BedwarsPlayer bedwarsPlayer) {
+        if (upgradeItem.getShopCategory() != shopCategory || upgradeItem.getSlot() != clickedSlot) {
+            return false;
+        }
+        GameInventories gameInventories = activeGame.getGameInventories();
+        if (gameInventories.canUpgrade(bedwarsPlayer, upgradeItem)) {
+            UpgradeLevel next = gameInventories.getNextUpgradeLevel(bedwarsPlayer, upgradeItem);
+
+            Material buyWith = next.getBuyWith();
+            int cost = next.getPrice();
+
+            if (inv.contains(buyWith, cost)) {
+                System.out.println("AINV: " + inv.toString());
+                gameInventories.updateItemUpgrade(shopCategory, upgradeItem, clickedSlot, bedwarsPlayer.getUniqueId());
+                GameUtils.payMaterial(buyWith, cost, bedwarsPlayer.getInventory());
+                GameUtils.paySound(bedwarsPlayer.getPlayer());
+                GameUtils.giveStackToPlayer(next.generateGameStack(), bedwarsPlayer.getPlayer(), bedwarsPlayer.getInventory().getContents());
+                return true;
+            } else {
+                bedwarsPlayer.sendMessage(AllStrings.PREFIX.get() + AllStrings.YOU_DID_NOT_HAVE_ENOUGH.get() + GameUtils.beautifyCaps(buyWith.name()));
+                GameUtils.buyFailSound(bedwarsPlayer.getPlayer());
+            }
+        } else {
+            bedwarsPlayer.sendMessage(AllStrings.PREFIX.get() + AllStrings.YOU_ALREADY_HAVE_HIGHEST_UPGRADE_AVAILABLE.get());
+            GameUtils.buyFailSound(bedwarsPlayer.getPlayer());
+        }
+        return false;
+    }
 
     private void shopLogic(BedwarsPlayer bedwarsPlayer, ShopCategory shopCategory, int clickedSlot, ItemStack clickedItem) {
-        final BedwarsGame bedwarsGame = activeGame.getBedwarsGame();
-        final Shop shop = bedwarsGame.getShop();
+        BedwarsGame bedwarsGame = activeGame.getBedwarsGame();
+        Shop shop = bedwarsGame.getShop();
         if (shop.getGlassSlots().stream().anyMatch(i -> clickedSlot == i)) {
             return;
         }
+        Inventory inv = bedwarsPlayer.getInventory();
 
-        final Inventory inv = bedwarsPlayer.getInventory();
-
-        for (final ShopCategory category : ShopCategory.values()) {
-            if (category.getSlot() == clickedSlot) {
-                final Map<ShopCategory, Inventory> map = activeGame.getGameInventories().getInventories();
-                if (map != null) {
-                    final Inventory tI = map.get(category);
-                    if (tI != null) {
-                        bedwarsPlayer.getPlayer().openInventory(tI);
-                        bedwarsPlayer.playSound(Sound.NOTE_STICKS, 9.50f, 0.805f);
-                    }
-                }
-                return;
-            }
+        for (ShopCategory category : ShopCategory.values()) {
+            if (moveShopCategory(category, clickedSlot, bedwarsPlayer)) return;
         }
 
-        for (final ShopItem item : shop.getItems()) {
-            if (item.getShopCategory() == shopCategory && item.getSlot() == clickedSlot) {
-                Material buyWith = item.getBuyWith();
-                int cost = item.getBuyCost();
-                if (inv.contains(buyWith, cost)) {
-                    GameUtils.paySound(bedwarsPlayer.getPlayer());
-                    GameUtils.payMaterial(buyWith, cost, inv);
-
-                    if (GameUtils.isArmor(clickedItem)) {
-                        TeamData<?> data = activeGame.getTeamManager().dataOfBedwarsPlayer(bedwarsPlayer);
-                        ArmorSet.setArmorFromType(bedwarsPlayer.getPlayer(), clickedItem.getType().name().split("_")[0], true, data.getArmorProtection());
-                    } else {
-                        GameUtils.giveStackToPlayer(item.getCachedGameStack(), bedwarsPlayer.getPlayer(), inv.getContents());
-                    }
-
-                } else {
-                    GameUtils.buyFailSound(bedwarsPlayer.getPlayer());
-                    bedwarsPlayer.sendMessage(AllStrings.PREFIX.get() + AllStrings.YOU_DID_NOT_HAVE_ENOUGH.get() + GameUtils.beautifyCaps(buyWith.name()));
-                }
-                return;
-            }
+        for (ShopItem item : shop.getItems()) {
+            if (buyShopItem(item, shopCategory, clickedSlot, inv, bedwarsPlayer, clickedItem)) return;
         }
 
-        for (final PotionItem item : shop.getPotionItem()) {
-            if (item.getShopCategory() == shopCategory && item.getSlot() == clickedSlot) {
-                Material buyWith = item.getBuyWith();
-                int cost = item.getPrice();
-                if (inv.contains(buyWith, cost)) {
-                    GameUtils.paySound(bedwarsPlayer.getPlayer());
-                    GameUtils.payMaterial(buyWith, cost, inv);
-                    GameUtils.giveStackToPlayer(item.getGameStack(), bedwarsPlayer.getPlayer(), inv.getContents());
-                } else {
-                    GameUtils.buyFailSound(bedwarsPlayer.getPlayer());
-                    bedwarsPlayer.sendMessage(AllStrings.PREFIX.get() + AllStrings.YOU_DID_NOT_HAVE_ENOUGH.get() + GameUtils.beautifyCaps(buyWith.name()));
-                }
-                return;
-            }
+        for (PotionItem item : shop.getPotionItem()) {
+            if (buyPotionItem(item, shopCategory, clickedSlot, inv, bedwarsPlayer)) return;
         }
 
-        for (final UpgradeItem item : shop.getUpgradeItems()) {
-            if (item.getShopCategory() == shopCategory && item.getSlot() == clickedSlot) {
-                final List<UpgradeLevel> levels = item.getLevels();
-                int currentLevel = bedwarsPlayer.getUpgradeItemLevel(item);
-                UpgradeLevel upgradeLevel = levels.get(currentLevel);
-                Material buyWith = upgradeLevel.getBuyWith();
-                int cost = upgradeLevel.getPrice();
-                if (inv.contains(buyWith, cost)) {
-                    if(bedwarsPlayer.upgradeAndGiveItem(item)) {
-                        GameUtils.paySound(bedwarsPlayer.getPlayer());
-                        GameUtils.payMaterial(buyWith, cost, inv);
-                        if (currentLevel + 1 != levels.size()) {
-                            activeGame.getGameInventories().updateItemUpgrade(shopCategory, clickedSlot, levels.get(currentLevel + 1), bedwarsPlayer.getUniqueId());
-                        }
-                    } else {
-                        GameUtils.buyFailSound(bedwarsPlayer.getPlayer());
-                        bedwarsPlayer.sendMessage(AllStrings.PREFIX.get() + AllStrings.ALREADY_BOUGHT_MAX_LVL.get());
-                    }
-                } else {
-                    GameUtils.buyFailSound(bedwarsPlayer.getPlayer());
-                    bedwarsPlayer.sendMessage(AllStrings.PREFIX.get() + AllStrings.YOU_DID_NOT_HAVE_ENOUGH.get() + GameUtils.beautifyCaps(buyWith.name()));
-                }
-
-                return;
-            }
+        for (UpgradeItem upgradeItem : shop.getUpgradeItems()) {
+            if (buyUpgradeItem(upgradeItem, shopCategory, clickedSlot, inv, bedwarsPlayer)) return;
         }
     }
 
@@ -131,7 +151,7 @@ public final class ShopInteractUnregisterableListener extends UnregisterableList
 
         BedwarsPlayer bedwarsPlayer = activeGame.getPlayerMapper().get(uuid);
 
-        Inventory topInventory = event.getView().getTopInventory();
+        Inventory topInventory = event.getInventory();
 
         ShopCategory open = activeGame.getGameInventories().getOpenShopCategory(uuid, topInventory);
 
@@ -139,8 +159,8 @@ public final class ShopInteractUnregisterableListener extends UnregisterableList
             int clickedSlot = event.getSlot();
             ItemStack clickedStack = event.getCurrentItem();
             if (clickedStack != null) {
-                event.setCancelled(true);
                 shopLogic(bedwarsPlayer, open, clickedSlot, clickedStack);
+                event.setCancelled(true);
             }
         }
     }

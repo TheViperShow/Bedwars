@@ -1,5 +1,6 @@
 package me.thevipershow.bedwars.game.managers;
 
+import java.util.Map;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.ArmorSet;
@@ -25,23 +26,18 @@ public final class ArmorManager {
      */
     public final void giveDefaultColoredSet() {
         TeamManager<?> teamManager = activeGame.getTeamManager();
-        teamManager.performAll(bedwarsPlayer -> {
-            Player player = bedwarsPlayer.getPlayer();
-            ArmorSet.setArmorFromType(player, "leather", false);
-            applyColorsAndProtection(bedwarsPlayer, player.getInventory().getArmorContents());
-        });
+        teamManager.performAll(bedwarsPlayer -> applyColorsAndProtection(bedwarsPlayer, ArmorSet.generateFromType("leather")));
     }
 
-    private void applyColorsAndProtection(BedwarsPlayer bedwarsPlayer, ItemStack[] armorPieces) {
-        BedwarsTeam team = bedwarsPlayer.getBedwarsTeam();
-        for (ItemStack stack : armorPieces) {
-            ItemMeta meta = stack.getItemMeta();
-            LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) meta;
-            leatherArmorMeta.setColor(team.getRGBColor());
-            if (stack.getType().name().endsWith("_HELMET")) {
-                stack.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 1);
+    private void applyColorsAndProtection(BedwarsPlayer bedwarsPlayer, Map<ArmorSet, ItemStack> map) {
+        map.forEach((k,v) -> {
+            if (k == ArmorSet.HELMET) {
+                v.addUnsafeEnchantment(Enchantment.WATER_WORKER, 1);
             }
-            stack.setItemMeta(leatherArmorMeta);
-        }
+            LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) v.getItemMeta();
+            leatherArmorMeta.setColor(bedwarsPlayer.getBedwarsTeam().getRGBColor());
+            v.setItemMeta(leatherArmorMeta);
+            k.setArmorPiece(bedwarsPlayer.getInventory(), v);
+        });
     }
 }

@@ -4,7 +4,7 @@ import java.util.logging.Logger;
 
 public final class LoggerUtils {
 
-    public enum ANSI {
+    private enum ANSI {
         RESET("\u001B[0m", 'r'),
         BLACK("\u001B[30m", '0'),
         RED("\u001B[31m", 'c'),
@@ -23,17 +23,17 @@ public final class LoggerUtils {
             this.colorCode = colorCode;
         }
 
-        public String getPlaceholder() {
+        public final String getPlaceholder() {
             return placeholder;
         }
 
-        public char getColorCode() {
+        public final char getColorCode() {
             return colorCode;
         }
     }
 
     public static void logColor(final Logger logger, String text) {
-        for (ANSI ansi : ANSI.values()) {
+        for (final ANSI ansi : ANSI.values()) {
             text = text.replace("&" + ansi.colorCode, ansi.placeholder);
         }
         logger.info(text + ANSI.RESET.placeholder);

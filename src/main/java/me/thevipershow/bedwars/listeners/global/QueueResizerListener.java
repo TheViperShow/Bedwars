@@ -1,5 +1,6 @@
 package me.thevipershow.bedwars.listeners.global;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import me.thevipershow.bedwars.bedwars.Gamemode;
@@ -13,6 +14,7 @@ import me.thevipershow.bedwars.game.data.game.BedwarsPlayer;
 import me.thevipershow.bedwars.game.data.game.PlayerMapper;
 import me.thevipershow.bedwars.game.data.teams.TeamData;
 import me.thevipershow.bedwars.game.managers.TeamManager;
+import me.tigerhix.lib.scoreboard.type.Scoreboard;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -46,9 +48,21 @@ public class QueueResizerListener implements Listener {
         removeBedwarsPlayerData(activeGame, bedwarsPlayer);
     }
 
+    private void removeScoreboards(ActiveGame activeGame, BedwarsPlayer bedwarsPlayer) {
+        Map<BedwarsPlayer, Scoreboard> map = activeGame.getScoreboardManager().getScoreboardMap();
+        if (map.containsKey(bedwarsPlayer)) {
+            Scoreboard playerScoreboard = map.get(bedwarsPlayer);
+            playerScoreboard.deactivate();
+            map.remove(bedwarsPlayer);
+        }
+    }
+
     private void removeBedwarsPlayerData(ActiveGame activeGame, BedwarsPlayer bedwarsPlayer) {
         TeamManager<?> teamManager = activeGame.getTeamManager();
         BedwarsTeam team = bedwarsPlayer.getBedwarsTeam();
+
+        removeScoreboards(activeGame, bedwarsPlayer);
+
         boolean removeTeam = false;
         if (activeGame.getBedwarsGame().getGamemode() == Gamemode.SOLO) {
             removeTeam = true;

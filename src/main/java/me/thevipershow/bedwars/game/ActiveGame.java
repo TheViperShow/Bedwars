@@ -29,6 +29,7 @@ import me.thevipershow.bedwars.game.managers.TeamManager;
 import me.thevipershow.bedwars.game.managers.TrapsManager;
 import me.thevipershow.bedwars.game.managers.UpgradesManager;
 import me.thevipershow.bedwars.listeners.unregisterable.GameTrapTriggerer;
+import me.tigerhix.lib.scoreboard.type.Scoreboard;
 import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
 
@@ -189,6 +190,8 @@ public final class ActiveGame {
 
         getGameInventories().assignPlayerShop(); // assigning a shop to each player
 
+        getGameInventories().assignUpgradeLevelsToAll(); // setting all upgrade levels to -1 for everyoneò
+
         getTrapsManager().fillTraps();      // filling traps list, we made sure teams are already assigned
         getTrapsManager().fillTrapsDelay(); // filling the last activation time
 
@@ -219,6 +222,8 @@ public final class ActiveGame {
      */
     public final void stop() {
         setGameState(ActiveGameState.FINISHED);
+
+        getScoreboardManager().deactivateAllScoreboards(); // deactivating scoreboards
 
         getActiveSpawnersManager().cancelAnnouncements();
 

@@ -43,6 +43,12 @@ public final class ScoreboardManager {
         return scoreboardMap;
     }
 
+    public final void deactivateAllScoreboards() {
+        for (Scoreboard scoreboard : scoreboardMap.values()) {
+            scoreboard.deactivate();
+        }
+    }
+
     public final void activateAll() {
         for (Scoreboard value : scoreboardMap.values()) {
             value.activate();

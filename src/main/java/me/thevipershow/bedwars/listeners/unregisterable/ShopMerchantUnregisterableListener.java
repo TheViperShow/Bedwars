@@ -32,8 +32,8 @@ public final class ShopMerchantUnregisterableListener extends UnregisterableList
         final Villager villager = (Villager) entity;
         final ShopActiveMerchant shopActiveMerchant = activeGame.getMerchantManager().getShopActiveMerchant(villager);
         if (shopActiveMerchant != null) {
-            event.setCancelled(true);
             activeGame.getGameInventories().openShop(p);
+            event.setCancelled(true);
         }
     }
 }

@@ -7,14 +7,17 @@ import java.util.UUID;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.config.objects.UpgradeItem;
 import me.thevipershow.bedwars.config.objects.UpgradeLevel;
+import me.thevipershow.bedwars.game.GameInventories;
 import me.thevipershow.bedwars.game.GameUtils;
 import me.thevipershow.bedwars.game.data.game.enums.PlayerState;
+import me.thevipershow.bedwars.game.shop.ShopCategory;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.util.Vector;
 
 public final class BedwarsPlayer {
@@ -30,7 +33,6 @@ public final class BedwarsPlayer {
     /*------------------------------------------------------------------------------------*/
 
     private final Player player;
-    private final Map<UpgradeItem, Integer> upgradeItemLevelMap = new HashMap<>();
     private boolean hidden = false;
     private boolean immuneToTraps = false;
     private PlayerState playerState = PlayerState.NONE;
@@ -38,24 +40,31 @@ public final class BedwarsPlayer {
 
     /*------------------------------------------------------------------------------------*/
 
-    /**
-     * Upgrade someone's item and give the next level to him.
-     *
-     * @param upgradeItem The UpgradeItem to be upgraded.
-     * @return true if he upgraded, false if he could not upgrade.
-     */
-    public final boolean upgradeAndGiveItem(UpgradeItem upgradeItem) {
-        if (!player.isOnline()) return false;
-        int currentLvl = getUpgradeItemLevel(upgradeItem);
+    /*
+    public final boolean upgradeAndGiveItem(UpgradeItem upgradeItem, GameInventories gameInventories) {
+        if (!player.isOnline()) {
+            return false;
+        }
+        int currentLvl = this.getUpgradeItemLevel(upgradeItem);
         List<UpgradeLevel> lvls = upgradeItem.getLevels();
         if (currentLvl + 2 <= lvls.size()) {
-            UpgradeLevel toGive = lvls.get(currentLvl + 1);
-            GameUtils.giveStackToPlayer(toGive.generateGameStack(), this.player, this.player.getInventory().getContents());
-            this.increaseUpgradeItemLevel(upgradeItem);
+
+            UpgradeLevel newLevel = lvls.get(currentLvl + 1);
+            GameUtils.giveStackToPlayer(newLevel.generateGameStack(), player, getInventory().getContents());
+
+            if (currentLvl + 3 <= lvls.size()) {
+                UpgradeLevel updateDisplay = lvls.get(currentLvl + 2);
+               // Map<ShopCategory, Inventory> map = gameInventories.getPlayerShop().get(getUniqueId());
+                gameInventories.updateItemUpgrade(upgradeItem.getShopCategory(), upgradeItem.getSlot(), updateDisplay, getUniqueId());
+                player.updateInventory();
+            }
+
             return true;
         }
         return false;
-    }
+    }*/
+
+    /*
 
     public final void increaseUpgradeItemLevel(UpgradeItem upgradeItem) {
         if (this.upgradeItemLevelMap.containsKey(upgradeItem)) {
@@ -70,10 +79,10 @@ public final class BedwarsPlayer {
         if (i != null) {
             return i;
         } else {
-            this.upgradeItemLevelMap.put(upgradeItem, +0);
-            return +0;
+            this.upgradeItemLevelMap.put(upgradeItem, -1);
+            return -1;
         }
-    }
+    }*/
 
     public final void slideTeleport(char axis, double amount) {
         switch (axis) {
@@ -98,10 +107,10 @@ public final class BedwarsPlayer {
     public final BedwarsTeam getBedwarsTeam() {
         return bedwarsTeam;
     }
-
+/*
     public final Map<UpgradeItem, Integer> getUpgradeItemLevelMap() {
         return upgradeItemLevelMap;
-    }
+    }*/
 
     public final void setBedwarsTeam(BedwarsTeam bedwarsTeam) {
         this.bedwarsTeam = bedwarsTeam;
@@ -119,7 +128,7 @@ public final class BedwarsPlayer {
         return immuneToTraps;
     }
 
-    public final Inventory getInventory() {
+    public final PlayerInventory getInventory() {
         return player.getInventory();
     }
 
@@ -127,7 +136,6 @@ public final class BedwarsPlayer {
         player.playSound(getLocation(), sound, volume, pitch);
     }
 
-    @Deprecated
     public final void sendTitle(final String big, final String small) {
         player.sendTitle(big, small);
     }
