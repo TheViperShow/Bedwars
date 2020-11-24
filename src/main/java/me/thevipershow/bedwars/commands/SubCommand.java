@@ -9,22 +9,22 @@ import org.bukkit.plugin.Plugin;
 public abstract class SubCommand {
 
     protected static void illegalExecutor(final CommandSender sender) {
-        sender.sendMessage(Bedwars.PREFIX + AllStrings.SUBCOMMAND_ILLEGAL_EXECUTOR.get());
+        sender.sendMessage(AllStrings.PREFIX.get() + AllStrings.SUBCOMMAND_ILLEGAL_EXECUTOR.get());
     }
 
     protected static void missingPerm(final CommandSender sender) {
-        sender.sendMessage(Bedwars.PREFIX + AllStrings.SUBCOMMAND_MISSING_PERM.get());
+        sender.sendMessage(AllStrings.PREFIX.get() + AllStrings.SUBCOMMAND_MISSING_PERM.get());
     }
 
     protected final void wrongArgsNumber(final CommandSender sender) {
-        sender.sendMessage(Bedwars.PREFIX + AllStrings.SUBCOMMAND_WRONG_ARGS.get() + this.args.length);
+        sender.sendMessage(AllStrings.PREFIX.get() + AllStrings.SUBCOMMAND_WRONG_ARGS.get() + this.args.length);
     }
 
     protected final GameManager gameManager;
     protected final Plugin plugin;
-    protected final String args[];
+    protected final String[] args;
 
-    public SubCommand(final GameManager gameManager, final Plugin plugin, String args[]) {
+    public SubCommand(final GameManager gameManager, final Plugin plugin, final String[] args) {
         this.gameManager = gameManager;
         this.plugin = plugin;
         this.args = args;

@@ -59,7 +59,7 @@ public final class BedwarsMainCommand implements CommandExecutor, TabExecutor {
     }
 
     public final void unknownArg(final CommandSender sender, final String arg) {
-        sender.sendMessage(Bedwars.PREFIX + AllStrings.UNKNOWN_ARG.get() + arg + "\"");
+        sender.sendMessage(AllStrings.PREFIX.get() + AllStrings.UNKNOWN_ARG.get() + arg + "\"");
     }
 
     @Override

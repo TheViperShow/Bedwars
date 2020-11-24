@@ -3,7 +3,6 @@ package me.thevipershow.bedwars.commands;
 import java.util.Collection;
 import java.util.stream.Collectors;
 import me.thevipershow.bedwars.AllStrings;
-import me.thevipershow.bedwars.Bedwars;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.ActiveGameState;
 import me.thevipershow.bedwars.game.managers.GameManager;
@@ -41,7 +40,7 @@ public final class QuitCommand extends SubCommand {
                 .collect(Collectors.toList());
 
         if (!activeGame.isEmpty()) {
-            sender.sendMessage(Bedwars.PREFIX + AllStrings.NOT_IN_QUEUE.get());
+            sender.sendMessage(AllStrings.PREFIX.get() + AllStrings.NOT_IN_QUEUE.get());
         } else {
             if (activeGame.size() != 1) {
                 throw new RuntimeException(String.format("Player %s was found to be in more than 1 queue at the same time.", sender.getName()));
@@ -53,7 +52,7 @@ public final class QuitCommand extends SubCommand {
             }
             //activeGame.get().getTeamManager().removePlayer((Player) sender);
             //activeGame.get().getMovementsManager().moveToSpawn((Player) sender);
-            sender.sendMessage(Bedwars.PREFIX + AllStrings.LEFT_QUEUE.get());
+            sender.sendMessage(AllStrings.PREFIX.get() + AllStrings.LEFT_QUEUE.get());
         }
     }
 }

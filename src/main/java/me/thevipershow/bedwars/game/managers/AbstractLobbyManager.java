@@ -25,7 +25,7 @@ public abstract class AbstractLobbyManager {
     }
 
     protected final String generateMissingPlayerText() {
-        return Bedwars.PREFIX + AllStrings.MISSING.get() + (activeGame.getBedwarsGame().getMinPlayers() - activeGame.getGameLobbyTicker().getAssociatedQueue().queueSize()) + " §7more players to play";
+        return AllStrings.PREFIX.get() + AllStrings.MISSING.get() + (activeGame.getBedwarsGame().getMinPlayers() - activeGame.getGameLobbyTicker().getAssociatedQueue().queueSize()) + " §7more players to play";
     }
 
     public abstract void startTicking();

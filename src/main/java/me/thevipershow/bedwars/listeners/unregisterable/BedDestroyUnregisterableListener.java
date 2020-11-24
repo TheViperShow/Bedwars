@@ -13,6 +13,7 @@ import org.bukkit.Sound;
 import org.bukkit.event.EventHandler;
 
 public final class BedDestroyUnregisterableListener extends UnregisterableListener {
+
     public BedDestroyUnregisterableListener(ActiveGame activeGame) {
         super(activeGame);
     }
@@ -31,7 +32,8 @@ public final class BedDestroyUnregisterableListener extends UnregisterableListen
         TeamData<?> data = teamManager.dataOfTeam(brokenTeam);
         data.setStatus(TeamStatus.BED_BROKEN);
 
-        data.perform(bedwarsPlayer -> bedwarsPlayer.sendTitle(null, AllStrings.YOUR_BED_BROKEN.get()));
+        data.perform(bedwarsPlayer -> bedwarsPlayer.sendTitle("", AllStrings.YOUR_BED_BROKEN.get()));
+        activeGame.getQuestManager().breakBedReward(brokenBy);
 
         teamManager.performAll(bedwarsPlayer -> {
             bedwarsPlayer.playSound(Sound.ENDERDRAGON_GROWL, 10.0f, 1.0f);

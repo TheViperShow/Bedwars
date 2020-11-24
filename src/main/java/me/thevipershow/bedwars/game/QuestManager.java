@@ -19,6 +19,10 @@ public final class QuestManager {
         this.plugin = experienceManager.getActiveGame().getPlugin();
     }
 
+    public final void rewardAllAtEndGame() {
+        experienceManager.getActiveGame().getTeamManager().performAll(this::gamePlayedReward);
+    }
+
     private void dailyFirstGameMessage(Player player) {
         player.sendMessage(AllStrings.DAILY_FIRST_GAME_MESSAGE.get());
     }

@@ -64,13 +64,13 @@ public final class UpgradeInteractUnregisterableListener extends UnregisterableL
 
     private static boolean payTraps(Pair<HashMap<Integer, Integer>, Boolean> result, Player player, ShopItem buying, String boughtName) {
         if (!result.getB()) {
-            player.sendMessage(Bedwars.PREFIX + AllStrings.CANNOT_AFFORD_TRAP.get());
+            player.sendMessage(AllStrings.PREFIX.get() + AllStrings.CANNOT_AFFORD_TRAP.get());
             GameUtils.buyFailSound(player);
             return false;
         } else {
             GameUtils.makePlayerPay(player.getInventory(), buying.getBuyWith(), buying.getBuyCost(), result.getA());
             GameUtils.paySound(player);
-            player.sendMessage(Bedwars.PREFIX + AllStrings.SUCCESSFULLY_ENABLED_TRAP.get() + boughtName);
+            player.sendMessage(AllStrings.PREFIX.get() + AllStrings.SUCCESSFULLY_ENABLED_TRAP.get() + boughtName);
             return true;
         }
     }
@@ -93,7 +93,7 @@ public final class UpgradeInteractUnregisterableListener extends UnregisterableL
         LinkedList<ActiveTrap> activeTeamTraps = activeGame.getTrapsManager().getActiveTraps().get(playerTeam);
         int slotToSet = 30 + activeTeamTraps.size();
         if (activeTeamTraps.size() >= 3) {
-            player.sendMessage(Bedwars.PREFIX + AllStrings.MAX_TRAPS_LIMIT.get());
+            player.sendMessage(AllStrings.PREFIX.get() + AllStrings.MAX_TRAPS_LIMIT.get());
             player.playSound(player.getLocation(), Sound.ARROW_HIT, 10.0f, 0.85f);
         } else if (alarmShopItem.getSlot() == clickedSlot) {
             Pair<HashMap<Integer, Integer>, Boolean> payment = GameUtils.canAfford(player.getInventory(), alarmShopItem.getBuyWith(), alarmShopItem.getBuyCost());

@@ -49,7 +49,7 @@ public final class LobbyManager extends AbstractLobbyManager {
                     if (missingTime > 0 && missingTime <= 5) {
                         associatedQueue.perform(p -> {
                             p.playSound(p.getLocation(), Sound.NOTE_STICKS, 10.0f, 0.850f);
-                            p.sendMessage(Bedwars.PREFIX + AllStrings.GAME_STARTING.get() + missingTime);
+                            p.sendMessage(AllStrings.PREFIX.get() + AllStrings.GAME_STARTING.get() + missingTime);
                         });
                     }
 

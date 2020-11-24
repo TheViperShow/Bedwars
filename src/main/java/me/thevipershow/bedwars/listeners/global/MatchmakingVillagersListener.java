@@ -74,7 +74,7 @@ public final class MatchmakingVillagersListener implements Listener {
                     return;
                 }
 
-                player.sendMessage(Bedwars.PREFIX + AllStrings.WE_COULD_NOT_FIND_GAME.get());
+                player.sendMessage(AllStrings.PREFIX.get() + AllStrings.WE_COULD_NOT_FIND_GAME.get());
                 return;
             }
 

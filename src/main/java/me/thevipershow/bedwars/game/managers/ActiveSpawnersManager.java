@@ -30,6 +30,10 @@ public final class ActiveSpawnersManager {
     private final HashSet<BukkitTask> emeraldBoostsTasks = new HashSet<>();
     private ActiveSpawner emeraldSampleSpawner, diamondSampleSpawner;
 
+    public final void cancelAllSpawners() {
+        this.activeSpawners.forEach(ActiveSpawner::despawn);
+    }
+
     public final void addSpawners() {
         for (Spawner spawner : activeGame.getBedwarsGame().getSpawners()) {
             ActiveSpawner activeSpawner = new ActiveSpawner(spawner, activeGame);
@@ -53,7 +57,7 @@ public final class ActiveSpawnersManager {
 
     private void newAnnouncement(ActiveSpawner activeSpawner, String message) {
         if (activeSpawner != null) {
-            activeSpawner.getSpawner().getSpawnerLevels().stream().filter(lvl -> lvl.getLevel() != 1).forEach(i -> announcementsTasks.add(plugin.getServer().getScheduler().runTaskLater(plugin, () -> activeGame.getCachedGameData().getGame().getPlayers().forEach(p -> p.sendMessage(Bedwars.PREFIX + message + i.getLevel())), i.getAfterSeconds() * 20L)));
+            activeSpawner.getSpawner().getSpawnerLevels().stream().filter(lvl -> lvl.getLevel() != 1).forEach(i -> announcementsTasks.add(plugin.getServer().getScheduler().runTaskLater(plugin, () -> activeGame.getCachedGameData().getGame().getPlayers().forEach(p -> p.sendMessage(AllStrings.PREFIX.get() + message + i.getLevel())), i.getAfterSeconds() * 20L)));
         }
     }
 

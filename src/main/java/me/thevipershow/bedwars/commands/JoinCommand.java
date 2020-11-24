@@ -25,12 +25,12 @@ public final class JoinCommand extends SubCommand {
                 final ActiveGame found = opt.get();
                 super.gameManager.addToQueue(player, found);
             } else {
-                player.sendMessage(Bedwars.PREFIX + String.format(AllStrings.NO_GAME_FOUND_FOR_GAMEMODE.get(), gamemode.name()));
+                player.sendMessage(AllStrings.PREFIX.get() + String.format(AllStrings.NO_GAME_FOUND_FOR_GAMEMODE.get(), gamemode.name()));
                 super.gameManager.loadRandom(gamemode);
             }
 
         } else {
-            player.sendMessage(Bedwars.PREFIX + AllStrings.GAME_ALREADY_JOINED.get());
+            player.sendMessage(AllStrings.PREFIX.get() + AllStrings.GAME_ALREADY_JOINED.get());
         }
     }
 
@@ -56,6 +56,6 @@ public final class JoinCommand extends SubCommand {
             }
         }
 
-        sender.sendMessage(Bedwars.PREFIX + AllStrings.INVALID_GAMEMODE.get() + args[1] + "\"");
+        sender.sendMessage(AllStrings.PREFIX.get() + AllStrings.INVALID_GAMEMODE.get() + args[1] + "\"");
     }
 }

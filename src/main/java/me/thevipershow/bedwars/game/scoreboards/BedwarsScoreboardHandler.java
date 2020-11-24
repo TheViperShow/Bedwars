@@ -31,7 +31,7 @@ public final class BedwarsScoreboardHandler implements ScoreboardHandler {
 
     @Override
     public final String getTitle(final Player player) {
-        return Bedwars.PREFIX;
+        return AllStrings.PREFIX.get();
     }
 
     @Override

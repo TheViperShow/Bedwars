@@ -2,6 +2,7 @@ package me.thevipershow.bedwars.game.runnables;
 
 import java.util.List;
 import java.util.Map;
+import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
 import me.thevipershow.bedwars.config.objects.SpawnPosition;
 import me.thevipershow.bedwars.config.objects.UpgradeItem;
@@ -122,7 +123,7 @@ public final class RespawnRunnable extends BukkitRunnable {
         } else {
             PlayerConnection conn = GameUtils.getPlayerConnection(p.getPlayer());
             PacketPlayOutTitle emptyTitle = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.TITLE, new ChatMessage(""), 2, 16, 2);
-            IChatBaseComponent iChat = new ChatMessage(Bedwars.PREFIX + String.format("§eRespawning in §7%d §es", secondsLeft));
+            IChatBaseComponent iChat = new ChatMessage(AllStrings.PREFIX.get() + String.format("§eRespawning in §7%d §es", secondsLeft));
             PacketPlayOutTitle titlePacket = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.SUBTITLE, iChat, 2, 16, 2);
             conn.sendPacket(emptyTitle);
             conn.sendPacket(titlePacket);

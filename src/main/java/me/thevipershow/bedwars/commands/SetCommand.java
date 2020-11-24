@@ -37,6 +37,6 @@ public final class SetCommand extends SubCommand {
                 return;
             }
         }
-        sender.sendMessage(Bedwars.PREFIX + AllStrings.INVALID_GAMEMODE.get() + secondArg + "\"");
+        sender.sendMessage(AllStrings.PREFIX.get() + AllStrings.INVALID_GAMEMODE.get() + secondArg + "\"");
     }
 }

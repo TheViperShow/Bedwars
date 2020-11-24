@@ -55,6 +55,8 @@ GAMEMODE("gamemode"),
     DUO("duo"),
     QUAD("quad"),
 
+    SERVER_NAME("settings.server-name"),
+    SERVER_DOMAIN("settings.server-domain"),
     DB_USER("settings.database.username"),
     DB_PASSWORD("settings.database.password"),
     DB_ADDRESS("settings.database.address"),
@@ -285,9 +287,13 @@ GAMEMODE("gamemode"),
     ANNOUNCE_DEATHMATCH("&6&lDEATHMATCH &r&6Mode has started&7...\n        &6Kill all of your enemies to win!"),
     ;
 
-    private final String s;
+    private String s;
 
     AllStrings(final String s) {
+        this.s = s;
+    }
+
+    public final void setS(String s) {
         this.s = s;
     }
 

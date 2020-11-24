@@ -212,6 +212,8 @@ public final class ActiveGame {
         getMovementsManager().moveToSpawnpoints();  // Ideally we want everything to get generated before teleporting.
 
         getArmorManager().giveDefaultColoredSet(); // giving default colored leather armor with enchant.
+
+        getExperienceManager().startRewardTask(); // start reward task
     }
 
     /**
@@ -223,9 +225,13 @@ public final class ActiveGame {
     public final void stop() {
         setGameState(ActiveGameState.FINISHED);
 
+        getExperienceManager().stopRewardTask(); // stop reward task
+
         getScoreboardManager().deactivateAllScoreboards(); // deactivating scoreboards
 
-        getActiveSpawnersManager().cancelAnnouncements();
+        getActiveSpawnersManager().cancelAnnouncements(); // removing all announcement tasks
+
+        getActiveSpawnersManager().cancelAllSpawners(); // cancel all spawners
 
         getMovementsManager().moveAllSpawn();
 
@@ -234,6 +240,7 @@ public final class ActiveGame {
 
         getTeamManager().cleanAllEffects(); // clean all effects.
         getTeamManager().cleanAllInventories(); // clean all inventories.
+        getQuestManager().rewardAllAtEndGame(); // reward all for playing until the end
 
         // The game is marked as finished from now on.
         callGameEvent(new ActiveGameTerminateEvent(this));

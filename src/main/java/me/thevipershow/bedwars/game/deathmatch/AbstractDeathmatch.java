@@ -68,7 +68,7 @@ public abstract class AbstractDeathmatch {
     public abstract void spawnEnderdragons();
 
     public void announceDeathmatch() {
-        activeGame.getTeamManager().getDataMap().values().forEach(v -> v.perform(b -> b.sendMessage(Bedwars.PREFIX + AllStrings.ANNOUNCE_DEATHMATCH.get())));
+        activeGame.getTeamManager().getDataMap().values().forEach(v -> v.perform(b -> b.sendMessage(AllStrings.PREFIX.get() + AllStrings.ANNOUNCE_DEATHMATCH.get())));
     }
 
     public abstract void startDeathMatch();

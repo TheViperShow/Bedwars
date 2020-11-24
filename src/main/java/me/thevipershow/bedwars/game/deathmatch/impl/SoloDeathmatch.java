@@ -20,7 +20,7 @@ public final class SoloDeathmatch extends AbstractDeathmatch {
     public void spawnEnderdragons() {
         for (Map.Entry<BedwarsTeam, ? extends TeamData<?>> entry : activeGame.getTeamManager().getDataMap().entrySet()) {
             entry.getValue().perform(bedwarsPlayer -> {
-                bedwarsPlayer.sendMessage(Bedwars.PREFIX + AllStrings.DRAGONS_RELEASED.get());
+                bedwarsPlayer.sendMessage(AllStrings.PREFIX.get() + AllStrings.DRAGONS_RELEASED.get());
                 bedwarsPlayer.playSound(Sound.ENDERDRAGON_GROWL, 8.5f, 1.0f);
 
                 if (bedwarsPlayer.getPlayerState() != PlayerState.DEAD) {

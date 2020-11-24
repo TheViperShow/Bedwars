@@ -31,7 +31,6 @@ public final class Bedwars extends JavaPlugin {
 
     public static Plugin plugin = null;
 
-    public static String PREFIX = AllStrings.PREFIX.get();
     public static String MYSQL_DRIVER_CLASS = null;
 
     private WorldsManager worldsManager = null;

@@ -181,13 +181,13 @@ public class ActiveSpawner {
     }
 
 
-    public boolean active() {
+    public final boolean active() {
         return this.animationTask != null
                 && this.updateNameTask != null
                 && this.dropTask != null;
     }
 
-    public void despawn() {
+    public final void despawn() {
         if (active()) {
             animationTask.cancel();
             updateNameTask.cancel();
@@ -199,7 +199,7 @@ public class ActiveSpawner {
         }
     }
 
-    public long getTimeUntilNextLevel() {
+    public final long getTimeUntilNextLevel() {
         final SpawnerLevel currentLevel = this.currentLevel;
         final int nextLevel = currentLevel.getLevel();
         if (spawner.getSpawnerLevels().size() > nextLevel) {
@@ -264,7 +264,7 @@ public class ActiveSpawner {
         this.dropSpeedRegulator = dropSpeedRegulator;
     }
 
-    public long getTimePassedSinceCreation() {
+    public final long getTimePassedSinceCreation() {
         return timePassedSinceCreation;
     }
 

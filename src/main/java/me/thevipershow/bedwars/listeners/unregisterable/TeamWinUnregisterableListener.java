@@ -5,6 +5,7 @@ import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.api.TeamWinEvent;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.GameUtils;
+import me.thevipershow.bedwars.game.QuestManager;
 import me.thevipershow.bedwars.game.data.teams.TeamData;
 import me.thevipershow.bedwars.game.managers.TeamManager;
 import org.bukkit.ChatColor;
@@ -28,11 +29,16 @@ public final class TeamWinUnregisterableListener extends UnregisterableListener 
             return; // this should never happen, but check is for safety.
         }
 
-        announceEndOfGame();
-        announceWinners(winnerTeam);
-        activeGame.getKillTracker().announceTopThreeScores();
+        this.announceEndOfGame();
+        this.announceWinners(winnerTeam);
+        super.activeGame.getKillTracker().announceTopThreeScores();
+        this.makeTeamWinExp(winnerTeam);
+        this.stopGameLater();
+    }
 
-        stopGameLater();
+    private void makeTeamWinExp(BedwarsTeam winner) {
+        QuestManager questManager = super.activeGame.getQuestManager();
+        super.activeGame.getTeamManager().dataOfTeam(winner).perform(questManager::winDailyFirstGame);
     }
 
     /**
