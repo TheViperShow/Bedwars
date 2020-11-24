@@ -4,7 +4,6 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -13,9 +12,11 @@ import me.thevipershow.bedwars.LoggerUtils;
 import me.thevipershow.bedwars.bedwars.Gamemode;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.game.ActiveGame;
-import me.thevipershow.bedwars.game.ExperienceManager;
-import me.thevipershow.bedwars.game.GameManager;
-import me.thevipershow.bedwars.game.Pair;
+import me.thevipershow.bedwars.game.managers.ExperienceManager;
+import me.thevipershow.bedwars.game.managers.GameManager;
+import me.thevipershow.bedwars.game.data.Pair;
+import me.thevipershow.bedwars.game.data.game.BedwarsPlayer;
+import me.thevipershow.bedwars.game.data.teams.TeamData;
 import me.thevipershow.bedwars.storage.sql.tables.GlobalStatsTableUtils;
 import me.thevipershow.bedwars.storage.sql.tables.RankTableUtils;
 import org.bukkit.Bukkit;
@@ -119,12 +120,12 @@ public final class BedwarsExpansion extends PlaceholderExpansion {
         } else if (player.isOnline()) {
             final Player p = player.getPlayer();
             for (final ActiveGame activeGame : gameManager.getWorldsManager().getActiveGameList()) {
-                if (!activeGame.getAssociatedWorld().equals(p.getWorld())) {
+                if (!activeGame.getCachedGameData().getGame().equals(p.getWorld())) {
                     continue;
                 }
 
-                for (final Map.Entry<BedwarsTeam, List<Player>> entry : activeGame.getAssignedTeams().entrySet()) {
-                    for (final Player player1 : entry.getValue()) {
+                for (final Map.Entry<BedwarsTeam, ? extends TeamData<?>> entry : activeGame.getTeamManager().getDataMap().entrySet()) {
+                    for (final BedwarsPlayer player1 : entry.getValue().getAll()) {
                         if (player1.getUniqueId().equals(player.getUniqueId())) {
                             final Character pChar = entry.getKey().getColorCode();
                             cachedTeamColors.put(player.getUniqueId(), new Pair<>(System.currentTimeMillis(), pChar));
@@ -221,7 +222,7 @@ public final class BedwarsExpansion extends PlaceholderExpansion {
         return Integer.toString(kills.getSoloKills() + kills.getDuoKills() + kills.getQuadKills());
     }
 
-    private static boolean included(final int lower, final int upper, final int n) {
+    public static boolean included(final int lower, final int upper, final int n) {
         return ((n >= lower) && (upper <= n));
     }
 

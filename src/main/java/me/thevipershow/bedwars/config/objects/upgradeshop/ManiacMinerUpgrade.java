@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import me.thevipershow.bedwars.AllStrings;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
-public final class ManiacMinerUpgrade implements ConfigurationSerializable , Upgrade {
+public final class ManiacMinerUpgrade implements ConfigurationSerializable , StagedUpgrade {
 
     @Override
     public Map<String, Object> serialize() {
@@ -34,6 +34,7 @@ public final class ManiacMinerUpgrade implements ConfigurationSerializable , Upg
         return slot;
     }
 
+    @Override
     public List<UpgradeShopItem> getLevels() {
         return levels;
     }
@@ -41,5 +42,10 @@ public final class ManiacMinerUpgrade implements ConfigurationSerializable , Upg
     @Override
     public final UpgradeType getType() {
         return UpgradeType.MANIAC_MINER;
+    }
+
+    @Override
+    public final boolean hasStages() {
+        return true;
     }
 }

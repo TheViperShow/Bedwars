@@ -8,6 +8,8 @@
 #
 # Plugin made by TheViperShow - Commissioned for SQCE
 settings:
+  server-name: "CloudCombat"
+  server-domain: "cloudcombat.net"
   database:
     username: "user" # set your username
     password: "password" # set your password

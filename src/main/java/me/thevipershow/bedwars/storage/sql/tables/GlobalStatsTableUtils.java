@@ -15,7 +15,7 @@ import me.thevipershow.bedwars.bedwars.Gamemode;
 import static me.thevipershow.bedwars.bedwars.Gamemode.DUO;
 import static me.thevipershow.bedwars.bedwars.Gamemode.QUAD;
 import static me.thevipershow.bedwars.bedwars.Gamemode.SOLO;
-import me.thevipershow.bedwars.game.Pair;
+import me.thevipershow.bedwars.game.data.Pair;
 import me.thevipershow.bedwars.storage.sql.MySQLDatabase;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;

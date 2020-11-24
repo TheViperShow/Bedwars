@@ -1,0 +1,99 @@
+merchants:
+  # MERCHANTS SHOP SIGNS
+  - name: "§7[§eAussieBedwars§7] §eShop"
+    type: "SHOP"
+    location:
+      x: 33.5 # Please set this
+      y: 62.0 # Please set this
+      z: -93.0 # Plz set this
+  - name: "§7[§eAussieBedwars§7] §eShop"
+    type: "SHOP"
+    location:
+      x: 94.0 # Please set this
+      y: 62.0 # Please set this
+      z: -32.5 # Plz set this
+  - name: "§7[§eAussieBedwars§7] §eShop"
+    type: "SHOP"
+    location:
+      x: 94.0 # Please set this
+      y: 62.0 # Please set this
+      z: 33.5 # Plz set this
+  - name: "§7[§eAussieBedwars§7] §eShop"
+    type: "SHOP"
+    location:
+      x: 33.5 # Please set this
+      y: 62.0 # Please set this
+      z: 94.0 # Plz set this
+  - name: "§7[§eAussieBedwars§7] §eShop"
+    type: "SHOP"
+    location:
+      x: -32.5 # Please set this
+      y: 62.0 # Please set this
+      z: 94.0 # Plz set this
+  - name: "§7[§eAussieBedwars§7] §eShop"
+    type: "SHOP"
+    location:
+      x: -93.0 # Please set this
+      y: 62.0 # Please set this
+      z: 33.50 # Plz set this
+  - name: "§7[§eAussieBedwars§7] §eShop"
+    type: "SHOP"
+    location:
+      x: -93.0 # Please set this
+      y: 62.0 # Please set this
+      z: -32.50 # Plz set this
+  - name: "§7[§eAussieBedwars§7] §eShop"
+    type: "SHOP"
+    location:
+      x: -32.50 # Please set this
+      y: 62.0 # Please set this
+      z: -93.0 # Plz set this
+  # upgrade merchant sections
+  - name: "§7[§eAussieBedwars§7] §eUpgrades"
+    type: "UPGRADE"
+    location:
+      x: 33.50
+      y: 62.0
+      z: -90.0
+  - name: "§7[§eAussieBedwars§7] §eUpgrades"
+    type: "UPGRADE"
+    location:
+      x: 91.00
+      y: 62.0
+      z: -32.50
+  - name: "§7[§eAussieBedwars§7] §eUpgrades"
+    type: "UPGRADE"
+    location:
+      x: 91.50
+      y: 62.0
+      z: 33.50
+  - name: "§7[§eAussieBedwars§7] §eUpgrades"
+    type: "UPGRADE"
+    location:
+      x: -32.50
+      y: 62.0
+      z: 91.0
+  - name: "§7[§eAussieBedwars§7] §eUpgrades"
+    type: "UPGRADE"
+    location:
+      x: -90.0
+      y: 62.0
+      z: 33.50
+  - name: "§7[§eAussieBedwars§7] §eUpgrades"
+    type: "UPGRADE"
+    location:
+      x: -90.0
+      y: 62.0
+      z: -32.50
+  - name: "§7[§eAussieBedwars§7] §eUpgrades"
+    type: "UPGRADE"
+    location:
+      x: -32.50
+      y: 62.0
+      z: -90.0
+  - name: "§7[§eAussieBedwars§7] §eUpgrades"
+    type: "UPGRADE"
+    location:
+      x: 33.500
+      y: 62.000
+      z: 91.000

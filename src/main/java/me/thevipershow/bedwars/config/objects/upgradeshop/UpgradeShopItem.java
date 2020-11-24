@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import me.thevipershow.bedwars.AllStrings;
-import me.thevipershow.bedwars.game.AbstractActiveMerchant;
+import me.thevipershow.bedwars.game.upgrades.merchants.AbstractActiveMerchant;
 import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;

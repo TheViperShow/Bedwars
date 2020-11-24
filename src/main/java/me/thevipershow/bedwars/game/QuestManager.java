@@ -2,9 +2,12 @@ package me.thevipershow.bedwars.game;
 
 import java.util.concurrent.CompletableFuture;
 import me.thevipershow.bedwars.AllStrings;
+import me.thevipershow.bedwars.game.managers.ExperienceManager;
+import me.thevipershow.bedwars.game.data.game.BedwarsPlayer;
 import me.thevipershow.bedwars.storage.sql.tables.QuestsTableUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
 
 public final class QuestManager {
 
@@ -16,53 +19,69 @@ public final class QuestManager {
         this.plugin = experienceManager.getActiveGame().getPlugin();
     }
 
-    private void dailyFirstGameMessage(final Player player) {
+    public final void rewardAllAtEndGame() {
+        experienceManager.getActiveGame().getTeamManager().performAll(this::gamePlayedReward);
+    }
+
+    private void dailyFirstGameMessage(Player player) {
         player.sendMessage(AllStrings.DAILY_FIRST_GAME_MESSAGE.get());
     }
 
-    private void dailyGamesPlayedMessage(final Player player) {
+    private void dailyGamesPlayedMessage(Player player) {
         player.sendMessage(AllStrings.DAILY_GAMES_PLAYER_MESSAGE.get());
     }
 
-    private void brokenBedsMessage(final Player player) {
+    private void brokenBedsMessage(Player player) {
         player.sendMessage(AllStrings.WEEKLY_BROKEN_BEDS_MESSAGE.get());
     }
 
-    public final void winDailyFirstGame(final Player player) {
-        final CompletableFuture<Boolean> dailyFirstWin = QuestsTableUtils.getDailyFirstWin(plugin, player);
+    public final void winDailyFirstGame(BedwarsPlayer player) {
+        if (player == null || !player.isOnline()) {
+            throw new IllegalArgumentException("This BedwarsPlayer was null.");
+        }
+        Player p = player.getPlayer();
+        final CompletableFuture<Boolean> dailyFirstWin = QuestsTableUtils.getDailyFirstWin(plugin, p);
         dailyFirstWin.thenAccept(bool -> {
             if (bool == null || !bool) {
                 ExperienceManager.rewardPlayer(250, player, experienceManager.getActiveGame());
-                QuestsTableUtils.setDailyFirstWin(plugin, player);
-                dailyFirstGameMessage(player);
+                QuestsTableUtils.setDailyFirstWin(plugin, p);
+                dailyFirstGameMessage(p);
             }
         });
     }
 
-    public final void gamePlayedReward(final Player player) {
-        final CompletableFuture<Integer> gamesPlayed = QuestsTableUtils.getDailyGamesPlayed(plugin, player);
+    public final void gamePlayedReward(BedwarsPlayer player) {
+        if (player == null || !player.isOnline()) {
+            throw new IllegalArgumentException("This BedwarsPlayer was null.");
+        }
+        Player p = player.getPlayer();
+        final CompletableFuture<Integer> gamesPlayed = QuestsTableUtils.getDailyGamesPlayed(plugin, p);
         gamesPlayed.thenAccept(i -> {
             if (i != null) {
                 if (i == 1) {
-                    dailyGamesPlayedMessage(player);
+                    dailyGamesPlayedMessage(p);
                     ExperienceManager.rewardPlayer(250, player, experienceManager.getActiveGame());
                 }
             }
-            QuestsTableUtils.increaseGamesPlayed(plugin, player);
+            QuestsTableUtils.increaseGamesPlayed(plugin, p);
         });
     }
 
-    public final void breakBedReward(final Player player) {
+    public final void breakBedReward(@NotNull BedwarsPlayer player) {
+        if (player == null || !player.isOnline()) {
+            throw new IllegalArgumentException("This BedwarsPlayer was null.");
+        }
+        Player p = player.getPlayer();
         final CompletableFuture<Integer> brokenBeds = QuestsTableUtils.getBedsBroken(player.getUniqueId(), plugin);
         brokenBeds.thenAccept(i -> {
             if (i == null) {
                 if (i == 24) {
-                    brokenBedsMessage(player);
+                    brokenBedsMessage(p);
                     ExperienceManager.rewardPlayer(5000, player, experienceManager.getActiveGame());
                 }
             }
 
-            QuestsTableUtils.increaseBrokenBeds(plugin, player);
+            QuestsTableUtils.increaseBrokenBeds(plugin, p);
         });
     }
 

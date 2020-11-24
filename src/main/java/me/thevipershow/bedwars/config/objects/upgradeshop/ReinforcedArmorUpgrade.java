@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import me.thevipershow.bedwars.AllStrings;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
-public final class ReinforcedArmorUpgrade implements ConfigurationSerializable, Upgrade {
+public final class ReinforcedArmorUpgrade implements ConfigurationSerializable, StagedUpgrade {
 
     @Override
     public Map<String, Object> serialize() {
@@ -34,12 +34,18 @@ public final class ReinforcedArmorUpgrade implements ConfigurationSerializable, 
         return slot;
     }
 
-    public List<UpgradeShopItem> getLevels() {
+    @Override
+    public final List<UpgradeShopItem> getLevels() {
         return levels;
     }
 
     @Override
     public final UpgradeType getType() {
         return UpgradeType.REINFORCED_ARMOR;
+    }
+
+    @Override
+    public final boolean hasStages() {
+        return true;
     }
 }

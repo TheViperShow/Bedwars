@@ -6,63 +6,61 @@ import java.util.function.Consumer;
 
 public abstract class AbstractQueue<T> {
 
-    private int maximumSize;
+    private final int maximumSize;
     private final LinkedList<T> inQueue = new LinkedList<>();
 
     public AbstractQueue(final int maximumSize) {
         this.maximumSize = maximumSize;
     }
 
-    public void cleanQueue() {
+    public final void cleanQueue() {
         inQueue.clear();
     }
 
-    public void performAndClean(final Consumer<? super T> consumer) {
+    public final void performAndClean(final Consumer<? super T> consumer) {
         perform(consumer);
         cleanQueue();
     }
 
-    public void perform(final Consumer<? super T> consumer) {
+    public final void perform(final Consumer<? super T> consumer) {
         inQueue.forEach(consumer);
     }
 
-    public boolean removeFromQueue(final T t) {
-        return inQueue.remove(t);
+    public final void removeFromQueue(final T t) {
+        inQueue.remove(t);
     }
 
-    public boolean addToQueue(T t) {
+    public final void addToQueue(T t) {
         if (!isFull()) {
             inQueue.offerLast(t);
-            return true;
         }
-        return false;
     }
 
-    public boolean isEmpty() {
+    public final boolean isEmpty() {
         return this.inQueue.isEmpty();
     }
 
-    public boolean contains(final T t) {
+    public final boolean contains(final T t) {
         return inQueue.contains(t);
     }
 
-    public int queueSize() {
+    public final int queueSize() {
         return this.inQueue.size();
     }
 
-    public boolean isFull() {
+    public final boolean isFull() {
         return maximumSize - inQueue.size() < 1;
     }
 
-    public Iterator<T> getIterator() {
+    public final Iterator<T> getIterator() {
         return inQueue.iterator();
     }
 
-    public int getMaximumSize() {
+    public final int getMaximumSize() {
         return maximumSize;
     }
 
-    public LinkedList<T> getInQueue() {
+    public final LinkedList<T> getInQueue() {
         return inQueue;
     }
 }

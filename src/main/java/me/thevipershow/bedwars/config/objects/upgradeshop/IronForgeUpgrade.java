@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import me.thevipershow.bedwars.AllStrings;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
-public final class IronForgeUpgrade implements ConfigurationSerializable , Upgrade {
+public final class IronForgeUpgrade implements ConfigurationSerializable, StagedUpgrade {
 
     @Override
     public Map<String, Object> serialize() {
@@ -34,6 +34,7 @@ public final class IronForgeUpgrade implements ConfigurationSerializable , Upgra
         return slot;
     }
 
+    @Override
     public List<UpgradeShopItem> getLevels() {
         return levels;
     }
@@ -41,5 +42,10 @@ public final class IronForgeUpgrade implements ConfigurationSerializable , Upgra
     @Override
     public final UpgradeType getType() {
         return UpgradeType.IRON_FORGE;
+    }
+
+    @Override
+    public final boolean hasStages() {
+        return true;
     }
 }

@@ -1,12 +1,23 @@
 package me.thevipershow.bedwars.config.objects;
 
+import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import me.thevipershow.bedwars.bedwars.Gamemode;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
+import me.thevipershow.bedwars.config.folders.ConfigFiles;
+import me.thevipershow.bedwars.config.folders.files.BedsConfiguration;
+import me.thevipershow.bedwars.config.folders.files.GeneralConfiguration;
+import me.thevipershow.bedwars.config.folders.files.MerchantsConfiguration;
+import me.thevipershow.bedwars.config.folders.files.ShopConfiguration;
+import me.thevipershow.bedwars.config.folders.files.SpawnersConfiguration;
+import me.thevipershow.bedwars.config.folders.files.SpawnsConfiguration;
+import me.thevipershow.bedwars.config.folders.files.TeamsConfiguration;
+import me.thevipershow.bedwars.config.folders.files.UpgradesConfiguration;
 import me.thevipershow.bedwars.config.objects.upgradeshop.UpgradeShop;
 
-public abstract class BedwarsGame {
+public final class BedwarsGame {
 
     protected final Gamemode gamemode;
     protected final int minGames;
@@ -19,33 +30,76 @@ public abstract class BedwarsGame {
     protected final Set<TeamSpawnPosition> mapSpawns;
     protected final List<Spawner> spawners;
     protected final List<Merchant> merchants;
-    protected final List<SpawnPosition> bedSpawnPositions;
+    protected final List<TeamSpawnPosition> bedSpawnPositions;
     protected final Shop shop;
     protected final UpgradeShop upgradeShop;
     protected final int startTimer;
     protected final int deathmatchStart;
     protected final int tntFuse;
     protected final SpawnPosition spawnProtection;
+    protected final File configurationFolder;
 
-    protected BedwarsGame(
-            final Gamemode gamemode,
-            final int minGames,
-            final int maxGames,
-            final int minPlayers,
-            final int players,
-            final List<BedwarsTeam> teams,
-            final SpawnPosition lobbySpawn,
-            final String mapFilename,
-            final Set<TeamSpawnPosition> mapSpawns,
-            final List<Spawner> spawners,
-            final List<Merchant> merchants,
-            final List<SpawnPosition> bedSpawnPositions,
-            final Shop shop,
-            final UpgradeShop upgradeShop,
-            final int startTimer,
-            final int deathmatchStart,
-            final int tntFuse,
-            final SpawnPosition spawnProtection) {
+    public BedwarsGame(Map<ConfigFiles, File> mappings, File configurationFolder) {
+        UpgradesConfiguration upgradesConfiguration = new UpgradesConfiguration(mappings.get(ConfigFiles.UPGRADES_FILE));
+        TeamsConfiguration teamsConfiguration = new TeamsConfiguration(mappings.get(ConfigFiles.TEAMS_FILE));
+        SpawnsConfiguration spawnsConfiguration = new SpawnsConfiguration(mappings.get(ConfigFiles.SPAWNS_FILE));
+        SpawnersConfiguration spawnersConfiguration = new SpawnersConfiguration(mappings.get(ConfigFiles.SPAWNERS_FILE));
+        ShopConfiguration shopConfiguration = new ShopConfiguration(mappings.get(ConfigFiles.SHOP_FILE));
+        MerchantsConfiguration merchantsConfiguration = new MerchantsConfiguration(mappings.get(ConfigFiles.MERCHANTS_FILE));
+        GeneralConfiguration generalConfiguration = new GeneralConfiguration(mappings.get(ConfigFiles.GENERAL_FILE));
+        BedsConfiguration bedsConfiguration = new BedsConfiguration(mappings.get(ConfigFiles.BEDS_FILE));
+        this.gamemode = generalConfiguration.getGamemode();
+        this.minGames = generalConfiguration.getMinGames();
+        this.maxGames = generalConfiguration.getMaxGames();
+        this.minPlayers = generalConfiguration.getMinPlayers();
+        this.players = generalConfiguration.getPlayers();
+        this.lobbySpawn = generalConfiguration.getLobbySpawn();
+        this.mapFilename = generalConfiguration.getMapFilename();
+        this.teams = teamsConfiguration.getActualTeams();
+        this.mapSpawns = spawnsConfiguration.getMapSpawnPos();
+        this.spawners = spawnersConfiguration.getSpawnerList();
+        this.merchants = merchantsConfiguration.getMerchantsList();
+        this.bedSpawnPositions = bedsConfiguration.getBedSpawnPositions();
+        this.shop = shopConfiguration.getShop();
+        this.upgradeShop = upgradesConfiguration.getUpgradeShop();
+        this.startTimer = generalConfiguration.getStartTimer();
+        this.deathmatchStart = generalConfiguration.getDeathmatchStart();
+        this.tntFuse = generalConfiguration.getTntFuse();
+        this.spawnProtection = generalConfiguration.getMapProtection();
+        this.configurationFolder = configurationFolder;
+    }
+
+    public BedwarsGame(UpgradesConfiguration upgradesConfiguration, TeamsConfiguration teamsConfiguration, SpawnsConfiguration spawnsConfiguration,
+                          SpawnersConfiguration spawnersConfiguration, ShopConfiguration shopConfiguration, MerchantsConfiguration merchantsConfiguration,
+                          GeneralConfiguration generalConfiguration, BedsConfiguration bedsConfiguration, File configurationFolder) {
+        this.gamemode = generalConfiguration.getGamemode();
+        this.minGames = generalConfiguration.getMinGames();
+        this.maxGames = generalConfiguration.getMaxGames();
+        this.minPlayers = generalConfiguration.getMinPlayers();
+        this.players = generalConfiguration.getPlayers();
+        this.lobbySpawn = generalConfiguration.getLobbySpawn();
+        this.mapFilename = generalConfiguration.getMapFilename();
+        this.teams = teamsConfiguration.getActualTeams();
+        this.mapSpawns = spawnsConfiguration.getMapSpawnPos();
+        this.spawners = spawnersConfiguration.getSpawnerList();
+        this.merchants = merchantsConfiguration.getMerchantsList();
+        this.bedSpawnPositions = bedsConfiguration.getBedSpawnPositions();
+        this.shop = shopConfiguration.getShop();
+        this.upgradeShop = upgradesConfiguration.getUpgradeShop();
+        this.startTimer = generalConfiguration.getStartTimer();
+        this.deathmatchStart = generalConfiguration.getDeathmatchStart();
+        this.tntFuse = generalConfiguration.getTntFuse();
+        this.spawnProtection = generalConfiguration.getMapProtection();
+        this.configurationFolder = configurationFolder;
+    }
+
+    public BedwarsGame(
+            final Gamemode gamemode, final int minGames, final int maxGames,
+            final int minPlayers, final int players, final List<BedwarsTeam> teams,
+            final SpawnPosition lobbySpawn, final String mapFilename, final Set<TeamSpawnPosition> mapSpawns,
+            final List<Spawner> spawners, final List<Merchant> merchants, final List<TeamSpawnPosition> bedSpawnPositions,
+            final Shop shop, final UpgradeShop upgradeShop, final int startTimer,
+            final int deathmatchStart, final int tntFuse, final SpawnPosition spawnProtection, File configurationFolder) {
         this.gamemode = gamemode;
         this.minGames = minGames;
         this.maxGames = maxGames;
@@ -64,9 +118,10 @@ public abstract class BedwarsGame {
         this.deathmatchStart = deathmatchStart;
         this.tntFuse = tntFuse;
         this.spawnProtection = spawnProtection;
+        this.configurationFolder = configurationFolder;
     }
 
-    public SpawnPosition spawnPosOfTeam(final BedwarsTeam team) {
+    public final SpawnPosition spawnPosOfTeam(final BedwarsTeam team) {
         for (TeamSpawnPosition mapSpawn : this.mapSpawns) {
             if (mapSpawn.getBedwarsTeam() == team) {
                 return mapSpawn;
@@ -131,7 +186,7 @@ public abstract class BedwarsGame {
         return startTimer;
     }
 
-    public final List<SpawnPosition> getBedSpawnPositions() {
+    public final List<TeamSpawnPosition> getBedSpawnPositions() {
         return bedSpawnPositions;
     }
 
@@ -145,5 +200,9 @@ public abstract class BedwarsGame {
 
     public final SpawnPosition getSpawnProtection() {
         return spawnProtection;
+    }
+
+    public final File getConfigurationFolder() {
+        return configurationFolder;
     }
 }

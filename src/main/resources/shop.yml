@@ -1,0 +1,372 @@
+shop:
+  title: "{TEAM} Shop"
+  slots: 54
+  glass:
+    color: 7
+    slots:
+      - 9
+      - 10
+      - 11
+      - 12
+      - 13
+      - 14
+      - 15
+      - 16
+      - 17
+  upgradable-items:
+    - slot: 20 # pickaxe upgrades ->
+      shop-category: "TOOLS"
+      amount: 1
+      levels:
+        - level: 1
+          material: "WOOD_PICKAXE"
+          item-name: "§eWooden Pickaxe (Efficiency I)"
+          buy-with: "IRON_INGOT"
+          price: 10
+          lore:
+            - "§7This is an upgradable item."
+            - "§7It will lose 1 tier upon death!"
+            - ""
+            - "§7You will permanently respawn at least"
+            - "§7with the lowest tier"
+          enchantments:
+            - level: 1
+              type: "DIG_SPEED"
+        - level: 2
+          material: "IRON_PICKAXE"
+          item-name: "§eIron Pickaxe (Efficiency II)"
+          buy-with: "IRON_INGOT"
+          price: 15
+          lore:
+            - "§7This is an upgradable item."
+            - "§7It will lose 1 tier upon death!"
+            - ""
+            - "§7You will permanently respawn at least"
+            - "§7with the lowest tier"
+          enchantments:
+            - level: 2
+              type: "DIG_SPEED"
+        - level: 3
+          material: "DIAMOND_PICKAXE"
+          item-name: "§eDiamond Pickaxe (Efficiency III)"
+          buy-with: "DIAMOND"
+          price: 4
+          lore:
+            - "§7This is an upgradable item."
+            - "§7It will lose 1 tier upon death!"
+            - ""
+            - "§7You will permanently respawn at least"
+            - "§7with the lowest tier"
+            - "§4NOTE§7: §cThis is the last upgrade available."
+          enchantments:
+            - level: 3
+              type: "DIG_SPEED"
+    - slot: 21 # axe upgrades ->
+      shop-category: "TOOLS"
+      amount: 1
+      levels:
+        - level: 1
+          material: "WOOD_AXE"
+          item-name: "§eWooden Axe (Sharpness I)"
+          buy-with: "IRON_INGOT"
+          price: 12
+          lore:
+            - "§7This is an upgradable item."
+            - "§7It will lose 1 tier upon death!"
+            - ""
+            - "§7You will permanently respawn at least"
+            - "§7with the lowest tier"
+          enchantments:
+            - level: 1
+              type: "DAMAGE_ALL"
+        - level: 2
+          material: "IRON_AXE"
+          item-name: "§eIron Axe (Sharpness II)"
+          buy-with: "IRON_INGOT"
+          price: 20
+          lore:
+            - "§7This is an upgradable item."
+            - "§7It will lose 1 tier upon death!"
+            - ""
+            - "§7You will permanently respawn at least"
+            - "§7with the lowest tier"
+          enchantments:
+            - level: 2
+              type: "DAMAGE_ALL"
+        - level: 3
+          material: "DIAMOND_AXE"
+          item-name: "§eDiamond Axe (Sharpness III)"
+          buy-with: "DIAMOND"
+          price: 4
+          lore:
+            - "§7This is an upgradable item."
+            - "§7It will lose 1 tier upon death!"
+            - ""
+            - "§7You will permanently respawn at least"
+            - "§7with the lowest tier"
+            - "§4NOTE§7: §cThis is the last upgrade available."
+          enchantments:
+            - level: 3
+              type: "DAMAGE_ALL"
+  items:
+    - material: "WOOL"
+      shop-category: "BLOCKS"
+      item-name: "§eWool Block"
+      slot: 19
+      amount: 16
+      buy-with: "IRON_INGOT"
+      price: 4
+      lore:
+        - "§7This is the wool with the colour of your team,"
+        - "§7you can use it to build bridges and"
+        - "§7reach your enemies base!"
+    - material: "ENDER_PEARL"
+      shop-category: "UTILITY"
+      item-name: "§2Ender Pearl"
+      slot: 25
+      amount: 2
+      buy-with: "GOLD_INGOT"
+      price: 16
+      lore:
+        - "§7This is an enderpearl,"
+        - "§7you can throw it you will get teleported"
+        - "§7in the same place it landed."
+    - material: "WATER_BUCKET"
+      shop-category: "UTILITY"
+      buy-with: "GOLD_INGOT"
+      slot: 26
+      amount: 1
+      item-name: "§bWater Bucket"
+      price: 3
+      lore:
+        - "§7Great to slow down incoming"
+        - "§7enemies. Can also protect you"
+        - "§7against explosives."
+    - material: "EGG"
+      shop-category: "UTILITY"
+      buy-with: "IRON_INGOT"
+      slot: 29
+      amount: 1
+      price: 8
+      item-name: "§7Chicken Egg"
+      lore:
+        - "§7Can be thrown at your"
+        - "§7enemies to apply knockback"
+        - "§7upon egg's impact, potentially"
+        - "§7causing them to fall."
+    - material: "MILK_BUCKET"
+      shop-category: "UTILITY"
+      buy-with: "GOLD_INGOT"
+      slot: 30
+      amount: 1
+      price: 4
+      item-name: "§fMilk Bucket"
+      lore: []
+    - material: "SPONGE"
+      shop-category: "UTILITY"
+      buy-with: "GOLD_INGOT"
+      slot: 30
+      amount: 4
+      price: 16
+      item-name: "§eSponge Block"
+      lore:
+        - "§7The sponge block is"
+        - "§7especially useful to remove"
+        - "§7water around you."
+    - material: "CHEST"
+      shop-category: "UTILITY"
+      buy-with: "GOLD_INGOT"
+      slot: 31
+      amount: 1
+      price: 8
+      item-name: "§eChest"
+      lore: []
+    - material: "FIREBALL"
+      shop-category: "UTILITY"
+      item-name: "§cExplosive Charge"
+      slot: 23
+      amount: 1
+      price: 1
+      buy-with: "DIAMOND"
+      lore:
+        - "§7This is an explosive charge,"
+        - "§7you can click while holding it and"
+        - "§7a fireball which can kill your enemies will be shot!"
+    - material: "GOLDEN_APPLE"
+      shop-category: "UTILITY"
+      item-name: "§eGolden Apple"
+      slot: 20
+      amount: 1
+      price: 2
+      buy-with: "DIAMOND"
+      lore:
+        - "§7A gold apple."
+    - material: "SNOW_BALL"
+      shop-category: "UTILITY"
+      item-name: "§fSnow ball"
+      slot: 21
+      amount: 1
+      price: 4
+      buy-with: "IRON_INGOT"
+      lore:
+        - "§7You can use snow balls"
+        - "§7to make your enemies"
+        - "§7fall into the void!"
+    - material: "BOW"
+      shop-category: "RANGED"
+      item-name: "§eBow"
+      slot: 21
+      amount: 1
+      price: 12
+      buy-with: "GOLD_INGOT"
+      lore: []
+    - material: "ARROW"
+      shop-category: "RANGED"
+      item-name: "§eArrows"
+      slot: 20
+      amount: 8
+      price: 12
+      buy-with: "IRON_INGOT"
+      lore: []
+    - material: "TNT"
+      shop-category: "UTILITY"
+      item-name: "§cDynamite"
+      slot: 24
+      amount: 1
+      price: 4
+      buy-with: "GOLD_INGOT"
+      lore:
+        - "§7This is a special dynamite block,"
+        - "§7it will lit as soon as you place it"
+        - "§7so watch out for the explosion!"
+    - material: "WOOD"
+      shop-category: "BLOCKS"
+      item-name: "§eWooden Planks"
+      slot: 20
+      amount: 16
+      price: 12
+      buy-with: "IRON_INGOT"
+      lore:
+        - "§7Wood planks."
+    - material: "STAINED_GLASS"
+      shop-category: "BLOCKS"
+      item-name: "§f§lGlass"
+      slot: 21
+      amount: 16
+      price: 8
+      buy-with: "GOLD_INGOT"
+      lore:
+        - "§7Glass blocks."
+    - material: "OBSIDIAN"
+      shop-category: "BLOCKS"
+      item-name: "§5§lObsidian Block"
+      slot: 22
+      amount: 4
+      price: 4
+      buy-with: "EMERALD"
+      lore:
+        - "§7Obsidian blocks."
+    - material: "ENDER_STONE"
+      shop-category: "BLOCKS"
+      item-name: "§e§lEnder Stone"
+      slot: 23
+      amount: 12
+      price: 8
+      buy-with: "GOLD_INGOT"
+      lore:
+        - "§7Ender blocks will protect"
+        - "§7your bed from explosives damage!"
+    - material: "LADDER"
+      shop-category: "BLOCKS"
+      item-name: "§e§lLadder"
+      slot: 24
+      amount: 16
+      price: 8
+      buy-with: "IRON_INGOT"
+      lore:
+        - "§7Use ladders to climb"
+        - "§7anywhere you want to!"
+    - material: "DIAMOND_CHESTPLATE"
+      shop-category: "ARMOR"
+      item-name: "§b§lPermanent Diamond Armor"
+      slot: 20
+      amount: 1
+      price: 6
+      buy-with: "EMERALD"
+      lore:
+        - "§7Buying this will give you a complete §b§lDIAMOND §r§7armor set"
+        - "§7It will be permanent upon death."
+    - material: "IRON_CHESTPLATE"
+      shop-category: "ARMOR"
+      item-name: "§7§lPermanent Iron Armor"
+      slot: 21
+      amount: 1
+      price: 6
+      buy-with: "DIAMOND"
+      lore:
+        - "§7Buying this will give you a complete §f§lIRON §r§7armor set"
+        - "§7It will be permanent upon death."
+    - material: "STONE_SWORD"
+      shop-category: "MELEE"
+      item-name: "§7§lStone Sword"
+      slot: 22
+      amount: 1
+      price: 6
+      buy-with: "IRON_INGOT"
+      lore:
+        - "§7Buying this will give you an §7§lStone §r§7sword."
+        - "§7It will lose one tier upon death."
+    - material: "IRON_SWORD"
+      shop-category: "MELEE"
+      item-name: "§f§lIron Sword"
+      slot: 21
+      amount: 1
+      price: 12
+      buy-with: "IRON_INGOT"
+      lore:
+        - "§7Buying this will give you an §f§lIRON §r§7sword."
+        - "§7It will lose one tier upon death."
+    - material: "DIAMOND_SWORD"
+      shop-category: "MELEE"
+      item-name: "§b§lDiamond Sword"
+      slot: 20
+      amount: 1
+      price: 8
+      buy-with: "GOLD_INGOT"
+      lore:
+        - "§7Buying this will give you an §b§lDIAMOND §r§7sword."
+        - "§7It will lose one tier upon death."
+  potions:
+    - item-name: "§f§lInvisibility Potion"
+      slot: 20
+      amount: 1
+      price: 2
+      buy-with: "DIAMOND"
+      lore:
+        - "§7This potion will make you"
+        - "§7invisible to all enemies."
+      type: "INVISIBILITY"
+      length: 30
+      level: 1
+    - item-name: "§f§lSpeed Potion"
+      slot: 21
+      amount: 1
+      price: 2
+      buy-with: "DIAMOND"
+      lore:
+        - "§7This potion will make you"
+        - "§7move very fast."
+      type: "SPEED"
+      length: 45
+      level: 2
+    - item-name: "§f§lJump Potion"
+      slot: 22
+      amount: 1
+      price: 2
+      buy-with: "DIAMOND"
+      lore:
+        - "§7This potion will make you"
+        - "§7jump insanely high."
+      type: "JUMP"
+      length: 45
+      level: 5

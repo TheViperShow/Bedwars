@@ -1,0 +1,388 @@
+spawners:
+  # EMERALD SPAWNERS
+  - type: "EMERALD"
+    invisible: false
+    location:
+      x: 26.5
+      y: 72.5
+      z: -25.5
+    drop-amount: 1
+    drop-delay: 180 # in seconds
+    levels:
+      - number: 1
+        increase-drop: 0
+        after-seconds: 1
+        decrease-delay: 0
+      - number: 2
+        increase-drop: 0
+        after-seconds: 720
+        decrease-delay: 40
+      - number: 3
+        increase-drop: 1
+        after-seconds: 1440
+        decrease-delay: 60
+  - type: "EMERALD"
+    invisible: false
+    location:
+      x: -25.5
+      y: 72.5
+      z: -25.5
+    drop-amount: 1
+    drop-delay: 180 # in seconds
+    levels:
+      - number: 1
+        increase-drop: 0
+        after-seconds: 1
+        decrease-delay: 0
+      - number: 2
+        increase-drop: 0
+        after-seconds: 720
+        decrease-delay: 40
+      - number: 3
+        increase-drop: 1
+        after-seconds: 1440
+        decrease-delay: 60
+  - type: "EMERALD"
+    invisible: false
+    location:
+      x: -25.5
+      y: 72.5
+      z: 26.5
+    drop-amount: 1
+    drop-delay: 180 # in seconds
+    levels:
+      - number: 1
+        increase-drop: 0
+        after-seconds: 1
+        decrease-delay: 0
+      - number: 2
+        increase-drop: 0
+        after-seconds: 720
+        decrease-delay: 40
+      - number: 3
+        increase-drop: 1
+        after-seconds: 1440
+        decrease-delay: 60
+  - type: "EMERALD"
+    invisible: false
+    location:
+      x: 26.5
+      y: 72.5
+      z: 26.5
+    drop-amount: 1
+    drop-delay: 180 # in seconds
+    levels:
+      - number: 1
+        increase-drop: 0
+        after-seconds: 1
+        decrease-delay: 0
+      - number: 2
+        increase-drop: 0
+        after-seconds: 720
+        decrease-delay: 40
+      - number: 3
+        increase-drop: 1
+        after-seconds: 1440
+        decrease-delay: 60
+  # DIAMONDS SPAWNERS
+  #---------------------------------------
+  - type: "DIAMOND"
+    invisible: false
+    location:
+      x: 62.5
+      y: 63.5
+      z: 0.5
+    drop-amount: 1
+    drop-delay: 120 # in seconds
+    levels:
+      - number: 1
+        increase-drop: 0
+        after-seconds: 1
+        decrease-delay: 0
+      - number: 2
+        increase-drop: 0
+        after-seconds: 360
+        decrease-delay: 40
+      - number: 3
+        increase-drop: 1
+        after-seconds: 1080
+        decrease-delay: 60
+  - type: "DIAMOND"
+    invisible: false
+    location:
+      x: 0.5
+      y: 63.5
+      z: 62.5
+    drop-amount: 1
+    drop-delay: 120 # in seconds
+    levels:
+      - number: 1
+        increase-drop: 0
+        after-seconds: 1
+        decrease-delay: 0
+      - number: 2
+        increase-drop: 0
+        after-seconds: 360
+        decrease-delay: 40
+      - number: 3
+        increase-drop: 1
+        after-seconds: 1080
+        decrease-delay: 60
+  - type: "DIAMOND"
+    invisible: false
+    location:
+      x: -61.5
+      y: 63.5
+      z: 0.5
+    drop-amount: 1
+    drop-delay: 120 # in seconds
+    levels:
+      - number: 1
+        increase-drop: 0
+        after-seconds: 1
+        decrease-delay: 0
+      - number: 2
+        increase-drop: 0
+        after-seconds: 360
+        decrease-delay: 40
+      - number: 3
+        increase-drop: 1
+        after-seconds: 1080
+        decrease-delay: 60
+  - type: "DIAMOND"
+    invisible: false
+    location:
+      x: 0.5
+      y: 63.5
+      z: -61.5
+    drop-amount: 1
+    drop-delay: 120 # in seconds
+    levels:
+      - number: 1
+        increase-drop: 0
+        after-seconds: 1
+        decrease-delay: 0
+      - number: 2
+        increase-drop: 0
+        after-seconds: 360
+        decrease-delay: 40
+      - number: 3
+        increase-drop: 1
+        after-seconds: 1080
+        decrease-delay: 60
+        #--------------------------------------- Dark
+  - type: "IRON"
+    invisible: true
+    location:
+      x: -96.5
+      y: 61.5
+      z: -37.5
+    drop-amount: 1
+    drop-delay: 2 # in seconds
+    levels:
+      - number: 1
+        increase-drop: 0
+        after-seconds: 60
+        decrease-delay: 0
+  - type: "GOLD"
+    invisible: true
+    location:
+      x: -96.5
+      y: 61.5
+      z: -37.5
+    drop-amount: 1
+    drop-delay: 5 # in seconds
+    levels:
+      - number: 1
+        increase-drop: 0
+        after-seconds: 60
+        decrease-delay: 0
+        #--------------------------------------- Red
+  - type: "IRON"
+    invisible: true
+    location:
+      x: -37.5
+      y: 61.5
+      z: -96.5
+    drop-amount: 2
+    drop-delay: 2 # in seconds
+    levels:
+      - number: 1
+        increase-drop: 0
+        after-seconds: 60
+        decrease-delay: 0
+  - type: "GOLD"
+    invisible: true
+    location:
+      x: -37.5
+      y: 61.5
+      z: -96.5
+    drop-amount: 1
+    drop-delay: 5 # in seconds
+    levels:
+      - number: 1
+        increase-drop: 0
+        after-seconds: 60
+        decrease-delay: 0
+        #--------------------------------------- Blue
+  - type: "IRON"
+    invisible: true
+    location:
+      x: 38.5
+      y: 61.5
+      z: -96.5
+    drop-amount: 1
+    drop-delay: 2 # in seconds
+    levels:
+      - number: 1
+        increase-drop: 0
+        after-seconds: 60
+        decrease-delay: 0
+  - type: "GOLD"
+    invisible: true
+    location:
+      x: 38.5
+      y: 61.5
+      z: -96.5
+    drop-amount: 1
+    drop-delay: 5 # in seconds
+    levels:
+      - number: 1
+        increase-drop: 0
+        after-seconds: 60
+        decrease-delay: 0
+        #--------------------------------------- Green
+  - type: "IRON"
+    invisible: true
+    location:
+      x: 97.5
+      y: 61.5
+      z: -37.5
+    drop-amount: 1
+    drop-delay: 2 # in seconds
+    levels:
+      - number: 1
+        increase-drop: 0
+        after-seconds: 60
+        decrease-delay: 0
+  - type: "GOLD"
+    invisible: true
+    location:
+      x: 97.5
+      y: 61.5
+      z: -37.5
+    drop-amount: 1
+    drop-delay: 5 # in seconds
+    levels:
+      - number: 1
+        increase-drop: 0
+        after-seconds: 60
+        decrease-delay: 0
+        #--------------------------------------- Yellow
+  - type: "IRON"
+    invisible: true
+    location:
+      x: 97.5
+      y: 61.5
+      z: 38.5
+    drop-amount: 1
+    drop-delay: 2 # in seconds
+    levels:
+      - number: 1
+        increase-drop: 0
+        after-seconds: 60
+        decrease-delay: 0
+  - type: "GOLD"
+    invisible: true
+    location:
+      x: 97.5
+      y: 61.5
+      z: 38.5
+    drop-amount: 1
+    drop-delay: 5 # in seconds
+    levels:
+      - number: 1
+        increase-drop: 0
+        after-seconds: 60
+        decrease-delay: 0
+        #---------------------------------------  cyan
+  - type: "IRON"
+    invisible: true
+    location:
+      x: 38.5
+      y: 61.5
+      z: 97.5
+    drop-amount: 1
+    drop-delay: 2 # in seconds
+    levels:
+      - number: 1
+        increase-drop: 0
+        after-seconds: 60
+        decrease-delay: 0
+  - type: "GOLD"
+    invisible: true
+    location:
+      x: 38.5
+      y: 61.5
+      z: 97.5
+    drop-amount: 1
+    drop-delay: 5 # in seconds
+    levels:
+      - number: 1
+        increase-drop: 0
+        after-seconds: 60
+        decrease-delay: 0
+        #--------------------------------------- White
+  - type: "IRON"
+    invisible: true
+    location:
+      x: -37.5
+      y: 61.5
+      z: 97.5
+    drop-amount: 1
+    drop-delay: 2 # in seconds
+    levels:
+      - number: 1
+        increase-drop: 0
+        after-seconds: 60
+        decrease-delay: 0
+  - type: "GOLD"
+    invisible: true
+    location:
+      x: -37.5
+      y: 61.5
+      z: 97.5
+    drop-amount: 1
+    drop-delay: 5 # in seconds
+    levels:
+      - number: 1
+        increase-drop: 0
+        after-seconds: 60
+        decrease-delay: 0
+        # ---------------------------------------- Pink
+  - type: "IRON"
+    invisible: true
+    location:
+      x: -96.5
+      y: 61.5
+      z: 38.5
+    drop-amount: 1
+    drop-delay: 2 # in seconds
+    levels:
+      - number: 1
+        increase-drop: 0
+        after-seconds: 60
+        decrease-delay: 0
+  - type: "GOLD"
+    invisible: true
+    location:
+      x: -96.5
+      y: 61.5
+      z: 38.5
+    drop-amount: 1
+    drop-delay: 5 # in seconds
+    levels:
+      - number: 1
+        increase-drop: 0
+        after-seconds: 60
+        decrease-delay: 0

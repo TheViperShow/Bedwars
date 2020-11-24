@@ -1,0 +1,17 @@
+map-filename: "bedwars-solo"
+gamemode: 'solo'
+start-timer: 15
+minimum-games: 2
+maximum-games: 16
+min-players: 2
+players: 8
+deathmatch-start: 1800 # in seconds
+tnt-fuse: 75 # in ticks (20 ticks = 1s)
+spawn-protection:
+  x: 8.00 # These values correspond to the
+  y: 3.00 # minimum distance that a block has to be
+  z: 8.00 # distant from the set spawn position.
+map-lobby-spawn:
+  x: -290.0 #Please modify this
+  y: 111.0 #Please modify this
+  z: 0.0 #Please modify this

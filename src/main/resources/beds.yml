@@ -1,0 +1,33 @@
+beds-locations:
+  - x: -80.5 #Pink
+    y: 62.5
+    z: 38.5
+    team: "PINK"
+  - x: -80.5 #Grey
+    y: 62.5
+    z: -37.5
+    team: "GREY"
+  - x: -37.5 #Red
+    y: 62.5
+    z: -80.5
+    team: "RED"
+  - x: 38.5 #Blue
+    y: 62.5
+    z: -80.5
+    team: "BLUE"
+  - x: 81.5 #Green
+    y: 62.5
+    z: -37.5
+    team: "GREEN"
+  - x: 81.5 #Yellow
+    y: 62.5
+    z: 38.5
+    team: "YELLOW"
+  - x: 38.5 #Cyan
+    y: 62.5
+    z: 81.5
+    team: "CYAN"
+  - x: -37.5 #LightGray
+    y: 62.5
+    z: 81.5
+    team: "WHITE"

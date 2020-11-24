@@ -15,20 +15,20 @@ public class VillageQueueRemover extends AbstractTargetInteractor<Player, Villag
     }
 
     @Override
-    public void perform() {
+    public final void perform() {
         final Optional<Villager> villager = lookupResult.getLookupResult();
         if (villager.isPresent()) {
                 QueueTableUtils.removeVillager(villager.get(), Bedwars.plugin)
                         .thenAccept(bool -> {
                            if (bool != null && bool) {
-                               interested.sendMessage(Bedwars.PREFIX + AllStrings.REMOVED_VILLAGER_FROM_DATABASE.get());
+                               interested.sendMessage(AllStrings.PREFIX.get() + AllStrings.REMOVED_VILLAGER_FROM_DATABASE.get());
                            } else {
-                               interested.sendMessage(Bedwars.PREFIX + AllStrings.VILLAGER_NOT_PRESENT_IN_DATABASE.get());
+                               interested.sendMessage(AllStrings.PREFIX.get() + AllStrings.VILLAGER_NOT_PRESENT_IN_DATABASE.get());
                            }
                         });
 
         } else {
-            interested.sendMessage(Bedwars.PREFIX + AllStrings.NOT_LOOKING_AT_VILLAGER);
+            interested.sendMessage(AllStrings.PREFIX.get() + AllStrings.NOT_LOOKING_AT_VILLAGER);
         }
     }
 }

@@ -12,6 +12,8 @@ public class DefaultConfiguration {
     private final JavaPlugin plugin;
     private final FileConfiguration config;
 
+    public static String serverName = null;
+    public static String serverDomain = null;
     private String databaseUsername = null;
     private String password = null;
     private String address = null;
@@ -30,6 +32,10 @@ public class DefaultConfiguration {
 
     private void setValues() {
         plugin.reloadConfig();
+        serverName = config.getString(AllStrings.SERVER_NAME.get());
+        serverDomain = config.getString(AllStrings.SERVER_DOMAIN.get());
+        AllStrings.PREFIX.setS(String.format("&8[&e%s&8]&7: ", serverName));
+        AllStrings.SERVER_BRAND.setS(serverDomain);
         this.databaseUsername = config.getString(AllStrings.DB_USER.get());
         this.password = config.getString(AllStrings.DB_PASSWORD.get());
         this.address = config.getString(AllStrings.DB_ADDRESS.get());

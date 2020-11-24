@@ -5,7 +5,7 @@ import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
 import me.thevipershow.bedwars.bedwars.Gamemode;
 import me.thevipershow.bedwars.game.ActiveGame;
-import me.thevipershow.bedwars.game.GameManager;
+import me.thevipershow.bedwars.game.managers.GameManager;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -16,22 +16,21 @@ public final class JoinCommand extends SubCommand {
     }
 
     private void joinGamemode(final Player player, final Gamemode gamemode) {
-        if (super.gameManager.getWorldsManager().getActiveGameList()
-                .stream()
-                .flatMap(game -> game.getAssociatedQueue().getInQueue().stream())
-                .noneMatch(p -> p.equals(player)))
-        {
+        if (super.gameManager.getWorldsManager().getActiveGameList().stream()
+                .flatMap(game -> game.getGameLobbyTicker().getAssociatedQueue().getInQueue().stream())
+                .noneMatch(p -> p.getUniqueId().equals(player.getUniqueId()))) {
+
             final Optional<ActiveGame> opt = gameManager.findOptimalGame(gamemode);
             if (opt.isPresent()) {
                 final ActiveGame found = opt.get();
                 super.gameManager.addToQueue(player, found);
             } else {
-                player.sendMessage(Bedwars.PREFIX + String.format(AllStrings.NO_GAME_FOUND_FOR_GAMEMODE.get(), gamemode.name()));
+                player.sendMessage(AllStrings.PREFIX.get() + String.format(AllStrings.NO_GAME_FOUND_FOR_GAMEMODE.get(), gamemode.name()));
                 super.gameManager.loadRandom(gamemode);
             }
 
         } else {
-            player.sendMessage(Bedwars.PREFIX + AllStrings.GAME_ALREADY_JOINED.get());
+            player.sendMessage(AllStrings.PREFIX.get() + AllStrings.GAME_ALREADY_JOINED.get());
         }
     }
 
@@ -57,6 +56,6 @@ public final class JoinCommand extends SubCommand {
             }
         }
 
-        sender.sendMessage(Bedwars.PREFIX + AllStrings.INVALID_GAMEMODE.get() + args[1] + "\"");
+        sender.sendMessage(AllStrings.PREFIX.get() + AllStrings.INVALID_GAMEMODE.get() + args[1] + "\"");
     }
 }

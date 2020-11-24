@@ -3,8 +3,8 @@ package me.thevipershow.bedwars.commands;
 import java.util.concurrent.CompletableFuture;
 import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
-import me.thevipershow.bedwars.game.ExperienceManager;
-import me.thevipershow.bedwars.game.GameManager;
+import me.thevipershow.bedwars.game.managers.ExperienceManager;
+import me.thevipershow.bedwars.game.managers.GameManager;
 import me.thevipershow.bedwars.storage.sql.tables.RankTableUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -30,9 +30,9 @@ public final class ExpCommand extends SubCommand {
             if (e <= 0) {
 
                 if (self) {
-                    p.sendMessage(Bedwars.PREFIX + AllStrings.NO_EXPERIENCE_POINTS.get());
+                    p.sendMessage(AllStrings.PREFIX.get() + AllStrings.NO_EXPERIENCE_POINTS.get());
                 } else {
-                    p.sendMessage(Bedwars.PREFIX + AllStrings.NO_EXPERIENCE_POINTS_HE.get());
+                    p.sendMessage(AllStrings.PREFIX.get() + AllStrings.NO_EXPERIENCE_POINTS_HE.get());
                 }
 
             } else {
@@ -44,11 +44,11 @@ public final class ExpCommand extends SubCommand {
                 final int currentLevelExp = e - playerLevelMinExp;
 
                 if (self) {
-                    p.sendMessage(Bedwars.PREFIX + AllStrings.YOUR_CURRENT_EXP.get() + e);
+                    p.sendMessage(AllStrings.PREFIX.get() + AllStrings.YOUR_CURRENT_EXP.get() + e);
                     p.sendMessage(AllStrings.YOUR_CURRENT_LEVEL.get() + playerLevel);
                     p.sendMessage(String.format(AllStrings.YOU_OWN.get(), currentLevelExp, expForNextLevel, playerLevel + 1));
                 } else {
-                    p.sendMessage(Bedwars.PREFIX + String.format(AllStrings.HIS_CURRENT_EXP.get(), targetName) + e);
+                    p.sendMessage(AllStrings.PREFIX.get() + String.format(AllStrings.HIS_CURRENT_EXP.get(), targetName) + e);
                     p.sendMessage(String.format(AllStrings.HIS_CURRENT_LEVEL.get(), targetName) + playerLevel);
                     p.sendMessage(String.format(AllStrings.HE_OWNS.get(), targetName, currentLevelExp, expForNextLevel, playerLevel+1));
                 }
@@ -87,9 +87,9 @@ public final class ExpCommand extends SubCommand {
                         try {
                             final int i = Integer.parseInt(args[3]);
                             RankTableUtils.rewardPlayerExp(args[2], i, plugin);
-                            sender.sendMessage(Bedwars.PREFIX + AllStrings.EXP_ADDED_MSG.get() + i);
+                            sender.sendMessage(AllStrings.PREFIX.get() + AllStrings.EXP_ADDED_MSG.get() + i);
                         } catch (final NumberFormatException e) {
-                            sender.sendMessage(Bedwars.PREFIX + AllStrings.LAST_ARG_NOT_NUMBER.get());
+                            sender.sendMessage(AllStrings.PREFIX.get() + AllStrings.LAST_ARG_NOT_NUMBER.get());
                         }
                     }
                 }

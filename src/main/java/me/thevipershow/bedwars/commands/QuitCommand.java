@@ -1,10 +1,11 @@
 package me.thevipershow.bedwars.commands;
 
-import java.util.Optional;
+import java.util.Collection;
+import java.util.stream.Collectors;
 import me.thevipershow.bedwars.AllStrings;
-import me.thevipershow.bedwars.Bedwars;
 import me.thevipershow.bedwars.game.ActiveGame;
-import me.thevipershow.bedwars.game.GameManager;
+import me.thevipershow.bedwars.game.ActiveGameState;
+import me.thevipershow.bedwars.game.managers.GameManager;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -29,17 +30,29 @@ public final class QuitCommand extends SubCommand {
             return;
         }
 
-        final Optional<ActiveGame> activeGame = super.gameManager.getWorldsManager().getActiveGameList()
+        final Collection<ActiveGame> activeGame = super.gameManager.getWorldsManager().getActiveGameList()
                 .stream()
-                .filter(game -> !game.isHasStarted() && game.getAssociatedQueue().getInQueue().stream().anyMatch(p -> p.equals(sender)))
-                .findFirst();
+                .filter(game ->
+                        game.getGameState() == ActiveGameState.QUEUE &&
+                                game.getGameLobbyTicker().getAssociatedQueue().getInQueue()
+                                        .stream()
+                                        .anyMatch(p -> p.getUniqueId().equals(((Player) sender).getUniqueId())))
+                .collect(Collectors.toList());
 
-        if (!activeGame.isPresent()) {
-            sender.sendMessage(Bedwars.PREFIX + AllStrings.NOT_IN_QUEUE.get());
+        if (!activeGame.isEmpty()) {
+            sender.sendMessage(AllStrings.PREFIX.get() + AllStrings.NOT_IN_QUEUE.get());
         } else {
-            activeGame.get().removePlayer((Player) sender);
-            activeGame.get().moveToLobby((Player) sender);
-            sender.sendMessage(Bedwars.PREFIX + AllStrings.LEFT_QUEUE.get());
+            if (activeGame.size() != 1) {
+                throw new RuntimeException(String.format("Player %s was found to be in more than 1 queue at the same time.", sender.getName()));
+            } else {
+                activeGame.forEach(game -> {
+                    game.getGameLobbyTicker().getAssociatedQueue().removeFromQueue((Player) sender);
+                    game.getMovementsManager().moveToSpawn((Player) sender);
+                });
+            }
+            //activeGame.get().getTeamManager().removePlayer((Player) sender);
+            //activeGame.get().getMovementsManager().moveToSpawn((Player) sender);
+            sender.sendMessage(AllStrings.PREFIX.get() + AllStrings.LEFT_QUEUE.get());
         }
     }
 }

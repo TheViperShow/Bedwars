@@ -1,49 +1,28 @@
 package me.thevipershow.bedwars;
 
-import me.thevipershow.bedwars.bedwars.spawner.SpawnerLevel;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import me.thevipershow.bedwars.commands.BedwarsMainCommand;
-import me.thevipershow.bedwars.config.BedwarsGamemodeConfig;
 import me.thevipershow.bedwars.config.ConfigManager;
 import me.thevipershow.bedwars.config.DefaultConfiguration;
-import me.thevipershow.bedwars.config.DuoConfig;
-import me.thevipershow.bedwars.config.QuadConfig;
-import me.thevipershow.bedwars.config.SoloConfig;
-import me.thevipershow.bedwars.config.objects.DuoBedwars;
-import me.thevipershow.bedwars.config.objects.Enchantment;
-import me.thevipershow.bedwars.config.objects.Merchant;
-import me.thevipershow.bedwars.config.objects.QuadBedwars;
-import me.thevipershow.bedwars.config.objects.Shop;
-import me.thevipershow.bedwars.config.objects.ShopItem;
-import me.thevipershow.bedwars.config.objects.SoloBedwars;
-import me.thevipershow.bedwars.config.objects.Spawner;
-import me.thevipershow.bedwars.config.objects.TeamSpawnPosition;
-import me.thevipershow.bedwars.config.objects.UpgradeItem;
-import me.thevipershow.bedwars.config.objects.UpgradeLevel;
-import me.thevipershow.bedwars.config.objects.upgradeshop.DragonBuffUpgrade;
-import me.thevipershow.bedwars.config.objects.upgradeshop.HealPoolUpgrade;
-import me.thevipershow.bedwars.config.objects.upgradeshop.IronForgeUpgrade;
-import me.thevipershow.bedwars.config.objects.upgradeshop.ManiacMinerUpgrade;
-import me.thevipershow.bedwars.config.objects.upgradeshop.ReinforcedArmorUpgrade;
-import me.thevipershow.bedwars.config.objects.upgradeshop.SharpnessUpgrade;
-import me.thevipershow.bedwars.config.objects.upgradeshop.TrapUpgrades;
-import me.thevipershow.bedwars.config.objects.upgradeshop.UpgradeShop;
-import me.thevipershow.bedwars.config.objects.upgradeshop.traps.AlarmTrap;
-import me.thevipershow.bedwars.config.objects.upgradeshop.traps.BlindnessAndPoisonTrap;
-import me.thevipershow.bedwars.config.objects.upgradeshop.traps.CounterOffensiveTrap;
-import me.thevipershow.bedwars.config.objects.upgradeshop.traps.MinerFatigueTrap;
-import me.thevipershow.bedwars.game.GameManager;
-import me.thevipershow.bedwars.listeners.LevelUpListener;
-import me.thevipershow.bedwars.listeners.queue.MatchmakingVillagersListener;
-import me.thevipershow.bedwars.listeners.queue.QueueResizerListener;
+import me.thevipershow.bedwars.config.folders.BedwarsGameFactory;
+import me.thevipershow.bedwars.config.folders.ConfigFiles;
+import me.thevipershow.bedwars.config.folders.ValidFoldersDiscoverer;
+import me.thevipershow.bedwars.game.managers.GameManager;
+import me.thevipershow.bedwars.game.GameUtils;
+import me.thevipershow.bedwars.listeners.global.ActiveGameTerminateListener;
+import me.thevipershow.bedwars.listeners.global.LevelUpListener;
+import me.thevipershow.bedwars.listeners.global.MatchmakingVillagersListener;
+import me.thevipershow.bedwars.listeners.global.QueueResizerListener;
 import me.thevipershow.bedwars.placeholders.BedwarsExpansion;
 import me.thevipershow.bedwars.storage.sql.DataCleaner;
 import me.thevipershow.bedwars.storage.sql.Database;
 import me.thevipershow.bedwars.storage.sql.MySQLDatabase;
 import me.thevipershow.bedwars.worlds.WorldsManager;
 import me.tigerhix.lib.scoreboard.ScoreboardLib;
-import org.bukkit.Bukkit;
+import org.apache.commons.io.FileUtils;
 import org.bukkit.command.PluginCommand;
-import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -52,23 +31,22 @@ public final class Bedwars extends JavaPlugin {
 
     public static Plugin plugin = null;
 
-    public static String PREFIX = AllStrings.PREFIX.get();
     public static String MYSQL_DRIVER_CLASS = null;
 
     private WorldsManager worldsManager = null;
     private GameManager gameManager = null;
     private Database database = null;
     private DefaultConfiguration defaultConfiguration = null;
-    // loading file configurations:
-    private BedwarsGamemodeConfig<SoloBedwars> soloConfig = null;
-    private BedwarsGamemodeConfig<DuoBedwars> duoConfig = null;
-    private BedwarsGamemodeConfig<QuadBedwars> quadConfig = null;
+
     private ConfigManager configManager = null;
+    private ValidFoldersDiscoverer validFoldersDiscoverer;
+    private BedwarsGameFactory bedwarsGameFactory;
 
     // Global Listeners section
     private Listener matchmakingVillagerListener = null;
     private Listener queueResizerListener = null;
     private Listener levelUpListener = null;
+    private Listener activeGameTerminateListener = null;
 
     // Cleaners
     private DataCleaner dataCleaner = null;
@@ -81,61 +59,53 @@ public final class Bedwars extends JavaPlugin {
         }
     }
 
-    private static void registerSerializers() {
-        ConfigurationSerialization.registerClass(DragonBuffUpgrade.class);
-        ConfigurationSerialization.registerClass(HealPoolUpgrade.class);
-        ConfigurationSerialization.registerClass(IronForgeUpgrade.class);
-        ConfigurationSerialization.registerClass(ManiacMinerUpgrade.class);
-        ConfigurationSerialization.registerClass(ReinforcedArmorUpgrade.class);
-        ConfigurationSerialization.registerClass(SharpnessUpgrade.class);
-        ConfigurationSerialization.registerClass(UpgradeShop.class);
-        ConfigurationSerialization.registerClass(Enchantment.class);
-        ConfigurationSerialization.registerClass(UpgradeItem.class);
-        ConfigurationSerialization.registerClass(UpgradeLevel.class);
-        ConfigurationSerialization.registerClass(SpawnerLevel.class);
-        ConfigurationSerialization.registerClass(Spawner.class);
-        ConfigurationSerialization.registerClass(ShopItem.class);
-        ConfigurationSerialization.registerClass(Shop.class);
-        ConfigurationSerialization.registerClass(Merchant.class);
-        ConfigurationSerialization.registerClass(SoloBedwars.class);
-        ConfigurationSerialization.registerClass(ShopItem.class);
-        ConfigurationSerialization.registerClass(TeamSpawnPosition.class);
-        ConfigurationSerialization.registerClass(DuoBedwars.class);
-        ConfigurationSerialization.registerClass(MinerFatigueTrap.class);
-        ConfigurationSerialization.registerClass(BlindnessAndPoisonTrap.class);
-        ConfigurationSerialization.registerClass(CounterOffensiveTrap.class);
-        ConfigurationSerialization.registerClass(AlarmTrap.class);
-        ConfigurationSerialization.registerClass(TrapUpgrades.class);
-        ConfigurationSerialization.registerClass(QuadBedwars.class);
+    private void exportSampleFolder() {
+        try {
+            File output = new File(getDataFolder(), "sample-game");
+            if (!output.exists()) {
+                output.mkdir();
+            } else {
+                return;
+            }
+            for (ConfigFiles value : ConfigFiles.values()) {
+                File current = new File(output, value.getFilename());
+                if (!current.exists()) {
+                    current.createNewFile();
+                }
+                try (InputStream inputStream = getResource(value.getFilename())) {
+                    FileUtils.copyInputStreamToFile(inputStream, current);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //    plugin.saveResource("sample-game" + File.separatorChar, false);
     }
 
     @Override
     public final void onLoad() {
-        registerSerializers();
+        GameUtils.registerSerializers();
     }
 
     @Override
     public final void onEnable() { // Plugin startup logic
         plugin = this;
         ScoreboardLib.setPluginInstance(this);                       // Setting the plugin instance for the ScoreboardLib
+
+        exportSampleFolder(); // saving sample-game folder if it didn't exist.
+
+        validFoldersDiscoverer = new ValidFoldersDiscoverer(this);
+        bedwarsGameFactory = new BedwarsGameFactory(validFoldersDiscoverer);
+
         defaultConfiguration = new DefaultConfiguration(this); // Instantiating new DefaultConfiguration
 
-        soloConfig = new SoloConfig(this); // Instantiating all configs:
-        soloConfig.saveDefaultConfig(); //saving them
-
-        duoConfig = new DuoConfig(this);
-        duoConfig.saveDefaultConfig();
-
-        quadConfig = new QuadConfig(this);
-        quadConfig.saveDefaultConfig();
-
-        configManager = new ConfigManager(defaultConfiguration, soloConfig, duoConfig, quadConfig);
+        configManager = new ConfigManager(defaultConfiguration);
 
         worldsManager = WorldsManager.getInstanceSafe(configManager, this);
         worldsManager.cleanPreviousDirs();
 
         database = new MySQLDatabase(this, defaultConfiguration);
-        gameManager = new GameManager(this, worldsManager, soloConfig, duoConfig, quadConfig);
+        gameManager = new GameManager(this, worldsManager, bedwarsGameFactory);
         gameManager.loadBaseAmount();
 
         final PluginCommand pluginCommand = getServer().getPluginCommand(AllStrings.MAIN_COMMAND.get());
@@ -146,9 +116,11 @@ public final class Bedwars extends JavaPlugin {
         matchmakingVillagerListener = new MatchmakingVillagersListener(this, gameManager); // Insantiating listeners
         queueResizerListener = new QueueResizerListener(gameManager);
         levelUpListener = new LevelUpListener();
+        activeGameTerminateListener = new ActiveGameTerminateListener(worldsManager);
         getServer().getPluginManager().registerEvents(matchmakingVillagerListener, this); // Registering global listeners
         getServer().getPluginManager().registerEvents(queueResizerListener, this);
         getServer().getPluginManager().registerEvents(levelUpListener, this);
+        getServer().getPluginManager().registerEvents(activeGameTerminateListener, this);
 
         dataCleaner = new DataCleaner(this);
         dataCleaner.startTasks();
@@ -168,7 +140,7 @@ public final class Bedwars extends JavaPlugin {
     @Override
     public final void onDisable() {
         dataCleaner.stopTasks();
-        worldsManager.getActiveGameList().forEach(game -> getServer().unloadWorld(game.getAssociatedWorld(), false));
+        worldsManager.getActiveGameList().forEach(game -> getServer().unloadWorld(game.getCachedGameData().getGame(), false));
     }
 
 }
