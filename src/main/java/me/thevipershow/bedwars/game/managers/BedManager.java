@@ -5,6 +5,8 @@ import java.util.Set;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.config.objects.TeamSpawnPosition;
 import me.thevipershow.bedwars.game.ActiveGame;
+import me.thevipershow.bedwars.game.data.game.enums.TeamStatus;
+import me.thevipershow.bedwars.game.data.teams.TeamData;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -40,7 +42,7 @@ public final class BedManager {
     }
 
     public static void cleanNearbyBeds(Location loc) {
-        loc.getWorld().getNearbyEntities(loc, 2.0, 1.5, 2.0)
+        loc.getWorld().getNearbyEntities(loc, 3.0, 2.5, 3.0)
                 .stream()
                 .filter(i -> i.getType() == EntityType.DROPPED_ITEM && ((Item) i).getItemStack().getType() == Material.BED)
                 .forEach(Entity::remove);
@@ -57,6 +59,11 @@ public final class BedManager {
                 }
                 return;
             }
+        }
+        TeamManager<?> teamManager = activeGame.getTeamManager();
+        TeamData<?> data = teamManager.dataOfTeam(team);
+        if (data != null) {
+            data.setStatus(TeamStatus.BED_BROKEN);
         }
     }
 

@@ -1,22 +1,13 @@
 package me.thevipershow.bedwars.game.data.game;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
-import me.thevipershow.bedwars.config.objects.UpgradeItem;
-import me.thevipershow.bedwars.config.objects.UpgradeLevel;
-import me.thevipershow.bedwars.game.GameInventories;
-import me.thevipershow.bedwars.game.GameUtils;
 import me.thevipershow.bedwars.game.data.game.enums.PlayerState;
-import me.thevipershow.bedwars.game.shop.ShopCategory;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.util.Vector;
 

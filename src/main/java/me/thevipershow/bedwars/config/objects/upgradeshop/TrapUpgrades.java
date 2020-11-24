@@ -55,30 +55,58 @@ public final class TrapUpgrades implements ConfigurationSerializable {
         return new TrapUpgrades(alarmTrap, blindnessAndPoisonTrap, counterOffensiveTrap, minerFatigueTrap, itemName, lore, slot, material);
     }
 
+    /**
+     * Get the AlarmTrap for this game.
+     * @return The trap.
+     */
     public AlarmTrap getAlarmTrap() {
         return alarmTrap;
     }
 
+    /**
+     * Get the BlindnessAndPoisonTrap for this game.
+     * @return The trap.
+     */
     public BlindnessAndPoisonTrap getBlindnessAndPoisonTrap() {
         return blindnessAndPoisonTrap;
     }
 
+    /**
+     * Get the CounterOffensiveTrap for this game.
+     * @return The trap.
+     */
     public CounterOffensiveTrap getCounterOffensiveTrap() {
         return counterOffensiveTrap;
     }
 
+    /**
+     * Get the MinerFatigueTrap for this game.
+     * @return The trap.
+     */
     public MinerFatigueTrap getMinerFatigueTrap() {
         return minerFatigueTrap;
     }
 
+    /**
+     * Get the item name for the traps open-menu button.
+     * @return The name.
+     */
     public String getItemName() {
         return itemName;
     }
 
+    /**
+     * Get the lore for the traps open-menu button.
+     * @return The lore.
+     */
     public List<String> getLore() {
         return lore;
     }
 
+    /**
+     * Get the slot associated with the traps open-menu button.
+     * @return The slot.
+     */
     public int getSlot() {
         return slot;
     }

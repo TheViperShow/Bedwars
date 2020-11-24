@@ -87,6 +87,25 @@ public final class GameUtils {
         return stringBuilder.toString();
     }
 
+    public static ItemStack applyEventualColors(ItemStack stack, BedwarsPlayer bedwarsPlayer) {
+        Material stackType = stack.getType();
+        BedwarsTeam team = bedwarsPlayer.getBedwarsTeam();
+        switch (stackType) {
+            case STAINED_GLASS:
+            case STAINED_GLASS_PANE:
+                stack.setDurability(team.getGlassColor());
+                break;
+            case WOOL:
+                stack.setDurability(team.getWoolColor());
+                break;
+            case STAINED_CLAY:
+                stack.setDurability(team.getClayColor());
+                break;
+            default:
+                break;
+        }
+        return stack;
+    }
 
     public static Pair<HashMap<Integer, Integer>, Boolean> canAfford(final PlayerInventory inventory, final Material currency, final int price) {
         final ItemStack[] contents = inventory.getContents();
@@ -586,7 +605,7 @@ public final class GameUtils {
 
     public static ItemStack applyEnchant(final ItemStack stack, final Enchantment enchant, final int level) {
         if (stack != null) {
-            stack.addEnchantment(enchant, level);
+            stack.addUnsafeEnchantment(enchant, level);
         }
         return stack;
     }
@@ -627,7 +646,7 @@ public final class GameUtils {
     public static void payMaterial(Material material, int amount, Inventory inventory) {
         Map<Integer, ? extends ItemStack> map = inventory.all(material);
         if (!map.isEmpty()) {
-            int collected = 0x00;
+            int collected = 0b00;
             for (Map.Entry<Integer, ? extends ItemStack> entry : map.entrySet()) {
                 int slot = entry.getKey();
                 ItemStack stack = entry.getValue();

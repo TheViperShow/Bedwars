@@ -9,6 +9,7 @@ import me.thevipershow.bedwars.game.data.game.BedwarsPlayer;
 import me.thevipershow.bedwars.game.deathmatch.AbstractDeathmatch;
 import me.thevipershow.bedwars.game.managers.ArmorManager;
 import me.thevipershow.bedwars.game.managers.ExperienceManager;
+import me.thevipershow.bedwars.game.managers.GameInventoriesManager;
 import me.thevipershow.bedwars.game.managers.LobbyManager;
 import me.thevipershow.bedwars.game.managers.ActiveSpawnersManager;
 import me.thevipershow.bedwars.game.managers.BedManager;
@@ -28,8 +29,7 @@ import me.thevipershow.bedwars.game.managers.SoloTeamManager;
 import me.thevipershow.bedwars.game.managers.TeamManager;
 import me.thevipershow.bedwars.game.managers.TrapsManager;
 import me.thevipershow.bedwars.game.managers.UpgradesManager;
-import me.thevipershow.bedwars.listeners.unregisterable.GameTrapTriggerer;
-import me.tigerhix.lib.scoreboard.type.Scoreboard;
+import me.thevipershow.bedwars.game.runnables.GameTrapTriggerer;
 import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
 
@@ -68,7 +68,7 @@ public final class ActiveGame {
                 new QuestManager(experienceManager),
                 new GameTrapTriggerer(this),
                 new KillTracker(this),
-                new GameInventories(this),
+                new GameInventoriesManager(this),
                 bedwarsGame,
                 bedwarsGame.getGamemode() == Gamemode.SOLO ? new SoloTeamManager(this) : new MultiTeamManager(this),
                 new ListenersManager(this),
@@ -297,7 +297,7 @@ public final class ActiveGame {
         return internalGameManager.getKillTracker();
     }
 
-    public final GameInventories getGameInventories() {
+    public final GameInventoriesManager getGameInventories() {
         return internalGameManager.getGameInventories();
     }
 

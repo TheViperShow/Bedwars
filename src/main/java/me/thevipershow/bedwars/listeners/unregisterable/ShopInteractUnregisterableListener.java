@@ -12,7 +12,7 @@ import me.thevipershow.bedwars.config.objects.UpgradeItem;
 import me.thevipershow.bedwars.config.objects.UpgradeLevel;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.ArmorSet;
-import me.thevipershow.bedwars.game.GameInventories;
+import me.thevipershow.bedwars.game.managers.GameInventoriesManager;
 import me.thevipershow.bedwars.game.GameUtils;
 import me.thevipershow.bedwars.game.data.game.BedwarsPlayer;
 import me.thevipershow.bedwars.game.data.teams.TeamData;
@@ -30,13 +30,22 @@ public final class ShopInteractUnregisterableListener extends UnregisterableList
         super(activeGame);
     }
 
+    /**
+     * This method is used to find out if the player has clicked on a "shop category" button.
+     * If the player has selected a shop category button, he will be prompted with its associated
+     * inventory.
+     * @param category The ShopCategory currently open.
+     * @param clickedSlot The clicked slot number.
+     * @param bedwarsPlayer The BedwarsPlayer who clicked.
+     * @return True if he clicked on a shop category button, false otherwise.
+     */
     private boolean moveShopCategory(ShopCategory category, int clickedSlot, BedwarsPlayer bedwarsPlayer) {
         if (category.getSlot() == clickedSlot) {
             final Map<ShopCategory, Inventory> map = activeGame.getGameInventories().getPlayerShop().get(bedwarsPlayer.getUniqueId());
             if (map != null) {
                 Inventory tI = map.get(category);
                 if (tI != null) {
-                    bedwarsPlayer.playSound(Sound.NOTE_STICKS, 9.0f, 0.750f);
+                    bedwarsPlayer.playSound(Sound.NOTE_STICKS, 9.0f, 0.650f);
                     bedwarsPlayer.getPlayer().openInventory(tI);
                     return true;
                 }
@@ -45,6 +54,17 @@ public final class ShopInteractUnregisterableListener extends UnregisterableList
         return false;
     }
 
+    /**
+     * This method is used to determine if the player clicked on a ShopItem.
+     * If he clicked, the buying procedure for that item will start.
+     * @param item The current ShopItem.
+     * @param shopCategory The current ShopCategory.
+     * @param clickedSlot The clicked slot number.
+     * @param inv The Inventory currently open.
+     * @param bedwarsPlayer The BedwarsPlayer who clicked.
+     * @param clickedItem The Item currently clicked.
+     * @return True if he clicked on a ShopItem, false otherwise.
+     */
     private boolean buyShopItem(ShopItem item, ShopCategory shopCategory, int clickedSlot, Inventory inv, BedwarsPlayer bedwarsPlayer, ItemStack clickedItem) {
         if (item.getShopCategory() == shopCategory && item.getSlot() == clickedSlot) {
             Material buyWith = item.getBuyWith();
@@ -58,7 +78,7 @@ public final class ShopInteractUnregisterableListener extends UnregisterableList
                     final String type = clickedItem.getType().name().split("_")[0].toLowerCase(Locale.ROOT);
                     ArmorSet.setArmorFromType(bedwarsPlayer.getPlayer(), type, true, data.getArmorProtection());
                 } else {
-                    GameUtils.giveStackToPlayer(item.getCachedGameStack(), bedwarsPlayer.getPlayer(), inv.getContents());
+                    GameUtils.giveStackToPlayer(GameUtils.applyEventualColors(item.getCachedGameStack(), bedwarsPlayer), bedwarsPlayer.getPlayer(), inv.getContents());
                 }
                 return true;
             } else {
@@ -69,6 +89,16 @@ public final class ShopInteractUnregisterableListener extends UnregisterableList
         return false;
     }
 
+    /**
+     * This method is used to determine if the player clicked on a PotionItem.
+     * If he clicked, the buying procedure for that item will start.
+     * @param item The current PotionItem.
+     * @param shopCategory The current ShopCategory.
+     * @param clickedSlot The clicked slot number.
+     * @param inv The Inventory currently open.
+     * @param bedwarsPlayer The BedwarsPlayer who clicked.
+     * @return True if he clicked on a ShopItem, false otherwise.
+     */
     private boolean buyPotionItem(PotionItem item, ShopCategory shopCategory, int clickedSlot, Inventory inv, BedwarsPlayer bedwarsPlayer) {
         if (item.getShopCategory() == shopCategory && item.getSlot() == clickedSlot) {
             Material buyWith = item.getBuyWith();
@@ -87,20 +117,29 @@ public final class ShopInteractUnregisterableListener extends UnregisterableList
 
     }
 
+    /**
+     * This method is used to determine if the player clicked on a UpgradeItem.
+     * If he clicked, the upgrading procedure for that item will start.
+     * @param upgradeItem The current UpgradeItem.
+     * @param shopCategory The current ShopCategory.
+     * @param clickedSlot The clicked slot number.
+     * @param inv The Inventory currently open.
+     * @param bedwarsPlayer The BedwarsPlayer who clicked.
+     * @return True if the player clicked on a UpgradeItem, false otherwise.
+     */
     private boolean buyUpgradeItem(UpgradeItem upgradeItem, ShopCategory shopCategory, int clickedSlot, Inventory inv, BedwarsPlayer bedwarsPlayer) {
         if (upgradeItem.getShopCategory() != shopCategory || upgradeItem.getSlot() != clickedSlot) {
             return false;
         }
-        GameInventories gameInventories = activeGame.getGameInventories();
-        if (gameInventories.canUpgrade(bedwarsPlayer, upgradeItem)) {
-            UpgradeLevel next = gameInventories.getNextUpgradeLevel(bedwarsPlayer, upgradeItem);
+        GameInventoriesManager gameInventoriesManager = activeGame.getGameInventories();
+        if (gameInventoriesManager.canUpgrade(bedwarsPlayer, upgradeItem)) {
+            UpgradeLevel next = gameInventoriesManager.getNextUpgradeLevel(bedwarsPlayer, upgradeItem);
 
             Material buyWith = next.getBuyWith();
             int cost = next.getPrice();
 
             if (inv.contains(buyWith, cost)) {
-                System.out.println("AINV: " + inv.toString());
-                gameInventories.updateItemUpgrade(shopCategory, upgradeItem, clickedSlot, bedwarsPlayer.getUniqueId());
+                gameInventoriesManager.updateItemUpgrade(shopCategory, upgradeItem, clickedSlot, bedwarsPlayer.getUniqueId());
                 GameUtils.payMaterial(buyWith, cost, bedwarsPlayer.getInventory());
                 GameUtils.paySound(bedwarsPlayer.getPlayer());
                 GameUtils.giveStackToPlayer(next.generateGameStack(), bedwarsPlayer.getPlayer(), bedwarsPlayer.getInventory().getContents());
@@ -116,6 +155,13 @@ public final class ShopInteractUnregisterableListener extends UnregisterableList
         return false;
     }
 
+    /**
+     * Handles all of the logic for how to proceed with a purchase.
+     * @param bedwarsPlayer The BedwarsPlayer who wants to purchase something.
+     * @param shopCategory The ShopCategory he's currently looking at.
+     * @param clickedSlot The number of the clicked slot.
+     * @param clickedItem The clicked item.
+     */
     private void shopLogic(BedwarsPlayer bedwarsPlayer, ShopCategory shopCategory, int clickedSlot, ItemStack clickedItem) {
         BedwarsGame bedwarsGame = activeGame.getBedwarsGame();
         Shop shop = bedwarsGame.getShop();

@@ -36,7 +36,6 @@ public final class DragonRedirectorListener extends UnregisterableListener {
         Player target = (Player) event.getTarget();
         EnderDragon enderDragon = (EnderDragon) event.getEntity();
 
-        //CraftEnderDragon craftEnderDragon = (CraftEnderDragon) enderDragon;
         UUID dragonUUID = enderDragon.getUniqueId();
         if (dragonTeamsMap.containsKey(dragonUUID)) {
             BedwarsTeam dragonOwnerTeam = dragonTeamsMap.get(dragonUUID);

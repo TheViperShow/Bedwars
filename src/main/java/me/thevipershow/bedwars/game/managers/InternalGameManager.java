@@ -2,23 +2,22 @@ package me.thevipershow.bedwars.game.managers;
 
 import me.thevipershow.bedwars.config.objects.BedwarsGame;
 import me.thevipershow.bedwars.game.deathmatch.AbstractDeathmatch;
-import me.thevipershow.bedwars.game.GameInventories;
 import me.thevipershow.bedwars.game.KillTracker;
 import me.thevipershow.bedwars.game.QuestManager;
 import me.thevipershow.bedwars.game.data.game.CachedGameData;
 import me.thevipershow.bedwars.game.data.game.PlayerMapper;
-import me.thevipershow.bedwars.listeners.unregisterable.GameTrapTriggerer;
+import me.thevipershow.bedwars.game.runnables.GameTrapTriggerer;
 import org.bukkit.plugin.Plugin;
 
 public final class InternalGameManager {
 
-    public InternalGameManager(AbstractDeathmatch abstractDeathmatch, ExperienceManager experienceManager, QuestManager questManager, GameTrapTriggerer gameTrapTriggerer, KillTracker killTracker, GameInventories gameInventories, BedwarsGame bedwarsGame, TeamManager<?> teamManager, ListenersManager listenersManager, LobbyManager lobbyManager, Plugin plugin, CachedGameData cachedGameData, ActiveSpawnersManager activeSpawnersManager, MovementsManager movementsManager, InvisibilityManager invisibilityManager, PlayerMapper playerMapper, ScoreboardManager scoreboardManager, MerchantManager merchantManager, TrapsManager trapsManager, MapManager mapManager, BedManager bedManager, UpgradesManager upgradesManager, ArmorManager armorManager) {
+    public InternalGameManager(AbstractDeathmatch abstractDeathmatch, ExperienceManager experienceManager, QuestManager questManager, GameTrapTriggerer gameTrapTriggerer, KillTracker killTracker, GameInventoriesManager gameInventoriesManager, BedwarsGame bedwarsGame, TeamManager<?> teamManager, ListenersManager listenersManager, LobbyManager lobbyManager, Plugin plugin, CachedGameData cachedGameData, ActiveSpawnersManager activeSpawnersManager, MovementsManager movementsManager, InvisibilityManager invisibilityManager, PlayerMapper playerMapper, ScoreboardManager scoreboardManager, MerchantManager merchantManager, TrapsManager trapsManager, MapManager mapManager, BedManager bedManager, UpgradesManager upgradesManager, ArmorManager armorManager) {
         this.abstractDeathmatch = abstractDeathmatch;
         this.experienceManager = experienceManager;
         this.questManager = questManager;
         this.gameTrapTriggerer = gameTrapTriggerer;
         this.killTracker = killTracker;
-        this.gameInventories = gameInventories;
+        this.gameInventoriesManager = gameInventoriesManager;
         this.bedwarsGame = bedwarsGame;
         this.teamManager = teamManager;
         this.listenersManager = listenersManager;
@@ -57,7 +56,7 @@ public final class InternalGameManager {
     private final KillTracker killTracker;
     // GameInventories is used to load standard inventories at the start of a game
     // and modify\interact with players individual inventories during it.
-    private final GameInventories gameInventories;
+    private final GameInventoriesManager gameInventoriesManager;
     // The BedwarsGame object is used to load this game and contains essentials info
     // about the data and the structure of the game and map that the players will play on.
     private final BedwarsGame bedwarsGame;
@@ -135,8 +134,8 @@ public final class InternalGameManager {
         return killTracker;
     }
 
-    public final GameInventories getGameInventories() {
-        return gameInventories;
+    public final GameInventoriesManager getGameInventories() {
+        return gameInventoriesManager;
     }
 
     public final BedwarsGame getBedwarsGame() {

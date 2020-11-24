@@ -3,12 +3,15 @@ package me.thevipershow.bedwars.game.deathmatch;
 import java.util.Map;
 import me.thevipershow.bedwars.AllStrings;
 import me.thevipershow.bedwars.Bedwars;
+import me.thevipershow.bedwars.api.AbstractDeathmatchStartEvent;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.config.objects.SpawnPosition;
 import me.thevipershow.bedwars.config.objects.upgradeshop.UpgradeType;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.ActiveGameState;
 import me.thevipershow.bedwars.game.data.teams.TeamData;
+import me.thevipershow.bedwars.game.managers.BedManager;
+import me.thevipershow.bedwars.game.managers.TeamManager;
 import me.thevipershow.bedwars.listeners.unregisterable.DragonRedirectorListener;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -70,30 +73,30 @@ public abstract class AbstractDeathmatch {
 
     public abstract void startDeathMatch();
 
-    public void breakBeds() {
-        activeGame.getBedwarsGame().getBedSpawnPositions().forEach(bed -> {
-            final Location location = bed.toLocation(activeGame.getCachedGameData().getGame());
-            final Block block = location.getBlock();
-            if (block != null && block.getType() == Material.BED) {
-                Bed b = (Bed) block.getState().getData();
-                final Block facing = block.getRelative(b.getFacing());
-                block.setType(Material.AIR);
-                facing.setType(Material.AIR);
-            }
-        });
+    /**
+     * Break all of the beds :)
+     */
+    public final void breakBeds() {
+        BedManager bedManager = activeGame.getBedManager();
+        TeamManager<?> teamManager = activeGame.getTeamManager();
+        teamManager.getDataMap().keySet().forEach(bedManager::destroyBed);
     }
 
-    public void start() {
+    public final void start() {
         this.task = activeGame.getPlugin().getServer().getScheduler().runTaskLater(activeGame.getPlugin(), () -> {
-            setRunning(true);
-            this.startTime = System.currentTimeMillis();
-            startDeathMatch();
-            breakBeds();
-            activeGame.getPlugin().getServer().getPluginManager().registerEvents(dragonTargetListener, activeGame.getPlugin());
+            AbstractDeathmatchStartEvent event = new AbstractDeathmatchStartEvent(activeGame);
+            activeGame.callGameEvent(event);
+            if (!event.isCancelled()) {
+                setRunning(true);
+                this.startTime = System.currentTimeMillis();
+                startDeathMatch();
+                breakBeds();
+                activeGame.getPlugin().getServer().getPluginManager().registerEvents(dragonTargetListener, activeGame.getPlugin());
+            }
         }, startAfter * 20L);
     }
 
-    public void stop() {
+    public final void stop() {
         this.running = false;
         if (task != null) {
             task.cancel();

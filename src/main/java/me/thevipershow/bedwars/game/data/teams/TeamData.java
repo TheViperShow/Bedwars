@@ -23,14 +23,14 @@ public abstract class TeamData<T> {
         this.playerMapper = playerMapper;
         final Map<UpgradeType, Integer> map = new EnumMap<>(UpgradeType.class);
         for (final UpgradeType value : UpgradeType.values()) {
-            map.put(value, 0);
+            map.put(value, -1);
         }
         this.upgradesShopLevelsMap = map;
     }
 
     protected T data;
     private TeamStatus status = TeamStatus.BED_EXISTS;
-    private final Map<UpgradeType, Integer> upgradesShopLevelsMap;
+    private final Map<UpgradeType, Integer> upgradesShopLevelsMap; // always value 0 at start!!!
     private ActiveHealPool activeHealPool;
     private final Gamemode gamemode;
     private final PlayerMapper playerMapper;
@@ -38,7 +38,7 @@ public abstract class TeamData<T> {
     @Nullable
     public Entry<Enchantment, Integer> getArmorProtection() {
         final Integer protectionUpgradeLevel = this.upgradesShopLevelsMap.get(UpgradeType.REINFORCED_ARMOR);
-        if (protectionUpgradeLevel == 0) {
+        if (protectionUpgradeLevel == -1) {
             return null;
         } else {
             return Maps.immutableEntry(Enchantment.PROTECTION_ENVIRONMENTAL, protectionUpgradeLevel);

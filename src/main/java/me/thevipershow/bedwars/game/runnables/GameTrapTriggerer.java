@@ -1,4 +1,4 @@
-package me.thevipershow.bedwars.listeners.unregisterable;
+package me.thevipershow.bedwars.game.runnables;
 
 import java.util.LinkedList;
 import java.util.Map;
@@ -6,11 +6,14 @@ import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.config.objects.SpawnPosition;
 import me.thevipershow.bedwars.api.TrapTriggerEvent;
 import me.thevipershow.bedwars.game.ActiveGame;
+import me.thevipershow.bedwars.game.ActiveGameState;
 import me.thevipershow.bedwars.game.data.game.BedwarsPlayer;
 import me.thevipershow.bedwars.game.data.game.enums.PlayerState;
 import me.thevipershow.bedwars.game.data.teams.TeamData;
 import me.thevipershow.bedwars.game.upgrades.traps.ActiveTrap;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
 public final class GameTrapTriggerer {
@@ -28,6 +31,10 @@ public final class GameTrapTriggerer {
         }
 
         task = activeGame.getPlugin().getServer().getScheduler().runTaskTimer(activeGame.getPlugin(), () -> {
+
+            if (activeGame.getGameState() != ActiveGameState.STARTED) {
+                this.stop();
+            }
 
             teamLabel:
             for (final Map.Entry<BedwarsTeam, LinkedList<ActiveTrap>> teamActiveTraps : activeGame.getTrapsManager().getActiveTraps().entrySet()) {
@@ -82,8 +89,8 @@ public final class GameTrapTriggerer {
                                     activeGame.getTrapsManager().getTrapsActivationTime().compute(trapTeamOwner, (k, v) -> v = System.currentTimeMillis());
 
                                     // Updating team GUIs: TODO: Reimplement for refactoring
-                                    //activeGame.getTeamPlayers(trapTeamOwner)
-                                    //        .forEach(p -> activeGame.getAssociatedTrapsGUI().get(p.getUniqueId()).setItem(30 + teamActiveTraps.getValue().size(), new ItemStack(Material.STAINED_GLASS_PANE, 1 + teamActiveTraps.getValue().size())));
+                                    activeGame.getTeamManager().dataOfTeam(trapTeamOwner)
+                                            .perform(p -> activeGame.getGameInventories().getAssociatedTrapsGUI().get(p.getUniqueId()).setItem(30 + teamActiveTraps.getValue().size(), new ItemStack(Material.STAINED_GLASS_PANE, 1 + teamActiveTraps.getValue().size())));
 
                                     //activeGame.getTeamPlayers(trapTeamOwner)
                                     //        .forEach(p -> activeGame.getAssociatedUpgradeGUI().get(p.getUniqueId()).setItem(30 + teamActiveTraps.getValue().size(), new ItemStack(Material.STAINED_GLASS_PANE, 1 + teamActiveTraps.getValue().size())));

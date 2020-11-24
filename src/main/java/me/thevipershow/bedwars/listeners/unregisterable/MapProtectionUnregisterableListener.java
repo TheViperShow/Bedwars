@@ -2,17 +2,17 @@ package me.thevipershow.bedwars.listeners.unregisterable;
 
 import java.util.HashSet;
 import me.thevipershow.bedwars.AllStrings;
+import me.thevipershow.bedwars.api.TeamBedDestroyEvent;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.config.objects.SpawnPosition;
 import me.thevipershow.bedwars.config.objects.TeamSpawnPosition;
-import me.thevipershow.bedwars.api.TeamBedDestroyEvent;
-import me.thevipershow.bedwars.game.managers.BedManager;
-import me.thevipershow.bedwars.game.upgrades.merchants.AbstractActiveMerchant;
 import me.thevipershow.bedwars.game.ActiveGame;
-import me.thevipershow.bedwars.game.spawners.ActiveSpawner;
 import me.thevipershow.bedwars.game.GameUtils;
 import me.thevipershow.bedwars.game.data.game.BedwarsPlayer;
 import me.thevipershow.bedwars.game.data.game.CachedGameData;
+import me.thevipershow.bedwars.game.managers.BedManager;
+import me.thevipershow.bedwars.game.spawners.ActiveSpawner;
+import me.thevipershow.bedwars.game.upgrades.merchants.AbstractActiveMerchant;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -38,7 +38,7 @@ public final class MapProtectionUnregisterableListener extends UnregisterableLis
      * Each team has a bed, players should not be able to break their own bed.
      *
      * @param bedwarsPlayer The BedwarsPlayer who has broken the block.
-     * @param block The Block broken.
+     * @param block         The Block broken.
      * @return True if the bed was his own, false otherwise.
      */
     private boolean isOwnBed(BedwarsPlayer bedwarsPlayer, Block block) {
@@ -67,6 +67,7 @@ public final class MapProtectionUnregisterableListener extends UnregisterableLis
         if (!returnValue) {
             TeamBedDestroyEvent destroyEvent = new TeamBedDestroyEvent(activeGame, destroyedBedTeamOwner, bedwarsPlayer);
             activeGame.getPlugin().getServer().getPluginManager().callEvent(destroyEvent);
+
             if (!destroyEvent.isCancelled()) {
                 BedManager.cleanNearbyBeds(block.getLocation());
             }
@@ -92,6 +93,8 @@ public final class MapProtectionUnregisterableListener extends UnregisterableLis
             if (isOwnBed(bedwarsPlayer, broken)) {
                 event.setCancelled(true);
                 player.sendMessage(AllStrings.PREFIX.get() + AllStrings.CANNOT_BREAK_OWN_BED.get());
+            } else {
+                BedManager.cleanNearbyBeds(event.getBlock().getLocation());
             }
         } else {
             HashSet<Block> valid = cachedGameData.getCachedPlacedBlocks();
@@ -157,7 +160,8 @@ public final class MapProtectionUnregisterableListener extends UnregisterableLis
     /**
      * Used to spawn a TNT where the player placed a TNT block.
      * This method also handles item removal and scheduling.
-     * @param whoPlaced The Player who placed the block.
+     *
+     * @param whoPlaced   The Player who placed the block.
      * @param blockPlaced The block placed.
      */
     private void spawnTNT(Player whoPlaced, Block blockPlaced) {

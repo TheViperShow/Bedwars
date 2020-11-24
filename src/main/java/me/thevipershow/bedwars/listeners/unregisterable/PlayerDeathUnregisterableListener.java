@@ -77,8 +77,6 @@ public final class PlayerDeathUnregisterableListener extends UnregisterableListe
 
         if (dataOfPlayer.getStatus() == TeamStatus.BED_BROKEN) {
             bedwarsPlayer.setPlayerState(PlayerState.DEAD);
-            System.out.println("We set " + bedwarsPlayer.getName() + " state to DEAD");
-            System.out.println("Set on reference " + bedwarsPlayer.toString());
         }
     }
 }

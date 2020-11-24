@@ -7,6 +7,7 @@ import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.GameUtils;
 import me.thevipershow.bedwars.game.data.game.BedwarsPlayer;
 import me.thevipershow.bedwars.game.data.teams.TeamData;
+import me.thevipershow.bedwars.game.deathmatch.AbstractDeathmatch;
 import me.thevipershow.bedwars.game.upgrades.traps.ActiveHealPool;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -23,16 +24,16 @@ public final class UpgradesManager {
     }
 
     private void dragonBuffUpgrade(BedwarsPlayer bedwarsPlayer, TeamData<?> data) {
-
+        AbstractDeathmatch deathmatch = activeGame.getAbstractDeathmatch();
     }
 
-    private void maniacMinerUpgrade(BedwarsPlayer bedwarsPlayer, TeamData<?> data) {
-        final int lvl = data.getUpgradeLevel(UpgradeType.MANIAC_MINER);
+    private void maniacMinerUpgrade(TeamData<?> data) {
+        final int lvl = data.getUpgradeLevel(UpgradeType.MANIAC_MINER) + 2;
         data.perform(bp -> bp.getPlayer().addPotionEffect(PotionEffectType.FAST_DIGGING.createEffect(0xA455, lvl)));
     }
 
     private void ironForgeUpgrade(BedwarsPlayer bedwarsPlayer, TeamData<?> data) {
-        int lvl = data.getUpgradeLevel(UpgradeType.IRON_FORGE);
+        int lvl = data.getUpgradeLevel(UpgradeType.IRON_FORGE) + 2;
         if (lvl == 3) {
             activeGame.getActiveSpawnersManager().getTeamSpawners(bedwarsPlayer.getBedwarsTeam())
                     .stream().findAny().ifPresent(any -> {
@@ -46,13 +47,13 @@ public final class UpgradesManager {
         }
     }
 
-    private void sharpnessUpgrade(BedwarsPlayer bedwarsPlayer, TeamData<?> data) {
-        int lvl = data.getUpgradeLevel(UpgradeType.SHARPNESS);
+    private void sharpnessUpgrade(TeamData<?> data) {
+        int lvl = data.getUpgradeLevel(UpgradeType.SHARPNESS) + 2;
         data.perform(bp -> GameUtils.enchantSwords(Enchantment.DAMAGE_ALL, lvl, bp.getPlayer()));
     }
 
-    private void reinforcedArmor(BedwarsPlayer bedwarsPlayer, TeamData<?> data) {
-        int lvl = data.getUpgradeLevel(UpgradeType.REINFORCED_ARMOR);
+    private void reinforcedArmor(TeamData<?> data) {
+        int lvl = data.getUpgradeLevel(UpgradeType.REINFORCED_ARMOR) + 2;
         data.perform(bp -> GameUtils.enchantArmor(Enchantment.PROTECTION_ENVIRONMENTAL, lvl, bp.getPlayer()));
     }
 
@@ -69,7 +70,7 @@ public final class UpgradesManager {
         }
         switch (type) {
             case MANIAC_MINER:
-                maniacMinerUpgrade(bedwarsPlayer, data);
+                maniacMinerUpgrade(data);
                 break;
             case DRAGON_BUFF:
                 dragonBuffUpgrade(bedwarsPlayer, data);
@@ -78,10 +79,10 @@ public final class UpgradesManager {
                 ironForgeUpgrade(bedwarsPlayer, data);
                 break;
             case SHARPNESS:
-                sharpnessUpgrade(bedwarsPlayer, data);
+                sharpnessUpgrade(data);
                 break;
             case REINFORCED_ARMOR:
-                reinforcedArmor(bedwarsPlayer, data);
+                reinforcedArmor(data);
                 break;
             case HEAL_POOL:
                 healPool(bedwarsPlayer, upgrade, data);
