@@ -1,12 +1,13 @@
 package me.thevipershow.bedwars.config.objects;
 
-import java.util.HashMap;
 import java.util.Map;
+import static me.thevipershow.bedwars.AllStrings.LOCATION;
+import static me.thevipershow.bedwars.AllStrings.NAME;
+import static me.thevipershow.bedwars.AllStrings.TYPE;
 import me.thevipershow.bedwars.bedwars.objects.shops.MerchantType;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.entity.EntityType;
-import static me.thevipershow.bedwars.AllStrings.*;
 
 @SerializableAs("Merchant")
 public class Merchant implements ConfigurationSerializable {
@@ -26,24 +27,24 @@ public class Merchant implements ConfigurationSerializable {
         this.merchantType = merchantType;
     }
 
-    public EntityType getMerchantEntity() {
+    public final EntityType getMerchantEntity() {
         return merchantEntity;
     }
 
-    public String getMerchantName() {
+    public final String getMerchantName() {
         return merchantName;
     }
 
-    public SpawnPosition getMerchantPosition() {
+    public final SpawnPosition getMerchantPosition() {
         return merchantPosition;
     }
 
-    public MerchantType getMerchantType() {
+    public final MerchantType getMerchantType() {
         return merchantType;
     }
 
     @Override
-    public Map<String, Object> serialize() {
+    public final Map<String, Object> serialize() {
         throw new UnsupportedOperationException();
     }
 

@@ -22,7 +22,6 @@ public final class DataResetTableUtils {
         plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
             try (final Connection conn = connectionOptional.get();
                  final PreparedStatement ps = conn.prepareStatement("INSERT INTO " + DataResetTableCreator.TABLE + " (cleaner, daily_reset_time) VALUES (?, ?) ON DUPLICATE KEY UPDATE daily_reset_time = ?;")) {
-
                 ps.setString(1, "server");
                 final long time = System.currentTimeMillis();
                 ps.setLong(2, time);

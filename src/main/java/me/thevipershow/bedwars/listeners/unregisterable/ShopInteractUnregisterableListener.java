@@ -41,7 +41,7 @@ public final class ShopInteractUnregisterableListener extends UnregisterableList
      */
     private boolean moveShopCategory(ShopCategory category, int clickedSlot, BedwarsPlayer bedwarsPlayer) {
         if (category.getSlot() == clickedSlot) {
-            final Map<ShopCategory, Inventory> map = activeGame.getGameInventories().getPlayerShop().get(bedwarsPlayer.getUniqueId());
+            final Map<ShopCategory, Inventory> map = activeGame.getGameInventoriesManager().getPlayerShop().get(bedwarsPlayer.getUniqueId());
             if (map != null) {
                 Inventory tI = map.get(category);
                 if (tI != null) {
@@ -131,7 +131,7 @@ public final class ShopInteractUnregisterableListener extends UnregisterableList
         if (upgradeItem.getShopCategory() != shopCategory || upgradeItem.getSlot() != clickedSlot) {
             return false;
         }
-        GameInventoriesManager gameInventoriesManager = activeGame.getGameInventories();
+        GameInventoriesManager gameInventoriesManager = activeGame.getGameInventoriesManager();
         if (gameInventoriesManager.canUpgrade(bedwarsPlayer, upgradeItem)) {
             UpgradeLevel next = gameInventoriesManager.getNextUpgradeLevel(bedwarsPlayer, upgradeItem);
 
@@ -199,7 +199,7 @@ public final class ShopInteractUnregisterableListener extends UnregisterableList
 
         Inventory topInventory = event.getInventory();
 
-        ShopCategory open = activeGame.getGameInventories().getOpenShopCategory(uuid, topInventory);
+        ShopCategory open = activeGame.getGameInventoriesManager().getOpenShopCategory(uuid, topInventory);
 
         if (open != null && bedwarsPlayer != null) {
             int clickedSlot = event.getSlot();

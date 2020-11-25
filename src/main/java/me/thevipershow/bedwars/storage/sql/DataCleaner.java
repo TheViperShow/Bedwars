@@ -1,16 +1,12 @@
 package me.thevipershow.bedwars.storage.sql;
 
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
-import me.thevipershow.bedwars.AllStrings;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import me.thevipershow.bedwars.LoggerUtils;
-import me.thevipershow.bedwars.storage.sql.tables.DataResetTableUtils;
-import me.thevipershow.bedwars.storage.sql.tables.QuestsTableUtils;
+import me.thevipershow.bedwars.storage.sql.tables.DailyQuestsTableCreator;
+import me.thevipershow.bedwars.storage.sql.tables.WeeklyQuestsTableCreator;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitTask;
 
 public final class DataCleaner {
 
@@ -20,56 +16,35 @@ public final class DataCleaner {
         this.plugin = plugin;
     }
 
-    private final BukkitTask[] cleanTask = new BukkitTask[2];
+    private static final String GET_EVENTSCHEDULER_STATUS = "select count(USER) from (select * from information_schema.PROCESSLIST where USER = 'event_scheduler') as res;";
+    private static final String START_DAILY_CLEAN_TASK = "CREATE EVENT IF NOT EXIST clean_daily ON SCHEDULE EVERY 1 DAY STARTS (TIMESTAMP(CURRENT_DATE) + INTERVAL 1 DAY) DO UPDATE " + DailyQuestsTableCreator.TABLE + " SET win_first=0,games_played=0;";
+    private static final String START_WEEKLY_CLEAN_TASK = "CREATE EVENT IF NOT EXIST clean_weekly ON SCHEDULE EVERY 7 DAY STARTS (TIMESTAMP(CURRENT_DATE) + INTERVAL 7 DAY) DO UPDATE " + WeeklyQuestsTableCreator.TABLE + " SET beds_broken=0;";
 
-    public final void startTasks() {
-        if (cleanTask[0] == null && cleanTask[1] == null) {
-            final Calendar nextWeekCalendar = GregorianCalendar.getInstance(TimeZone.getTimeZone(ZoneId.systemDefault()));
-            final Calendar originalCalendar = (Calendar) nextWeekCalendar.clone();
-            int dayOfMonth = nextWeekCalendar.get(Calendar.DAY_OF_MONTH);
-            nextWeekCalendar.set(Calendar.HOUR_OF_DAY, 0);
-            nextWeekCalendar.set(Calendar.MINUTE, 1);
-
-            while (dayOfMonth % 7 != 0) {
-                nextWeekCalendar.add(Calendar.DAY_OF_MONTH, 1);
-                dayOfMonth = nextWeekCalendar.get(Calendar.DAY_OF_MONTH);
-            }
-
-            final long untilWeek = originalCalendar.toInstant().until(nextWeekCalendar.toInstant(), ChronoUnit.SECONDS);
-
-            this.cleanTask[0] = plugin.getServer().getScheduler().runTaskTimer(plugin, () -> {
-                DataResetTableUtils.getWeeklyTime(plugin).thenAccept(value -> {
-                    if (value == null || value == 0 || (System.currentTimeMillis() - value >= (1000 * 60 * 60 * 24 * 7))) {
-                        QuestsTableUtils.clearWeeklyData(plugin);
-                        DataResetTableUtils.updateWeeklyTime(plugin);
-                    }
-                });
-            }, untilWeek * 20L, 20L * 60L * 60L * 24L * 7L);
-
-            final Calendar nextDayCalendar = (Calendar) originalCalendar.clone();
-            nextDayCalendar.add(Calendar.DAY_OF_MONTH, 1);
-            nextDayCalendar.set(Calendar.HOUR_OF_DAY, 0);
-            nextDayCalendar.set(Calendar.MINUTE, 1);
-            final long untilDay = originalCalendar.toInstant().until(nextDayCalendar.toInstant(), ChronoUnit.SECONDS);
-
-            this.cleanTask[1] = plugin.getServer().getScheduler().runTaskTimer(plugin, () -> {
-                DataResetTableUtils.getDailyTime(plugin).thenAccept(value -> {
-                    if (value == null || value == 0 || (System.currentTimeMillis() - value >= (1000 * 60 * 60 * 24))) {
-                        QuestsTableUtils.clearDailyData(plugin);
-                        DataResetTableUtils.updateDailyTime(plugin);
-                    }
-                });
-            }, untilDay * 20L, 20L * 60L * 60L * 24L);
-
-        }
+    private void inform() {
+        LoggerUtils.logColor(plugin.getLogger(), "&eStarting MySQL data cleaner task.");
     }
 
-    public final void stopTasks() {
-        for (final BukkitTask task : this.cleanTask) {
-            if (task != null) {
-                LoggerUtils.logColor(plugin.getLogger(), AllStrings.REMOVE_CLEAN_TASK.get() + task.getTaskId());
-                task.cancel();
+    private static void dispatchTasks() {
+        MySQLDatabase.getConnection().ifPresent(c -> {
+
+            try (Connection connection = c;
+                 PreparedStatement statement = connection.prepareStatement(GET_EVENTSCHEDULER_STATUS);) {
+                int res = statement.executeUpdate();
+                if (res == 1) {
+                    try (PreparedStatement cleanDaily = connection.prepareStatement(START_DAILY_CLEAN_TASK);
+                         PreparedStatement cleanWeekly = connection.prepareStatement(START_WEEKLY_CLEAN_TASK)) {
+                        cleanDaily.executeUpdate();
+                        cleanWeekly.executeUpdate();
+                    }
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-        }
+        });
+    }
+
+    public final void startClearTasks() {
+        inform();
+        dispatchTasks();
     }
 }

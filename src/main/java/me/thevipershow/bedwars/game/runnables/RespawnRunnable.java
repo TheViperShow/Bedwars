@@ -3,7 +3,6 @@ package me.thevipershow.bedwars.game.runnables;
 import java.util.List;
 import java.util.Map;
 import me.thevipershow.bedwars.AllStrings;
-import me.thevipershow.bedwars.Bedwars;
 import me.thevipershow.bedwars.config.objects.SpawnPosition;
 import me.thevipershow.bedwars.config.objects.UpgradeItem;
 import me.thevipershow.bedwars.config.objects.UpgradeLevel;
@@ -53,7 +52,7 @@ public final class RespawnRunnable extends BukkitRunnable {
     private static final String[] matches = {"_SWORD", "_PICKAXE", "_AXE"};
 
     private static void downgradeItems(BedwarsPlayer bedwarsPlayer, ActiveGame activeGame) {
-        GameInventoriesManager invManager = activeGame.getGameInventories();
+        GameInventoriesManager invManager = activeGame.getGameInventoriesManager();
         PlayerInventory playerInventory = bedwarsPlayer.getInventory();
         Map<ShopCategory, Inventory> shops = invManager.getPlayerShop().get(bedwarsPlayer.getUniqueId());
         if (shops == null) {

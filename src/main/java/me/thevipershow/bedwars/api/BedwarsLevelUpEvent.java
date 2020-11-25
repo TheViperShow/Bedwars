@@ -34,7 +34,7 @@ public final class BedwarsLevelUpEvent extends ActiveGameEvent implements Cancel
      * @return true if this event is cancelled
      */
     @Override
-    public boolean isCancelled() {
+    public final boolean isCancelled() {
         return this.cancel;
     }
 
@@ -45,7 +45,7 @@ public final class BedwarsLevelUpEvent extends ActiveGameEvent implements Cancel
      * @param cancel true if you wish to cancel this event
      */
     @Override
-    public void setCancelled(final boolean cancel) {
+    public final void setCancelled(final boolean cancel) {
         this.cancel = cancel;
     }
 

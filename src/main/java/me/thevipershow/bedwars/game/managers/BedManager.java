@@ -15,6 +15,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.material.Bed;
+import org.bukkit.plugin.Plugin;
 
 public final class BedManager {
 
@@ -24,7 +25,7 @@ public final class BedManager {
         this.activeGame = activeGame;
     }
 
-    private static void breakBed(Block block) {
+    private static void breakBed(Block block, Plugin plugin) {
         Bed bed = (Bed) block.getState().getData();
         Block relative = block.getRelative(bed.getFacing());
         if (bed.isHeadOfBed()) {
@@ -32,7 +33,7 @@ public final class BedManager {
         } else {
             breakOrdered(relative, block);
         }
-        cleanNearbyBeds(block.getLocation());
+        cleanNearbyBeds(block.getLocation(), plugin);
     }
 
     public static void breakOrdered(Block bedHead, Block bedFoot) {
@@ -41,11 +42,13 @@ public final class BedManager {
         bedFoot.setType(air);
     }
 
-    public static void cleanNearbyBeds(Location loc) {
-        loc.getWorld().getNearbyEntities(loc, 3.0, 2.5, 3.0)
-                .stream()
-                .filter(i -> i.getType() == EntityType.DROPPED_ITEM && ((Item) i).getItemStack().getType() == Material.BED)
-                .forEach(Entity::remove);
+    public static void cleanNearbyBeds(Location loc, Plugin plugin) {
+        plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+            loc.getWorld().getNearbyEntities(loc, 3.0, 3.0, 3.0)
+                    .stream()
+                    .filter(i -> i.getType() == EntityType.DROPPED_ITEM && ((Item) i).getItemStack().getType() == Material.BED)
+                    .forEach(Entity::remove);
+        }, 1L);
     }
 
     public final void destroyBed(BedwarsTeam team) {
@@ -55,7 +58,7 @@ public final class BedManager {
                 World gameWorld = activeGame.getCachedGameData().getGame();
                 Block block = gameWorld.getBlockAt(teamSpawnPosition.toLocation(gameWorld));
                 if (block.getType() == Material.BED_BLOCK) {
-                    breakBed(block);
+                    breakBed(block, activeGame.getPlugin());
                 }
                 return;
             }

@@ -1,6 +1,7 @@
 package me.thevipershow.bedwars.listeners.unregisterable;
 
 import com.google.common.collect.ImmutableList;
+import me.thevipershow.bedwars.bedwars.Gamemode;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.api.BedwarsPlayerDeathEvent;
 import me.thevipershow.bedwars.game.ActiveGame;
@@ -9,6 +10,7 @@ import me.thevipershow.bedwars.game.data.game.BedwarsPlayer;
 import me.thevipershow.bedwars.game.managers.TeamManager;
 import me.thevipershow.bedwars.game.runnables.RespawnRunnable;
 import me.thevipershow.bedwars.listeners.DeathMessages;
+import me.thevipershow.bedwars.storage.sql.tables.GlobalStatsTableUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -189,6 +191,7 @@ public final class BedwarsPlayerDeathUnregisterableListener extends Unregisterab
             return;                                      // I ensure games instances are not different.
         }
 
+        Gamemode gamemode = activeGame.getBedwarsGame().getGamemode();
         TeamManager<?> teamManager = activeGame.getTeamManager();
         DamageCause cause = event.getCause();
         BedwarsPlayer killed = event.getDied();
@@ -215,6 +218,7 @@ public final class BedwarsPlayerDeathUnregisterableListener extends Unregisterab
             GameUtils.sendKillSound(killer);                              // sending a kill sound to the killer
 
             deathMessage.append(slainDeath(killer, killed));
+            GlobalStatsTableUtils.increaseKills(gamemode, activeGame.getPlugin(), killer.getUniqueId(), isFinalKill);
         } else if (killerEntity != null && killer == null) { // Killer may be a TNT or other entities.
             BedwarsPlayer foundKiller = findEntityOwner(killerEntity);
             deathMessage.append(generateEntityDeathMessage(foundKiller, killed, killerEntity.getType()));

@@ -1,11 +1,16 @@
 package me.thevipershow.bedwars.config.objects.upgradeshop;
 
 import java.util.Map;
+import static me.thevipershow.bedwars.AllStrings.DRAGON_BUFF;
+import static me.thevipershow.bedwars.AllStrings.HEAL_POOL;
+import static me.thevipershow.bedwars.AllStrings.IRON_FORGE;
+import static me.thevipershow.bedwars.AllStrings.MANIAC_MINER;
+import static me.thevipershow.bedwars.AllStrings.REINFORCED_ARMOR;
+import static me.thevipershow.bedwars.AllStrings.SHARPNESS;
+import static me.thevipershow.bedwars.AllStrings.SLOTS;
+import static me.thevipershow.bedwars.AllStrings.TRAPS;
 import me.thevipershow.bedwars.config.folders.files.AbstractFileConfig;
-import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import static me.thevipershow.bedwars.AllStrings.*;
-import sun.security.provider.SHA;
 
 public final class UpgradeShop implements ConfigurationSerializable {
 

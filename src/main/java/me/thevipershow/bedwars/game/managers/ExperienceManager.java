@@ -14,7 +14,6 @@ import org.jetbrains.annotations.NotNull;
 
 public final class ExperienceManager {
 
-
     private final ActiveGame activeGame;
     private BukkitTask playtimeExperienceTask = null;
 
@@ -22,7 +21,6 @@ public final class ExperienceManager {
     public final static long PLAY_REWARD_DELAY = 60L * 20L;
     public final static int PLAY_REWARD_EXP = 25;
     public final static int FIRST_LVL = 500, SECOND_LVL = 1500, THIRD_LVL = 3500, FOURTH_LVL = 7000;
-
 
     static {
         for (int j = 0; j <= 10; j++) {
@@ -58,7 +56,7 @@ public final class ExperienceManager {
      * @return Level optional.
      */
     @NotNull
-    public static Optional<Integer> hasLevelledUp(final int currentExp, final int givenExp) {
+    public static Optional<Integer> hasLevelledUp(int currentExp, int givenExp) {
 
         final int currentLevel = findLevelFromExp(currentExp);
         final int increasedLevel = findLevelFromExp(currentExp + givenExp);
@@ -123,7 +121,7 @@ public final class ExperienceManager {
                 .thenAccept(e -> {
                     final int sum = e + experience;
                     if (sum != 0) {
-                        Optional<Integer> hasLevelledUp = hasLevelledUp(sum, experience);
+                        Optional<Integer> hasLevelledUp = hasLevelledUp(e, experience);
                         hasLevelledUp.ifPresent(newLevel -> {
                             BedwarsLevelUpEvent event = new BedwarsLevelUpEvent(p, newLevel - 1, newLevel, activeGame);
                             plugin.getServer().getPluginManager().callEvent(event);

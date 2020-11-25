@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import me.thevipershow.bedwars.AllStrings;
-import me.thevipershow.bedwars.Bedwars;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.config.objects.ShopItem;
 import me.thevipershow.bedwars.config.objects.upgradeshop.StagedUpgrade;
@@ -58,8 +57,8 @@ public final class UpgradeInteractUnregisterableListener extends UnregisterableL
         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
-        activeGame.getGameInventories().getAssociatedTrapsGUI().get(player.getUniqueId()).setItem(slot, item.getCachedFancyStack());
-        activeGame.getGameInventories().getAssociatedUpgradeGUI().get(player.getUniqueId()).setItem(slot, item.getCachedFancyStack());
+        activeGame.getGameInventoriesManager().getAssociatedTrapsGUI().get(player.getUniqueId()).setItem(slot, item.getCachedFancyStack());
+        activeGame.getGameInventoriesManager().getAssociatedUpgradeGUI().get(player.getUniqueId()).setItem(slot, item.getCachedFancyStack());
     }
 
     private static boolean payTraps(Pair<HashMap<Integer, Integer>, Boolean> result, Player player, ShopItem buying, String boughtName) {
@@ -166,7 +165,7 @@ public final class UpgradeInteractUnregisterableListener extends UnregisterableL
         if (upgrade == null || nextUpgrade == null) {
             return;
         }
-        Map<UUID, Inventory> map = activeGame.getGameInventories().getAssociatedUpgradeGUI();
+        Map<UUID, Inventory> map = activeGame.getGameInventoriesManager().getAssociatedUpgradeGUI();
         data.perform(bedwarsPlayer -> {
             final Inventory playerInv = map.get(bedwarsPlayer.getUniqueId());
             if (playerInv != null) {
@@ -226,7 +225,7 @@ public final class UpgradeInteractUnregisterableListener extends UnregisterableL
      */
     private void markTeamShopUpgradeAsBought(UpgradeType type, TeamData<?> teamData, int slot) {
         levelUpTeamUpgradeType(teamData, type);
-        Map<UUID, Inventory> map = activeGame.getGameInventories().getAssociatedUpgradeGUI();
+        Map<UUID, Inventory> map = activeGame.getGameInventoriesManager().getAssociatedUpgradeGUI();
         teamData.perform(bp -> {
             final Inventory i = map.get(bp.getUniqueId());
             if (i != null) {
@@ -269,7 +268,7 @@ public final class UpgradeInteractUnregisterableListener extends UnregisterableL
                 }
             }
         } else {
-            activeGame.getGameInventories().openTraps(player);
+            activeGame.getGameInventoriesManager().openTraps(player);
         }
 
     }
@@ -289,12 +288,12 @@ public final class UpgradeInteractUnregisterableListener extends UnregisterableL
             return;
         }
 
-        Inventory ui = activeGame.getGameInventories().getAssociatedUpgradeGUI().get(player.getUniqueId());
+        Inventory ui = activeGame.getGameInventoriesManager().getAssociatedUpgradeGUI().get(player.getUniqueId());
         if (ui == null) {
             return;
         }
 
-        Inventory traps = activeGame.getGameInventories().getAssociatedTrapsGUI().get(player.getUniqueId());
+        Inventory traps = activeGame.getGameInventoriesManager().getAssociatedTrapsGUI().get(player.getUniqueId());
 
         if (event.getClickedInventory() == null) {
             return;

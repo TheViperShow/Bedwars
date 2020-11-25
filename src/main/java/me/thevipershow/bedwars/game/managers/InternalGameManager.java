@@ -3,7 +3,6 @@ package me.thevipershow.bedwars.game.managers;
 import me.thevipershow.bedwars.config.objects.BedwarsGame;
 import me.thevipershow.bedwars.game.deathmatch.AbstractDeathmatch;
 import me.thevipershow.bedwars.game.KillTracker;
-import me.thevipershow.bedwars.game.QuestManager;
 import me.thevipershow.bedwars.game.data.game.CachedGameData;
 import me.thevipershow.bedwars.game.data.game.PlayerMapper;
 import me.thevipershow.bedwars.game.runnables.GameTrapTriggerer;
@@ -11,7 +10,7 @@ import org.bukkit.plugin.Plugin;
 
 public final class InternalGameManager {
 
-    public InternalGameManager(AbstractDeathmatch abstractDeathmatch, ExperienceManager experienceManager, QuestManager questManager, GameTrapTriggerer gameTrapTriggerer, KillTracker killTracker, GameInventoriesManager gameInventoriesManager, BedwarsGame bedwarsGame, TeamManager<?> teamManager, ListenersManager listenersManager, LobbyManager lobbyManager, Plugin plugin, CachedGameData cachedGameData, ActiveSpawnersManager activeSpawnersManager, MovementsManager movementsManager, InvisibilityManager invisibilityManager, PlayerMapper playerMapper, ScoreboardManager scoreboardManager, MerchantManager merchantManager, TrapsManager trapsManager, MapManager mapManager, BedManager bedManager, UpgradesManager upgradesManager, ArmorManager armorManager) {
+    public InternalGameManager(AbstractDeathmatch abstractDeathmatch, ExperienceManager experienceManager, QuestManager questManager, GameTrapTriggerer gameTrapTriggerer, KillTracker killTracker, GameInventoriesManager gameInventoriesManager, BedwarsGame bedwarsGame, TeamManager<?> teamManager, ListenersManager listenersManager, LobbyManager lobbyManager, Plugin plugin, CachedGameData cachedGameData, ActiveSpawnersManager activeSpawnersManager, MovementsManager movementsManager, InvisibilityManager invisibilityManager, PlayerMapper playerMapper, ScoreboardManager scoreboardManager, MerchantManager merchantManager, TrapsManager trapsManager, MapManager mapManager, BedManager bedManager, UpgradesManager upgradesManager, ToolsAndArmorManager toolsAndArmorManager) {
         this.abstractDeathmatch = abstractDeathmatch;
         this.experienceManager = experienceManager;
         this.questManager = questManager;
@@ -34,7 +33,7 @@ public final class InternalGameManager {
         this.mapManager = mapManager;
         this.bedManager = bedManager;
         this.upgradesManager = upgradesManager;
-        this.armorManager = armorManager;
+        this.toolsAndArmorManager = toolsAndArmorManager;
     }
 
     //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -82,12 +81,12 @@ public final class InternalGameManager {
     private final MapManager mapManager;
     private final BedManager bedManager;
     private final UpgradesManager upgradesManager;
-    private final ArmorManager armorManager;
+    private final ToolsAndArmorManager toolsAndArmorManager;
     //━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 
-    public final ArmorManager getArmorManager() {
-        return armorManager;
+    public final ToolsAndArmorManager getArmorManager() {
+        return toolsAndArmorManager;
     }
 
     public final UpgradesManager getUpgradesManager() {

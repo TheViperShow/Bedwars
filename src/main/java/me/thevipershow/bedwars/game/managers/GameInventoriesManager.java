@@ -93,15 +93,13 @@ public final class GameInventoriesManager {
     }
 
     public final void assignPlayerShop() {
-        for (TeamData<?> teamData : activeGame.getTeamManager().getDataMap().values()) {
-            teamData.perform(bedwarsPlayer -> {
-                Map<ShopCategory, Inventory> shopMap = new EnumMap<>(ShopCategory.class);
-                for (ShopCategory category : ShopCategory.values()) {
-                    shopMap.put(category, cloneInventory(this.inventories.get(category)));
-                }
-                this.playerShop.put(bedwarsPlayer.getUniqueId(), shopMap);
-            });
-        }
+        activeGame.getTeamManager().performAll(bedwarsPlayer -> {
+            Map<ShopCategory, Inventory> shopMap = new EnumMap<>(ShopCategory.class);
+            for (ShopCategory shopCategory : ShopCategory.values()) {
+                shopMap.put(shopCategory, cloneInventory(this.inventories.get(shopCategory)));
+            }
+            this.playerShop.put(bedwarsPlayer.getUniqueId(), shopMap);
+        });
     }
 
     public final void updateItemUpgrade(ShopCategory category, UpgradeItem upgradeItem, int slot, UUID of) {
@@ -187,20 +185,20 @@ public final class GameInventoriesManager {
         }
     }
 
-    public final void openTraps(Player player) {
-        Inventory associated = associatedTrapsGUI.get(player.getUniqueId());
-        if (associated == null) {
-            associated = cloneInventory(defaultTrapsInv);
-            associatedTrapsGUI.put(player.getUniqueId(), associated);
-        }
-        player.openInventory(associated);
-    }
-
     public final void openUpgrade(Player player) {
         Inventory associated = associatedUpgradeGUI.get(player.getUniqueId());
         if (associated == null) {
             associated = cloneInventory(defaultUpgradeInv);
             associatedUpgradeGUI.put(player.getUniqueId(), associated);
+        }
+        player.openInventory(associated);
+    }
+
+    public final void openTraps(Player player) {
+        Inventory associated = associatedTrapsGUI.get(player.getUniqueId());
+        if (associated == null) {
+            associated = cloneInventory(defaultTrapsInv);
+            associatedTrapsGUI.put(player.getUniqueId(), associated);
         }
         player.openInventory(associated);
     }
@@ -211,17 +209,19 @@ public final class GameInventoriesManager {
         return inventory;
     }
 
+    final private static int GUI_SIZE = 9 * 6;
+
     private void setupShopCategories(Shop shop) {
-        for (final ShopCategory shopCategory : ShopCategory.values()) {
-            final Inventory inv = Bedwars.plugin.getServer().createInventory(null, 9 * 6, shopCategory.getTitle());
-            shop.getGlassSlots().forEach(slot -> {
-                final ItemStack glassStack = new ItemStack(Material.STAINED_GLASS_PANE, 1, shopCategory.ordinal() == slot % 9 ? Shop.GREEN_GLASS_DAMAGE : (short) shop.getGlassColor());
-                final ItemMeta meta = glassStack.getItemMeta();
-                meta.setDisplayName(" ");
-                glassStack.setItemMeta(meta);
-                inv.setItem(slot, glassStack);
-            });
-            for (final ShopCategory value : ShopCategory.values()) {
+        for (ShopCategory shopCategory : ShopCategory.values()) {
+            Inventory inv = Bedwars.plugin.getServer().createInventory(null, GUI_SIZE, shopCategory.getTitle());
+            for (Integer glassSlot : shop.getGlassSlots()) {
+                ItemStack glassStack = new ItemStack(Material.STAINED_GLASS_PANE, 1, shopCategory.ordinal() == glassSlot % 9 ? Shop.GREEN_GLASS_DAMAGE : (short) shop.getGlassColor());
+                ItemMeta glassMeta = glassStack.getItemMeta();
+                glassMeta.setDisplayName("");
+                glassStack.setItemMeta(glassMeta);
+                inv.setItem(glassSlot, glassStack);
+            }
+            for (ShopCategory value : ShopCategory.values()) {
                 inv.setItem(value.ordinal(), value.generateItem());
             }
             inventories.put(shopCategory, inv);

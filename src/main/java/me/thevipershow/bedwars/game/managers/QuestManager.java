@@ -1,4 +1,4 @@
-package me.thevipershow.bedwars.game;
+package me.thevipershow.bedwars.game.managers;
 
 import java.util.concurrent.CompletableFuture;
 import me.thevipershow.bedwars.AllStrings;

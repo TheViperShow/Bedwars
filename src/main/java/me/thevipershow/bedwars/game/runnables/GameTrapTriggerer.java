@@ -90,7 +90,7 @@ public final class GameTrapTriggerer {
 
                                     // Updating team GUIs: TODO: Reimplement for refactoring
                                     activeGame.getTeamManager().dataOfTeam(trapTeamOwner)
-                                            .perform(p -> activeGame.getGameInventories().getAssociatedTrapsGUI().get(p.getUniqueId()).setItem(30 + teamActiveTraps.getValue().size(), new ItemStack(Material.STAINED_GLASS_PANE, 1 + teamActiveTraps.getValue().size())));
+                                            .perform(p -> activeGame.getGameInventoriesManager().getAssociatedTrapsGUI().get(p.getUniqueId()).setItem(30 + teamActiveTraps.getValue().size(), new ItemStack(Material.STAINED_GLASS_PANE, 1 + teamActiveTraps.getValue().size())));
 
                                     //activeGame.getTeamPlayers(trapTeamOwner)
                                     //        .forEach(p -> activeGame.getAssociatedUpgradeGUI().get(p.getUniqueId()).setItem(30 + teamActiveTraps.getValue().size(), new ItemStack(Material.STAINED_GLASS_PANE, 1 + teamActiveTraps.getValue().size())));

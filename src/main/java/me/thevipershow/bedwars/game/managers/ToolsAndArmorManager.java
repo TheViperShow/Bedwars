@@ -5,17 +5,18 @@ import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.ArmorSet;
 import me.thevipershow.bedwars.game.data.game.BedwarsPlayer;
+import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 
-public final class ArmorManager {
+public final class ToolsAndArmorManager {
 
     private final ActiveGame activeGame;
 
-    public ArmorManager(ActiveGame activeGame) {
+    public ToolsAndArmorManager(ActiveGame activeGame) {
         this.activeGame = activeGame;
     }
 
@@ -39,5 +40,11 @@ public final class ArmorManager {
             v.setItemMeta(leatherArmorMeta);
             k.setArmorPiece(bedwarsPlayer.getInventory(), v);
         });
+    }
+
+    public final void giveDefaultSword() {
+        TeamManager<?> teamManager = activeGame.getTeamManager();
+        final ItemStack stack = new ItemStack(Material.WOOD_SWORD, 1);
+        teamManager.performAll(bp -> bp.getInventory().setItem(1, stack));
     }
 }

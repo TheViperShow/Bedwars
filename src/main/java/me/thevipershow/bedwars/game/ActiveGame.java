@@ -7,7 +7,8 @@ import me.thevipershow.bedwars.api.ActiveGameEvent;
 import me.thevipershow.bedwars.api.ActiveGameTerminateEvent;
 import me.thevipershow.bedwars.game.data.game.BedwarsPlayer;
 import me.thevipershow.bedwars.game.deathmatch.AbstractDeathmatch;
-import me.thevipershow.bedwars.game.managers.ArmorManager;
+import me.thevipershow.bedwars.game.managers.QuestManager;
+import me.thevipershow.bedwars.game.managers.ToolsAndArmorManager;
 import me.thevipershow.bedwars.game.managers.ExperienceManager;
 import me.thevipershow.bedwars.game.managers.GameInventoriesManager;
 import me.thevipershow.bedwars.game.managers.LobbyManager;
@@ -85,7 +86,7 @@ public final class ActiveGame {
                 new MapManager(this),
                 new BedManager(this),
                 new UpgradesManager(this),
-                new ArmorManager(this));
+                new ToolsAndArmorManager(this));
     }
 
     /*---------------------------------------------------------------------------------------------------------------*/
@@ -184,13 +185,15 @@ public final class ActiveGame {
         // Teams must be assigned after the player mapper has been correctly
         // filled with the players from the AbstractQueue.
 
+        getTeamManager().cleanAllInventories(); // cleaning to be sure.
+
         getTeamManager().setEveryoneStatus(PlayerState.PLAYING); // setting everyone's status to playing
 
         getBedManager().destroyInactiveBeds(); // removing all beds that are not assigned from the map
 
-        getGameInventories().assignPlayerShop(); // assigning a shop to each player
+        getGameInventoriesManager().assignPlayerShop(); // assigning a shop to each player
 
-        getGameInventories().assignUpgradeLevelsToAll(); // setting all upgrade levels to -1 for everyoneò
+        getGameInventoriesManager().assignUpgradeLevelsToAll(); // setting all upgrade levels to -1 for everyoneò
 
         getTrapsManager().fillTraps();      // filling traps list, we made sure teams are already assigned
         getTrapsManager().fillTrapsDelay(); // filling the last activation time
@@ -211,7 +214,8 @@ public final class ActiveGame {
 
         getMovementsManager().moveToSpawnpoints();  // Ideally we want everything to get generated before teleporting.
 
-        getArmorManager().giveDefaultColoredSet(); // giving default colored leather armor with enchant.
+        getToolsAndArmorManager().giveDefaultColoredSet(); // giving default colored leather armor with enchant.
+        getToolsAndArmorManager().giveDefaultSword(); // give wood sword
 
         getExperienceManager().startRewardTask(); // start reward task
     }
@@ -248,11 +252,11 @@ public final class ActiveGame {
 
     /*---------------------------------------------------------------------------------------------------------------*/
 
-    public final void callGameEvent(ActiveGameEvent activeGameEvent) {
+    public final void callGameEvent(final ActiveGameEvent activeGameEvent) {
         this.plugin.getServer().getPluginManager().callEvent(activeGameEvent);
     }
 
-    public final ArmorManager getArmorManager() {
+    public final ToolsAndArmorManager getToolsAndArmorManager() {
         return internalGameManager.getArmorManager();
     }
 
@@ -304,7 +308,7 @@ public final class ActiveGame {
         return internalGameManager.getKillTracker();
     }
 
-    public final GameInventoriesManager getGameInventories() {
+    public final GameInventoriesManager getGameInventoriesManager() {
         return internalGameManager.getGameInventories();
     }
 

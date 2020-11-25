@@ -17,6 +17,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.craftbukkit.v1_8_R3.block.CraftBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
@@ -69,7 +70,7 @@ public final class MapProtectionUnregisterableListener extends UnregisterableLis
             activeGame.getPlugin().getServer().getPluginManager().callEvent(destroyEvent);
 
             if (!destroyEvent.isCancelled()) {
-                BedManager.cleanNearbyBeds(block.getLocation());
+                BedManager.cleanNearbyBeds(block.getLocation(), activeGame.getPlugin());
             }
         }
 
@@ -94,7 +95,7 @@ public final class MapProtectionUnregisterableListener extends UnregisterableLis
                 event.setCancelled(true);
                 player.sendMessage(AllStrings.PREFIX.get() + AllStrings.CANNOT_BREAK_OWN_BED.get());
             } else {
-                BedManager.cleanNearbyBeds(event.getBlock().getLocation());
+              BedManager.cleanNearbyBeds(event.getBlock().getLocation(), activeGame.getPlugin());
             }
         } else {
             HashSet<Block> valid = cachedGameData.getCachedPlacedBlocks();
@@ -138,7 +139,7 @@ public final class MapProtectionUnregisterableListener extends UnregisterableLis
     }
 
 
-    public boolean isValidPlacement(Block block) {
+    public final boolean isValidPlacement(Block block) {
         return !isBlockInsideMerchant(block) && !isBlockInsideSpawn(block) && !isBlockNearSpawner(block);
     }
 

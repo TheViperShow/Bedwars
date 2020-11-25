@@ -123,7 +123,7 @@ public final class Bedwars extends JavaPlugin {
         getServer().getPluginManager().registerEvents(activeGameTerminateListener, this);
 
         dataCleaner = new DataCleaner(this);
-        dataCleaner.startTasks();
+        dataCleaner.startClearTasks();
 
         registerExpansions();
     }
@@ -139,7 +139,6 @@ public final class Bedwars extends JavaPlugin {
 
     @Override
     public final void onDisable() {
-        dataCleaner.stopTasks();
         worldsManager.getActiveGameList().forEach(game -> getServer().unloadWorld(game.getCachedGameData().getGame(), false));
     }
 
