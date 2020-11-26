@@ -45,7 +45,7 @@ public final class RespawnRunnable extends BukkitRunnable {
     public static void startForBedwarsPlayer(ActiveGame activeGame, BedwarsPlayer bedwarsPlayer) {
         BukkitRunnable bukkitRunnable = new RespawnRunnable(bedwarsPlayer, activeGame);
         bukkitRunnable.runTaskTimer(activeGame.getPlugin(), 1L, 20L);
-        clearInventory(bedwarsPlayer);
+        clearInventory(bedwarsPlayer, activeGame);
         downgradeItems(bedwarsPlayer, activeGame);
     }
 
@@ -80,24 +80,30 @@ public final class RespawnRunnable extends BukkitRunnable {
 
             UpgradeLevel current = levels.get(lvl + 1);
             UpgradeLevel previous = levels.get(lvl);
-            upgradeLevels.compute(upgrade, (k,v) -> v--);
+            upgradeLevels.compute(upgrade, (k, v) -> v--);
             shopCategoryInv.setItem(upgrade.getSlot(), previous.generateFancyStack());
             playerInventory.remove(current.generateGameStack());
             GameUtils.giveStackToPlayer(previous.generateGameStack(), bedwarsPlayer.getPlayer(), playerInventory.getContents());
         }
     }
 
-    private static boolean shouldBeRemovedFromInventory(ItemStack stack) {
+    private static boolean shouldBeRemovedFromInventory(ItemStack stack, ActiveGame activeGame) {
         Material type = stack.getType();
-        return !type.name().endsWith(matches[0]);
+        boolean anyMatchWithBaseUpgradeItems = activeGame.getBedwarsGame().getShop().getUpgradeItems()
+                .stream()
+                .filter(ui -> ui.getLevels().size() >= 1)
+                .map(ui -> ui.getLevels().get(0))
+                .anyMatch(ul -> ul.getCachedGameStack().isSimilar(stack));
+
+        return !type.name().endsWith(matches[0]) && !anyMatchWithBaseUpgradeItems;
     }
 
-    private static void clearInventory(BedwarsPlayer bedwarsPlayer) {
+    private static void clearInventory(BedwarsPlayer bedwarsPlayer, ActiveGame activeGame) {
         PlayerInventory inventory = bedwarsPlayer.getInventory();
         final ItemStack[] contents = inventory.getContents();
         for (byte index = 0x00; index < contents.length; index++) {
             final ItemStack content = contents[index];
-            if (content != null && shouldBeRemovedFromInventory(content)) {
+            if (content != null && shouldBeRemovedFromInventory(content, activeGame)) {
                 inventory.setItem(index, null);
             }
         }

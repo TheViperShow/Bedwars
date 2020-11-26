@@ -129,7 +129,7 @@ public final class MapProtectionUnregisterableListener extends UnregisterableLis
         return false;
     }
 
-    private boolean isBlockInsideMerchant(Block block) { //TODO: Implement
+    private boolean isBlockInsideMerchant(Block block) {
         for (AbstractActiveMerchant activeMerchant : activeGame.getMerchantManager().getActiveMerchants()) {
             if (activeMerchant.getMerchant().getMerchantPosition().squaredDistance(block.getLocation()) < 15.00) {
                 return true;

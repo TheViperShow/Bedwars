@@ -1,10 +1,7 @@
 package me.thevipershow.bedwars.game;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import me.thevipershow.bedwars.bedwars.Gamemode;
 import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
@@ -51,22 +48,27 @@ import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.jetbrains.annotations.NotNull;
 
 public final class GameUtils {
     public final static String NO_AI_TAG = "NoAi";
 
     private GameUtils() {
         throw new UnsupportedOperationException();
+    }
+
+    public static void cleanAllEntities(ActiveGame activeGame) {
+        World world = activeGame.getCachedGameData().getGame();
+        if (world == null) {
+            return;
+        }
+        world.getEntities().forEach(Entity::remove);
     }
 
     public static String capitalize(String str) {
@@ -171,38 +173,6 @@ public final class GameUtils {
         return nearest.getBedwarsTeam();
     }
 
-    public static ItemStack copyClean(final ItemStack stack) {
-        if (stack == null) return null;
-        Material type = stack.getType();
-        return new ItemStack(type, stack.getAmount(), stack.getDurability());
-    }
-
-    public static ItemStack hasItemOfType(final Player player, final Material material) {
-        for (ItemStack content : player.getInventory().getContents()) {
-            if (content != null && content.getType() == material) {
-                return content;
-            }
-        }
-        return null;
-    }
-
-    public static void upgradePlayerStack(final Player player, final ItemStack oldStack, final ItemStack newStack) {
-        final PlayerInventory inv = player.getInventory();
-        final ItemStack[] contents = inv.getContents();
-
-        for (int i = 0; i < contents.length; i++) {
-            final ItemStack content = contents[i];
-            if (content == null) continue;
-
-            if (content.isSimilar(oldStack)) {
-                inv.setItem(i, newStack);
-                return;
-            }
-        }
-
-        giveStackToPlayer(newStack, player, contents);
-    }
-
     public static boolean isArmor(final ItemStack stack) {
         final Material material = stack.getType();
         final boolean isHelmet = material.name().endsWith("_HELMET");
@@ -219,11 +189,10 @@ public final class GameUtils {
 
     /**
      * Generate a kill action bar.
-     * @param activeGame The ActiveGame that the player is playing in.
      * @param killed The BedwarsPlayer that has been killed.
      * @return The Packet for the ActionBar.
      */
-    public static PacketPlayOutChat killActionBar(ActiveGame activeGame, BedwarsPlayer killed) {
+    public static PacketPlayOutChat killActionBar(BedwarsPlayer killed) {
         final BedwarsTeam killedTeam = killed.getBedwarsTeam();
         final IChatBaseComponent iChatBaseComponent = new ChatMessage(color("&e⚔ You killed player &" + killedTeam.getColorCode() + killed.getName() + " &r&e⚔"));
         return new PacketPlayOutChat(iChatBaseComponent, (byte) 0x02);
@@ -231,13 +200,12 @@ public final class GameUtils {
 
     /**
      * Send the predefined action bar for Bedwars kills.
-     * @param activeGame The ActiveGame where the kill has happened.
      * @param killer The BedwarsPlayer who performed this kill.
      * @param killed The BedwarsPlayer who has been killed.
      */
-    public static void sendKillActionBar(ActiveGame activeGame, BedwarsPlayer killer, BedwarsPlayer killed) {
+    public static void sendKillActionBar(BedwarsPlayer killer, BedwarsPlayer killed) {
         final PlayerConnection conn = getPlayerConnection(killer.getPlayer());
-        conn.sendPacket(killActionBar(activeGame, killed));
+        conn.sendPacket(killActionBar(killed));
     }
 
     /**
@@ -246,32 +214,6 @@ public final class GameUtils {
      */
     public static void sendKillSound(BedwarsPlayer bedwarsPlayer) {
         bedwarsPlayer.playSound(Sound.NOTE_PLING, 9.0f, 0.805f);
-    }
-
-    /**
-     * Generate a death message when for a BedwarsPlayer that has not been killed by an entity.
-     * @param cause The DamageCause.
-     * @param dead The BedwarsPlayer that has did.
-     * @return The String associated with his kind of death.
-     */
-    @NotNull
-    public static String generateDeathMessage(EntityDamageEvent.DamageCause cause, BedwarsPlayer dead) {
-        final StringBuilder builder = new StringBuilder(color(String.format("&%c%s &7", dead.getBedwarsTeam().getColorCode(), dead.getName())));
-        switch (cause) {
-            case VOID:
-                builder.append("has &ointentionally&r&7 voided");
-                break;
-            case FALL:
-                builder.append("has fallen to death");
-                break;
-            case SUFFOCATION:
-                builder.append("forgot how to breathe");
-                break;
-            default:
-                builder.append("has died in a mysterious way");
-                break;
-        }
-        return builder.toString();
     }
 
     public static void giveStackToPlayer(final ItemStack itemStack, final Player player, final ItemStack[] contents) {
@@ -332,7 +274,7 @@ public final class GameUtils {
      *
      * @return any integer if found, -1 if no slots are found.
      */
-    public static int findFirstEmptySlot(final ItemStack contents[]) {
+    public static int findFirstEmptySlot(final ItemStack[] contents) {
         int empty = -1;
         for (int i = 0; i < contents.length; i++) {
             final ItemStack content = contents[i];
@@ -342,20 +284,6 @@ public final class GameUtils {
             }
         }
         return empty;
-    }
-
-    public static void clearAllEffects(final Player player) {
-        for (final PotionEffect potionEffect : player.getActivePotionEffects()) {
-            player.removePotionEffect(potionEffect.getType());
-        }
-    }
-
-    public static void clearArmor(final Player player) {
-        final PlayerInventory inv = player.getInventory();
-        inv.setHelmet(null);
-        inv.setChestplate(null);
-        inv.setLeggings(null);
-        inv.setBoots(null);
     }
 
     public static void decreaseItemInHand(final Player player) {
@@ -399,54 +327,6 @@ public final class GameUtils {
             }
         }
         return full;
-    }
-
-    public static <T> List<List<T>> splitByTwo(final List<T> t) {
-        final int groups = (int) Math.ceil(t.size() / 2.0);
-        final List<List<T>> lists = new ArrayList<>(groups);
-        for (int k = 0; k < t.size(); k++) {
-            final T e = t.get(k);
-            final List<T> temp = new ArrayList<>(2);
-            temp.add(e);
-            if (k != t.size() - 1) {
-                final T e2 = t.get(++k);
-                temp.add(e2);
-            }
-            lists.add(temp);
-        }
-        return lists;
-    }
-
-    public static <T> Collection<Collection<T>> redistributeEqually(final Collection<T> sample, final int groupSize) {
-
-        final int predictedGroups = (int) Math.ceil(sample.size() / (double) groupSize);
-        final Collection<Collection<T>> sampleGroups = new ArrayList<>(predictedGroups);
-
-        final Iterator<T> iterator = sample.iterator();
-
-        while (iterator.hasNext()) {
-            final Collection<T> temp = new ArrayList<>(groupSize);
-            int got = 0x00;
-            while (got < groupSize) {
-                if (iterator.hasNext()) {
-                    temp.add(iterator.next());
-                    got++;
-                } else {
-                    break;
-                }
-            }
-            sampleGroups.add(temp);
-        }
-
-        return sampleGroups;
-    }
-
-    public static void removeAllEffects(final Player p) {
-        for (final PotionEffectType type : PotionEffectType.values()) {
-            if (p.hasPotionEffect(type)) {
-                p.removePotionEffect(type);
-            }
-        }
     }
 
     public static AbstractActiveMerchant fromMerchant(final Merchant merchant, final ActiveGame activeGame) {
@@ -525,72 +405,6 @@ public final class GameUtils {
         player.playSound(player.getLocation(), Sound.ORB_PICKUP, 10.0f, 1.0f);
     }
 
-    public static void upgradeSound(final Player player) {
-        player.playSound(player.getLocation(), Sound.LEVEL_UP, 9.0f, 1.0f);
-    }
-
-    public static void printInventory(final Inventory inventory) {
-        System.out.println(inventory.getTitle());
-        final ItemStack[] contents = inventory.getContents();
-        for (int i = 0; i < contents.length; i++) {
-            final ItemStack s = contents[i];
-            if (s == null) continue;
-            System.out.println("Slot: " + i + " Type: " + s.getType().name());
-        }
-    }
-
-    public static void replaceIfPresent(final ItemStack toGive, final Material toReplace, final Player player) {
-        final ItemStack[] contents = player.getInventory().getContents();
-        for (int i = 0; i < contents.length; i++) {
-            final ItemStack stack = contents[i];
-            if (stack == null) continue;
-            if (stack.getType() == toReplace) {
-                player.getInventory().setItem(i, toGive);
-                break;
-            }
-        }
-
-        //giveStackToPlayer(toGive, player, contents);
-    }
-
-    public static String getUpgradeString(final String oreName) {
-        switch (oreName) {
-            case "WOOD":
-                return "IRON";
-            case "IRON":
-                return "DIAMOND";
-            default:
-                return null;
-        }
-    }
-
-    public static void upgradeTool(final String toolType, final Player player) {
-        final ItemStack[] contents = player.getInventory().getContents();
-        ItemStack foundTool = null;
-        int slot = -1;
-        for (int i = 0; i < contents.length; i++) {
-            ItemStack stack = contents[i];
-            if (stack == null) continue;
-            if (stack.getType().name().endsWith(toolType)) {
-                slot = i;
-                foundTool = stack;
-                break;
-            }
-        }
-
-        if (slot != -1) {
-            final String materialName = foundTool.getType().name();
-            final String[] strings = materialName.split("_");
-            final String nextToolLevel = getUpgradeString(strings[0]);
-            if (nextToolLevel == null) return;
-            final ItemStack newItem = new ItemStack(Material.valueOf(nextToolLevel + '_' + strings[1]), 1);
-            player.getInventory().setItem(slot, newItem);
-        } else {
-            giveStackToPlayer(new ItemStack(Material.valueOf("WOOD" + toolType), 1), player, contents);
-        }
-
-    }
-
     public static AbstractDeathmatch deathmatchFromGamemode(final Gamemode gamemode, final ActiveGame activeGame) {
         switch (gamemode) {
             case SOLO:
@@ -635,10 +449,6 @@ public final class GameUtils {
         applyEnchant(boots, enchant, level);
     }
 
-    public static boolean anyMatchMaterial(final Collection<ItemStack> stack, final Material material) {
-        return stack.stream().anyMatch(s -> s.getType() == material);
-    }
-
     public static ActiveGame from(final World world, final BedwarsGame game, final World lobbyWorld, final Plugin plugin) {
         return new ActiveGame(world, game, lobbyWorld, plugin);
     }
@@ -662,19 +472,6 @@ public final class GameUtils {
                     return;
                 }
             }
-        }
-    }
-
-    public static boolean pay(Player player, Inventory playerInventory, Material buyWith, int price, String successMsg, String failMsg) {
-        if (playerInventory.contains(buyWith, price)) {
-            GameUtils.payMaterial(buyWith, price, playerInventory);
-            GameUtils.paySound(player);
-            player.sendMessage(successMsg);
-            return true;
-        } else {
-            GameUtils.buyFailSound(player);
-            player.sendMessage(failMsg);
-            return false;
         }
     }
 

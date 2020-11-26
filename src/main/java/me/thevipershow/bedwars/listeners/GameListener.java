@@ -7,6 +7,7 @@ import java.util.Map;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.listeners.unregisterable.CompassUtilizeUnregisterableListener;
 import me.thevipershow.bedwars.listeners.unregisterable.ExplosionsUnregisterableListeners;
+import me.thevipershow.bedwars.listeners.unregisterable.NaturalMobSpawnPreventUnregisterableListener;
 import me.thevipershow.bedwars.listeners.unregisterable.UnregisterableListener;
 import me.thevipershow.bedwars.listeners.unregisterable.HungerLossListener;
 import me.thevipershow.bedwars.listeners.unregisterable.ItemDegradeListener;
@@ -51,6 +52,7 @@ public enum GameListener {
     SPECTATORS_INTERACT(SpectatorsInteractUnregisterableListeners.class, RegistrationStage.STARTUP),
     EXPLOSIONS(ExplosionsUnregisterableListeners.class, RegistrationStage.STARTUP),
     COMPASS(CompassUtilizeUnregisterableListener.class, RegistrationStage.STARTUP),
+    NATURAL_MOB_SPAWN_PREVENTION(NaturalMobSpawnPreventUnregisterableListener.class, RegistrationStage.STARTUP),
 
     HUNGER_LOSS(HungerLossListener.class, RegistrationStage.INITIALIZATION),
     QUEUE(LobbyUnregisterableListener.class, RegistrationStage.INITIALIZATION);

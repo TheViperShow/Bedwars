@@ -39,9 +39,9 @@ public class QueueResizerListener implements Listener {
         activeGame.getGameLobbyTicker().getAssociatedQueue().removeFromQueue(player);
 
         PlayerMapper playerMapper = activeGame.getPlayerMapper();
-        BedwarsPlayer bedwarsPlayer = Objects.requireNonNull(playerMapper.get(player));
-        ActiveGameEvent bedwarsPlayerQuitEvent = new BedwarsPlayerQuitEvent(activeGame, bedwarsPlayer);
+        BedwarsPlayer bedwarsPlayer = Objects.requireNonNull(playerMapper.get(player), "Player " + player.getName() + " did not have a BedwarsPlayer instance.");
 
+        ActiveGameEvent bedwarsPlayerQuitEvent = new BedwarsPlayerQuitEvent(activeGame, bedwarsPlayer);
         activeGame.callGameEvent(bedwarsPlayerQuitEvent);
 
         playerMapper.getMappings().remove(player.getUniqueId());

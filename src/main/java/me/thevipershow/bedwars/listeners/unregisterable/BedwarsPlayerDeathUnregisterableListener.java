@@ -214,7 +214,7 @@ public final class BedwarsPlayerDeathUnregisterableListener extends Unregisterab
 
         if (killerEntity != null && killer != null) { // Killer is a BedwarsPlayer
 
-            GameUtils.sendKillActionBar(this.activeGame, killer, killed); // sending a kill action bar to the killer
+            GameUtils.sendKillActionBar(killer, killed); // sending a kill action bar to the killer
             GameUtils.sendKillSound(killer);                              // sending a kill sound to the killer
 
             deathMessage.append(slainDeath(killer, killed));
@@ -224,7 +224,7 @@ public final class BedwarsPlayerDeathUnregisterableListener extends Unregisterab
             deathMessage.append(generateEntityDeathMessage(foundKiller, killed, killerEntity.getType()));
 
             if (foundKiller != null) {
-                GameUtils.sendKillActionBar(this.activeGame, killer, killed); // sending a kill action bar to the killer
+                GameUtils.sendKillActionBar(killer, killed); // sending a kill action bar to the killer
                 GameUtils.sendKillSound(killer);                              // sending a kill sound to the killer
             }
         } else { // killer is not an entity

@@ -31,7 +31,7 @@ public class Shop implements ConfigurationSerializable {
 
     @Override
     public Map<String, Object> serialize() {
-        return null; //TODO: im not going to write this.
+        throw new UnsupportedOperationException("no");
     }
 
     public static Shop deserialize(Map<String, Object> objectMap) {

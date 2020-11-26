@@ -174,6 +174,8 @@ public final class ActiveGame {
 
         setGameState(ActiveGameState.STARTED); // setting start time as now.
 
+        GameUtils.cleanAllEntities(this); // cleaning all entities.
+
         getListenersManager().disable(GameListener.QUEUE); // removing queue listener; not required.
         getListenersManager().enableAllByPhase(GameListener.RegistrationStage.STARTUP);
 

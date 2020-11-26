@@ -121,7 +121,7 @@ public final class GameInventoriesManager {
         int currentLevel = levels.get(upgradeItem);
         int levelToReach = 2 + currentLevel;
 
-        if (upgradeItem.getLevels().size() < 1 + levelToReach) { // TODO : FIX THIS
+        if (upgradeItem.getLevels().size() < 1 + levelToReach) {
             return;
         }
 
