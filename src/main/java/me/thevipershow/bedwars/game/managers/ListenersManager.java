@@ -7,16 +7,14 @@ import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.listeners.GameListener;
 import me.thevipershow.bedwars.listeners.unregisterable.UnregisterableListener;
 
-public final class ListenersManager {
+public final class ListenersManager extends AbstractGameManager{
 
-    private final ActiveGame activeGame;
+    public ListenersManager(ActiveGame activeGame) {
+        super(activeGame);
+    }
 
     private final Map<UnregisterableListener, Boolean> unregisterableListeners = new HashMap<>();
     private final Map<GameListener, UnregisterableListener> gameListenerMap = new EnumMap<>(GameListener.class);
-
-    public ListenersManager(ActiveGame activeGame) {
-        this.activeGame = activeGame;
-    }
 
     public final void enableAllByPhase(GameListener.RegistrationStage stage) {
         for (GameListener listener : GameListener.values()) {
@@ -40,16 +38,12 @@ public final class ListenersManager {
         for (GameListener listener : GameListener.values()) {
             if (this.gameListenerMap.containsKey(listener)) {
                 UnregisterableListener instance = this.gameListenerMap.get(listener);
-                if (instance != null && !instance.isUnregistered()) {
+                if (instance != null && !instance.isUnregistered() && listener.getRegistrationStage() == stage) {
                     instance.unregister();
                     this.gameListenerMap.remove(listener);
                 }
             }
         }
-    }
-
-    public final ActiveGame getActiveGame() {
-        return activeGame;
     }
 
     public final Map<UnregisterableListener, Boolean> getUnregisterableListeners() {

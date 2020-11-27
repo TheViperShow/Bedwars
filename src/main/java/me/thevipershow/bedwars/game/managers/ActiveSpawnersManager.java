@@ -17,18 +17,16 @@ import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.spawners.ActiveSpawner;
 import org.bukkit.scheduler.BukkitTask;
 
-public final class ActiveSpawnersManager {
-
-    public ActiveSpawnersManager(ActiveGame activeGame) {
-        this.activeGame = activeGame;
-    }
-
-    private final ActiveGame activeGame;
+public final class ActiveSpawnersManager extends AbstractGameManager {
 
     private final HashSet<ActiveSpawner> activeSpawners = new HashSet<>();
     private final HashSet<BukkitTask> announcementsTasks = new HashSet<>();
     private final HashSet<BukkitTask> emeraldBoostsTasks = new HashSet<>();
     private ActiveSpawner emeraldSampleSpawner, diamondSampleSpawner;
+
+    public ActiveSpawnersManager(ActiveGame activeGame) {
+        super(activeGame);
+    }
 
     public final void cancelAllSpawners() {
         this.activeSpawners.forEach(ActiveSpawner::despawn);
@@ -68,10 +66,6 @@ public final class ActiveSpawnersManager {
 
     public final void cancelAnnouncements() {
         announcementsTasks.forEach(BukkitTask::cancel);
-    }
-
-    public ActiveGame getActiveGame() {
-        return activeGame;
     }
 
     private final Map<BedwarsTeam, Collection<ActiveSpawner>> cachedTeamSpawners = new EnumMap<>(BedwarsTeam.class);

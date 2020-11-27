@@ -22,7 +22,6 @@ public final class TeamEliminationUnregisterableListener extends UnregisterableL
         if (!game.equals(this.activeGame)) {
             return;
         }
-        System.out.println("Team lost " + losers.name());
 
         TeamManager<?> teamManager = activeGame.getTeamManager();
         TeamData<?> teamData = teamManager.dataOfTeam(losers);

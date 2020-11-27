@@ -6,13 +6,11 @@ import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.data.game.BedwarsPlayer;
 import me.thevipershow.bedwars.game.data.teams.TeamData;
 
-public final class InvisibilityManager {
+public final class InvisibilityManager extends AbstractGameManager {
 
     public InvisibilityManager(ActiveGame activeGame) {
-        this.activeGame = activeGame;
+        super(activeGame);
     }
-
-    private final ActiveGame activeGame;
 
     public final void hidePlayer(BedwarsPlayer player) {
         for (TeamData<?> value : activeGame.getTeamManager().getDataMap().values()) {

@@ -7,12 +7,10 @@ import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.game.upgrades.traps.ActiveTrap;
 
-public final class TrapsManager {
-
-    private final ActiveGame activeGame;
+public final class TrapsManager extends AbstractGameManager {
 
     public TrapsManager(ActiveGame activeGame) {
-        this.activeGame = activeGame;
+        super(activeGame);
     }
 
     private final Map<BedwarsTeam, LinkedList<ActiveTrap>> activeTraps = new EnumMap<>(BedwarsTeam.class);

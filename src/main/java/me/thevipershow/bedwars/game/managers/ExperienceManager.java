@@ -12,9 +12,10 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
-public final class ExperienceManager {
+public final class ExperienceManager extends AbstractGameManager {
 
-    private final ActiveGame activeGame;
+
+
     private BukkitTask playtimeExperienceTask = null;
 
     public static final Map<Integer, Integer> requiredExpMap = new LinkedHashMap<>();
@@ -41,8 +42,8 @@ public final class ExperienceManager {
         }
     }
 
-    public ExperienceManager(@NotNull ActiveGame activeGame) {
-        this.activeGame = activeGame;
+    public ExperienceManager(ActiveGame activeGame) {
+        super(activeGame);
     }
 
     /**
@@ -166,13 +167,4 @@ public final class ExperienceManager {
         this.playtimeExperienceTask.cancel();
     }
 
-    /**
-     * Get the {@link ActiveGame} that this object
-     * has been instantiated from.
-     *
-     * @return The ActiveGame
-     */
-    public final ActiveGame getActiveGame() {
-        return activeGame;
-    }
 }

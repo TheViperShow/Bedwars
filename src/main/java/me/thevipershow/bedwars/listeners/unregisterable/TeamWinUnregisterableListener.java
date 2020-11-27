@@ -8,6 +8,7 @@ import me.thevipershow.bedwars.game.GameUtils;
 import me.thevipershow.bedwars.game.managers.QuestManager;
 import me.thevipershow.bedwars.game.data.teams.TeamData;
 import me.thevipershow.bedwars.game.managers.TeamManager;
+import me.thevipershow.bedwars.listeners.GameListener;
 import me.thevipershow.bedwars.storage.sql.tables.GlobalStatsTableUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
@@ -35,6 +36,7 @@ public final class TeamWinUnregisterableListener extends UnregisterableListener 
         super.activeGame.getKillTracker().announceTopThreeScores();
         this.makeTeamWinExp(winnerTeam);
         makeTeamIncreaseKillCount(winnerTeam);
+        activeGame.getListenersManager().enableAllByPhase(GameListener.RegistrationStage.END_GAME);
         this.stopGameLater();
     }
 

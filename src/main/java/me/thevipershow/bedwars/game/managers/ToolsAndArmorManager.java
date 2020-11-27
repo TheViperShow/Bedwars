@@ -12,12 +12,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 
-public final class ToolsAndArmorManager {
-
-    private final ActiveGame activeGame;
+public final class ToolsAndArmorManager extends AbstractGameManager {
 
     public ToolsAndArmorManager(ActiveGame activeGame) {
-        this.activeGame = activeGame;
+        super(activeGame);
     }
 
     /**

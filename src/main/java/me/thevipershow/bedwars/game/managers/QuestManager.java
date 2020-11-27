@@ -14,7 +14,7 @@ public final class QuestManager {
     private final ExperienceManager experienceManager;
     private final Plugin plugin;
 
-    public QuestManager(final ExperienceManager experienceManager) {
+    public QuestManager(ExperienceManager experienceManager) {
         this.experienceManager = experienceManager;
         this.plugin = experienceManager.getActiveGame().getPlugin();
     }

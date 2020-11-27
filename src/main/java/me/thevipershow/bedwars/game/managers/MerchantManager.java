@@ -11,13 +11,12 @@ import me.thevipershow.bedwars.game.upgrades.merchants.impl.ShopActiveMerchant;
 import me.thevipershow.bedwars.game.upgrades.merchants.impl.UpgradeActiveMerchant;
 import org.bukkit.entity.Villager;
 
-public final class MerchantManager {
+public final class MerchantManager extends AbstractGameManager {
 
     public MerchantManager(ActiveGame activeGame) {
-        this.activeGame = activeGame;
+        super(activeGame);
     }
 
-    private final ActiveGame activeGame;
     private final HashSet<AbstractActiveMerchant> activeMerchants = new HashSet<>();
 
     public final HashSet<AbstractActiveMerchant> getActiveMerchants() {
@@ -65,7 +64,4 @@ public final class MerchantManager {
         return null;
     }
 
-    public final ActiveGame getActiveGame() {
-        return activeGame;
-    }
 }

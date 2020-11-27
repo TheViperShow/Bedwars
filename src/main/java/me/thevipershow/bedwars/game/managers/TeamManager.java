@@ -19,13 +19,12 @@ import me.thevipershow.bedwars.game.data.teams.impl.MultiTeamData;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-public abstract class TeamManager<T> {
+public abstract class TeamManager<T> extends AbstractGameManager {
 
     public TeamManager(ActiveGame activeGame) {
-        this.activeGame = activeGame;
+        super(activeGame);
     }
 
-    private final ActiveGame activeGame;
     private final Map<BedwarsTeam, TeamData<T>> dataMap = new EnumMap<>(BedwarsTeam.class);
 
     public abstract void assignTeams();
@@ -158,10 +157,6 @@ public abstract class TeamManager<T> {
             }
         }
         return null;
-    }
-
-    public final ActiveGame getActiveGame() {
-        return activeGame;
     }
 
     public final Map<BedwarsTeam, TeamData<T>> getDataMap() {

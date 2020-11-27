@@ -1,5 +1,6 @@
 package me.thevipershow.bedwars.game;
 
+import com.sun.org.apache.xerces.internal.impl.dv.dtd.ENTITYDatatypeValidator;
 import java.util.Objects;
 import me.thevipershow.bedwars.bedwars.Gamemode;
 import me.thevipershow.bedwars.config.objects.BedwarsGame;
@@ -174,7 +175,7 @@ public final class ActiveGame {
 
         setGameState(ActiveGameState.STARTED); // setting start time as now.
 
-        GameUtils.cleanAllEntities(this); // cleaning all entities.
+       // GameUtils.cleanAllEntities(this); // cleaning all entities.
 
         getListenersManager().disable(GameListener.QUEUE); // removing queue listener; not required.
         getListenersManager().enableAllByPhase(GameListener.RegistrationStage.STARTUP);
@@ -241,6 +242,7 @@ public final class ActiveGame {
 
         getMovementsManager().moveAllSpawn();
 
+        getListenersManager().disableAllByPhase(GameListener.RegistrationStage.END_GAME);
         getListenersManager().disableAllByPhase(GameListener.RegistrationStage.STARTUP);
         getListenersManager().disableAllByPhase(GameListener.RegistrationStage.INITIALIZATION);
 

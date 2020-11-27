@@ -12,12 +12,10 @@ import me.tigerhix.lib.scoreboard.type.Scoreboard;
 import me.tigerhix.lib.scoreboard.type.ScoreboardHandler;
 import org.bukkit.scheduler.BukkitTask;
 
-public final class ScoreboardManager {
-
-    private final ActiveGame activeGame;
+public final class ScoreboardManager extends AbstractGameManager {
 
     public ScoreboardManager(ActiveGame activeGame) {
-        this.activeGame = activeGame;
+        super(activeGame);
         this.scoreboardHandler = new BedwarsScoreboardHandler(activeGame);
     }
 

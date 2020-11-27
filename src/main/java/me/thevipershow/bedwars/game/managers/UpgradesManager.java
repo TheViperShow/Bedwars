@@ -15,12 +15,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-public final class UpgradesManager {
-
-    private final ActiveGame activeGame;
+public final class UpgradesManager extends AbstractGameManager {
 
     public UpgradesManager(ActiveGame activeGame) {
-        this.activeGame = activeGame;
+        super(activeGame);
     }
 
     private void dragonBuffUpgrade(BedwarsPlayer bedwarsPlayer, TeamData<?> data) {

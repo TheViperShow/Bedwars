@@ -38,9 +38,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-public final class GameInventoriesManager {
+public final class GameInventoriesManager extends AbstractGameManager {
 
-    private final ActiveGame activeGame;
     private final EnderchestManager enderchestManager;
     private final Map<ShopCategory, Inventory> inventories = new EnumMap<>(ShopCategory.class);
     private final Map<UUID, Map<ShopCategory, Inventory>> playerShop = new HashMap<>();
@@ -51,7 +50,7 @@ public final class GameInventoriesManager {
     private final Inventory defaultTrapsInv;
 
     public GameInventoriesManager(ActiveGame activeGame) {
-        this.activeGame = activeGame;
+        super(activeGame);
         this.enderchestManager = new EnderchestManager();
         setupShopCategories(activeGame.getBedwarsGame().getShop());
         this.defaultTrapsInv = setupTrapsGUIs(activeGame.getBedwarsGame());

@@ -34,7 +34,7 @@ public final class LoggerUtils {
 
     public static void logColor(final Logger logger, String text) {
         for (ANSI ansi : ANSI.values()) {
-            text = text.replace("&" + Character.toString(ansi.colorCode), ansi.placeholder);
+            text = text.replace("&" + ansi.colorCode, ansi.placeholder);
         }
         logger.info(text + ANSI.RESET.placeholder);
     }

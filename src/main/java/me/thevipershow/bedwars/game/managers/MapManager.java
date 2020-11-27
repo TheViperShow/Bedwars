@@ -7,12 +7,10 @@ import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.worlds.WorldsManager;
 import org.apache.commons.io.FileUtils;
 
-public final class MapManager {
-
-    private final ActiveGame activeGame;
+public final class MapManager extends AbstractGameManager {
 
     public MapManager(ActiveGame activeGame) {
-        this.activeGame = activeGame;
+        super(activeGame);
     }
 
     public final void destroyMap() {

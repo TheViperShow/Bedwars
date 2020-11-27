@@ -7,6 +7,7 @@ import java.util.Map;
 import me.thevipershow.bedwars.game.ActiveGame;
 import me.thevipershow.bedwars.listeners.unregisterable.CompassUtilizeUnregisterableListener;
 import me.thevipershow.bedwars.listeners.unregisterable.ExplosionsUnregisterableListeners;
+import me.thevipershow.bedwars.listeners.unregisterable.GoodGamePointUnregisterableListener;
 import me.thevipershow.bedwars.listeners.unregisterable.NaturalMobSpawnPreventUnregisterableListener;
 import me.thevipershow.bedwars.listeners.unregisterable.UnregisterableListener;
 import me.thevipershow.bedwars.listeners.unregisterable.HungerLossListener;
@@ -30,9 +31,7 @@ import me.thevipershow.bedwars.listeners.unregisterable.UpgradeInteractUnregiste
 import me.thevipershow.bedwars.listeners.unregisterable.UpgradeMerchantUnregisterableListener;
 
 public enum GameListener {
-
     // The new listeners:,
-
     BED_DESTROY(BedDestroyUnregisterableListener.class, RegistrationStage.STARTUP),
     BEDWARS_PLAYER_DEATH(BedwarsPlayerDeathUnregisterableListener.class, RegistrationStage.STARTUP),
     DRAGON_REDIRECTOR(DragonRedirectorListener.class, RegistrationStage.STARTUP),
@@ -55,10 +54,12 @@ public enum GameListener {
     NATURAL_MOB_SPAWN_PREVENTION(NaturalMobSpawnPreventUnregisterableListener.class, RegistrationStage.STARTUP),
 
     HUNGER_LOSS(HungerLossListener.class, RegistrationStage.INITIALIZATION),
-    QUEUE(LobbyUnregisterableListener.class, RegistrationStage.INITIALIZATION);
+    QUEUE(LobbyUnregisterableListener.class, RegistrationStage.INITIALIZATION),
+
+    GOOD_GAME(GoodGamePointUnregisterableListener.class, RegistrationStage.END_GAME);
 
     public enum RegistrationStage {
-        INITIALIZATION, STARTUP
+        INITIALIZATION, STARTUP, END_GAME;
     }
 
     private final Class<? extends UnregisterableListener> ownClass;

@@ -17,12 +17,10 @@ import org.bukkit.entity.Item;
 import org.bukkit.material.Bed;
 import org.bukkit.plugin.Plugin;
 
-public final class BedManager {
-
-    private final ActiveGame activeGame;
+public final class BedManager extends AbstractGameManager {
 
     public BedManager(ActiveGame activeGame) {
-        this.activeGame = activeGame;
+        super(activeGame);
     }
 
     private static void breakBed(Block block, Plugin plugin) {

@@ -8,13 +8,11 @@ import me.thevipershow.bedwars.game.data.game.BedwarsPlayer;
 import me.thevipershow.bedwars.game.data.teams.TeamData;
 import org.bukkit.entity.Player;
 
-public final class MovementsManager {
+public final class MovementsManager extends AbstractGameManager {
 
     public MovementsManager(ActiveGame activeGame) {
-        this.activeGame = activeGame;
+        super(activeGame);
     }
-
-    private final ActiveGame activeGame;
 
     public final void moveAllSpawn() {
         for (BedwarsPlayer bedwarsPlayer : activeGame.getInternalGameManager().getPlayerMapper().getMappings().values()) {

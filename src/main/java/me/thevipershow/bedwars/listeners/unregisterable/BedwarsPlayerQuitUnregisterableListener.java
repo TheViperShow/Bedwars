@@ -29,6 +29,7 @@ public final class BedwarsPlayerQuitUnregisterableListener extends Unregisterabl
         }
 
         BedwarsPlayer quit = event.getBedwarsPlayer();
+        quit.getInventory().clear();
         announcePlayerQuit(quit);
     }
 }
