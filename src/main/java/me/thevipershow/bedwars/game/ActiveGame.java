@@ -117,6 +117,8 @@ public final class ActiveGame {
     public final void initialize() {
         setGameState(ActiveGameState.INITIALIZING); // setting game state to initializing.
 
+        GameUtils.cleanAllEntities(this); // cleaning non-player entities
+
         getListenersManager().enableAllByPhase(GameListener.RegistrationStage.INITIALIZATION); // registering map and movement protection.
         // other listeners are not required before start of game!
         getGameLobbyTicker().startTicking(); // starting to tick,
@@ -174,8 +176,6 @@ public final class ActiveGame {
         this.startTime = System.currentTimeMillis();
 
         setGameState(ActiveGameState.STARTED); // setting start time as now.
-
-       // GameUtils.cleanAllEntities(this); // cleaning all entities.
 
         getListenersManager().disable(GameListener.QUEUE); // removing queue listener; not required.
         getListenersManager().enableAllByPhase(GameListener.RegistrationStage.STARTUP);

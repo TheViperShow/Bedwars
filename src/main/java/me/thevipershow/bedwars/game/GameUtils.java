@@ -1,6 +1,5 @@
 package me.thevipershow.bedwars.game;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import me.thevipershow.bedwars.bedwars.Gamemode;
@@ -28,10 +27,10 @@ import me.thevipershow.bedwars.config.objects.upgradeshop.traps.BlindnessAndPois
 import me.thevipershow.bedwars.config.objects.upgradeshop.traps.CounterOffensiveTrap;
 import me.thevipershow.bedwars.config.objects.upgradeshop.traps.MinerFatigueTrap;
 import me.thevipershow.bedwars.game.data.Pair;
+import me.thevipershow.bedwars.game.data.game.BedwarsPlayer;
 import me.thevipershow.bedwars.game.deathmatch.AbstractDeathmatch;
 import me.thevipershow.bedwars.game.deathmatch.impl.SoloDeathmatch;
 import me.thevipershow.bedwars.game.deathmatch.impl.TeamDeathmatch;
-import me.thevipershow.bedwars.game.data.game.BedwarsPlayer;
 import me.thevipershow.bedwars.game.spawners.ActiveSpawner;
 import me.thevipershow.bedwars.game.upgrades.merchants.AbstractActiveMerchant;
 import me.thevipershow.bedwars.game.upgrades.merchants.impl.ShopActiveMerchant;
@@ -49,6 +48,7 @@ import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -57,10 +57,20 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.Plugin;
 
 public final class GameUtils {
-    public final static String NO_AI_TAG = "NoAi";
+
+    private final static String NO_AI_TAG = "NoAi";
 
     private GameUtils() {
         throw new UnsupportedOperationException();
+    }
+
+    public static void clearInventory(BedwarsPlayer bedwarsPlayer) {
+        PlayerInventory playerInventory = bedwarsPlayer.getInventory();
+        playerInventory.setHelmet(null);
+        playerInventory.setChestplate(null);
+        playerInventory.setLeggings(null);
+        playerInventory.setBoots(null);
+        playerInventory.clear();
     }
 
     public static void cleanAllEntities(ActiveGame activeGame) {
@@ -68,7 +78,11 @@ public final class GameUtils {
         if (world == null) {
             return;
         }
-        world.getEntities().forEach(Entity::remove);
+        for (Entity entity : world.getEntities()) {
+            if (entity.getType() != EntityType.PLAYER) {
+                entity.remove();
+            }
+        }
     }
 
     public static String capitalize(String str) {

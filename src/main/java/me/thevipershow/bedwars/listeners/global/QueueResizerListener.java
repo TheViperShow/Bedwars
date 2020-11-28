@@ -9,6 +9,7 @@ import me.thevipershow.bedwars.api.ActiveGameEvent;
 import me.thevipershow.bedwars.api.BedwarsPlayerQuitEvent;
 import me.thevipershow.bedwars.api.TeamEliminationEvent;
 import me.thevipershow.bedwars.game.ActiveGame;
+import me.thevipershow.bedwars.game.GameUtils;
 import me.thevipershow.bedwars.game.managers.GameManager;
 import me.thevipershow.bedwars.game.data.game.BedwarsPlayer;
 import me.thevipershow.bedwars.game.data.game.PlayerMapper;
@@ -44,6 +45,7 @@ public class QueueResizerListener implements Listener {
         ActiveGameEvent bedwarsPlayerQuitEvent = new BedwarsPlayerQuitEvent(activeGame, bedwarsPlayer);
         activeGame.callGameEvent(bedwarsPlayerQuitEvent);
 
+        GameUtils.clearInventory(bedwarsPlayer);
         playerMapper.getMappings().remove(player.getUniqueId());
         removeBedwarsPlayerData(activeGame, bedwarsPlayer);
     }

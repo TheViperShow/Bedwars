@@ -51,8 +51,8 @@ public enum GameListener {
     SPECTATORS_INTERACT(SpectatorsInteractUnregisterableListeners.class, RegistrationStage.STARTUP),
     EXPLOSIONS(ExplosionsUnregisterableListeners.class, RegistrationStage.STARTUP),
     COMPASS(CompassUtilizeUnregisterableListener.class, RegistrationStage.STARTUP),
-    NATURAL_MOB_SPAWN_PREVENTION(NaturalMobSpawnPreventUnregisterableListener.class, RegistrationStage.STARTUP),
 
+    NATURAL_MOB_SPAWN_PREVENTION(NaturalMobSpawnPreventUnregisterableListener.class, RegistrationStage.INITIALIZATION),
     HUNGER_LOSS(HungerLossListener.class, RegistrationStage.INITIALIZATION),
     QUEUE(LobbyUnregisterableListener.class, RegistrationStage.INITIALIZATION),
 

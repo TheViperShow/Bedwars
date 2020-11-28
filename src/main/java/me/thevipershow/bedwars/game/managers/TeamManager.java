@@ -11,12 +11,14 @@ import me.thevipershow.bedwars.bedwars.objects.BedwarsTeam;
 import me.thevipershow.bedwars.api.TeamEliminationEvent;
 import me.thevipershow.bedwars.api.TeamWinEvent;
 import me.thevipershow.bedwars.game.ActiveGame;
+import me.thevipershow.bedwars.game.GameUtils;
 import me.thevipershow.bedwars.game.data.game.BedwarsPlayer;
 import me.thevipershow.bedwars.game.data.game.enums.PlayerState;
 import me.thevipershow.bedwars.game.data.game.enums.TeamStatus;
 import me.thevipershow.bedwars.game.data.teams.TeamData;
 import me.thevipershow.bedwars.game.data.teams.impl.MultiTeamData;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.Plugin;
 
 public abstract class TeamManager<T> extends AbstractGameManager {
@@ -48,7 +50,7 @@ public abstract class TeamManager<T> extends AbstractGameManager {
      * Clean all inventories for teams.
      */
     public final void cleanAllInventories() {
-        this.performAll(bedwarsPlayer -> bedwarsPlayer.getInventory().clear());
+        this.performAll(GameUtils::clearInventory);
     }
 
     /**
