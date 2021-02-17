@@ -36,7 +36,7 @@ public final class FireballShootUnregisterableListener extends UnregisterableLis
         }
     }
 
-    @EventHandler(ignoreCancelled = false)
+    @EventHandler()
     public void onPlayerInteract(PlayerInteractEvent event) {
         final Player player = event.getPlayer();
         if (!player.getWorld().equals(activeGame.getCachedGameData().getGame())) {

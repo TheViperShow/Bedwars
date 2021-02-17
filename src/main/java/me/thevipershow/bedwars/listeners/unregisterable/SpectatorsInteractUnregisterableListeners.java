@@ -23,9 +23,6 @@ public final class SpectatorsInteractUnregisterableListeners extends Unregistera
     }
 
     private <T extends Event & Cancellable> void cancel(final Player player, final T cancellableEvent) {
-    //    if (activeGame.isOutOfGame(player) && activeGame.isHasStarted()) {
-    //        cancellableEvent.setCancelled(true);
-    //    }
         boolean sameWorld = activeGame.getCachedGameData().getGame().equals(player.getWorld());
         if (!sameWorld) return;
         BedwarsPlayer bedwarsPlayer = activeGame.getPlayerMapper().get(player);
@@ -71,7 +68,5 @@ public final class SpectatorsInteractUnregisterableListeners extends Unregistera
             cancel((Player) event.getDamager(), event);
         }
     }
-
-
 
 }
